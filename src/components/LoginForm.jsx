@@ -40,6 +40,10 @@ export function LoginForm({ onSuccess }) {
       } else {
         setMessage('Login successful!')
         setFormData({ email: '', password: '' })
+        
+        // Force a session refresh to ensure AuthContext updates
+        const { data: { session } } = await supabase.auth.getSession()
+        
         if (onSuccess) onSuccess()
       }
     } catch (error) {

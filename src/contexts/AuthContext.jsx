@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
+/**
+ * Authentication Context for Virgil
+ * Manages user authentication state using Supabase Auth
+ */
 const AuthContext = createContext({})
 
 export const useAuth = () => {
@@ -18,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session }, error } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       setLoading(false)
     }

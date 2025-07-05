@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext'
+import { RaccoonMascot } from './RaccoonMascot'
 
 export function Dashboard() {
   const { user, signOut } = useAuth()
@@ -19,6 +20,9 @@ export function Dashboard() {
           ⏻
         </button>
       </div>
+      
+      {/* Interactive Raccoon Mascot */}
+      <RaccoonMascot />
     </div>
   )
 }

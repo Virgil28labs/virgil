@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { SignUpForm } from './SignUpForm'
 import { LoginForm } from './LoginForm'
+import { RaccoonMascot } from './RaccoonMascot'
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
-
-  const toggleMode = () => {
-    setIsLogin(!isLogin)
-  }
 
   return (
     <div className="auth-page">
@@ -32,20 +29,24 @@ export function AuthPage() {
           </button>
         </div>
         
-        {isLogin ? <LoginForm /> : <SignUpForm />}
+        {isLogin ? (
+          <LoginForm />
+        ) : (
+          <SignUpForm />
+        )}
         
         <div className="auth-switch">
           {isLogin ? (
             <p>
               No account?{' '}
-              <button onClick={toggleMode} className="link-btn">
+              <button onClick={() => setIsLogin(false)} className="link-btn">
                 Sign up here
               </button>
             </p>
           ) : (
             <p>
               Have account?{' '}
-              <button onClick={toggleMode} className="link-btn">
+              <button onClick={() => setIsLogin(true)} className="link-btn">
                 Login here
               </button>
             </p>
@@ -53,6 +54,9 @@ export function AuthPage() {
         </div>
         </div>
       </div>
+      
+      {/* Interactive Raccoon Mascot */}
+      <RaccoonMascot />
     </div>
   )
 }
