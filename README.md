@@ -1,13 +1,16 @@
 # Virgil
 
-A minimalist authentication web application with elegant design and perfect user experience.
+A minimalist authentication web application with interactive mascot, location services, and elegant design.
 
 ## ✨ Features
 
-- **Ultra-minimalist Design**: Clean, dark purple aesthetic with perfect viewport centering
+- **Interactive Raccoon Mascot**: Physics-based character with collision detection, triple jump, wall sticking, and text interaction
+- **Location Services**: GPS coordinates and IP geolocation with street address display
 - **Secure Authentication**: Complete signup/login system powered by Supabase
+- **Dynamic UI Elements**: Animated power button with blue/pink states and responsive scaling
+- **Ultra-minimalist Design**: Clean, dark purple aesthetic with perfect viewport centering
+- **Brand Identity**: Two-tone "Virgil" logo with purple V and cohesive color palette
 - **Responsive**: Fluid typography and layout that works beautifully on all devices
-- **Brand Identity**: Custom Virgil flame logo and cohesive color palette
 
 ## 🎨 Design System
 
@@ -59,16 +62,22 @@ A minimalist authentication web application with elegant design and perfect user
 src/
 ├── components/         # React components
 │   ├── AuthPage.jsx   # Login/Signup toggle
-│   ├── Dashboard.jsx  # User dashboard
+│   ├── Dashboard.jsx  # User dashboard with mascot
 │   ├── LoginForm.jsx  # Login form
-│   └── SignUpForm.jsx # Registration form
+│   ├── SignUpForm.jsx # Registration form
+│   ├── RaccoonMascot.jsx # Interactive physics mascot
+│   └── VirgilLogo.jsx # Two-tone brand logo
 ├── contexts/
-│   └── AuthContext.jsx # Auth state management
-├── assets/brand/       # Brand assets
-│   ├── VirgilLogo.jsx # Logo component
-│   └── colors.js      # Brand colors
-└── lib/
-    └── supabase.js    # Supabase client
+│   ├── AuthContext.jsx    # Auth state management
+│   └── LocationContext.jsx # Location services
+├── lib/
+│   ├── supabase.js           # Supabase client
+│   ├── locationService.js    # GPS & IP geolocation
+│   ├── mapsService.js        # Google Maps integration
+│   └── textAlignmentUtils.js # Text collision detection
+└── assets/brand/       # Brand assets
+    ├── colors.js      # Brand color palette
+    └── index.js       # Brand exports
 ```
 
 ## 🎯 User Experience
@@ -76,7 +85,13 @@ src/
 ### Authentication Flow
 1. **Landing**: Clean auth page with login/signup toggle
 2. **Registration**: Name, email, password with validation
-3. **Dashboard**: Centered display of user info and subtle sign-out
+3. **Dashboard**: User info display with location data, interactive mascot, and animated power button
+
+### Interactive Features
+- **Raccoon Mascot**: Click to pick up, arrow keys to move, spacebar for triple jump
+- **Text Collision**: Mascot can land on and interact with all text elements
+- **Location Detection**: Automatic GPS and IP-based location services
+- **Dynamic UI**: Power button changes from blue to pink on hover
 
 ### Design Philosophy
 - **Mathematical centering** using CSS Grid

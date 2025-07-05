@@ -46,7 +46,7 @@ export function SignUpForm({ onSuccess }) {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
         options: {
@@ -63,7 +63,7 @@ export function SignUpForm({ onSuccess }) {
         setFormData({ name: '', email: '', password: '' })
         if (onSuccess) onSuccess()
       }
-    } catch (error) {
+    } catch {
       setMessage('Network error. Please try again.')
     } finally {
       setLoading(false)

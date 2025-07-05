@@ -184,7 +184,7 @@ html, body {
   margin-bottom: clamp(1rem, 3vh, 1.8rem);
   text-align: center;
   width: 100%;
-  max-width: clamp(250px, 70vw, 350px);
+  max-width: min(90vw, 600px);
 }
 
 /* Compact spacing for sign-up form with 3 fields */
@@ -198,6 +198,7 @@ html, body {
 
 .form-group input {
   width: 100%;
+  min-width: 280px;
   padding: clamp(0.5rem, 2vh, 1rem) 0;
   border: none;
   border-bottom: 1px solid var(--brand-accent-purple);
@@ -206,10 +207,10 @@ html, body {
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(1rem, 4vw, 1.25rem);
   font-weight: 400;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
   text-align: center;
   opacity: 0.8;
+  transition: border-color 0.3s ease, opacity 0.3s ease;
+  box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -253,8 +254,11 @@ html, body {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: clamp(1rem, 3vh, 2rem);
+  margin-left: auto;
+  margin-right: auto;
   opacity: 0.8;
   height: clamp(40px, 8vh, 55px);
+  display: block;
 }
 
 .signup-form button:hover:not(:disabled), 
@@ -298,23 +302,19 @@ html, body {
   height: 100vh;
   width: 100vw;
   background: var(--brand-dark-purple);
-  display: grid;
-  place-items: center;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
   margin: 0;
   overflow: hidden;
 }
 
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(1rem, 3vh, 2rem);
-  text-align: center;
-}
 
 .user-info {
   margin: 0;
+  text-align: center;
 }
 
 .user-info p {
@@ -354,6 +354,63 @@ html, body {
   opacity: 0.8;
 }
 
+.sign-out-fixed {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+  border: 2px solid #60a5fa;
+  border-radius: 50%;
+  font-size: clamp(0.7rem, 3vw, 1.3rem);
+  color: white;
+  opacity: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.15rem;
+  z-index: 1000;
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.8),
+    0 0 25px rgba(99, 102, 241, 0.6),
+    0 0 35px rgba(139, 92, 246, 0.4),
+    inset 0 1px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 4px rgba(99, 102, 241, 0.3);
+  animation: powerGlow 2s ease-in-out infinite alternate;
+}
+
+.sign-out-fixed:hover {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
+  color: white;
+  transform: scale(1.15);
+  border: 2px solid var(--brand-accent-pink);
+  box-shadow: 
+    0 0 20px rgba(239, 176, 194, 1),
+    0 0 30px rgba(244, 114, 182, 0.8),
+    0 0 45px rgba(236, 72, 153, 0.6),
+    inset 0 1px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 4px rgba(244, 114, 182, 0.4);
+}
+
+@keyframes powerGlow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(59, 130, 246, 0.8),
+      0 0 25px rgba(99, 102, 241, 0.6),
+      0 0 35px rgba(139, 92, 246, 0.4),
+      inset 0 1px 4px rgba(255, 255, 255, 0.3),
+      inset 0 -1px 4px rgba(99, 102, 241, 0.3);
+  }
+  100% {
+    box-shadow: 
+      0 0 20px rgba(59, 130, 246, 1),
+      0 0 30px rgba(99, 102, 241, 0.8),
+      0 0 45px rgba(139, 92, 246, 0.6),
+      inset 0 1px 4px rgba(255, 255, 255, 0.4),
+      inset 0 -1px 4px rgba(139, 92, 246, 0.4);
+  }
+}
+
+
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
   /* Auth Page Mobile */
@@ -384,6 +441,7 @@ html, body {
   /* Form Mobile */
   .form-group {
     margin-bottom: 1.5rem;
+    max-width: 95vw;
   }
   
   .signup-form button, .login-form button {
@@ -400,13 +458,7 @@ html, body {
   
   /* Dashboard Mobile */
   .dashboard {
-    height: 100vh;
-    width: 100vw;
-    padding: 0;
-  }
-  
-  .dashboard-content {
-    gap: clamp(0.8rem, 2vh, 1.5rem);
+    padding: 1rem;
   }
 }
 
@@ -427,6 +479,7 @@ html, body {
   
   .form-group input {
     font-size: 16px;
+    min-width: 250px;
   }
   
   .signup-form button, .login-form button {
@@ -435,8 +488,38 @@ html, body {
     font-size: 16px;
   }
   
-  .dashboard-content {
-    gap: clamp(0.5rem, 1.5vh, 1rem);
+}
+
+
+/* Virgil Logo */
+.virgil-logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  text-align: left;
+  line-height: 1;
+  user-select: none;
+  cursor: default;
+  position: fixed;
+  top: 1.5rem;
+  left: 2rem;
+  z-index: 1000;
+  display: flex;
+  align-items: baseline;
+}
+
+.virgil-v {
+  color: var(--brand-accent-purple);
+  font-weight: bold;
+}
+
+.virgil-text {
+  color: var(--brand-light-gray);
+}
+
+@media (max-width: 768px) {
+  .virgil-logo {
+    font-size: clamp(1.2rem, 3.5vw, 2rem);
   }
 }
 

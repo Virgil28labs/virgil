@@ -1,5 +1,6 @@
 import './App.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { LocationProvider } from './contexts/LocationContext'
 import { AuthPage } from './components/AuthPage'
 import { Dashboard } from './components/Dashboard'
 
@@ -21,9 +22,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <div className="app">
-        <AppContent />
-      </div>
+      <LocationProvider>
+        <div className="app">
+          <AppContent />
+        </div>
+      </LocationProvider>
     </AuthProvider>
   )
 }

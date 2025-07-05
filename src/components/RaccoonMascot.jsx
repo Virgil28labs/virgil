@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from '../contexts/LocationContext';
+import { calculateTextPosition, validateTextPosition, measureText, calculateVisualTextBounds } from '../lib/textAlignmentUtils';
 
 /**
  * 🦝 Interactive Raccoon Mascot Component for Virgil
@@ -14,6 +16,9 @@ import { useState, useEffect, useRef } from 'react';
  * - Brand-consistent purple color scheme
  */
 export function RaccoonMascot() {
+  // Location data for dynamic hit box updates
+  const { address, ipLocation, hasGPSLocation, hasIPLocation } = useLocation();
+  
   // Physics Constants
   const GROUND_Y = window.innerHeight - 100;
   const GRAVITY = 1.2;
@@ -41,7 +46,7 @@ export function RaccoonMascot() {
   const [velocity, setVelocity] = useState({ x: 0, y: 0 });
   const [jumpsUsed, setJumpsUsed] = useState(0);
   const [isOnWall, setIsOnWall] = useState(false);
-  const [wallSide, setWallSide] = useState(null);
+  const [, setWallSide] = useState(null);
   
   // Interaction State
   const [isPickedUp, setIsPickedUp] = useState(false);
@@ -54,7 +59,7 @@ export function RaccoonMascot() {
   const [bounceCount, setBounceCount] = useState(0);
   const [showSparkles, setShowSparkles] = useState(false);
   const [showGif, setShowGif] = useState(false);
-  const [currentMascot, setCurrentMascot] = useState(0);
+  const [, setCurrentMascot] = useState(0);
   
   // UI Element Interaction State
   const [uiElements, setUiElements] = useState([]);
@@ -77,9 +82,13 @@ export function RaccoonMascot() {
     
     // Target selectors for different UI elements
     const selectors = [
+      '.virgil-logo',         // Virgil "V" logo text
       '.user-name',           // "Ben" text
       '.user-email',          // Email text  
       '.user-created',        // Member since text
+      '.user-location',       // Location/street name (Purdue Avenue)
+      '.user-ip',            // IP address text
+      '.sign-out-fixed',      // Fixed power button
       '.sign-out-icon',       // Power button
       '.auth-page header h1', // "Virgil" header on auth page
       '.auth-toggle button',  // Login/Sign Up buttons
@@ -100,53 +109,27 @@ export function RaccoonMascot() {
           let adjustedY = rect.top;
           let textBaseline = rect.top;
           
-          if (selector === '.user-name' || selector === '.user-email' || selector === '.user-created' || selector === '.auth-page header h1') {
-            // Get precise text measurements
+          if (selector === '.virgil-logo' || selector === '.user-name' || selector === '.user-email' || selector === '.user-created' || selector === '.user-location' || selector === '.user-ip' || selector === '.auth-page header h1') {
+            // Get precise text measurements using utility
             const computedStyle = window.getComputedStyle(element);
-            const fontSize = parseFloat(computedStyle.fontSize);
             const textContent = (element.textContent || element.innerText).trim();
+            const fontSize = parseFloat(computedStyle.fontSize);
             
-            // Create canvas for precise text measurement
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = `${computedStyle.fontWeight} ${fontSize}px ${computedStyle.fontFamily}`;
+            // Measure text dimensions
+            const textMeasurement = measureText(textContent, computedStyle);
+            const textWidth = textMeasurement.width;
             
-            // Get text metrics
-            const metrics = context.measureText(textContent);
-            const textWidth = metrics.width;
+            // Calculate text position based on alignment
+            const calculatedX = calculateTextPosition(rect, textWidth, computedStyle);
+            adjustedX = validateTextPosition(calculatedX, textWidth, rect);
             
-            // Calculate actual text bounds
-            // Text baseline is typically at 0.8 * fontSize from top
-            const textHeight = fontSize;
-            const baselineOffset = fontSize * 0.2; // Approximate top padding above characters
+            // Calculate visual text bounds
+            const visualBounds = calculateVisualTextBounds(rect, fontSize);
+            adjustedY = visualBounds.top;
+            textBaseline = visualBounds.baseline;
             
-            // Get element's text alignment
-            const textAlign = computedStyle.textAlign;
-            
-            // Calculate precise X position based on text alignment
-            if (textAlign === 'center' || element.style.textAlign === 'center') {
-              adjustedX = rect.left + (rect.width - textWidth) / 2;
-            } else if (textAlign === 'right') {
-              adjustedX = rect.right - textWidth;
-            } else {
-              adjustedX = rect.left;
-            }
-            
-            // Calculate visual top of text (where characters actually start)
-            // Most text sits at the vertical center of its container
-            const visualTextTop = rect.top + ((rect.height - fontSize) / 2);
-            adjustedY = visualTextTop;
-            textBaseline = visualTextTop + (fontSize * 0.8); // Baseline is typically 80% down from top
-            
-            // Set precise width with NO padding for exact text bounds
-            adjustedWidth = textWidth; // Exact text width, no padding
-            
-            // Ensure X position is centered if needed
-            if (selector === '.user-name') {
-              // For centered text, ensure collision box is centered
-              const containerCenter = rect.left + (rect.width / 2);
-              adjustedX = containerCenter - (adjustedWidth / 2);
-            }
+            // Set precise width with no padding for exact text bounds
+            adjustedWidth = textWidth;
           }
           
           elements.push({
@@ -184,7 +167,7 @@ export function RaccoonMascot() {
         const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
         audio.volume = 0.3;
         audio.play().catch(() => {}); // Ignore errors if audio fails
-      } catch (e) {
+      } catch {
         // Audio not supported, continue silently
       }
 
@@ -274,7 +257,7 @@ export function RaccoonMascot() {
       window.removeEventListener('resize', updateUIElements);
       clearInterval(interval);
     };
-  }, []);
+  }, [address, ipLocation, hasGPSLocation, hasIPLocation]);
 
   // Cycle through mascots every 10 seconds
   useEffect(() => {
@@ -341,11 +324,26 @@ export function RaccoonMascot() {
         
         // UI Element Collision Detection
         let landedOnUI = false;
-        let currentElement = null;
+        // let currentElement = null;
         
         for (const uiElement of uiElements) {
           const raccoonRight = x + 80;
           const raccoonBottom = y + 80;
+          const raccoonTop = y;
+          
+          // Check for ceiling collision (jumping into bottom of element)
+          if (
+            raccoonRight > uiElement.x && 
+            x < uiElement.right &&
+            raccoonTop < uiElement.bottom &&
+            raccoonBottom > uiElement.bottom &&
+            vy < 0 // Moving upward
+          ) {
+            // Hit ceiling - stop upward movement
+            y = uiElement.bottom;
+            vy = 0;
+            continue; // Skip other collision checks for this element
+          }
           
           // Check if raccoon is landing on top of UI element
           if (
@@ -390,7 +388,6 @@ export function RaccoonMascot() {
                 }
               }
               
-              currentElement = uiElement;
               break;
             } else {
               // Side collision - bounce off

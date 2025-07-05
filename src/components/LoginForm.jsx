@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+/**
+ * Login form component with automatic email remembering
+ * Saves email to localStorage on successful login for convenience
+ */
 export function LoginForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     email: '',
@@ -8,6 +12,14 @@ export function LoginForm({ onSuccess }) {
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+
+  // Load saved email on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('virgil_email')
+    if (savedEmail) {
+      setFormData(prev => ({ ...prev, email: savedEmail }))
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -30,7 +42,7 @@ export function LoginForm({ onSuccess }) {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: formData.email.trim().toLowerCase(),
         password: formData.password
       })
@@ -39,14 +51,19 @@ export function LoginForm({ onSuccess }) {
         setMessage(error.message)
       } else {
         setMessage('Login successful!')
-        setFormData({ email: '', password: '' })
+        
+        // Save email for next time
+        localStorage.setItem('virgil_email', formData.email.trim().toLowerCase())
+        
+        // Clear only password, keep email
+        setFormData(prev => ({ ...prev, password: '' }))
         
         // Force a session refresh to ensure AuthContext updates
-        const { data: { session } } = await supabase.auth.getSession()
+        await supabase.auth.getSession()
         
         if (onSuccess) onSuccess()
       }
-    } catch (error) {
+    } catch {
       setMessage('Network error. Please try again.')
     } finally {
       setLoading(false)
