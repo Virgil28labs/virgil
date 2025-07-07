@@ -1,4 +1,6 @@
 import { useState, useEffect, memo, useCallback, MouseEvent } from 'react'
+import { SkeletonLoader } from './SkeletonLoader'
+import { dedupeFetch } from '../lib/requestDeduplication'
 
 const DOG_API = 'https://dog.ceo/api'
 const DOG_DOCS = 'https://dog.ceo/dog-api/'
@@ -33,7 +35,7 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${DOG_API}/breeds/list/all`)
+      const res = await dedupeFetch(`${DOG_API}/breeds/list/all`)
       if (!res.ok) throw new Error('Failed to fetch breeds')
       const data: any = await res.json()
       const breedList = Object.keys(data.message)
@@ -52,7 +54,7 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
     let url = `${DOG_API}/breeds/image/random`
     if (breed) url = `${DOG_API}/breed/${breed}/images/random`
     try {
-      const res = await fetch(url)
+      const res = await dedupeFetch(url)
       if (!res.ok) throw new Error('Failed to fetch dog image')
       const data: any = await res.json()
       setDogUrl(data.message)
@@ -70,7 +72,7 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
     setGalleryLoading(true)
     setGalleryError(null)
     try {
-      const res = await fetch(`${DOG_API}/breed/${breed}/images/random/8`)
+      const res = await dedupeFetch(`${DOG_API}/breed/${breed}/images/random/8`)
       if (!res.ok) throw new Error('Failed to fetch gallery')
       const data: any = await res.json()
       setGallery(data.message)
@@ -90,7 +92,7 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
     }
     const fetchSubBreeds = async (): Promise<void> => {
       try {
-        const res = await fetch(`${DOG_API}/breed/${selectedBreed}/list`)
+        const res = await dedupeFetch(`${DOG_API}/breed/${selectedBreed}/list`)
         if (!res.ok) throw new Error()
         const data: any = await res.json()
         setSubBreeds(data.message)
@@ -130,15 +132,17 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
         aria-label="Show me a dog!"
         onClick={handleClick}
         style={{
-          fontSize: '2.2rem',
+          fontSize: '1.4rem',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
           position: 'fixed',
-          bottom: '2.2rem',
-          left: '2.2rem',
+          top: '4.5rem',
+          right: '2rem',
           zIndex: 1000,
-          filter: 'drop-shadow(0 2px 8px #0002)'
+          opacity: 0.6,
+          transition: 'opacity 0.2s',
+          filter: 'drop-shadow(0 1px 4px #0001)'
         }}
         title="Click for a random dog!"
       >
@@ -221,7 +225,7 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
             </div>
             {/* Main Dog Image */}
             <div style={{marginBottom: '1.5rem', minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%'}}>
-              {loading && <p style={{color: SECONDARY}}>Loading...</p>}
+              {loading && <SkeletonLoader width="260px" height="220px" borderRadius="1.2rem" />}
               {error && <p style={{color: '#efb0c2'}}>{error}</p>}
               {dogUrl && (
                 <img
@@ -248,7 +252,13 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
             {/* Gallery */}
             <div style={{width: '100%', marginBottom: '1.7rem'}}>
               <div style={{fontWeight: 600, marginBottom: 8, color: SECONDARY, fontSize: '1.08rem'}}>Gallery:</div>
-              {galleryLoading && <p style={{color: SECONDARY}}>Loading gallery...</p>}
+              {galleryLoading && (
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 12}}>
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <SkeletonLoader key={i} width="110px" height="110px" borderRadius="10px" />
+                  ))}
+                </div>
+              )}
               {galleryError && <p style={{color: '#efb0c2'}}>{galleryError}</p>}
               <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 12}}>
                 {gallery.map((img, i) => (
