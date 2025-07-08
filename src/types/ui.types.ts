@@ -3,9 +3,11 @@
  * Common UI patterns and component props
  */
 
+import { type ReactNode } from 'react'
+
 export interface BaseComponentProps {
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
   id?: string;
 }
 
@@ -40,7 +42,7 @@ export interface FormFieldProps {
 }
 
 export interface ButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
@@ -55,7 +57,7 @@ export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   size?: 'small' | 'medium' | 'large';
   closeOnOverlayClick?: boolean;
 }
@@ -74,7 +76,7 @@ export interface DropdownProps {
 
 export interface TooltipProps {
   content: string;
-  children: React.ReactNode;
+  children: ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   delay?: number;
 }
@@ -91,5 +93,5 @@ export interface LogoProps {
 
 export interface SkipLinkProps {
   href: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }

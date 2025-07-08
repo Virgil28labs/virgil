@@ -18,14 +18,45 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          supabase: ['@supabase/supabase-js']
+        manualChunks: (id) => {
+          // Core React dependencies
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'react-vendor';
+          }
+          
+          // Supabase dependencies
+          if (id.includes('@supabase/supabase-js')) {
+            return 'supabase';
+          }
+          
+          // Large components for lazy loading
+          if (id.includes('RaccoonMascot')) {
+            return 'mascot';
+          }
+          
+          if (id.includes('VirgilChatbot')) {
+            return 'chatbot';
+          }
+          
+          // Services and utilities
+          if (id.includes('services/llm') || id.includes('lib/locationService') || id.includes('lib/mapsService')) {
+            return 'services';
+          }
+          
+          // Other node_modules
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
+      },
+      treeshake: {
+        moduleSideEffects: false
       }
     },
-    sourcemap: process.env.NODE_ENV !== 'production', // Disable sourcemaps in production for security
-    minify: 'esbuild'
+    sourcemap: process.env.NODE_ENV !== 'production',
+    minify: 'esbuild',
+    target: 'es2020',
+    cssMinify: true
   },
   optimizeDeps: {
     include: ['react', 'react-dom', '@supabase/supabase-js']

@@ -1,3 +1,5 @@
+import { dedupeFetch } from './requestDeduplication';
+
 interface IPResponse {
   ip: string;
 }
@@ -5,7 +7,7 @@ interface IPResponse {
 export const ipService = {
   async getIP(): Promise<string> {
     try {
-      const response = await fetch('https://api.ipify.org?format=json');
+      const response = await dedupeFetch('https://api.ipify.org?format=json');
       if (!response.ok) {
         throw new Error('Failed to fetch IP address');
       }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { locationService } from '../lib/locationService'
 import type { 
   LocationContextType, 
@@ -87,7 +87,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
       const locationData = await locationService.getFullLocationData()
       dispatch({ type: 'SET_LOCATION_DATA', payload: locationData })
     } catch (error: any) {
-      console.error('Location fetch error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Location fetch error:', error)
+      }
       dispatch({ type: 'SET_ERROR', payload: error.message })
     }
   }, [state.loading, state.lastUpdated])
@@ -106,7 +108,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
         dispatch({ type: 'SET_PERMISSION_STATUS', payload: permission.state })
       }
     } catch (error: any) {
-      console.warn('Could not check location permission:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not check location permission:', error)
+      }
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'unavailable' })
     }
   }
@@ -141,7 +145,39 @@ export function LocationProvider({ children }: LocationProviderProps) {
     }
   }, [state.permissionStatus, fetchLocationData])
 
-  const value: LocationContextType = {
+  // Optimized debug logging (performance optimization)
+  useEffect(() => {
+    // Only log in development and throttle logs to prevent performance impact
+    if (process.env.NODE_ENV === 'development' && state.lastUpdated) {
+      const logData = {
+        coordinates: !!state.coordinates,
+        address: !!state.address,
+        ipLocation: !!state.ipLocation,
+        loading: state.loading,
+        error: !!state.error,
+        permissionStatus: state.permissionStatus
+      };
+      
+      // Throttle logging to prevent spam
+      const lastLog = sessionStorage.getItem('last-location-log');
+      const now = Date.now();
+      if (!lastLog || now - parseInt(lastLog) > 2000) {
+        console.log('📍 [LocationContext] State update:', logData);
+        sessionStorage.setItem('last-location-log', now.toString());
+        
+        if (state.coordinates) {
+          console.log('📍 [LocationContext] GPS:', {
+            lat: state.coordinates.latitude.toFixed(6),
+            lon: state.coordinates.longitude.toFixed(6),
+            accuracy: Math.round(state.coordinates.accuracy)
+          });
+        }
+      }
+    }
+  }, [state.lastUpdated, state.coordinates, state.error, state.loading]);
+
+  // Memoized context value to prevent unnecessary re-renders (performance optimization)
+  const value: LocationContextType = useMemo(() => ({
     ...state,
     fetchLocationData,
     requestLocationPermission,
@@ -149,7 +185,12 @@ export function LocationProvider({ children }: LocationProviderProps) {
     hasLocation: !!state.coordinates,
     hasGPSLocation: !!state.coordinates,
     hasIPLocation: !!state.ipLocation
-  }
+  }), [
+    state, 
+    fetchLocationData, 
+    requestLocationPermission, 
+    clearError
+  ])
 
   return (
     <LocationContext.Provider value={value}>

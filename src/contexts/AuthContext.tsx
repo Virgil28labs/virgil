@@ -31,7 +31,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const { data: { session } } = await supabase.auth.getSession()
         setUser(session?.user ?? null)
       } catch (error: any) {
-        console.error('Auth session error:', error)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Auth session error:', error)
+        }
         setUser(null)
       } finally {
         setLoading(false)

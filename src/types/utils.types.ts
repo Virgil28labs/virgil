@@ -3,6 +3,8 @@
  * General purpose types and helpers
  */
 
+import type { FormEvent } from 'react'
+
 // React Hook Types
 export interface UseAsyncResult<T> {
   data: T | null;
@@ -21,7 +23,7 @@ export interface UseLocalStorageResult<T> {
 export type EventHandler<T = Event> = (event: T) => void;
 export type ChangeHandler = (value: string) => void;
 export type ClickHandler = () => void;
-export type SubmitHandler = (event: React.FormEvent) => void;
+export type SubmitHandler = (event: FormEvent) => void;
 
 // Common Utility Types
 export type Nullable<T> = T | null;

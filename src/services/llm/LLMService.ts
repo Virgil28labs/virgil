@@ -141,7 +141,7 @@ export class LLMService extends EventEmitter {
             try {
               const parsed = JSON.parse(data);
               yield parsed;
-            } catch (e) {
+            } catch (_e) {
               // Skip invalid JSON
             }
           }
@@ -257,7 +257,7 @@ export class LLMService extends EventEmitter {
       
       const data = await response.json();
       return data.data?.tokenCount || 0;
-    } catch (error) {
+    } catch (_error) {
       // Fallback to estimation
       return Math.ceil(text.length / 4);
     }

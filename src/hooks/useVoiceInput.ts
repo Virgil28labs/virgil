@@ -132,7 +132,7 @@ export function useVoiceInput(options: VoiceInputOptions = {}): UseVoiceInputRet
       setError(null);
       recognitionRef.current?.start();
       return true;
-    } catch (err: any) {
+    } catch (_err: any) {
       const errorMsg = 'Failed to start speech recognition';
       setError(errorMsg);
       return false;

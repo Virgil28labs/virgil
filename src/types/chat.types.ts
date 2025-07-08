@@ -70,3 +70,32 @@ export interface ChatError {
   code?: string;
   recoverable?: boolean;
 }
+
+export interface SearchResult {
+  title: string;
+  url: string;
+  content: string;
+  published_date?: string;
+  score?: number;
+}
+
+export interface SearchResponse {
+  success: boolean;
+  query: string;
+  answer?: string;
+  results: SearchResult[];
+  total_results: number;
+  timestamp: string;
+}
+
+export interface SearchRequest {
+  query: string;
+  max_results?: number;
+  include_domains?: string[];
+  exclude_domains?: string[];
+}
+
+export interface ChatMessageWithSearch extends ChatMessage {
+  searchResults?: SearchResult[];
+  searchQuery?: string;
+}

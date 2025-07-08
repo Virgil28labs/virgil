@@ -7,3 +7,4 @@ export * from './chat.types';
 export * from './ui.types';
 export * from './api.types';
 export * from './utils.types';
+export * from './weather.types';

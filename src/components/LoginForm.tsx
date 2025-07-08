@@ -1,5 +1,6 @@
 import { useState, useEffect, memo, FormEvent, ChangeEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { useFocusManagement } from '../hooks/useFocusManagement'
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -21,6 +22,12 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
   })
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
+
+  // Focus management for login form
+  const { containerRef } = useFocusManagement(true, {
+    autoFocus: true,
+    initialFocusSelector: 'input[type="email"]'
+  });
 
   // Load saved email on component mount
   useEffect(() => {
@@ -80,8 +87,8 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
   }
 
   return (
-    <div className="login-form">
-      <h2>Login</h2>
+    <div ref={containerRef} className="login-form" role="form" aria-labelledby="login-title">
+      <h2 id="login-title">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email:</label>

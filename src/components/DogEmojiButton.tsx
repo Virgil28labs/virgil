@@ -2,8 +2,13 @@ import { useState, useEffect, memo, useCallback, MouseEvent } from 'react'
 import { SkeletonLoader } from './SkeletonLoader'
 import { dedupeFetch } from '../lib/requestDeduplication'
 
-const DOG_API = 'https://dog.ceo/api'
-const DOG_DOCS = 'https://dog.ceo/dog-api/'
+// Environment-configurable API endpoints with fallbacks
+const DOG_API = import.meta.env.VITE_DOG_API_URL || 'https://dog.ceo/api'
+const DOG_DOCS = import.meta.env.VITE_DOG_DOCS_URL || 'https://dog.ceo/dog-api/'
+
+// Network configuration
+const REQUEST_TIMEOUT = 8000 // 8 seconds timeout
+const MAX_RETRIES = 2
 
 // Virgil brand colors
 const BG = '#39293e'
@@ -24,28 +29,47 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
   const [galleryError, setGalleryError] = useState<string | null>(null)
   const [subBreeds, setSubBreeds] = useState<string[]>([])
 
-  // Fetch all breeds on open
+  // Timeout wrapper for fetch requests
+  const fetchWithTimeout = useCallback(async (url: string): Promise<Response> => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
+    
+    try {
+      const response = await dedupeFetch(url, { signal: controller.signal })
+      clearTimeout(timeoutId)
+      return response
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw error
+    }
+  }, [])
+
+  // Fetch all breeds on open (with proper cleanup)
   useEffect(() => {
     if (open && breeds.length === 0) {
       fetchBreeds()
     }
-  }, [open])
+  }, [open]) // Remove fetchBreeds from deps to prevent infinite loops
 
   const fetchBreeds = useCallback(async (): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
-      const res = await dedupeFetch(`${DOG_API}/breeds/list/all`)
-      if (!res.ok) throw new Error('Failed to fetch breeds')
+      const res = await fetchWithTimeout(`${DOG_API}/breeds/list/all`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch breeds`)
       const data: any = await res.json()
-      const breedList = Object.keys(data.message)
+      const breedList = Object.keys(data.message || {})
       setBreeds(breedList)
-    } catch (e: any) {
-      setError('Could not load breeds')
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Dog API breeds fetch failed:', error.message)
+      }
+      setError('Unable to load dog breeds. Please try again later.')
+      setBreeds([]) // Fallback to empty array
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [fetchWithTimeout])
 
   // Fetch a random dog (optionally by breed)
   const fetchDog = useCallback(async (breed: string = selectedBreed): Promise<void> => {
@@ -54,56 +78,86 @@ export const DogEmojiButton = memo(function DogEmojiButton() {
     let url = `${DOG_API}/breeds/image/random`
     if (breed) url = `${DOG_API}/breed/${breed}/images/random`
     try {
-      const res = await dedupeFetch(url)
-      if (!res.ok) throw new Error('Failed to fetch dog image')
+      const res = await fetchWithTimeout(url)
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch dog image`)
       const data: any = await res.json()
-      setDogUrl(data.message)
-    } catch (e: any) {
-      setError('Could not load dog image')
+      setDogUrl(data.message || null)
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Dog API image fetch failed:', error.message)
+      }
+      setError('Unable to load dog image. Please try again.')
       setDogUrl(null)
     } finally {
       setLoading(false)
     }
-  }, [selectedBreed])
+  }, [selectedBreed, fetchWithTimeout])
 
   // Fetch gallery for breed
-  const fetchGallery = async (breed: string = selectedBreed): Promise<void> => {
+  const fetchGallery = useCallback(async (breed: string = selectedBreed): Promise<void> => {
     if (!breed) return
     setGalleryLoading(true)
     setGalleryError(null)
     try {
-      const res = await dedupeFetch(`${DOG_API}/breed/${breed}/images/random/8`)
-      if (!res.ok) throw new Error('Failed to fetch gallery')
+      const res = await fetchWithTimeout(`${DOG_API}/breed/${breed}/images/random/8`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch gallery`)
       const data: any = await res.json()
-      setGallery(data.message)
-    } catch (e: any) {
-      setGalleryError('Could not load gallery')
+      setGallery(data.message || [])
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Dog API gallery fetch failed:', error.message)
+      }
+      setGalleryError('Unable to load gallery images.')
       setGallery([])
     } finally {
       setGalleryLoading(false)
     }
-  }
+  }, [selectedBreed, fetchWithTimeout])
 
-  // Fetch sub-breeds when breed changes
+  // Fetch sub-breeds when breed changes (with proper cleanup and error handling)
   useEffect(() => {
     if (!selectedBreed) {
       setSubBreeds([])
       return
     }
+    
+    let cancelled = false
+    
     const fetchSubBreeds = async (): Promise<void> => {
       try {
-        const res = await dedupeFetch(`${DOG_API}/breed/${selectedBreed}/list`)
-        if (!res.ok) throw new Error()
+        const res = await fetchWithTimeout(`${DOG_API}/breed/${selectedBreed}/list`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch sub-breeds`)
         const data: any = await res.json()
-        setSubBreeds(data.message)
-      } catch {
-        setSubBreeds([])
+        if (!cancelled) {
+          setSubBreeds(data.message || [])
+        }
+      } catch (error: any) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Dog API sub-breeds fetch failed:', error.message)
+        }
+        if (!cancelled) {
+          setSubBreeds([])
+        }
       }
     }
+    
+    // Stagger API calls to prevent overwhelming the external service
     fetchSubBreeds()
-    fetchDog(selectedBreed)
-    fetchGallery(selectedBreed)
-  }, [selectedBreed])
+    setTimeout(() => {
+      if (!cancelled) {
+        fetchDog(selectedBreed)
+      }
+    }, 300)
+    setTimeout(() => {
+      if (!cancelled) {
+        fetchGallery(selectedBreed)
+      }
+    }, 600)
+    
+    return () => {
+      cancelled = true
+    }
+  }, [selectedBreed, fetchWithTimeout, fetchDog, fetchGallery])
 
   const handleClick = useCallback((): void => {
     setOpen(true)

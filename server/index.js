@@ -43,12 +43,16 @@ const llmRoutes = require('./routes/llm');
 const healthRoutes = require('./routes/health');
 const analyticsRoutes = require('./routes/analytics');
 const chatRoutes = require('./routes/chat');
+const weatherRoutes = require('./routes/weather');
+const searchRoutes = require('./routes/search');
 
 // Mount routes
 app.use('/api/v1/llm', llmRoutes);
 app.use('/api/v1/health', healthRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/search', searchRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -88,6 +92,10 @@ const server = app.listen(PORT, () => {
   console.log(`  POST /api/v1/chat - Secure chat endpoint`);
   console.log(`  GET /api/v1/health - Health check`);
   console.log(`  POST /api/v1/analytics/track - Analytics tracking`);
+  console.log(`  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates`);
+  console.log(`  GET /api/v1/weather/city/:city - Weather by city`);
+  console.log(`  POST /api/v1/search - Web search endpoint`);
+  console.log(`  GET /api/v1/search/health - Search service health check`);
 });
 
 // Graceful shutdown

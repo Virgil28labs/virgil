@@ -92,31 +92,84 @@ export function validateTextPosition(
   }
 }
 
+// Global canvas instance for text measurements (performance optimization)
+let globalCanvas: HTMLCanvasElement | null = null;
+let globalContext: CanvasRenderingContext2D | null = null;
+
+// LRU cache for text measurements
+const textMeasurementCache = new Map<string, TextMeasurement>();
+const MAX_CACHE_SIZE = 100;
+
+/**
+ * Gets or creates the global canvas instance for text measurements
+ */
+function getGlobalCanvas(): { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D } {
+  if (!globalCanvas || !globalContext) {
+    globalCanvas = document.createElement('canvas');
+    globalContext = globalCanvas.getContext('2d');
+    if (!globalContext) {
+      throw new Error('Could not get canvas context');
+    }
+  }
+  return { canvas: globalCanvas, context: globalContext };
+}
+
+/**
+ * Creates a cache key for text measurement
+ */
+function createCacheKey(text: string, fontConfig: string): string {
+  return `${text}|${fontConfig}`;
+}
+
+/**
+ * Manages LRU cache size by removing oldest entries
+ */
+function pruneCache(): void {
+  if (textMeasurementCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = textMeasurementCache.keys().next().value;
+    textMeasurementCache.delete(firstKey);
+  }
+}
+
 /**
  * Measures text dimensions using Canvas API for precise calculations
+ * Optimized with global canvas reuse and LRU caching
  */
 export function measureText(
   text: string, 
   computedStyle: CSSStyleDeclaration
 ): TextMeasurement {
   const fontSize = parseFloat(computedStyle.fontSize);
+  const fontConfig = `${computedStyle.fontWeight} ${fontSize}px ${computedStyle.fontFamily}`;
+  const cacheKey = createCacheKey(text, fontConfig);
   
-  // Create canvas for precise text measurement
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  if (!context) {
-    throw new Error('Could not get canvas context');
+  // Check cache first
+  const cached = textMeasurementCache.get(cacheKey);
+  if (cached) {
+    // Move to end (most recently used)
+    textMeasurementCache.delete(cacheKey);
+    textMeasurementCache.set(cacheKey, cached);
+    return cached;
   }
   
-  context.font = `${computedStyle.fontWeight} ${fontSize}px ${computedStyle.fontFamily}`;
+  // Get global canvas instance
+  const { context } = getGlobalCanvas();
+  
+  context.font = fontConfig;
   
   // Get text metrics
   const metrics = context.measureText(text);
   
-  return {
+  const measurement: TextMeasurement = {
     width: metrics.width,
     height: fontSize
   };
+  
+  // Cache the result
+  pruneCache();
+  textMeasurementCache.set(cacheKey, measurement);
+  
+  return measurement;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useLocation } from '../contexts/LocationContext';
 import { calculateTextPosition, validateTextPosition, measureText, calculateVisualTextBounds } from '../lib/textAlignmentUtils';
@@ -24,6 +24,7 @@ interface UIElement {
   height: number;
   isText: boolean;
   isPowerButton: boolean;
+  isWeatherWidget: boolean;
   id?: string;
   type?: string;
   textBaseline?: number;
@@ -44,7 +45,7 @@ type WallSide = 'left' | 'right' | null;
  * - Click interactions and drag & drop functionality
  * - Brand-consistent purple color scheme
  */
-export function RaccoonMascot() {
+const RaccoonMascot = memo(function RaccoonMascot() {
   // Location data for dynamic hit box updates
   const { address, ipLocation, hasGPSLocation, hasIPLocation } = useLocation();
   
@@ -61,6 +62,7 @@ export function RaccoonMascot() {
   // Emoji Arrays
   const mascots = ['🦝', '🦝', '🦝', '🦝', '🦝'];
   const raccoonEmojis = ['🦝', '🐾', '🍃', '🌰', '🗑️', '🌙', '🐻', '🍯'];
+  const weatherEmojis = ['⛅', '🌤️', '🌧️', '🌦️', '☀️', '🌩️', '❄️', '🌪️', '🌈'];
   
   /**
    * Returns a random raccoon-related emoji for text bubble display
@@ -68,6 +70,14 @@ export function RaccoonMascot() {
    */
   const getRandomRaccoonEmoji = () => {
     return raccoonEmojis[Math.floor(Math.random() * raccoonEmojis.length)];
+  };
+
+  /**
+   * Returns a random weather-related emoji for weather widget interaction
+   * @returns {string} Random emoji from weatherEmojis array
+   */
+  const getRandomWeatherEmoji = () => {
+    return weatherEmojis[Math.floor(Math.random() * weatherEmojis.length)];
   };
 
   // Physics State
@@ -90,6 +100,11 @@ export function RaccoonMascot() {
   const [showGif, setShowGif] = useState<boolean>(false);
   const [, setCurrentMascot] = useState<number>(0);
   
+  // Running Animation State
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [runningFrame, setRunningFrame] = useState<number>(0);
+  const [facingDirection, setFacingDirection] = useState<'left' | 'right'>('right');
+  
   // UI Element Interaction State
   const [uiElements, setUiElements] = useState<UIElement[]>([]);
   const [isOnUIElement, setIsOnUIElement] = useState<boolean>(false);
@@ -101,38 +116,77 @@ export function RaccoonMascot() {
   const keys = useRef<{ left: boolean; right: boolean; jump: boolean }>({ left: false, right: false, jump: false });
   const wasOnUIElement = useRef<boolean>(false);
 
+  // Memoized selectors for UI element detection (performance optimization)
+  const UI_SELECTORS = useMemo(() => [
+    '.virgil-logo',         // Virgil "V" logo text
+    '.datetime-display .time', // Time display
+    '.datetime-display .date', // Date display
+    '.datetime-display .day',  // Day display
+    '.user-name',           // "Ben" text
+    '.user-email',          // Email text  
+    '.member-since',        // Member since text
+    '.street-address',      // Street address (Purdue Avenue)
+    '.ip-address',          // IP address text
+    '.ip-loading',          // IP loading text
+    '.ip-error',            // IP error text
+    '.address-loading',     // Address loading text
+    '.weather-widget',      // Weather display widget
+    '.power-button',        // Small circular power button
+    '.virgil-chatbot-bubble', // Chatbot floating button
+    '.auth-page header h1', // "Virgil" header on auth page
+    '.auth-toggle button',  // Login/Sign Up buttons
+    '.login-form button',   // Login button
+    '.signup-form button',  // Sign up button
+    '.form-group input'     // Text input fields
+  ], []);
+
+  // Cache for UI element detection results
+  const uiElementsCache = useRef<{
+    elements: UIElement[];
+    lastUpdate: number;
+    lastHash: string;
+  }>({ elements: [], lastUpdate: 0, lastHash: '' });
+
+  /**
+   * Creates a hash of current DOM state to detect changes
+   */
+  const createDOMHash = useCallback((): string => {
+    const relevantData = [
+      address?.formatted || '',
+      ipLocation?.ip || '',
+      hasGPSLocation.toString(),
+      hasIPLocation.toString(),
+      window.innerWidth,
+      window.innerHeight
+    ];
+    return relevantData.join('|');
+  }, [address, ipLocation, hasGPSLocation, hasIPLocation]);
+
   /**
    * Detects and measures UI elements that the raccoon can interact with
    * Uses Canvas API for precise text measurement and creates collision boundaries
-   * @returns {Array} Array of UI element objects with position and size data
+   * Optimized with caching and memoization
    */
-  const detectUIElements = (): UIElement[] => {
+  const detectUIElements = useCallback((): UIElement[] => {
+    const now = Date.now();
+    const currentHash = createDOMHash();
+    const cache = uiElementsCache.current;
+    
+    // Return cached result if DOM hasn't changed and cache is recent (< 1 second)
+    if (cache.lastHash === currentHash && now - cache.lastUpdate < 1000) {
+      return cache.elements;
+    }
+    
     const elements: UIElement[] = [];
     
-    // Target selectors for different UI elements
-    const selectors = [
-      '.virgil-logo',         // Virgil "V" logo text
-      '.datetime-display .time', // Time display
-      '.datetime-display .date', // Date display
-      '.datetime-display .day',  // Day display
-      '.user-name',           // "Ben" text
-      '.user-email',          // Email text  
-      '.member-since',        // Member since text
-      '.street-address',      // Street address (Purdue Avenue)
-      '.ip-address',          // IP address text
-      '.ip-loading',          // IP loading text
-      '.ip-error',            // IP error text
-      '.address-loading',     // Address loading text
-      '.power-button',        // Small circular power button
-      '.virgil-chatbot-bubble', // Chatbot floating button
-      '.auth-page header h1', // "Virgil" header on auth page
-      '.auth-toggle button',  // Login/Sign Up buttons
-      '.login-form button',   // Login button
-      '.signup-form button',  // Sign up button
-      '.form-group input'     // Text input fields
-    ];
+    // Define text element selectors once (micro-optimization)
+    const textSelectors = new Set([
+      '.virgil-logo', '.user-name', '.user-email', '.member-since', 
+      '.street-address', '.ip-address', '.ip-loading', '.ip-error', 
+      '.address-loading', '.auth-page header h1'
+    ]);
     
-    selectors.forEach(selector => {
+    UI_SELECTORS.forEach(selector => {
       const domElements = document.querySelectorAll(selector);
       domElements.forEach((element, index) => {
         const rect = element.getBoundingClientRect();
@@ -144,13 +198,13 @@ export function RaccoonMascot() {
           let adjustedY = rect.top;
           let textBaseline = rect.top;
           
-          if (selector === '.virgil-logo' || selector === '.user-name' || selector === '.user-email' || selector === '.member-since' || selector === '.street-address' || selector === '.ip-address' || selector === '.ip-loading' || selector === '.ip-error' || selector === '.address-loading' || selector === '.auth-page header h1') {
+          if (textSelectors.has(selector)) {
             // Get precise text measurements using utility
             const computedStyle = window.getComputedStyle(element);
             const textContent = (element.textContent || (element as HTMLElement).innerText || '').trim();
             const fontSize = parseFloat(computedStyle.fontSize);
             
-            // Measure text dimensions
+            // Measure text dimensions (now cached)
             const textMeasurement = measureText(textContent, computedStyle);
             const textWidth = textMeasurement.width;
             
@@ -178,15 +232,23 @@ export function RaccoonMascot() {
             right: adjustedX + adjustedWidth,
             element: element as HTMLElement,
             textBaseline: textBaseline,
-            isText: selector === '.user-name' || selector === '.user-email' || selector === '.member-since' || selector === '.street-address' || selector === '.ip-address' || selector === '.ip-loading' || selector === '.ip-error' || selector === '.address-loading' || selector === '.auth-page header h1',
-            isPowerButton: selector === '.power-button'
+            isText: textSelectors.has(selector),
+            isPowerButton: selector === '.power-button',
+            isWeatherWidget: selector === '.weather-widget'
           });
         }
       });
     });
     
+    // Update cache
+    uiElementsCache.current = {
+      elements,
+      lastUpdate: now,
+      lastHash: currentHash
+    };
+    
     return elements;
-  };
+  }, [UI_SELECTORS, createDOMHash]);
 
   // Handle click to pick up and show GIF
   const handleClick = () => {
@@ -275,7 +337,7 @@ export function RaccoonMascot() {
     return undefined;
   }, [isDragging, dragOffset]);
 
-  // Update UI elements regularly
+  // Update UI elements with optimized caching
   useEffect(() => {
     const updateUIElements = () => {
       setUiElements(detectUIElements());
@@ -284,17 +346,23 @@ export function RaccoonMascot() {
     // Initial detection
     updateUIElements();
     
-    // Update on resize
-    window.addEventListener('resize', updateUIElements);
+    // Update on resize (more responsive than before)
+    const handleResize = () => {
+      // Clear cache on resize to force recomputation
+      uiElementsCache.current.lastHash = '';
+      updateUIElements();
+    };
     
-    // Update periodically to catch dynamic changes
-    const interval = setInterval(updateUIElements, 1000);
+    window.addEventListener('resize', handleResize);
+    
+    // Reduced frequency since we now have smart caching (5 seconds instead of 2)
+    const interval = setInterval(updateUIElements, 5000);
     
     return () => {
-      window.removeEventListener('resize', updateUIElements);
+      window.removeEventListener('resize', handleResize);
       clearInterval(interval);
     };
-  }, [address, ipLocation, hasGPSLocation, hasIPLocation]);
+  }, [detectUIElements]);
 
   // Cycle through mascots every 10 seconds
   useEffect(() => {
@@ -311,16 +379,40 @@ export function RaccoonMascot() {
   useEffect(() => {
     if (isPickedUp || isDragging) return;
     let animationFrame: number;
-    const step = () => {
+    let lastTime = 0;
+    const targetFPS = 60;
+    const frameTime = 1000 / targetFPS;
+    
+    const step = (currentTime: number) => {
+      if (currentTime - lastTime < frameTime) {
+        animationFrame = requestAnimationFrame(step);
+        return;
+      }
+      lastTime = currentTime;
       setPosition(prev => {
         let { x, y } = prev;
         let vx = 0;
         let vy = velocity.y;
         
         // Horizontal movement
-        if (keys.current.left) vx = -MOVE_SPEED;
-        if (keys.current.right) vx = MOVE_SPEED;
+        if (keys.current.left) {
+          vx = -MOVE_SPEED;
+          setFacingDirection('left');
+        }
+        if (keys.current.right) {
+          vx = MOVE_SPEED;
+          setFacingDirection('right');
+        }
         x += vx;
+        
+        // Update running state
+        const nowRunning = keys.current.left || keys.current.right;
+        if (nowRunning !== isRunning) {
+          setIsRunning(nowRunning);
+          if (!nowRunning) {
+            setRunningFrame(0); // Reset to first frame when stopping
+          }
+        }
         
         // Wall collision detection
         const hitLeftWall = x <= 0;
@@ -409,20 +501,31 @@ export function RaccoonMascot() {
               
               // Only set new random emoji if just landed (state transition)
               if (!wasOnUIElement.current) {
-                setCurrentRaccoonEmoji(getRandomRaccoonEmoji());
+                if (uiElement.isPowerButton) {
+                  setCurrentRaccoonEmoji('⚡');
+                } else if (uiElement.isWeatherWidget) {
+                  setCurrentRaccoonEmoji(getRandomWeatherEmoji());
+                } else {
+                  setCurrentRaccoonEmoji(getRandomRaccoonEmoji());
+                }
               }
               
               landedOnUI = true;
               
-              // Add glow effect - use text-shadow for text elements, special effect for power button
+              // Add glow effect - use text-shadow for text elements, special effects for interactive widgets
               if (uiElement.element) {
                 if (uiElement.isPowerButton) {
                   // Special power button interaction
                   uiElement.element.style.boxShadow = '0 0 25px rgba(239, 176, 194, 1), 0 0 35px rgba(244, 114, 182, 0.8)';
                   uiElement.element.style.transform = 'scale(1.2)';
                   uiElement.element.style.transition = 'all 0.3s ease';
-                  // Change raccoon emoji to power-related
-                  setCurrentRaccoonEmoji('⚡');
+                } else if (uiElement.isWeatherWidget) {
+                  // Special weather widget interaction with brand purple glow (consistent with other UI elements)
+                  uiElement.element.style.boxShadow = '0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6)';
+                  uiElement.element.style.transform = 'scale(1.1) translateY(-3px)';
+                  uiElement.element.style.transition = 'all 0.3s ease';
+                  uiElement.element.style.background = 'rgba(108, 59, 170, 0.15)';
+                  uiElement.element.style.borderColor = 'rgba(108, 59, 170, 0.6)';
                 } else if (uiElement.isText) {
                   uiElement.element.style.textShadow = '0 0 15px rgba(108, 59, 170, 0.8)';
                   uiElement.element.style.transition = 'text-shadow 0.3s ease';
@@ -452,6 +555,12 @@ export function RaccoonMascot() {
             // Reset power button effects
             currentUIElement.element.style.boxShadow = '';
             currentUIElement.element.style.transform = '';
+          } else if (currentUIElement.isWeatherWidget) {
+            // Reset weather widget effects
+            currentUIElement.element.style.boxShadow = '';
+            currentUIElement.element.style.transform = '';
+            currentUIElement.element.style.background = '';
+            currentUIElement.element.style.borderColor = '';
           } else if (currentUIElement.isText) {
             currentUIElement.element.style.textShadow = '';
           } else {
@@ -559,7 +668,7 @@ export function RaccoonMascot() {
   }, [isPickedUp, charging, position.y]);
 
   useEffect(() => {
-    let chargeInterval: NodeJS.Timeout;
+    let chargeInterval: ReturnType<typeof setTimeout>;
     if (charging && charge < CHARGE_MAX) {
       chargeInterval = setInterval(() => {
         setCharge(c => Math.min(CHARGE_MAX, c + CHARGE_RATE));
@@ -567,6 +676,17 @@ export function RaccoonMascot() {
     }
     return () => clearInterval(chargeInterval);
   }, [charging, charge]);
+
+  // Running animation frame cycling
+  useEffect(() => {
+    if (!isRunning || isPickedUp || isDragging) return;
+    
+    const frameInterval = setInterval(() => {
+      setRunningFrame(prevFrame => (prevFrame + 1) % 4);
+    }, 66); // ~15 FPS for smooth animation
+    
+    return () => clearInterval(frameInterval);
+  }, [isRunning, isPickedUp, isDragging]);
 
   const raccoonMascotStyles = `
     @keyframes bounce {
@@ -687,7 +807,9 @@ export function RaccoonMascot() {
               ? 'bounce 0.5s ease-in-out' 
               : isOnUIElement 
                 ? 'sitting 3s ease-in-out infinite' // Special sitting animation
-                : 'idle 2s ease-in-out infinite',
+                : isRunning 
+                  ? 'none' // No CSS animation when running (frame-based instead)
+                  : 'idle 2s ease-in-out infinite',
             boxShadow: isPickedUp 
               ? '0 8px 25px rgba(0,0,0,0.2)' 
               : '0 4px 15px rgba(0,0,0,0.1)',
@@ -695,7 +817,19 @@ export function RaccoonMascot() {
           }}
           title={isPickedUp ? "I'm being held! 🦝💕" : "Click to pick up, use ← → to run, space to jump (triple jump available)!"}
         >
-          <img src="/racoon.png" alt="Racoon Mascot" style={{ width: '80px', height: '80px', pointerEvents: 'none', userSelect: 'none' }} draggable={false} />
+          <img 
+            src={isRunning ? `/racoon_run${runningFrame + 1}.png` : "/racoon.png"} 
+            alt="Racoon Mascot" 
+            style={{ 
+              width: '80px', 
+              height: '80px', 
+              pointerEvents: 'none', 
+              userSelect: 'none',
+              transform: facingDirection === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
+              transition: 'transform 0.1s ease-in-out'
+            }} 
+            draggable={false} 
+          />
         </div>
 
         {/* Bounce counter */}
@@ -837,4 +971,6 @@ export function RaccoonMascot() {
       </div>
     </>
   );
-}
+});
+
+export { RaccoonMascot };

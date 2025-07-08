@@ -43,7 +43,12 @@ export default [
       },
       globals: {
         ...globals.browser,
+        ...globals.node,
         JSX: 'readonly',
+        process: 'readonly',
+        NodeJS: 'readonly',
+        RequestInit: 'readonly',
+        NodeListOf: 'readonly',
       },
     },
     plugins: {
