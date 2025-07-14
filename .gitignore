@@ -67,3 +67,6 @@ coverage/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# SuperClaude directory (separate git repository)
+SuperClaude/
