@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: process.env.VITE_DEV_PORT ? parseInt(process.env.VITE_DEV_PORT) : 3000,
-    host: 'localhost',
+    host: true, // Listen on all addresses including localhost and network
     hmr: {
       overlay: true
     },

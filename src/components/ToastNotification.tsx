@@ -6,6 +6,7 @@ export interface Toast {
   title?: string;
   message: string;
   duration?: number;
+  persistent?: boolean;
   action?: {
     label: string;
     onClick: () => void;
@@ -24,7 +25,7 @@ export const ToastNotification = memo(function ToastNotification({
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
-  const { id, type, title, message, duration = 5000, action } = toast;
+  const { id, type, title, message, duration = 5000, persistent, action } = toast;
 
   const typeStyles = {
     success: {
@@ -58,13 +59,13 @@ export const ToastNotification = memo(function ToastNotification({
   }, []);
 
   useEffect(() => {
-    if (duration > 0) {
+    if (!persistent && duration > 0) {
       const timer = setTimeout(() => {
         handleDismiss();
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [duration]);
+  }, [duration, persistent]);
 
   const handleDismiss = () => {
     setIsLeaving(true);
@@ -166,7 +167,7 @@ export const ToastNotification = memo(function ToastNotification({
         </button>
       </div>
       
-      {duration > 0 && (
+      {!persistent && duration > 0 && (
         <div
           style={{
             position: 'absolute',

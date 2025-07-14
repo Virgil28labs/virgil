@@ -16,6 +16,8 @@ export const SkeletonLoader = memo(function SkeletonLoader({
   return (
     <div
       className={`skeleton-loader ${className}`}
+      data-testid="skeleton-loader"
+      aria-hidden="true"
       style={{
         width,
         height,

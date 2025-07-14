@@ -81,8 +81,8 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
   }
 
   return (
-    <div className="signup-form">
-      <h2>Sign Up</h2>
+    <div className="signup-form" role="form" aria-labelledby="signup-title">
+      <h2 id="signup-title">Sign Up</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name:</label>
