@@ -159,6 +159,31 @@ Shared types in `src/types/`:
 - `weather.types.ts` - Weather API types
 - `llm.types.ts` - LLM service types
 
+## AI Assistant Tools
+
+### Context7 MCP Server
+Context7 is configured to provide up-to-date documentation for all project dependencies:
+- **React 19.1.0**: Latest hooks, components, and patterns
+- **TypeScript 5.8.3**: Current type system features and best practices
+- **Express 5.1.0**: Modern middleware and routing patterns
+- **Vite 7.0.0**: Build configuration and optimization strategies
+- **Supabase JS 2.50.3**: Authentication and database operations
+
+To use Context7, add "use context7" to your prompts for accurate, version-specific documentation.
+
+### MCP Fetch Server
+The MCP Fetch server enables web content retrieval and processing capabilities:
+- **Web Content Fetching**: Retrieve any web URL and convert HTML to markdown
+- **Chunked Content**: Extract specific sections of web pages using start_index parameter
+- **Flexible Configuration**: Supports custom user agents, proxy settings, and robots.txt handling
+
+Usage examples:
+- "Fetch the latest React documentation from react.dev"
+- "Retrieve and analyze content from [specific URL]"
+- "Get web-based API documentation not available in Context7"
+
+⚠️ Security Note: The fetch server can access local/internal IPs. Use only with trusted URLs.
+
 ## Common Debugging Scenarios
 
 ### Frontend Not Loading
