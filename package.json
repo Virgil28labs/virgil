@@ -6,9 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev-full": "./start-dev.sh",
-    "dev-improved": "./start-dev-improved.sh",
-    "dev-simple": "./start-dev-simple.sh",
-    "dev-backend": "./start-llm-server.sh",
+    "backend": "cd server && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -16,7 +14,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --maxWorkers=2"
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "check-env": "./check-env.sh",
+    "cleanup-ports": "./cleanup-ports.sh",
+    "diagnose": "./diagnose.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",

@@ -365,7 +365,7 @@ html, body {
   text-align: center;
 }
 
-.coordinates, .street-address, .address-loading {
+.coordinates, .street-address, .address-loading, .elevation {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
@@ -376,6 +376,10 @@ html, body {
 
 .address-loading {
   opacity: 0.6;
+}
+
+.elevation-info {
+  margin-top: 0.5rem;
 }
 
 .user-location-error {

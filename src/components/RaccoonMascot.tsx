@@ -130,6 +130,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     '.ip-loading',          // IP loading text
     '.ip-error',            // IP error text
     '.address-loading',     // Address loading text
+    '.elevation',           // Elevation text
     '.weather-widget',      // Weather display widget
     '.power-button',        // Small circular power button
     '.virgil-chatbot-bubble', // Chatbot floating button
@@ -183,7 +184,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     const textSelectors = new Set([
       '.virgil-logo', '.user-name', '.user-email', '.member-since', 
       '.street-address', '.ip-address', '.ip-loading', '.ip-error', 
-      '.address-loading', '.auth-page header h1'
+      '.address-loading', '.elevation', '.auth-page header h1'
     ]);
     
     UI_SELECTORS.forEach(selector => {

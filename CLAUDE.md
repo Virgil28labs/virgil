@@ -18,6 +18,11 @@ npm run dev-full        # Recommended: starts both servers
 npm run dev            # Frontend only (port 3000)
 npm run backend        # Backend only (port 5002)
 
+# Environment & Diagnostics
+npm run check-env      # Check development environment
+npm run cleanup-ports  # Clean up stuck processes on ports
+npm run diagnose       # Run comprehensive diagnostics
+
 # Testing
 npm test               # Run all tests with coverage
 npm run test:watch     # Watch mode for development
@@ -143,6 +148,7 @@ Backend routes follow REST conventions:
 POST   /api/llm/chat     - Chat with LLM
 GET    /api/weather      - Get weather data
 GET    /api/location     - Get location from IP
+GET    /api/elevation/coordinates/:lat/:lon - Get elevation data
 ```
 
 ### Component Testing Pattern
@@ -183,6 +189,21 @@ Usage examples:
 - "Get web-based API documentation not available in Context7"
 
 ⚠️ Security Note: The fetch server can access local/internal IPs. Use only with trusted URLs.
+
+## Development Scripts
+
+### Unified Startup Script
+The project includes a robust startup script (`start-dev.sh`) that handles:
+- Process management with graceful shutdown
+- Port conflict detection and resolution
+- Automatic dependency installation
+- Real-time server monitoring
+- Cross-platform compatibility (macOS, Linux, Windows with WSL)
+
+### Diagnostic Tools
+- **check-env.sh**: Validates development environment, checks dependencies, ports, and configuration
+- **cleanup-ports.sh**: Safely cleans up processes using Virgil's ports (3000, 5002)
+- **diagnose.sh**: Comprehensive troubleshooting tool that generates diagnostic reports
 
 ## Common Debugging Scenarios
 

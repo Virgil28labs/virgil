@@ -6,6 +6,8 @@ import type {
   GeolocationError
 } from '../types/location.types'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+
 export const locationService = {
   async getCurrentPosition(): Promise<Coordinates> {
     return new Promise<Coordinates>((resolve, reject) => {
@@ -128,6 +130,27 @@ export const locationService = {
     }
   },
 
+  async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch elevation data');
+      }
+      
+      const data = await response.json();
+      return {
+        elevation: data.elevation,
+        elevationFeet: data.elevationFeet
+      };
+    } catch (error) {
+      console.error('Error fetching elevation:', error);
+      throw new Error('Failed to get elevation data');
+    }
+  },
+
   async getFullLocationData(): Promise<LocationData> {
     const locationData: LocationData = {
       timestamp: Date.now()
@@ -153,10 +176,29 @@ export const locationService = {
     try {
       const coords = await this.getCurrentPosition();
       locationData.coordinates = coords;
-      locationData.address = await this.getAddressFromCoordinates(
-        coords.latitude, 
-        coords.longitude
-      );
+      
+      // Try to get address
+      try {
+        locationData.address = await this.getAddressFromCoordinates(
+          coords.latitude, 
+          coords.longitude
+        );
+      } catch (addressError) {
+        console.warn('Failed to get address:', addressError.message);
+      }
+      
+      // Try to get elevation
+      try {
+        const elevationData = await this.getElevation(coords.latitude, coords.longitude);
+        locationData.coordinates = {
+          ...coords,
+          elevation: elevationData.elevation,
+          elevationUnit: 'meters'
+        };
+      } catch (elevationError) {
+        console.warn('Failed to get elevation:', elevationError.message);
+        // Continue without elevation data
+      }
     } catch (error) {
       console.warn('Failed to get GPS location:', error.message);
       // Don't set null values - let the context preserve existing data

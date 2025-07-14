@@ -8,6 +8,8 @@ export interface Coordinates {
   longitude: number;
   accuracy: number;
   timestamp: number;
+  elevation?: number; // in meters
+  elevationUnit?: 'meters' | 'feet';
 }
 
 export interface Address {

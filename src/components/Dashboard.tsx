@@ -11,14 +11,26 @@ import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth()
-  const { address, ipLocation, loading: locationLoading } = useLocation()
+  const { address, ipLocation, coordinates, loading: locationLoading } = useLocation()
   const [showProfileViewer, setShowProfileViewer] = useState(false)
+  const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
+    const saved = localStorage.getItem('elevationUnit')
+    return (saved === 'feet' || saved === 'meters') ? saved : 'meters'
+  })
 
   const formatDate = useCallback((dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',
       year: 'numeric'
+    })
+  }, [])
+
+  const toggleElevationUnit = useCallback(() => {
+    setElevationUnit(prev => {
+      const newUnit = prev === 'meters' ? 'feet' : 'meters'
+      localStorage.setItem('elevationUnit', newUnit)
+      return newUnit
     })
   }, [])
 
@@ -99,6 +111,22 @@ export const Dashboard = memo(function Dashboard() {
               <p className="ip-error">IP address unavailable</p>
             )}
           </div>
+          
+          {coordinates?.elevation !== undefined && (
+            <div className="elevation-info">
+              <p 
+                className="elevation" 
+                onClick={toggleElevationUnit}
+                style={{ cursor: 'pointer' }}
+                title="Click to toggle unit"
+              >
+                Elevation: {elevationUnit === 'meters' 
+                  ? `${Math.round(coordinates.elevation)}m`
+                  : `${Math.round(coordinates.elevation * 3.28084)}ft`
+                }
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
