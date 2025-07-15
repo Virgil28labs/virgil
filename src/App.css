@@ -894,8 +894,8 @@ a:focus-visible,
   min-height: 32px;
   padding: 0;
   border-radius: 50%;
-  background: rgba(139, 123, 161, 0.15);
-  border: 1px solid rgba(139, 123, 161, 0.4);
+  background: rgba(139, 123, 161, 0.05);
+  border: 1px solid rgba(139, 123, 161, 0.2);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -903,31 +903,31 @@ a:focus-visible,
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.8;
+  opacity: 0.4;
   backdrop-filter: blur(6px);
 }
 
 .user-profile-toggle:hover {
-  opacity: 1;
-  background: rgba(108, 59, 170, 0.2);
-  border-color: var(--brand-accent-purple);
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 2px 8px rgba(108, 59, 170, 0.3);
+  opacity: 0.6;
+  background: rgba(108, 59, 170, 0.1);
+  border-color: rgba(139, 123, 161, 0.3);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 2px 8px rgba(108, 59, 170, 0.2);
 }
 
 .user-profile-toggle:focus {
   outline: none;
-  opacity: 1;
-  background: rgba(108, 59, 170, 0.2);
-  border-color: var(--brand-accent-purple);
-  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.4);
+  opacity: 0.7;
+  background: rgba(108, 59, 170, 0.15);
+  border-color: rgba(139, 123, 161, 0.4);
+  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.2);
 }
 
 .user-profile-toggle.active {
-  opacity: 1;
-  background: rgba(108, 59, 170, 0.3);
-  border-color: var(--brand-accent-purple);
-  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.4);
+  opacity: 0.8;
+  background: rgba(108, 59, 170, 0.2);
+  border-color: rgba(139, 123, 161, 0.5);
+  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.3);
 }
 
 .user-profile-viewer {
