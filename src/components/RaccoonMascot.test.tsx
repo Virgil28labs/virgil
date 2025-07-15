@@ -327,7 +327,7 @@ describe('RaccoonMascot', () => {
 
   describe('Drag and Drop', () => {
     it('allows dragging the mascot', async () => {
-      const user = userEvent.setup({ delay: null });
+      const _user = userEvent.setup({ delay: null });
       render(<RaccoonMascot />);
       
       const mascotContainer = screen.getByAltText('Racoon Mascot').parentElement!;

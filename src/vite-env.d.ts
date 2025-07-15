@@ -28,6 +28,12 @@ declare global {
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
   }
+
+  // DOM API types
+  type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
+  type FrameRequestCallback = (time: number) => void;
+  type PermissionState = 'granted' | 'denied' | 'prompt';
+  type PermissionStatus = 'granted' | 'denied' | 'unknown' | 'unavailable';
 }
 
 // Asset type declarations

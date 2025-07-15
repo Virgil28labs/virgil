@@ -55,7 +55,7 @@ describe('LoginForm', () => {
   });
 
   it('validates empty fields when bypassing HTML validation', async () => {
-    const user = userEvent.setup();
+    const _user = userEvent.setup();
     const { container } = render(<LoginForm />);
     
     // Bypass HTML5 validation by calling submit directly

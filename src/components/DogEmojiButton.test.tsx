@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DogEmojiButton } from './DogEmojiButton';
 import { dedupeFetch } from '../lib/requestDeduplication';
 
@@ -56,7 +56,7 @@ describe('DogEmojiButton', () => {
       blob: jest.fn(),
       formData: jest.fn(),
       text: jest.fn()
-    } as Response);
+    } as unknown as Response);
   });
 
   it('renders the dog emoji button', () => {

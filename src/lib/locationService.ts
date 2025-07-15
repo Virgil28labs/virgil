@@ -83,7 +83,7 @@ export const locationService = {
         country: address.country || '',
         formatted: data.display_name || ''
       };
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to get address from coordinates');
     }
   },
@@ -103,7 +103,7 @@ export const locationService = {
       {
         maxRetries: 2,
         initialDelay: 500,
-        onRetry: (attempt, error) => {
+        onRetry: (_attempt, _error) => {
           // Retry silently
         }
       }
@@ -136,7 +136,7 @@ export const locationService = {
       {
         maxRetries: 2,
         initialDelay: 500,
-        onRetry: (attempt, error) => {
+        onRetry: (_attempt, _error) => {
           // Retry silently
         }
       }
@@ -158,7 +158,7 @@ export const locationService = {
         elevation: data.elevation,
         elevationFeet: data.elevationFeet
       };
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Failed to get elevation data');
     }
   },
@@ -178,7 +178,7 @@ export const locationService = {
       if (ipLocation?.city) {
         locationData.address = this.createAddressFromIPLocation(ipLocation);
       }
-    } catch (error) {
+    } catch (_error) {
       // Return empty location data on error
     }
 
@@ -209,7 +209,7 @@ export const locationService = {
       if (gpsResult.address) {
         locationData.address = gpsResult.address;
       }
-    } catch (error) {
+    } catch (_error) {
       // GPS is optional, continue without it
     }
 
@@ -225,12 +225,12 @@ export const locationService = {
     try {
       const ip = await this.getIPAddress();
       return await this.getIPLocation(ip);
-    } catch (error) {
+    } catch (_error) {
       // Try to at least get the IP
       try {
         const ip = await this.getIPAddress();
         return { ip };
-      } catch (ipError) {
+      } catch (_ipError) {
         return undefined;
       }
     }
@@ -260,7 +260,7 @@ export const locationService = {
       }
       
       return result;
-    } catch (error) {
+    } catch (_error) {
       return {};
     }
   },

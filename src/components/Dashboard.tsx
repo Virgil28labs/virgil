@@ -18,13 +18,6 @@ export const Dashboard = memo(function Dashboard() {
     return (saved === 'feet' || saved === 'meters') ? saved : 'meters'
   })
 
-  const formatDate = useCallback((dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }, [])
 
   const toggleElevationUnit = useCallback(() => {
     setElevationUnit(prev => {

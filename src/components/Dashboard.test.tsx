@@ -50,7 +50,7 @@ const mockAuthValue = {
 };
 
 const mockLocationValue = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060 },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
   address: {
     street: '123 Main St',
     city: 'New York',
@@ -60,6 +60,7 @@ const mockLocationValue = {
     formatted: '123 Main St, New York, NY 10001, USA'
   },
   ipLocation: {
+    ip: '192.168.1.1',
     city: 'New York',
     region: 'NY',
     country: 'US',
@@ -67,10 +68,14 @@ const mockLocationValue = {
   },
   loading: false,
   error: null,
-  permissionStatus: 'granted' as PermissionState,
+  permissionStatus: 'granted' as PermissionStatus,
   lastUpdated: Date.now(),
   hasLocation: true,
-  refresh: jest.fn(),
+  fetchLocationData: jest.fn(),
+  requestLocationPermission: jest.fn(),
+  hasGPSLocation: true,
+  hasIPLocation: true,
+  initialized: true,
   clearError: jest.fn()
 };
 
@@ -79,8 +84,11 @@ describe('Dashboard', () => {
     jest.clearAllMocks();
     mockUseKeyboardNavigation.mockReturnValue({
       containerRef: { current: null },
-      activeIndex: 0,
-      setActiveIndex: jest.fn()
+      focusFirst: jest.fn(),
+      focusLast: jest.fn(),
+      focusNext: jest.fn(),
+      focusPrevious: jest.fn(),
+      focusElement: jest.fn()
     });
     mockUseAuth.mockReturnValue(mockAuthValue);
     mockUseLocation.mockReturnValue(mockLocationValue);
@@ -114,7 +122,13 @@ describe('Dashboard', () => {
     mockUseLocation.mockReturnValue({
       ...mockLocationValue,
       loading: true,
-      address: null
+      address: null,
+      coordinates: null,
+      fetchLocationData: jest.fn(),
+      requestLocationPermission: jest.fn(),
+      hasGPSLocation: false,
+      hasIPLocation: false,
+      initialized: false
     });
     
     render(<Dashboard />);
@@ -176,7 +190,13 @@ describe('Dashboard', () => {
     mockUseLocation.mockReturnValue({
       ...mockLocationValue,
       address: null,
-      hasLocation: false
+      coordinates: null,
+      hasLocation: false,
+      fetchLocationData: jest.fn(),
+      requestLocationPermission: jest.fn(),
+      hasGPSLocation: false,
+      hasIPLocation: true,
+      initialized: true
     });
     
     render(<Dashboard />);
@@ -188,8 +208,14 @@ describe('Dashboard', () => {
     mockUseLocation.mockReturnValue({
       ...mockLocationValue,
       address: null,
-      ipLocation: { city: 'Boston' },
-      hasLocation: false
+      coordinates: null,
+      ipLocation: { ip: '127.0.0.1', city: 'Boston' },
+      hasLocation: false,
+      fetchLocationData: jest.fn(),
+      requestLocationPermission: jest.fn(),
+      hasGPSLocation: false,
+      hasIPLocation: true,
+      initialized: true
     });
     
     render(<Dashboard />);
