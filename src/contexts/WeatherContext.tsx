@@ -52,7 +52,7 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
 
 const initialState: WeatherState = {
   data: null,
-  loading: false,
+  loading: false,  // Start with loading false to allow initial fetch
   error: null,
   lastUpdated: null,
   unit: 'fahrenheit'
@@ -66,33 +66,10 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
   const [state, dispatch] = useReducer(weatherReducer, initialState);
   const { coordinates, ipLocation } = useLocation();
 
-  // Environment validation in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const apiUrl = import.meta.env.VITE_LLM_API_URL;
-      if (!apiUrl) {
-        console.warn('🌤️ [WeatherContext] VITE_LLM_API_URL not configured');
-      } else {
-        console.log('🌤️ [WeatherContext] Backend API URL:', apiUrl);
-      }
-    }
-  }, []);
 
   const fetchWeather = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🌤️ [WeatherContext] fetchWeather called', { 
-        forceRefresh, 
-        loading: state.loading,
-        coordinates: !!coordinates,
-        ipLocation: !!ipLocation?.city,
-        lastUpdated: state.lastUpdated 
-      });
-    }
-
-    if (state.loading) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🌤️ [WeatherContext] Already loading, skipping');
-      }
+    // Skip if already loading and not forcing refresh
+    if (state.loading && !forceRefresh) {
       return;
     }
 
@@ -101,37 +78,22 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     const isCacheValid = state.lastUpdated && (Date.now() - state.lastUpdated) < cacheExpiry;
 
     if (!forceRefresh && isCacheValid) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🌤️ [WeatherContext] Using cached data');
-      }
       return;
     }
 
     // Need either coordinates or city to fetch weather
     if (!coordinates && !ipLocation?.city) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('🌤️ [WeatherContext] No location data available, using fallback location');
-      }
       // Use San Francisco as fallback location
       try {
         const fallbackWeatherData = await weatherService.getWeatherByCoordinates(37.7749, -122.4194);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🌤️ [WeatherContext] Using fallback location (San Francisco)');
-        }
         dispatch({ type: 'SET_WEATHER_DATA', payload: fallbackWeatherData });
         return;
       } catch (fallbackError: any) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('🌤️ [WeatherContext] Fallback location also failed:', fallbackError);
-        }
         dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
         return;
       }
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🌤️ [WeatherContext] Starting weather fetch');
-    }
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
 
@@ -140,23 +102,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
 
       // Prefer GPS coordinates over IP location
       if (coordinates) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🌤️ [WeatherContext] Using GPS coordinates', { 
-            lat: coordinates.latitude, 
-            lon: coordinates.longitude 
-          });
-        }
         weatherData = await weatherService.getWeatherByCoordinates(
           coordinates.latitude,
           coordinates.longitude
         );
       } else if (ipLocation?.city) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🌤️ [WeatherContext] Using IP location', { 
-            city: ipLocation.city, 
-            country: ipLocation.country 
-          });
-        }
         weatherData = await weatherService.getWeatherByCity(
           ipLocation.city,
           ipLocation.country
@@ -165,22 +115,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
         throw new Error('No location available');
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🌤️ [WeatherContext] Weather data received', weatherData);
-      }
       dispatch({ type: 'SET_WEATHER_DATA', payload: weatherData });
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('🌤️ [WeatherContext] Weather fetch error:', error);
-        console.error('🌤️ [WeatherContext] Error details:', {
-          message: error.message,
-          stack: error.stack,
-          cause: error.cause
-        });
-      }
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to fetch weather' });
     }
-  }, [state.loading, state.lastUpdated, coordinates, ipLocation]);
+  }, [coordinates, ipLocation]);
 
   const toggleUnit = useCallback((): void => {
     dispatch({ type: 'TOGGLE_UNIT' });
@@ -190,29 +129,24 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
-  // Fetch weather when location becomes available (optimized to prevent duplicate calls)
-  useEffect(() => {
-    if (coordinates || ipLocation?.city) {
-      // Only fetch if we don't have recent data (within 5 minutes)
-      const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0);
-      if (timeSinceLastUpdate > 5 * 60 * 1000) {
-        fetchWeather();
-      }
-    }
-  }, [coordinates, ipLocation?.city]); // More specific dependency
-
-  // Set up auto-refresh every 10 minutes (optimized with single interval)
+  // Fetch weather when location becomes available and set up auto-refresh
   useEffect(() => {
     if (!coordinates && !ipLocation?.city) return;
 
+    // Initial fetch if we don't have recent data
+    const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0);
+    const cacheExpiry = 10 * 60 * 1000;
+    if (!state.loading && timeSinceLastUpdate > cacheExpiry) {
+      fetchWeather();
+    }
+
+    // Set up auto-refresh interval
     const interval = setInterval(() => {
-      if (coordinates || ipLocation?.city) {
-        fetchWeather(true);
-      }
-    }, 10 * 60 * 1000); // 10 minutes
+      fetchWeather(true);
+    }, cacheExpiry); // 10 minutes
 
     return () => clearInterval(interval);
-  }, [!!coordinates, !!ipLocation?.city]); // Boolean dependencies to prevent unnecessary effect runs
+  }, [!!coordinates, !!ipLocation?.city, state.loading, state.lastUpdated, fetchWeather]); // Boolean dependencies to prevent unnecessary effect runs
 
   // Convert temperature based on unit preference - memoized to prevent re-calculation
   const displayData = useMemo((): WeatherData | null => {

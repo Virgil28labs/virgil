@@ -1,5 +1,6 @@
 import type { WeatherData } from '../types/weather.types';
 import { dedupeFetch } from './requestDeduplication';
+import { retryWithBackoff } from './retryUtils';
 
 const BACKEND_API_BASE = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -15,52 +16,55 @@ class WeatherService {
   async getWeatherByCoordinates(lat: number, lon: number): Promise<WeatherData> {
     const cacheKey = `weather-${lat.toFixed(2)}-${lon.toFixed(2)}`;
     
-    console.log('🌡️ [WeatherService] getWeatherByCoordinates called', { lat, lon, cacheKey });
-    
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('🌡️ [WeatherService] Using cached data');
       return cached.data;
     }
 
     const apiUrl = `${BACKEND_API_BASE}/weather/coordinates/${lat}/${lon}`;
-    console.log('🌡️ [WeatherService] Making API request to:', apiUrl);
 
     try {
-      const response = await dedupeFetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await dedupeFetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            timeout: 10000
+          });
+
+          if (!res.ok) {
+            let errorText = 'Unknown error';
+            try {
+              const errorData = await res.json();
+              errorText = errorData.error || errorData.message || `HTTP ${res.status}`;
+            } catch {
+              errorText = await res.text().catch(() => `HTTP ${res.status}`);
+            }
+            throw new Error(errorText);
+          }
+          
+          return res;
         },
-        timeout: 10000
-      });
-
-      console.log('🌡️ [WeatherService] API response status:', response.status);
-
-      if (!response.ok) {
-        let errorText = 'Unknown error';
-        try {
-          const errorData = await response.json();
-          errorText = errorData.error || errorData.message || `HTTP ${response.status}`;
-        } catch {
-          errorText = await response.text().catch(() => `HTTP ${response.status}`);
+        {
+          maxRetries: 3,
+          initialDelay: 1000,
+          onRetry: (attempt, error) => {
+            // Retry silently
+          }
         }
-        console.error('🌡️ [WeatherService] API error response:', errorText);
-        throw new Error(`Weather API error: ${response.status} - ${errorText}`);
-      }
+      );
 
       const result = await response.json();
-      console.log('🌡️ [WeatherService] API response data:', result);
       
       if (!result.success || !result.data) {
-        console.error('🌡️ [WeatherService] Invalid response structure:', result);
         throw new Error('Invalid weather response');
       }
 
       const weatherData = result.data;
-      console.log('🌡️ [WeatherService] Parsed weather data:', weatherData);
 
       // Cache the result
       this.cache.set(cacheKey, {
@@ -70,7 +74,6 @@ class WeatherService {
 
       return weatherData;
     } catch (error: any) {
-      console.error('Weather fetch error:', error);
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -120,7 +123,6 @@ class WeatherService {
 
       return weatherData;
     } catch (error: any) {
-      console.error('Weather fetch error:', error);
       throw new Error('Failed to fetch weather data');
     }
   }

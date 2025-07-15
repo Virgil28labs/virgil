@@ -1,0 +1,239 @@
+Virgil Diagnostics Report
+Generated: Mon Jul 14 16:51:02 PDT 2025
+Platform: Darwin
+User: bbb
+Directory: /Users/bbb/Desktop/Code/Virgil
+
+
+════════════════════════════════════════════════════════
+  Process Status
+════════════════════════════════════════════════════════
+ℹ  No PID directory found
+
+All Node.js processes:
+bbb              88177   9.0  0.7 411594864  57408 s008  R+    4:51PM   0:00.08 npm    
+bbb              78034   0.0  0.0 422499040    688   ??  S     1:55PM   0:00.29 node /Users/bbb/.npm/_npx/eea2bd7412d4593b/node_modules/.bin/context7-mcp
+bbb              78025   0.0  0.0 411927680   2800   ??  S     1:55PM   0:00.66 npm exec @upstash/context7-mcp   
+bbb              54580   0.0  0.2 1621827392  16464   ??  S    10:20AM   0:02.09 /Applications/Cursor.app/Contents/Frameworks/Cursor Helper (Plugin).app/Contents/MacOS/Cursor Helper (Plugin) /Applications/Cursor.app/Contents/Resources/app/extensions/markdown-language-features/dist/serverWorkerMain --node-ipc --clientProcessId=53056
+bbb              54096   0.0  0.1 1621777216   7328   ??  S    10:16AM   0:00.66 /Applications/Cursor.app/Contents/Frameworks/Cursor Helper (Plugin).app/Contents/MacOS/Cursor Helper (Plugin) /Applications/Cursor.app/Contents/Resources/app/extensions/node_modules/typescript/lib/typingsInstaller.js --globalTypingsCacheLocation /Users/bbb/Library/Caches/typescript/5.8 --enableTelemetry --typesMapLocation /Applications/Cursor.app/Contents/Resources/app/extensions/node_modules/typescript/lib/typesMap.json --validateDefaultNpmLocation
+bbb              53332   0.0  0.1 1621823488  12016   ??  S    10:10AM   0:02.16 /Applications/Cursor.app/Contents/Frameworks/Cursor Helper (Plugin).app/Contents/MacOS/Cursor Helper (Plugin) /Applications/Cursor.app/Contents/Resources/app/extensions/json-language-features/server/dist/node/jsonServerMain --node-ipc --clientProcessId=53056
+bbb              53289   0.0  0.1 420402752   4704   ??  S    10:10AM   0:01.79 node /Users/bbb/.npm/_npx/0496d3f111c50e47/node_modules/.bin/cli run @smithery-ai/github --key 5e65781f-7511-45e8-aae0-b31b0b99ce24 --profile printed-rodent-ocslL7
+bbb              53253   0.0  0.1 411771904   5424   ??  S    10:10AM   0:00.57 npm exec @smithery/cli@latest run @smithery-ai/github --key *** --profile printed-rodent-ocslL7         
+bbb              53244   0.0  0.1 420263488   4688   ??  S    10:10AM   0:01.86 node /Users/bbb/.npm/_npx/0496d3f111c50e47/node_modules/.bin/cli run @smithery-ai/github --key 5e65781f-7511-45e8-aae0-b31b0b99ce24 --profile printed-rodent-ocslL7
+bbb              53174   0.0  0.1 411773440   5424   ??  S    10:10AM   0:00.68 npm exec @smithery/cli@latest run @smithery-ai/github --key *** --profile printed-rodent-ocslL7         
+bbb              87399   0.0  0.2 411458688  18384   ??  SN    4:46PM   0:00.09 node /Users/bbb/Desktop/Code/Virgil/server/node_modules/.bin/nodemon index.js
+bbb              87377   0.0  0.3 411621632  22976   ??  SN    4:46PM   0:00.10 npm run dev   
+
+════════════════════════════════════════════════════════
+  Port Analysis
+════════════════════════════════════════════════════════
+
+Port 3000:
+  lsof: Port is free
+  netstat: Port is free
+  nc: Port is not responding
+  HTTP: No HTTP response
+✅ Port 3000 appears to be free
+
+Port 5002:
+  lsof: Port is free
+  netstat: Port is free
+  nc: Port is not responding
+  HTTP: No HTTP response
+✅ Port 5002 appears to be free
+
+════════════════════════════════════════════════════════
+  Recent Log Errors
+════════════════════════════════════════════════════════
+
+=== backend.log ===
+⚠️  Found 4 error(s) in backend.log
+Last 10 error lines:
+❌ SerpAPI error: 401 {
+  error: 'Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key'
+❌ SerpAPI error: 401 {
+  error: 'Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key'
+
+Last 5 lines of backend.log:
+  error: 'Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key'
+}
+🛑 Received shutdown signal, closing server gracefully...
+✅ Server closed
+[32m[nodemon] clean exit - waiting for changes before restart[39m
+
+=== frontend.log ===
+✅ No errors found in frontend.log
+
+Last 5 lines of frontend.log:
+
+  VITE v7.0.4  ready in 798 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.1.178:3000/
+
+=== startup.log ===
+⚠️  Found 1 error(s) in startup.log
+Last 10 error lines:
+2025-07-14 16:46:43 [ERROR] Backend server crashed!
+
+Last 5 lines of startup.log:
+2025-07-14 16:46:43 [WARNING] Could not find actual frontend process, using npm PID
+2025-07-14 16:46:43 [INFO] Waiting for frontend server to be ready...
+2025-07-14 16:46:43 [SUCCESS] Frontend server is ready!
+2025-07-14 16:46:43 [INFO] Monitoring servers... Press Ctrl+C to stop
+2025-07-14 16:46:43 [ERROR] Backend server crashed!
+
+════════════════════════════════════════════════════════
+  Node.js and npm Diagnostics
+════════════════════════════════════════════════════════
+
+Node.js:
+  Version: v24.3.0
+  Path: /opt/homebrew/bin/node
+  Process versions:
+{
+  node: '24.3.0',
+  acorn: '8.15.0',
+  ada: '3.2.4',
+  amaro: '1.1.0',
+  ares: '1.34.5',
+  brotli: '1.1.0',
+  cjs_module_lexer: '2.1.0',
+  cldr: '47.0',
+  icu: '77.1',
+  llhttp: '9.3.0',
+  modules: '137',
+  napi: '10',
+  nbytes: '0.1.1',
+  ncrypto: '0.0.1',
+  nghttp2: '1.66.0',
+  openssl: '3.5.0',
+  simdjson: '3.13.0',
+  simdutf: '6.4.0',
+  sqlite: '3.50.1',
+  tz: '2025a',
+  undici: '7.10.0',
+  unicode: '16.0',
+  uv: '1.51.0',
+  uvwasi: '0.0.21',
+  v8: '13.6.233.10-node.18',
+  zlib: '1.2.12',
+  zstd: '1.5.7'
+}
+
+npm:
+  Version: 11.4.2
+  Path: /Users/bbb/.npm-global/bin/npm
+  Global prefix: /Users/bbb/.npm-global
+  Registry: https://registry.npmjs.org/
+
+npm cache status:
+Cache verified and compressed (~/.npm/_cacache)
+Content verified: 1315 (347460498 bytes)
+Content garbage-collected: 99 (124301013 bytes)
+Index entries: 1315
+Finished in 3.623s
+
+Package scripts:
+Frontend scripts:
+  dev: vite
+  dev-full: ./start-dev.sh
+  backend: cd server && npm run dev
+  build: vite build
+  lint: eslint .
+  preview: vite preview
+  dev-fast: vite --force
+  test: jest
+  test:watch: jest --watch
+  test:coverage: jest --coverage
+  test:ci: jest --ci --coverage --maxWorkers=2
+  check-env: ./check-env.sh
+  cleanup-ports: ./cleanup-ports.sh
+  diagnose: ./diagnose.sh
+
+Backend scripts:
+  start: node index.js
+  dev: nodemon index.js
+  test: echo "Error: no test specified" && exit 1
+
+════════════════════════════════════════════════════════
+  Environment Configuration
+════════════════════════════════════════════════════════
+
+PATH:
+/Users/bbb/.npm-global/bin
+/Users/bbb/.npm-global/bin
+
+Relevant environment variables:
+CLAUDE_CODE_SSE_PORT=21288
+OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+VSCODE_GIT_ASKPASS_NODE=/Applications/Cursor.app/Contents/Frameworks/Cursor Helper (Plugin).app/Contents/MacOS/Cursor Helper (Plugin)
+
+.env file:
+  Size:     1162 bytes
+  Lines:       27
+  Variables set:
+    VITE_SUPABASE_URL
+    VITE_SUPABASE_ANON_KEY
+    VITE_LLM_API_URL
+    VITE_API_URL
+    OPENAI_API_KEY
+    LLM_SERVER_PORT
+    NODE_ENV
+    OPENWEATHER_API_KEY
+    SERPAPI_KEY
+    VITE_DOG_API_URL
+    VITE_DOG_DOCS_URL
+    VITE_GOOGLE_MAPS_API_KEY
+
+════════════════════════════════════════════════════════
+  File System Analysis
+════════════════════════════════════════════════════════
+
+Disk space:
+Filesystem      Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s5   228Gi   187Gi   5.9Gi    97%    2.4M   62M    4%   /System/Volumes/Data
+
+Directory permissions:
+drwxr-xr-x   35 bbb  staff    1120 Jul 14 16:51 .
+drwxr-xr-x    4 bbb  staff     128 Jul 14 07:51 ..
+drwxr-xr-x@   3 bbb  staff      96 Jul 14 16:51 .claude
+drwxr-xr-x@  16 bbb  staff     512 Jul 14 16:49 .git
+drwxr-xr-x@  18 bbb  staff     576 Jul 14 10:33 SuperClaude
+drwxr-xr-x@  13 bbb  staff     416 Jul 14 12:02 coverage
+drwxr-xr-x@   5 bbb  staff     160 Jul 14 16:46 logs
+drwxr-xr-x@ 394 bbb  staff   12608 Jul 14 16:45 node_modules
+drwxr-xr-x@  11 bbb  staff     352 Jul 14 09:21 public
+drwxr-xr-x@  11 bbb  staff     352 Jul 14 16:08 server
+
+Large files (>10MB):
+
+Recently modified files:
+/Users/bbb/Desktop/Code/Virgil/virgil-diagnostics-20250714-165102.txt
+/Users/bbb/Desktop/Code/Virgil/.claude/settings.local.json
+/Users/bbb/Desktop/Code/Virgil/server/package-lock.json
+/Users/bbb/Desktop/Code/Virgil/logs/backend.log
+/Users/bbb/Desktop/Code/Virgil/logs/frontend.log
+/Users/bbb/Desktop/Code/Virgil/logs/startup.log
+/Users/bbb/Desktop/Code/Virgil/.gitignore
+/Users/bbb/Desktop/Code/Virgil/CLAUDE.md
+
+════════════════════════════════════════════════════════
+  Network Diagnostics
+════════════════════════════════════════════════════════
+
+Localhost resolution:
+localhost.lan has address 127.0.0.1
+
+Port connectivity:
+  Port 3000: Cannot connect
+  Port 5002: Cannot connect
+
+Firewall status:
+  Could not check firewall (needs sudo)
+
+════════════════════════════════════════════════════════
+  Recommendations
+════════════════════════════════════════════════════════
+Based on the diagnostics, here are some recommendations:
+

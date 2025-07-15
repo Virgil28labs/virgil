@@ -5,6 +5,7 @@ import type {
   LocationData,
   GeolocationError
 } from '../types/location.types'
+import { retryWithBackoff } from './retryUtils'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
@@ -42,7 +43,7 @@ export const locationService = {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 3000, // Reduced from 10s to 3s for faster response
           maximumAge: 300000
         }
       );
@@ -83,51 +84,63 @@ export const locationService = {
         formatted: data.display_name || ''
       };
     } catch (error) {
-      console.error('Error fetching address:', error);
       throw new Error('Failed to get address from coordinates');
     }
   },
 
 
+
   async getIPAddress(): Promise<string> {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch IP address');
+    return retryWithBackoff(
+      async () => {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (!response.ok) {
+          throw new Error('Failed to fetch IP address');
+        }
+        const data: { ip: string } = await response.json();
+        return data.ip;
+      },
+      {
+        maxRetries: 2,
+        initialDelay: 500,
+        onRetry: (attempt, error) => {
+          // Retry silently
+        }
       }
-      const data: { ip: string } = await response.json();
-      return data.ip;
-    } catch (error) {
-      console.error('Error fetching IP address:', error);
-      throw new Error('Failed to get IP address');
-    }
+    );
   },
 
   async getIPLocation(ip: string): Promise<IPLocation> {
-    try {
-      const response = await fetch(`https://ipapi.co/${ip}/json/`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch IP location');
+    return retryWithBackoff(
+      async () => {
+        const response = await fetch(`https://ipapi.co/${ip}/json/`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch IP location');
+        }
+        const data: any = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.reason || 'Failed to get location from IP');
+        }
+        
+        return {
+          ip: data.ip,
+          country: data.country_name,
+          region: data.region,
+          city: data.city,
+          lat: data.latitude,
+          lon: data.longitude,
+          timezone: data.timezone
+        };
+      },
+      {
+        maxRetries: 2,
+        initialDelay: 500,
+        onRetry: (attempt, error) => {
+          // Retry silently
+        }
       }
-      const data: any = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.reason || 'Failed to get location from IP');
-      }
-      
-      return {
-        ip: data.ip,
-        country: data.country_name,
-        region: data.region,
-        city: data.city,
-        lat: data.latitude,
-        lon: data.longitude,
-        timezone: data.timezone
-      };
-    } catch (error) {
-      console.error('Error fetching IP location:', error);
-      throw new Error('Failed to get location from IP');
-    }
+    );
   },
 
   async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
@@ -146,64 +159,120 @@ export const locationService = {
         elevationFeet: data.elevationFeet
       };
     } catch (error) {
-      console.error('Error fetching elevation:', error);
       throw new Error('Failed to get elevation data');
     }
   },
 
-  async getFullLocationData(): Promise<LocationData> {
+  async getQuickLocation(): Promise<LocationData> {
+    // Fast IP-only location for immediate weather display
     const locationData: LocationData = {
       timestamp: Date.now()
     };
 
-    // Get IP information
     try {
       const ip = await this.getIPAddress();
       const ipLocation = await this.getIPLocation(ip);
       locationData.ipLocation = ipLocation;
-    } catch (error) {
-      console.error('Failed to get IP location:', error);
-      // Still set a basic IP location object with just the IP
-      try {
-        const ip = await this.getIPAddress();
-        locationData.ipLocation = { ip: ip };
-      } catch (ipError) {
-        console.error('Failed to get even basic IP:', ipError);
-      }
-    }
-
-    // Try to get GPS location (may fail due to permissions)
-    try {
-      const coords = await this.getCurrentPosition();
-      locationData.coordinates = coords;
       
-      // Try to get address
-      try {
-        locationData.address = await this.getAddressFromCoordinates(
-          coords.latitude, 
-          coords.longitude
-        );
-      } catch (addressError) {
-        console.warn('Failed to get address:', addressError.message);
-      }
-      
-      // Try to get elevation
-      try {
-        const elevationData = await this.getElevation(coords.latitude, coords.longitude);
-        locationData.coordinates = {
-          ...coords,
-          elevation: elevationData.elevation,
-          elevationUnit: 'meters'
-        };
-      } catch (elevationError) {
-        console.warn('Failed to get elevation:', elevationError.message);
-        // Continue without elevation data
+      // Create basic address from IP data
+      if (ipLocation?.city) {
+        locationData.address = this.createAddressFromIPLocation(ipLocation);
       }
     } catch (error) {
-      console.warn('Failed to get GPS location:', error.message);
-      // Don't set null values - let the context preserve existing data
+      // Return empty location data on error
     }
 
     return locationData;
+  },
+
+  async getFullLocationData(existingIPLocation?: IPLocation): Promise<LocationData> {
+    const locationData: LocationData = {
+      timestamp: Date.now()
+    };
+
+    // If we already have IP location, use it; otherwise fetch it
+    if (existingIPLocation) {
+      locationData.ipLocation = existingIPLocation;
+    } else {
+      const ipLocationResult = await this.fetchIPLocationData();
+      if (ipLocationResult) {
+        locationData.ipLocation = ipLocationResult;
+      }
+    }
+
+    // Fetch GPS location data
+    try {
+      const gpsResult = await this.fetchGPSLocationData();
+      if (gpsResult.coordinates) {
+        locationData.coordinates = gpsResult.coordinates;
+      }
+      if (gpsResult.address) {
+        locationData.address = gpsResult.address;
+      }
+    } catch (error) {
+      // GPS is optional, continue without it
+    }
+
+    // If we have no GPS but have IP location, create a basic address from IP data
+    if (!locationData.address && locationData.ipLocation?.city) {
+      locationData.address = this.createAddressFromIPLocation(locationData.ipLocation);
+    }
+
+    return locationData;
+  },
+
+  async fetchIPLocationData(): Promise<IPLocation | undefined> {
+    try {
+      const ip = await this.getIPAddress();
+      return await this.getIPLocation(ip);
+    } catch (error) {
+      // Try to at least get the IP
+      try {
+        const ip = await this.getIPAddress();
+        return { ip };
+      } catch (ipError) {
+        return undefined;
+      }
+    }
+  },
+
+  async fetchGPSLocationData(): Promise<{ coordinates?: Coordinates; address?: Address }> {
+    try {
+      const coords = await this.getCurrentPosition();
+      const result: { coordinates?: Coordinates; address?: Address } = { coordinates: coords };
+      
+      // Fetch address and elevation in parallel
+      const [addressResult, elevationResult] = await Promise.allSettled([
+        this.getAddressFromCoordinates(coords.latitude, coords.longitude),
+        this.getElevation(coords.latitude, coords.longitude)
+      ]);
+      
+      if (addressResult.status === 'fulfilled') {
+        result.address = addressResult.value;
+      }
+      
+      if (elevationResult.status === 'fulfilled') {
+        result.coordinates = {
+          ...coords,
+          elevation: elevationResult.value.elevation,
+          elevationUnit: 'meters'
+        };
+      }
+      
+      return result;
+    } catch (error) {
+      return {};
+    }
+  },
+
+  createAddressFromIPLocation(ipLocation: IPLocation): Address {
+    return {
+      street: '',
+      house_number: '',
+      city: ipLocation.city || '',
+      postcode: '',
+      country: ipLocation.country || '',
+      formatted: `${ipLocation.city || ''}, ${ipLocation.region || ''} ${ipLocation.country || ''}`.trim()
+    };
   }
 };

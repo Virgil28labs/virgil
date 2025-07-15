@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Virgil Port Cleanup Utility
-# Safely cleans up processes using Virgil's default ports
+# Quickly cleans up processes using Virgil's default ports
+# Usage: ./cleanup-ports.sh [--interactive]
 
 set -euo pipefail
 
@@ -27,28 +28,11 @@ log_success() { echo -e "${GREEN}✅${NC} $*"; }
 log_warning() { echo -e "${YELLOW}⚠️${NC}  $*"; }
 log_error() { echo -e "${RED}❌${NC} $*"; }
 
-# Platform detection
-detect_platform() {
-    case "$OSTYPE" in
-        darwin*) echo "macos" ;;
-        linux*) echo "linux" ;;
-        *) echo "unknown" ;;
-    esac
-}
-
-readonly PLATFORM=$(detect_platform)
+# Simple platform check - we only need lsof which works on both macOS and Linux
 
 # Get process using a port
 get_port_process() {
-    local port="$1"
-    
-    if command -v lsof >/dev/null 2>&1; then
-        lsof -i ":$port" -sTCP:LISTEN -t 2>/dev/null | head -1
-    elif command -v ss >/dev/null 2>&1; then
-        ss -tlnp 2>/dev/null | grep ":$port " | awk '{print $NF}' | grep -o '[0-9]\+' | head -1
-    else
-        echo ""
-    fi
+    lsof -i ":$1" -sTCP:LISTEN -t 2>/dev/null | head -1
 }
 
 # Check if process is a node process
@@ -63,83 +47,78 @@ get_process_info() {
     ps -p "$pid" -o pid,ppid,user,command 2>/dev/null || echo "Process $pid not found"
 }
 
+# Parse command line arguments
+INTERACTIVE=false
+for arg in "$@"; do
+    case $arg in
+        --interactive|-i)
+            INTERACTIVE=true
+            shift
+            ;;
+    esac
+done
+
 # Kill process safely
 kill_process_safely() {
     local pid="$1"
     local port="$2"
     
-    log_info "Checking process $pid on port $port..."
-    
-    # Show process details
-    echo "Process details:"
-    get_process_info "$pid" | sed 's/^/  /'
-    echo
-    
     # Safety check - only kill node-related processes
     if ! is_node_process "$pid"; then
-        log_warning "Process $pid is not a Node.js process. Skipping for safety."
+        log_warning "Process $pid is not a Node.js process. Skipping."
         return 1
     fi
     
-    # Confirm with user
-    read -p "Kill this process? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Skipping process $pid"
-        return 1
+    # Interactive mode - show details and confirm
+    if $INTERACTIVE; then
+        log_info "Process on port $port:"
+        get_process_info "$pid" | sed 's/^/  /'
+        echo
+        
+        read -p "Kill this process? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Skipping process $pid"
+            return 1
+        fi
     fi
     
     # Try graceful termination first
-    log_info "Sending SIGTERM to process $pid..."
     kill -TERM "$pid" 2>/dev/null || {
         log_warning "Process $pid not found"
         return 1
     }
     
-    # Wait for process to terminate
+    # Wait for process to terminate (max 1 second)
     local count=0
-    while kill -0 "$pid" 2>/dev/null && [ $count -lt 5 ]; do
-        sleep 1
+    while kill -0 "$pid" 2>/dev/null && [ $count -lt 10 ]; do
+        sleep 0.1
         ((count++))
     done
     
     # Force kill if still running
     if kill -0 "$pid" 2>/dev/null; then
-        log_warning "Process didn't terminate gracefully, forcing..."
         kill -9 "$pid" 2>/dev/null || true
     fi
     
-    log_success "Process $pid terminated"
+    log_success "Stopped process on port $port (PID: $pid)"
     return 0
 }
 
 # Clean up PID files
 cleanup_pid_files() {
     if [[ -d "$PID_DIR" ]]; then
-        log_info "Cleaning up PID files..."
-        local cleaned=0
-        
-        for pidfile in "$PID_DIR"/*.json; do
-            if [[ -f "$pidfile" ]]; then
-                local pid=$(jq -r '.pid' "$pidfile" 2>/dev/null || echo "")
-                if [[ -n "$pid" ]] && ! kill -0 "$pid" 2>/dev/null; then
-                    rm -f "$pidfile"
-                    ((cleaned++))
-                fi
-            fi
-        done
-        
-        if [[ $cleaned -gt 0 ]]; then
-            log_success "Cleaned up $cleaned stale PID files"
-        fi
+        rm -rf "$PID_DIR"
+        log_info "Cleaned up PID files"
     fi
 }
 
 # Main cleanup function
 main() {
-    echo -e "${BLUE}═══════════════════════════════════════════════════════${NC}"
-    echo -e "${BLUE}        Virgil Port Cleanup Utility                    ${NC}"
-    echo -e "${BLUE}═══════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}🛑 Virgil Port Cleanup${NC}"
+    if $INTERACTIVE; then
+        echo "   Running in interactive mode"
+    fi
     echo
     
     local found_processes=false
@@ -201,14 +180,12 @@ main() {
     
     echo
     if $all_clear; then
-        log_success "All ports are clear. You can now start Virgil!"
-        echo
-        echo "Run: ./start-dev.sh"
+        log_success "All ports are clear!"
     else
-        log_warning "Some ports are still in use. You may need to manually kill the processes."
-        echo
-        echo "Try running with sudo if processes are owned by root:"
-        echo "  sudo $0"
+        log_error "Failed to clear some ports"
+        if ! $INTERACTIVE; then
+            echo "Try: $0 --interactive"
+        fi
     fi
 }
 

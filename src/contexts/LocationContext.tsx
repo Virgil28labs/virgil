@@ -54,7 +54,7 @@ const initialState: LocationState = {
   coordinates: null,
   address: null,
   ipLocation: null,
-  loading: false,
+  loading: false,  // Start with loading false to allow initial fetch
   error: null,
   permissionStatus: 'unknown',
   lastUpdated: null
@@ -69,7 +69,8 @@ export function LocationProvider({ children }: LocationProviderProps) {
 
 
   const fetchLocationData = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
-    if (state.loading) {
+    // Skip if already loading and not forcing refresh
+    if (state.loading && !forceRefresh) {
       return;
     }
 
@@ -84,17 +85,29 @@ export function LocationProvider({ children }: LocationProviderProps) {
     dispatch({ type: 'CLEAR_ERROR' })
 
     try {
-      const locationData = await locationService.getFullLocationData()
-      dispatch({ type: 'SET_LOCATION_DATA', payload: locationData })
-    } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Location fetch error:', error)
+      // First, get quick IP location for immediate weather display
+      const quickLocation = await locationService.getQuickLocation()
+      if (quickLocation.ipLocation) {
+        dispatch({ type: 'SET_LOCATION_DATA', payload: quickLocation })
       }
+      
+      // Then enhance with GPS data in the background (non-blocking)
+      // Pass the existing IP location to avoid duplicate fetching
+      locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
+        // Only update if we got GPS coordinates or better address
+        if (fullLocationData.coordinates || 
+            (fullLocationData.address?.street && !state.address?.street)) {
+          dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData })
+        }
+      }).catch(() => {
+        // Silently ignore GPS errors since we already have IP location
+      })
+    } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message })
     }
-  }, [state.loading, state.lastUpdated])
+  }, [])
 
-  const checkLocationPermission = async (): Promise<void> => {
+  const checkLocationPermission = useCallback(async (): Promise<void> => {
     if (!navigator.permissions) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'unavailable' })
       return
@@ -104,18 +117,22 @@ export function LocationProvider({ children }: LocationProviderProps) {
       const permission = await navigator.permissions.query({ name: 'geolocation' })
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: permission.state })
       
-      permission.onchange = () => {
+      // Store permission listener for cleanup
+      const handlePermissionChange = () => {
         dispatch({ type: 'SET_PERMISSION_STATUS', payload: permission.state })
       }
-    } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Could not check location permission:', error)
+      permission.addEventListener('change', handlePermissionChange)
+      
+      // Return cleanup function
+      return () => {
+        permission.removeEventListener('change', handlePermissionChange)
       }
+    } catch (error: any) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'unavailable' })
     }
-  }
+  }, [])
 
-  const requestLocationPermission = async (): Promise<void> => {
+  const requestLocationPermission = useCallback(async (): Promise<void> => {
     try {
       await locationService.getCurrentPosition()
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'granted' })
@@ -124,15 +141,19 @@ export function LocationProvider({ children }: LocationProviderProps) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'denied' })
       dispatch({ type: 'SET_ERROR', payload: error.message })
     }
-  }
+  }, [fetchLocationData])
 
-  const clearError = (): void => {
+  const clearError = useCallback((): void => {
     dispatch({ type: 'CLEAR_ERROR' })
-  }
+  }, [])
 
   useEffect(() => {
-    checkLocationPermission()
-  }, [])
+    // Check location permission on mount
+    const cleanup = checkLocationPermission();
+    return () => {
+      cleanup?.then(fn => fn?.())
+    }
+  }, [checkLocationPermission])
 
   useEffect(() => {
     // Always attempt to fetch location if permission is granted, unavailable, or unknown
@@ -141,40 +162,15 @@ export function LocationProvider({ children }: LocationProviderProps) {
       state.permissionStatus === 'unavailable' ||
       state.permissionStatus === 'unknown'
     ) {
-      fetchLocationData()
-    }
-  }, [state.permissionStatus, fetchLocationData])
-
-  // Optimized debug logging (performance optimization)
-  useEffect(() => {
-    // Only log in development and throttle logs to prevent performance impact
-    if (process.env.NODE_ENV === 'development' && state.lastUpdated) {
-      const logData = {
-        coordinates: !!state.coordinates,
-        address: !!state.address,
-        ipLocation: !!state.ipLocation,
-        loading: state.loading,
-        error: !!state.error,
-        permissionStatus: state.permissionStatus
-      };
-      
-      // Throttle logging to prevent spam
-      const lastLog = sessionStorage.getItem('last-location-log');
-      const now = Date.now();
-      if (!lastLog || now - parseInt(lastLog) > 2000) {
-        console.log('📍 [LocationContext] State update:', logData);
-        sessionStorage.setItem('last-location-log', now.toString());
-        
-        if (state.coordinates) {
-          console.log('📍 [LocationContext] GPS:', {
-            lat: state.coordinates.latitude.toFixed(6),
-            lon: state.coordinates.longitude.toFixed(6),
-            accuracy: Math.round(state.coordinates.accuracy)
-          });
-        }
+      // Check state internally to avoid dependency
+      const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0)
+      const cacheExpiry = 5 * 60 * 1000
+      if (!state.loading && timeSinceLastUpdate > cacheExpiry) {
+        fetchLocationData()
       }
     }
-  }, [state.lastUpdated, state.coordinates, state.error, state.loading]);
+  }, [state.permissionStatus, state.loading, state.lastUpdated, fetchLocationData])
+
 
   // Memoized context value to prevent unnecessary re-renders (performance optimization)
   const value: LocationContextType = useMemo(() => ({
@@ -182,9 +178,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
     fetchLocationData,
     requestLocationPermission,
     clearError,
-    hasLocation: !!state.coordinates,
     hasGPSLocation: !!state.coordinates,
-    hasIPLocation: !!state.ipLocation
+    hasIPLocation: !!state.ipLocation,
+    initialized: true  // Always initialized after mount
   }), [
     state, 
     fetchLocationData, 

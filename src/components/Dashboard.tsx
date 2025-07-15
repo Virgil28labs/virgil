@@ -97,8 +97,10 @@ export const Dashboard = memo(function Dashboard() {
               )
             ) : locationLoading ? (
               <SkeletonLoader width="200px" height="16px" />
+            ) : ipLocation?.city ? (
+              <p className="street-address">{ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}</p>
             ) : (
-              <p className="address-error">Address unavailable</p>
+              <p className="address-error">Location unavailable</p>
             )}
           </div>
           

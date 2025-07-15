@@ -60,7 +60,7 @@ check_log_errors() {
                 echo -e "\n${YELLOW}=== $basename ===${NC}" | tee -a "$DIAG_FILE"
                 
                 # Check for common error patterns
-                local error_count=$(grep -ciE "(error|failed|exception|crash|fatal)" "$logfile" 2>/dev/null || echo 0)
+                local error_count=$(grep -ciE "(error|failed|exception|crash|fatal)" "$logfile" 2>/dev/null | head -1 || echo 0)
                 
                 if [[ $error_count -gt 0 ]]; then
                     log_warning "Found $error_count error(s) in $basename"
@@ -323,7 +323,7 @@ generate_recommendations() {
         local total_errors=0
         for logfile in "$LOG_DIR"/*.log; do
             if [[ -f "$logfile" ]]; then
-                local errors=$(grep -ciE "(error|failed|exception)" "$logfile" 2>/dev/null || echo 0)
+                local errors=$(grep -ciE "(error|failed|exception)" "$logfile" 2>/dev/null | head -1 || echo 0)
                 total_errors=$((total_errors + errors))
             fi
         done

@@ -51,7 +51,12 @@ export const Weather = memo(function Weather() {
             {process.env.NODE_ENV === 'development' ? 'ERR' : '--°'}
           </span>
         </div>
-      ) : null}
+      ) : (
+        // Default state - show loading skeleton
+        <div className="weather-content">
+          <SkeletonLoader width="120px" height="24px" />
+        </div>
+      )}
     </div>
   );
 });

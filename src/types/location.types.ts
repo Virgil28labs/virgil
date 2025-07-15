@@ -46,6 +46,7 @@ export interface LocationState {
   error: string | null;
   permissionStatus: PermissionStatus;
   lastUpdated: number | null;
+  initialized: boolean;
 }
 
 export interface LocationContextValue extends LocationState {
