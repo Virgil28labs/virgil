@@ -1,9 +1,9 @@
-import { useState, memo } from 'react'
+import React, { useState, memo } from 'react'
 import { SignUpForm } from './SignUpForm'
 import { LoginForm } from './LoginForm'
 import { RaccoonMascot } from './RaccoonMascot'
 
-export const AuthPage = memo(function AuthPage(): JSX.Element {
+export const AuthPage = memo(function AuthPage(): React.ReactElement {
   const [isLogin, setIsLogin] = useState<boolean>(true)
 
   return (

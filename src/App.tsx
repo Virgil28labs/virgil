@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import React, { Suspense } from 'react'
 import './App.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LocationProvider } from './contexts/LocationContext'
@@ -12,7 +12,7 @@ import { SkeletonLoader } from './components/SkeletonLoader'
 import { ToastContainer } from './components/ToastNotification'
 import { useToast } from './hooks/useToast'
 
-function AppContent(): JSX.Element {
+function AppContent(): React.ReactElement {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -60,7 +60,7 @@ function AppContent(): JSX.Element {
   )
 }
 
-function App(): JSX.Element {
+function App(): React.ReactElement {
   const { toasts, removeToast } = useToast();
 
   return (

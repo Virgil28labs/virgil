@@ -6,7 +6,7 @@ import tseslint from '@typescript-eslint/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 
 export default [
-  { ignores: ['dist', 'server'] },
+  { ignores: ['dist', 'server', 'coverage', 'node_modules'] },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
@@ -30,6 +30,25 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+  // Jest environment for test files
+  {
+    files: ['**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}', '**/jest.setup.ts', '**/test-utils.tsx', '**/__mocks__/**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+      },
+    },
+  },
+  // Node.js environment for CommonJS files
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
   {
