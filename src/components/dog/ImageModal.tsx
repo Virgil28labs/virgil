@@ -1,5 +1,6 @@
 import { memo, useEffect, useCallback } from 'react'
 import type { DogImage } from './hooks/useDogApi'
+import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils'
 
 interface ImageModalProps {
   dogs: DogImage[]
@@ -35,81 +36,29 @@ export const ImageModal = memo(function ImageModal({
   }, [hasNext, currentIndex, onNavigate])
 
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
+    stopEvent(e)
     if (!currentDog) return
     
     try {
-      const response = await fetch(currentDog.url)
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `doggo-${currentDog.breed}-${Date.now()}.jpg`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      await downloadImage(currentDog.url, currentDog.breed)
     } catch (error) {
       console.error('Failed to download image:', error)
     }
   }, [currentDog])
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
+    stopEvent(e)
     if (!currentDog) return
     
     try {
-      // Create a canvas to draw the image
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      
-      await new Promise((resolve, reject) => {
-        img.onload = resolve
-        img.onerror = reject
-        img.src = currentDog.url
-      })
-      
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      const ctx = canvas.getContext('2d')
-      if (!ctx) throw new Error('Could not get canvas context')
-      
-      ctx.drawImage(img, 0, 0)
-      
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob)
-          else reject(new Error('Failed to create blob'))
-        }, 'image/png')
-      })
-      
-      // Try to copy image to clipboard
-      if (navigator.clipboard && window.ClipboardItem) {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'image/png': blob
-          })
-        ])
-      } else {
-        // Fallback: copy URL if image copy is not supported
-        await navigator.clipboard.writeText(currentDog.url)
-        console.log('Image copy not supported, copied URL instead')
-      }
+      await copyImageToClipboard(currentDog.url)
     } catch (error) {
       console.error('Failed to copy image:', error)
-      // Fallback to copying URL
-      try {
-        await navigator.clipboard.writeText(currentDog.url)
-      } catch (fallbackError) {
-        console.error('Failed to copy URL as fallback:', fallbackError)
-      }
     }
   }, [currentDog])
 
   const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
+    stopEvent(e)
     if (currentDog) {
       onFavoriteToggle(currentDog)
     }
@@ -185,10 +134,7 @@ export const ImageModal = memo(function ImageModal({
       
       <button
         className="doggo-modal-close"
-        onClick={(e) => {
-          e.stopPropagation()
-          onClose()
-        }}
+        onClick={onClose}
         aria-label="Close image"
       >
         ×
@@ -197,10 +143,7 @@ export const ImageModal = memo(function ImageModal({
       {hasPrevious && (
         <button
           className="doggo-modal-nav doggo-modal-prev"
-          onClick={(e) => {
-            e.stopPropagation()
-            handlePrevious()
-          }}
+          onClick={handlePrevious}
           aria-label="Previous image"
         >
           ‹
@@ -210,10 +153,7 @@ export const ImageModal = memo(function ImageModal({
       {hasNext && (
         <button
           className="doggo-modal-nav doggo-modal-next"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleNext()
-          }}
+          onClick={handleNext}
           aria-label="Next image"
         >
           ›

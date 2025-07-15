@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import { useDogApi } from './hooks/useDogApi'
 import { useDogFavorites } from './hooks/useDogFavorites'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
@@ -36,10 +36,6 @@ export const DogGallery = memo(function DogGallery({ isOpen, onClose }: DogGalle
     fetchDogs(selectedBreed, fetchCount)
   }, [fetchDogs, selectedBreed, fetchCount])
 
-  // Switch to fetch tab
-  const handleGoFetch = useCallback(() => {
-    setActiveTab('fetch')
-  }, [])
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -142,7 +138,7 @@ export const DogGallery = memo(function DogGallery({ isOpen, onClose }: DogGalle
                   : "Start by fetching some adorable friends"}
               </p>
               {activeTab === 'gallery' && (
-                <button className="doggo-empty-button" onClick={handleGoFetch}>
+                <button className="doggo-empty-button" onClick={() => setActiveTab('fetch')}>
                   Go Fetch →
                 </button>
               )}

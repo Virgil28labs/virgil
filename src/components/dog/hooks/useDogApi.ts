@@ -79,12 +79,12 @@ export const useDogApi = () => {
       
       setDogs(newDogs)
       
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
         return
       }
       
-      console.warn('Dog API fetch failed:', error.message)
+      console.warn('Dog API fetch failed:', error)
       setError('Unable to fetch dogs. Please try again.')
       setDogs([])
     } finally {
@@ -105,8 +105,8 @@ export const useDogApi = () => {
       const breedList = Object.keys(data.message || {})
       setBreeds(breedList)
       
-    } catch (error: any) {
-      console.warn('Failed to fetch breeds:', error.message)
+    } catch (error) {
+      console.warn('Failed to fetch breeds:', error)
       setBreeds([])
     }
   }, [fetchWithTimeout])
