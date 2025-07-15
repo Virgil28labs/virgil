@@ -23,13 +23,15 @@ export const ImageModal = memo(function ImageModal({
   const hasNext = currentIndex !== null && currentIndex < dogs.length - 1
   const currentDog = currentIndex !== null ? dogs[currentIndex] : null
 
-  const handlePrevious = useCallback(() => {
+  const handlePrevious = useCallback((e: React.MouseEvent) => {
+    stopEvent(e)
     if (hasPrevious && currentIndex !== null) {
       onNavigate(currentIndex - 1)
     }
   }, [hasPrevious, currentIndex, onNavigate])
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback((e: React.MouseEvent) => {
+    stopEvent(e)
     if (hasNext && currentIndex !== null) {
       onNavigate(currentIndex + 1)
     }
@@ -74,17 +76,21 @@ export const ImageModal = memo(function ImageModal({
           onClose()
           break
         case 'ArrowLeft':
-          handlePrevious()
+          if (hasPrevious && currentIndex !== null) {
+            onNavigate(currentIndex - 1)
+          }
           break
         case 'ArrowRight':
-          handleNext()
+          if (hasNext && currentIndex !== null) {
+            onNavigate(currentIndex + 1)
+          }
           break
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, onClose, handlePrevious, handleNext])
+  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext])
 
   if (currentIndex === null || !currentDog) return null
 
