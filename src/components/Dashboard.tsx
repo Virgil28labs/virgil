@@ -80,9 +80,6 @@ export const Dashboard = memo(function Dashboard() {
         <div className="user-info">
           <p className="user-name">{user?.user_metadata?.name || 'Anonymous User'}</p>
           <p className="user-email">{user?.email}</p>
-          {user?.created_at && (
-            <p className="member-since">Member since {formatDate(user.created_at)}</p>
-          )}
         </div>
 
         <div className="location-info">

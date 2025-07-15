@@ -314,7 +314,7 @@ html, body {
 
 
 .user-info {
-  margin: 0;
+  margin: 0 0 0.15rem 0;
   text-align: center;
 }
 
@@ -323,7 +323,7 @@ html, body {
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
-  line-height: 1.4;
+  line-height: 1.2;
   font-weight: 400;
 }
 
@@ -349,7 +349,7 @@ html, body {
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
-  line-height: 1.4;
+  line-height: 1.2;
   font-weight: 400;
 }
 
@@ -365,12 +365,20 @@ html, body {
   text-align: center;
 }
 
+.address-info {
+  margin-bottom: 0.15rem;
+}
+
+.ip-info {
+  margin-bottom: 0.15rem;
+}
+
 .coordinates, .street-address, .address-loading, .elevation {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
-  line-height: 1.4;
+  line-height: 1.2;
   font-weight: 400;
 }
 
@@ -379,7 +387,7 @@ html, body {
 }
 
 .elevation-info {
-  margin-top: 0.5rem;
+  margin-bottom: 0.15rem;
 }
 
 .user-location-error {

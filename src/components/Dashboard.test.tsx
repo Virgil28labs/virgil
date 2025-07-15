@@ -102,7 +102,6 @@ describe('Dashboard', () => {
     render(<Dashboard />);
     
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
-    expect(screen.getByText(/member since/i)).toBeInTheDocument();
   });
 
   it('displays location information when available', () => {
@@ -151,12 +150,6 @@ describe('Dashboard', () => {
     expect(profileButton).toHaveClass('active');
   });
 
-  it('formats member since date correctly', () => {
-    render(<Dashboard />);
-    
-    // Should format the date as "January 1, 2024"
-    expect(screen.getByText(/January 1, 2024/)).toBeInTheDocument();
-  });
 
   it('uses keyboard navigation hook', () => {
     render(<Dashboard />);

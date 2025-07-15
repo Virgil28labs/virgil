@@ -124,7 +124,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     '.datetime-display .day',  // Day display
     '.user-name',           // "Ben" text
     '.user-email',          // Email text  
-    '.member-since',        // Member since text
     '.street-address',      // Street address (Purdue Avenue)
     '.ip-address',          // IP address text
     '.ip-loading',          // IP loading text
@@ -182,7 +181,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     
     // Define text element selectors once (micro-optimization)
     const textSelectors = new Set([
-      '.virgil-logo', '.user-name', '.user-email', '.member-since', 
+      '.virgil-logo', '.user-name', '.user-email', 
       '.street-address', '.ip-address', '.ip-loading', '.ip-error', 
       '.address-loading', '.elevation', '.auth-page header h1'
     ]);
