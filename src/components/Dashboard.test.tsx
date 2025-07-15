@@ -19,8 +19,8 @@ jest.mock('./LazyComponents', () => ({
 jest.mock('./DogEmojiButton', () => ({
   DogEmojiButton: () => <button data-testid="dog-emoji-button">🐕</button>
 }));
-jest.mock('./VirgilLogo', () => ({
-  VirgilLogo: () => <div data-testid="virgil-logo">Virgil Logo</div>
+jest.mock('./VirgilTextLogo', () => ({
+  VirgilTextLogo: () => <div data-testid="virgil-logo">Virgil Logo</div>
 }));
 jest.mock('./DateTime', () => ({
   DateTime: () => <div data-testid="datetime">DateTime</div>

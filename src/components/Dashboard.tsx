@@ -1,7 +1,7 @@
 import { memo, useCallback, useState, Suspense } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocation } from '../contexts/LocationContext'
-import { VirgilLogo } from './VirgilLogo'
+import { VirgilTextLogo } from './VirgilTextLogo'
 import { DateTime } from './DateTime'
 import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents'
 import { DogEmojiButton } from './DogEmojiButton'
@@ -48,7 +48,7 @@ export const Dashboard = memo(function Dashboard() {
   return (
     <div ref={containerRef} className="dashboard" role="main" aria-label="Dashboard">
       {/* Fixed positioned elements */}
-      <VirgilLogo />
+      <VirgilTextLogo />
       <button 
         className={`user-profile-toggle ${showProfileViewer ? 'active' : ''}`}
         onClick={() => setShowProfileViewer(true)}

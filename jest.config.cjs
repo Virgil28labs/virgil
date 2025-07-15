@@ -8,23 +8,13 @@ module.exports = {
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        strict: true,
-        moduleResolution: 'node',
-        resolveJsonModule: true,
-        isolatedModules: true,
-        noEmit: true,
-        allowJs: true,
-        skipLibCheck: true,
-        forceConsistentCasingInFileNames: true
-      }
-    }]
+    '^.+\\.(ts|tsx)$': '<rootDir>/jest-transformer.cjs',
+    '^.+\\.(js|jsx)$': '<rootDir>/jest-transformer.cjs'
   },
   moduleNameMapper: {
+    // Mock problematic ESM modules
+    '^isows$': '<rootDir>/src/lib/__mocks__/isows.js',
+    
     // Handle CSS imports (CSS modules)
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     
@@ -40,6 +30,7 @@ module.exports = {
     '^@/services/(.*)$': '<rootDir>/src/services/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1'
   },
+  setupFiles: ['<rootDir>/jest-env-setup.cjs'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   clearMocks: true,
   collectCoverage: false,
@@ -63,4 +54,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testTimeout: 10000,
+  transformIgnorePatterns: [
+    'node_modules/(?!(isows|@supabase|superjson|ws)/)'
+  ],
 };

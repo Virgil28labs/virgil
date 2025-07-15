@@ -1,16 +1,17 @@
 # Virgil
 
-A minimalist authentication web application with interactive mascot, location services, and elegant design.
+A modern React/TypeScript application featuring an interactive physics-based raccoon mascot, weather integration, location services, and LLM chat capabilities.
 
 ## ✨ Features
 
 - **Interactive Raccoon Mascot**: Physics-based character with collision detection, triple jump, wall sticking, and text interaction
+- **Weather Integration**: Real-time weather data with OpenWeatherMap API
 - **Location Services**: GPS coordinates and IP geolocation with street address display
+- **LLM Chat**: AI-powered chat functionality with backend proxy for security
 - **Secure Authentication**: Complete signup/login system powered by Supabase
 - **Dynamic UI Elements**: Animated power button with blue/pink states and responsive scaling
 - **Ultra-minimalist Design**: Clean, dark purple aesthetic with perfect viewport centering
-- **Brand Identity**: Two-tone "Virgil" logo with purple V and cohesive color palette
-- **Responsive**: Fluid typography and layout that works beautifully on all devices
+- **Progressive Web App**: Installable with offline support
 
 ## 🎨 Design System
 
@@ -28,56 +29,87 @@ A minimalist authentication web application with interactive mascot, location se
 
 ### Prerequisites
 - Node.js 18+
+- npm package manager
 - Supabase project with auth enabled
+- OpenWeatherMap API key (optional)
+- Anthropic API key (for LLM features)
 
 ### Installation
 
 1. **Clone and install dependencies**:
    ```bash
+   git clone [repository-url]
    cd virgil
    npm install
+   cd server && npm install
    ```
 
 2. **Environment Setup**:
-   - Ensure global `.env` file at `/Users/bbb/Desktop/Coding/.env` contains:
+   ```bash
+   cp .env.example .env
    ```
+   
+   Configure the following in `.env`:
+   ```env
+   # Backend/LLM Server
+   ANTHROPIC_API_KEY=your_anthropic_api_key
+   LLM_SERVER_PORT=5002
+   
+   # Frontend
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_LLM_API_URL=http://localhost:5002/api
+   
+   # Optional Services
+   OPENWEATHERMAP_API_KEY=your_weather_api_key
    ```
 
-3. **Run development server**:
+3. **Start Development Environment**:
+   
+   **Important**: Virgil requires TWO servers running simultaneously:
+   
    ```bash
+   # Recommended: Use the unified startup script
+   npm run dev-full
+   ```
+   
+   Or run servers separately:
+   ```bash
+   # Terminal 1: Backend server (port 5002)
+   npm run backend
+   
+   # Terminal 2: Frontend server (port 3000)
    npm run dev
    ```
 
 ## 🏗️ Architecture
 
 ### Tech Stack
-- **Frontend**: React 19 + Vite
-- **Backend**: Supabase (Auth + Database)
-- **Styling**: Pure CSS with modern features
+- **Frontend**: React 19.1, TypeScript 5.8, Vite 7.0, PWA
+- **Backend**: Express 5.1 (port 5002), Node.js
+- **Database**: Supabase (Auth + Data)
+- **Testing**: Jest, React Testing Library
+- **Styling**: CSS Modules, Tailwind CSS
+
+### Two-Server Architecture
+1. **Frontend Server** (Port 3000): Vite-powered React application
+2. **Backend Server** (Port 5002): Express API for LLM proxy and sensitive operations
 
 ### Project Structure
 ```
-src/
-├── components/         # React components
-│   ├── AuthPage.jsx   # Login/Signup toggle
-│   ├── Dashboard.jsx  # User dashboard with mascot
-│   ├── LoginForm.jsx  # Login form
-│   ├── SignUpForm.jsx # Registration form
-│   ├── RaccoonMascot.jsx # Interactive physics mascot
-│   └── VirgilLogo.jsx # Two-tone brand logo
-├── contexts/
-│   ├── AuthContext.jsx    # Auth state management
-│   └── LocationContext.jsx # Location services
-├── lib/
-│   ├── supabase.js           # Supabase client
-│   ├── locationService.js    # GPS & IP geolocation
-│   ├── mapsService.js        # Google Maps integration
-│   └── textAlignmentUtils.js # Text collision detection
-└── assets/brand/       # Brand assets
-    ├── colors.js      # Brand color palette
-    └── index.js       # Brand exports
+src/                    # React frontend
+├── components/         # Feature-based components
+├── hooks/             # Custom React hooks
+├── contexts/          # Global state (Auth, Location, Weather)
+├── services/          # API integrations
+├── types/             # TypeScript definitions
+└── utils/             # Helper functions
+
+server/                 # Express backend
+├── routes/            # API endpoints
+├── middleware/        # Security, validation
+├── services/          # Business logic
+└── config/            # Configuration
 ```
 
 ## 🎯 User Experience
@@ -101,26 +133,62 @@ src/
 
 ## 🛠️ Development
 
-### Available Scripts
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-### Brand Assets
-Import and use brand components:
-```jsx
-import { VirgilLogo, brandColors } from './assets/brand'
-
-<VirgilLogo size={32} />
+### Essential Commands
+```bash
+npm run dev-full      # Start both servers (recommended)
+npm run dev          # Frontend only (port 3000)
+npm run backend      # Backend only (port 5002)
+npm test             # Run all tests
+npm run lint         # ESLint check
+npm run type-check   # TypeScript validation
+npm run build        # Production build
 ```
+
+### Development Scripts
+- `start-dev.sh` - Unified startup script with process management
+- `check-env.sh` - Validate development environment
+- `cleanup-ports.sh` - Clean up stuck processes
+
+### API Endpoints
+- `POST /api/llm/chat` - LLM chat functionality
+- `GET /api/weather` - Weather data
+- `GET /api/location` - Location services
+- `GET /api/elevation/coordinates/:lat/:lon` - Elevation data
 
 ## 🔒 Security
 
-- Supabase Row Level Security (RLS) enabled
-- Environment variables for sensitive config
-- Secure authentication with email verification
+- API keys stored server-side only
+- Backend proxy for all external APIs
+- Supabase Row Level Security (RLS)
+- Input validation and sanitization
+- Rate limiting on all endpoints
+
+## 🧪 Testing
+
+- Minimum 80% code coverage required
+- Run tests before committing
+- Test files co-located with components
+- Focus on behavior, not implementation
+
+## 🚨 Troubleshooting
+
+### Port Already in Use
+```bash
+npm run cleanup-ports  # or manually:
+lsof -ti:3000 | xargs kill
+lsof -ti:5002 | xargs kill
+```
+
+### Environment Issues
+- Verify `.env` file exists and is configured
+- Check API keys are valid
+- Restart servers after changing `.env`
+
+### Health Check
+```bash
+curl http://localhost:5002/api/health
+```
 
 ---
 
-*Designed with ❤️ for simplicity and elegance*
+*Built with excellence in mind - see CLAUDE.md for coding standards*

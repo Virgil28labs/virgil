@@ -1,3 +1,14 @@
 // Virgil Brand Assets
-export { VirgilLogo } from '../../components/VirgilLogo'
-export { brandColors, cssVariables, type BrandColors } from './colors'
+export { 
+  brandColors, 
+  cssVariables, 
+  colors,
+  semanticColors,
+  tokens,
+  withOpacity,
+  getColorForBackground,
+  type BrandColors,
+  type ColorPalette,
+  type SemanticColors,
+  type DesignTokens
+} from './colors'

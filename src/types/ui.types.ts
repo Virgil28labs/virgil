@@ -86,11 +86,6 @@ export interface DateTimeDisplayProps {
   updateInterval?: number;
 }
 
-export interface LogoProps {
-  size?: 'small' | 'medium' | 'large';
-  variant?: 'full' | 'icon';
-}
-
 export interface SkipLinkProps {
   href: string;
   children: ReactNode;
