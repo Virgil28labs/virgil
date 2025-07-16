@@ -67,7 +67,7 @@ export const NasaApodButton = memo(function NasaApodButton() {
             display: 'inline-block'
           }}
         >
-          🌌
+          🔭
         </span>
       </button>
       
