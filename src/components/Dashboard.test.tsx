@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Dashboard } from './Dashboard';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
+import { PermissionStatus } from '../types/location.types';
 
 // Mock contexts
 jest.mock('../contexts/AuthContext');
@@ -53,10 +53,10 @@ const mockLocationValue = {
   coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
   address: {
     street: '123 Main St',
+    house_number: '123',
     city: 'New York',
-    state: 'NY',
+    postcode: '10001',
     country: 'USA',
-    postalCode: '10001',
     formatted: '123 Main St, New York, NY 10001, USA'
   },
   ipLocation: {

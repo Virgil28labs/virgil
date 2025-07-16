@@ -22,7 +22,7 @@ export class LLMService extends EventEmitter {
       apiUrl: import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1',
       defaultModel: import.meta.env.VITE_DEFAULT_MODEL || 'gpt-4o-mini',
       enableCache: import.meta.env.VITE_ENABLE_CACHE === 'true',
-      cacheTTL: parseInt(import.meta.env.VITE_CACHE_TTL) || 3600,
+      cacheTTL: parseInt(import.meta.env.VITE_CACHE_TTL || '3600'),
       maxRetries: 3,
       retryDelay: 1000,
       ...config
@@ -53,7 +53,7 @@ export class LLMService extends EventEmitter {
 
     // Check cache first
     if (this.config.enableCache && cacheKey && !stream) {
-      const cached = await this.cache.get(cacheKey);
+      const cached = await this.cache.get<LLMResponse>(cacheKey);
       if (cached) {
         this.emit('cache-hit', { cacheKey });
         return cached;
@@ -240,7 +240,7 @@ export class LLMService extends EventEmitter {
       const data = await response.json();
       return data.data || {};
     } catch (error) {
-      this.emit('error', { error: error.message });
+      this.emit('error', { error: String(error) });
       return {};
     }
   }

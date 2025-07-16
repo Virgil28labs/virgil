@@ -53,6 +53,9 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             return 'vendor';
           }
+          
+          // Return undefined for all other cases
+          return undefined;
         }
       },
       treeshake: {

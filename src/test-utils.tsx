@@ -62,10 +62,12 @@ interface AllTheProvidersProps {
 // Custom provider that wraps components with all necessary contexts
 const AllTheProviders: React.FC<AllTheProvidersProps> = ({ 
   children,
-  authValue = mockAuthContextValue,
-  locationValue = mockLocationContextValue,
-  weatherValue = mockWeatherContextValue
+  authValue: _authValue = mockAuthContextValue,
+  locationValue: _locationValue = mockLocationContextValue,
+  weatherValue: _weatherValue = mockWeatherContextValue
 }) => {
+  // Note: This is a simplified test setup that uses the default providers
+  // The unused parameters are prefixed with _ to indicate they are intentionally unused
   return (
     <ErrorBoundary>
       <AuthProvider>

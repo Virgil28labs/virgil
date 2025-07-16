@@ -4,9 +4,7 @@ import type {
   DrawPerfectCircleProps, 
   Point, 
   EvaluationResult, 
-  CanvasInfo, 
   CircleEvaluationParams, 
-  GameStats, 
   GridConfig, 
   DrawingConfig 
 } from './types'

@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { DogCard } from './DogCard'
 import type { DogImage } from './hooks/useDogApi'

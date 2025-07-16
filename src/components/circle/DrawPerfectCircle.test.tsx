@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DrawPerfectCircle } from './DrawPerfectCircle';
@@ -38,7 +37,7 @@ const mockCanvasContext = {
 };
 
 // Mock HTMLCanvasElement
-HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext);
+HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext) as any;
 
 // Mock getBoundingClientRect
 HTMLCanvasElement.prototype.getBoundingClientRect = jest.fn(() => ({
