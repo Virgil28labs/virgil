@@ -1,0 +1,703 @@
+/* Giphy Gallery - Sleek & Minimalist Design */
+
+/* CSS Variables - Optimized for Compact Design */
+:root {
+  --giphy-spacing-xs: 0.5rem;
+  --giphy-spacing-sm: 0.75rem;
+  --giphy-spacing-md: 1rem;
+  --giphy-spacing-lg: 1.25rem;  /* Reduced from 1.5rem */
+  --giphy-spacing-xl: 1.5rem;   /* Reduced from 2rem */
+  --giphy-spacing-2xl: 2rem;    /* Reduced from 2.5rem */
+  --giphy-radius-sm: 0.75rem;
+  --giphy-radius-md: 1.25rem;
+  --giphy-radius-lg: 1.5rem;
+  --giphy-radius-xl: 2rem;
+  --giphy-radius-full: 50%;
+  --giphy-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --giphy-bg-primary: rgba(57, 41, 62, 0.8);
+  --giphy-bg-secondary: rgba(45, 34, 51, 0.4);
+  --giphy-bg-tertiary: rgba(45, 34, 51, 0.3);
+  --giphy-border: rgba(178, 165, 193, 0.3);
+  --giphy-accent: #ff6b9d; /* Giphy pink accent */
+  --giphy-accent-light: #ff8fb3;
+}
+
+/* Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes heartPop {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.3) rotate(-10deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Base Styles */
+.giphy-gallery-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 40, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+  padding: 60px;
+}
+
+.giphy-gallery-panel {
+  background: var(--giphy-bg-primary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--giphy-border);
+  border-radius: var(--giphy-radius-xl);
+  padding: var(--giphy-spacing-xl);
+  width: calc(100vw - 120px);
+  max-width: 1400px;
+  height: calc(100vh - 120px);
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* Header - Optimized for Compact Design */
+.giphy-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--giphy-spacing-md);
+  padding-bottom: var(--giphy-spacing-sm);
+  border-bottom: 1px solid rgba(178, 165, 193, 0.2);
+}
+
+.giphy-gallery-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--lavender, #b2a5c1);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--giphy-spacing-xs);
+  letter-spacing: -0.3px;
+}
+
+.giphy-gallery-title span {
+  font-size: 1.5rem;
+}
+
+/* Subtitle removed to save space */
+
+.giphy-gallery-close {
+  background: rgba(178, 165, 193, 0.1);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  font-size: 1.5rem;
+  color: var(--lavender, #b2a5c1);
+  cursor: pointer;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--giphy-radius-full);
+  transition: all var(--giphy-transition);
+}
+
+.giphy-gallery-close:hover {
+  background: rgba(178, 165, 193, 0.2);
+  color: var(--off-white, #f5f5f5);
+  transform: rotate(90deg) scale(1.1);
+  border-color: var(--giphy-accent);
+}
+
+/* Attribution - Subtle Bottom Corner */
+.giphy-attribution {
+  position: absolute;
+  bottom: var(--giphy-spacing-md);
+  right: var(--giphy-spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--giphy-spacing-xs);
+  font-size: 0.7rem;
+  color: var(--lavender, #b2a5c1);
+  opacity: 0.4;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.giphy-logo {
+  height: 12px;
+  width: auto;
+}
+
+.giphy-attribution:hover {
+  opacity: 0.7;
+}
+
+/* Tabs - Compact Design */
+.giphy-gallery-tabs {
+  display: flex;
+  gap: var(--giphy-spacing-sm);
+  margin-bottom: var(--giphy-spacing-sm);
+  background: var(--giphy-bg-secondary);
+  padding: var(--giphy-spacing-xs);
+  border-radius: var(--giphy-radius-md);
+}
+
+.giphy-gallery-tab {
+  flex: 1;
+  padding: var(--giphy-spacing-sm) var(--giphy-spacing-lg);
+  background: transparent;
+  border: none;
+  color: var(--lavender, #b2a5c1);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--giphy-radius-sm);
+  transition: all var(--giphy-transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--giphy-spacing-xs);
+}
+
+.giphy-gallery-tab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--giphy-accent) 0%, var(--giphy-accent-light) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: var(--giphy-radius-md);
+}
+
+.giphy-gallery-tab.active {
+  color: var(--off-white, #f5f5f5);
+}
+
+.giphy-gallery-tab.active::before {
+  opacity: 1;
+}
+
+.giphy-gallery-tab > span {
+  position: relative;
+  z-index: 1;
+}
+
+.giphy-gallery-tab:hover:not(.active) {
+  transform: translateY(-2px);
+  color: var(--off-white, #f5f5f5);
+}
+
+.giphy-tab-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* Search Controls - Compact Layout */
+.giphy-search-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--giphy-spacing-md);
+  max-width: 700px;
+  margin: 0 auto var(--giphy-spacing-md);
+  padding: var(--giphy-spacing-md);
+  background: var(--giphy-bg-secondary);
+  border-radius: var(--giphy-radius-lg);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.giphy-search-input {
+  flex: 1;
+  min-width: 180px;
+  padding: var(--giphy-spacing-sm) var(--giphy-spacing-md);
+  border-radius: var(--giphy-radius-sm);
+  background: rgba(57, 41, 62, 0.6);
+  color: var(--off-white, #f5f5f5);
+  border: 1px solid var(--giphy-border);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all var(--giphy-transition);
+}
+
+.giphy-search-input::placeholder {
+  color: rgba(178, 165, 193, 0.6);
+}
+
+.giphy-search-input:focus {
+  background: rgba(108, 59, 170, 0.3);
+  border-color: var(--giphy-accent);
+  transform: translateY(-1px);
+}
+
+.giphy-rating-select {
+  padding: var(--giphy-spacing-sm) var(--giphy-spacing-md);
+  border-radius: var(--giphy-radius-sm);
+  background: rgba(57, 41, 62, 0.6);
+  color: var(--off-white, #f5f5f5);
+  border: 1px solid var(--giphy-border);
+  font-size: 0.9rem;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--giphy-transition);
+}
+
+.giphy-rating-select:hover,
+.giphy-rating-select:focus {
+  background: rgba(108, 59, 170, 0.3);
+  border-color: var(--giphy-accent);
+}
+
+.giphy-search-btn {
+  padding: var(--giphy-spacing-sm) var(--giphy-spacing-lg);
+  background: var(--giphy-accent);
+  color: white;
+  border: none;
+  border-radius: var(--giphy-radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--giphy-transition);
+  position: relative;
+  overflow: hidden;
+  min-width: 90px;
+  box-shadow: 0 2px 8px rgba(255, 107, 157, 0.2);
+}
+
+.giphy-search-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+  background: var(--giphy-accent-light);
+}
+
+.giphy-search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Content Area - Maximized for GIFs */
+.giphy-gallery-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--giphy-spacing-md);
+  background: var(--giphy-bg-tertiary);
+  border-radius: var(--giphy-radius-md);
+  scrollbar-width: thin;
+  position: relative;
+  scrollbar-color: var(--giphy-accent) transparent;
+}
+
+.giphy-gallery-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.giphy-gallery-content::-webkit-scrollbar-track {
+  background: rgba(45, 34, 51, 0.3);
+  border-radius: 4px;
+}
+
+.giphy-gallery-content::-webkit-scrollbar-thumb {
+  background: var(--giphy-accent);
+  border-radius: 4px;
+}
+
+/* GIF Grid - Optimized Layout */
+.giphy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--giphy-spacing-sm);
+  padding: var(--giphy-spacing-xs);
+}
+
+.giphy-grid-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--giphy-radius-md);
+  cursor: pointer;
+  transition: all var(--giphy-transition);
+  background: rgba(45, 34, 51, 0.5);
+  animation: slideUpFade 0.5s ease-out backwards;
+}
+
+.giphy-grid-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.giphy-grid-item:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px var(--giphy-border);
+}
+
+.giphy-grid-item:hover::before {
+  opacity: 1;
+}
+
+.giphy-grid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.giphy-grid-item:hover .giphy-grid-image {
+  transform: scale(1.1);
+}
+
+/* Loading States - Optimized */
+.giphy-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: var(--giphy-spacing-md);
+}
+
+.giphy-loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(178, 165, 193, 0.2);
+  border-top-color: var(--giphy-accent);
+  border-radius: var(--giphy-radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.giphy-loading-text {
+  color: var(--lavender, #b2a5c1);
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+/* Loading More Indicator */
+.giphy-loading-more {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--giphy-spacing-lg);
+  margin-top: var(--giphy-spacing-md);
+}
+
+.giphy-loading-more .giphy-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 2px;
+}
+
+/* Image Loading Skeleton */
+.giphy-image-skeleton {
+  position: absolute;
+  inset: 0;
+  background: rgba(45, 34, 51, 0.3);
+  border-radius: var(--giphy-radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.giphy-image-skeleton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(178, 165, 193, 0.1) 0%, rgba(178, 165, 193, 0.2) 50%, rgba(178, 165, 193, 0.1) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Image Error State */
+.giphy-image-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(45, 34, 51, 0.4);
+  border-radius: var(--giphy-radius-md);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  color: var(--lavender, #b2a5c1);
+  text-align: center;
+  padding: var(--giphy-spacing-md);
+}
+
+.giphy-image-error > div:first-child {
+  font-size: 3rem;
+  opacity: 0.5;
+  margin-bottom: var(--giphy-spacing-sm);
+}
+
+.giphy-image-error > div:last-child {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Error State */
+.giphy-error {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 107, 157, 0.1);
+  border: 1px solid rgba(255, 107, 157, 0.2);
+  border-radius: var(--giphy-radius-lg);
+  margin-bottom: var(--giphy-spacing-lg);
+}
+
+.giphy-error-icon {
+  font-size: 3rem;
+  margin-bottom: var(--giphy-spacing-md);
+  opacity: 0.7;
+}
+
+.giphy-error-message {
+  color: var(--giphy-accent-light);
+  font-size: 1.15rem;
+  margin-bottom: var(--giphy-spacing-lg);
+}
+
+.giphy-error-retry {
+  padding: var(--giphy-spacing-sm) var(--giphy-spacing-lg);
+  background: var(--giphy-accent);
+  color: white;
+  border: none;
+  border-radius: var(--giphy-radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--giphy-transition);
+}
+
+.giphy-error-retry:hover {
+  background: var(--giphy-accent-light);
+  transform: translateY(-1px);
+}
+
+/* Empty State */
+.giphy-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.giphy-empty-icon {
+  font-size: 4rem;
+  opacity: 0.5;
+  margin-bottom: var(--giphy-spacing-lg);
+}
+
+.giphy-empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--off-white, #f5f5f5);
+  margin-bottom: var(--giphy-spacing-xs);
+}
+
+.giphy-empty-message {
+  font-size: 1.1rem;
+  color: var(--lavender, #b2a5c1);
+  opacity: 0.8;
+}
+
+/* Favorite Overlay */
+.giphy-favorite-overlay {
+  position: absolute;
+  top: var(--giphy-spacing-sm);
+  right: var(--giphy-spacing-sm);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--giphy-radius-full);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  font-size: 1.25rem;
+}
+
+.giphy-favorite-overlay:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.15);
+  border-color: var(--giphy-accent);
+}
+
+.giphy-favorite-overlay.favorited {
+  animation: heartPop 0.4s ease;
+}
+
+/* Action Buttons */
+.giphy-action-buttons {
+  position: absolute;
+  bottom: var(--giphy-spacing-sm);
+  left: var(--giphy-spacing-sm);
+  display: flex;
+  gap: var(--giphy-spacing-xs);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.giphy-grid-item:hover .giphy-action-buttons {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.giphy-action-btn {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--giphy-radius-sm);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  color: white;
+  position: relative;
+  z-index: 4;
+}
+
+.giphy-action-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+  border-color: var(--giphy-accent);
+}
+
+/* Responsive Design - Enhanced */
+@media (max-width: 1200px) {
+  .giphy-gallery-panel {
+    max-width: calc(100vw - 80px);
+    max-height: calc(100vh - 80px);
+    padding: var(--giphy-spacing-lg);
+  }
+
+  .giphy-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .giphy-gallery-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .giphy-gallery-backdrop {
+    padding: 16px;
+  }
+
+  .giphy-gallery-panel {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 32px);
+    padding: var(--giphy-spacing-md);
+  }
+
+  .giphy-gallery-header {
+    margin-bottom: var(--giphy-spacing-sm);
+    padding-bottom: var(--giphy-spacing-xs);
+  }
+
+  .giphy-gallery-title {
+    font-size: 1.4rem;
+  }
+
+  .giphy-gallery-tabs {
+    margin-bottom: var(--giphy-spacing-xs);
+  }
+
+  .giphy-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--giphy-spacing-xs);
+  }
+
+  .giphy-search-controls {
+    flex-direction: column;
+    gap: var(--giphy-spacing-sm);
+    margin-bottom: var(--giphy-spacing-sm);
+    padding: var(--giphy-spacing-sm);
+  }
+
+  .giphy-search-input {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .giphy-search-btn {
+    width: 100%;
+  }
+
+  .giphy-action-buttons {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .giphy-action-btn {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .giphy-attribution {
+    bottom: var(--giphy-spacing-sm);
+    right: var(--giphy-spacing-sm);
+    font-size: 0.65rem;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

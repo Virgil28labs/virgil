@@ -1,6 +1,7 @@
 // Export all type definitions for easy importing
 export * from './auth.types';
 export * from './dog.types';
+export * from './giphy.types';
 export * from './location.types';
 export * from './llm.types';
 export * from './physics.types';
