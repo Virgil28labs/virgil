@@ -102,6 +102,27 @@ Object.defineProperty(global, 'crypto', {
   },
 });
 
+// Mock TextEncoder/TextDecoder for streaming tests
+if (typeof TextEncoder === 'undefined') {
+  global.TextEncoder = class TextEncoder {
+    encode(input: string): Uint8Array {
+      const encoded = new Uint8Array(input.length);
+      for (let i = 0; i < input.length; i++) {
+        encoded[i] = input.charCodeAt(i);
+      }
+      return encoded;
+    }
+  } as any;
+}
+
+if (typeof TextDecoder === 'undefined') {
+  global.TextDecoder = class TextDecoder {
+    decode(input: Uint8Array): string {
+      return String.fromCharCode(...Array.from(input));
+    }
+  } as any;
+}
+
 // Mock console methods to reduce noise in tests
 const originalError = console.error;
 const originalWarn = console.warn;

@@ -57,7 +57,7 @@ app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/elevation', elevationRoutes);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error('Error:', err);
   
   // Don't leak error details in production

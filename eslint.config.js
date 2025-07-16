@@ -6,8 +6,24 @@ import tseslint from '@typescript-eslint/eslint-plugin'
 import parser from '@typescript-eslint/parser'
 
 export default [
-  { ignores: ['dist', 'server', 'coverage', 'node_modules'] },
+  { ignores: ['dist', 'coverage', 'node_modules'] },
   js.configs.recommended,
+  // Server files (Node.js)
+  {
+    files: ['server/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+      },
+      sourceType: 'commonjs',
+    },
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
   {
     files: ['**/*.{js,jsx}'],
     plugins: {
@@ -30,6 +46,7 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
   // Jest environment for test files
@@ -83,6 +100,7 @@ export default [
       ],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
 ]

@@ -46,9 +46,6 @@ class RequestDeduplicator {
     // Check if we have a pending request for this key
     const pending = this.pendingRequests.get(key);
     if (pending) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔄 Deduplicating request for hash: ${key}`);
-      }
       return pending.promise;
     }
 
@@ -96,10 +93,6 @@ class RequestDeduplicator {
     
     // Batch delete for better performance
     keysToDelete.forEach(key => this.pendingRequests.delete(key));
-    
-    if (process.env.NODE_ENV === 'development' && keysToDelete.length > 0) {
-      console.log(`🧹 Cleaned up ${keysToDelete.length} expired requests`);
-    }
   }
 
   /**

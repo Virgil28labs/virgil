@@ -94,19 +94,27 @@ describe('RaccoonMascot', () => {
     it('starts at the initial position near the ground', () => {
       render(<RaccoonMascot />);
       
-      const mascot = screen.getByAltText('Racoon Mascot').closest('div')?.parentElement?.parentElement;
-      expect(mascot).toHaveStyle({
-        position: 'fixed',
-        left: '20px',
-        top: `${mockInnerHeight - 100}px`
-      });
+      // The fixed position div is the great-grandparent of the img
+      const mascotImage = screen.getByAltText('Racoon Mascot');
+      const mascot = mascotImage.closest('div')?.parentElement;
+      
+      // The component sets inline styles
+      expect(mascot).toHaveAttribute('style');
+      const style = mascot?.getAttribute('style');
+      expect(style).toContain('position: fixed');
+      expect(style).toContain('left: 20px');
+      expect(style).toContain(`top: ${mockInnerHeight - 100}px`);
     });
 
     it('has grab cursor when not picked up', () => {
       render(<RaccoonMascot />);
       
-      const mascot = screen.getByAltText('Racoon Mascot').closest('div')?.parentElement?.parentElement;
-      expect(mascot).toHaveStyle({ cursor: 'grab' });
+      const mascotImage = screen.getByAltText('Racoon Mascot');
+      const mascot = mascotImage.closest('div')?.parentElement;
+      
+      expect(mascot).toHaveAttribute('style');
+      const style = mascot?.getAttribute('style');
+      expect(style).toContain('cursor: grab');
     });
 
     it('displays helpful title on hover', () => {
@@ -128,15 +136,15 @@ describe('RaccoonMascot', () => {
       const mascotContainer = screen.getByAltText('Racoon Mascot').parentElement!;
       await user.click(mascotContainer);
       
-      // Check for picked up visual changes
-      expect(mascotContainer).toHaveStyle({
-        transform: expect.stringContaining('scale(1.2)'),
-        filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))'
-      });
+      // Check for picked up visual changes - check the style attribute directly
+      const style = mascotContainer.getAttribute('style');
+      expect(style).toContain('transform: scale(1.2)');
+      expect(style).toContain('filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3))');
       
       // Check cursor changes to grabbing
-      const mascot = mascotContainer.parentElement?.parentElement;
-      expect(mascot).toHaveStyle({ cursor: 'grabbing' });
+      const mascot = mascotContainer.parentElement;
+      const mascotStyle = mascot?.getAttribute('style');
+      expect(mascotStyle).toContain('cursor: grabbing');
     });
 
     it('shows sparkles effect when picked up', async () => {
@@ -146,9 +154,9 @@ describe('RaccoonMascot', () => {
       const mascotContainer = screen.getByAltText('Racoon Mascot').parentElement!;
       await user.click(mascotContainer);
       
-      // Check for sparkle emojis
-      expect(screen.getByText('✨')).toBeInTheDocument();
-      expect(screen.getByText('⭐')).toBeInTheDocument();
+      // Check for sparkle emojis - there are multiple of some emojis
+      expect(screen.getAllByText('✨')).toHaveLength(2);
+      expect(screen.getAllByText('⭐')).toHaveLength(2);
       expect(screen.getByText('💫')).toBeInTheDocument();
     });
 

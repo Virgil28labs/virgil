@@ -100,7 +100,7 @@ describe('Dashboard', () => {
     // Check for main elements
     expect(screen.getByRole('main', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'View user profile' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign out of your account' })).toBeInTheDocument();
     
     // Check for lazy loaded components (they should be in loading state initially)
     expect(screen.getByText('Loading weather...')).toBeInTheDocument();

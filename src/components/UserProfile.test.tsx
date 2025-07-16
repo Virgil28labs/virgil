@@ -109,7 +109,7 @@ describe('UserProfile', () => {
     fireEvent.click(editButton);
     
     // Should show form inputs
-    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/bio/i)).toBeInTheDocument();
     
     // Should show save and cancel buttons

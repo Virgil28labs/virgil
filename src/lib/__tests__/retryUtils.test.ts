@@ -126,12 +126,17 @@ describe('retryWithBackoff', () => {
       const finalError = new Error('Final failure');
       const mockFn = jest.fn().mockRejectedValue(finalError);
 
+      // Start the retry operation
       const promise = retryWithBackoff(mockFn, { maxRetries: 2 });
       
-      // Process all retry attempts
-      await jest.runAllTimersAsync();
+      // Run timers and await the promise simultaneously
+      const [result] = await Promise.allSettled([
+        promise,
+        jest.runAllTimersAsync()
+      ]);
 
-      await expect(promise).rejects.toThrow('Final failure');
+      expect(result.status).toBe('rejected');
+      expect((result as PromiseRejectedResult).reason.message).toBe('Final failure');
       expect(mockFn).toHaveBeenCalledTimes(3); // Initial + 2 retries
     });
 
@@ -149,9 +154,13 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 2 });
       
-      await jest.runAllTimersAsync();
+      const [result] = await Promise.allSettled([
+        promise,
+        jest.runAllTimersAsync()
+      ]);
 
-      await expect(promise).rejects.toThrow('Error 3');
+      expect(result.status).toBe('rejected');
+      expect((result as PromiseRejectedResult).reason.message).toBe('Error 3');
     });
   });
 
@@ -174,9 +183,13 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 1 });
       
-      await jest.runAllTimersAsync();
+      const [result] = await Promise.allSettled([
+        promise,
+        jest.runAllTimersAsync()
+      ]);
 
-      await expect(promise).rejects.toThrow('Async error');
+      expect(result.status).toBe('rejected');
+      expect((result as PromiseRejectedResult).reason.message).toBe('Async error');
       expect(mockFn).toHaveBeenCalledTimes(2);
     });
 

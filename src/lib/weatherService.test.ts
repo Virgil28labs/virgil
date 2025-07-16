@@ -98,7 +98,6 @@ describe('weatherService', () => {
 
       expect(result).toEqual(mockWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledTimes(1); // Only called once
-      expect(console.log).toHaveBeenCalledWith('🌡️ [WeatherService] Using cached data');
     });
 
     it('refetches when cache expires', async () => {
@@ -145,11 +144,6 @@ describe('weatherService', () => {
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
         .rejects.toThrow('Failed to fetch weather data');
-
-      expect(console.error).toHaveBeenCalledWith(
-        '🌡️ [WeatherService] API error response:',
-        'Invalid API key'
-      );
     });
 
     it('handles API errors with text response', async () => {

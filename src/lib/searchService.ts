@@ -67,17 +67,22 @@ class SearchService {
   }
 
   extractSearchQuery(message: string): string {
-    // Remove common chat prefixes and search triggers
-    let query = message
-      .replace(/^(can you |could you |please |search for |find |lookup |tell me about |what is |what are |research )/i, '')
-      .replace(/\?$/, '')
-      .trim();
-
-    // If query is too short, use the original message
-    if (query.length < 3) {
-      query = message;
+    // Remove common chat prefixes and search triggers - apply multiple times to handle chained prefixes
+    let query = message.trim();
+    let prevQuery = '';
+    
+    // Keep applying the regex until no more matches (handles "please find cats" -> "cats")
+    while (query !== prevQuery) {
+      prevQuery = query;
+      query = query
+        .replace(/^(can you search for |can you |could you |please |search for |search |find |lookup |tell me about |what is |what are |research )/i, '')
+        .trim();
     }
-
+    
+    // Remove trailing question marks
+    query = query.replace(/\?$/, '');
+    
+    // Always return the extracted query, even if short
     return query;
   }
 

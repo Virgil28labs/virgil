@@ -23,7 +23,7 @@ import type {
  * - Data caching with refresh intervals
  */
 
-const LocationContext = createContext<LocationContextType | undefined>(undefined)
+export const LocationContext = createContext<LocationContextType | undefined>(undefined)
 
 const locationReducer = (state: LocationState, action: LocationAction): LocationState => {
   switch (action.type) {

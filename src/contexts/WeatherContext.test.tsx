@@ -7,10 +7,14 @@ import { weatherService } from '../lib/weatherService';
 import type { LocationContextType } from '../types/location.types';
 import type { WeatherData } from '../types/weather.types';
 
-// Mock the weather service
+// Mock the weather service completely
 jest.mock('../lib/weatherService', () => ({
   weatherService: {
-    getWeatherByCoordinates: jest.fn()
+    getWeatherByCoordinates: jest.fn(),
+    getWeatherByCity: jest.fn(),
+    convertTemperature: jest.fn((temp: number, toCelsius: boolean) => {
+      return toCelsius ? Math.round((temp - 32) * 5/9) : temp;
+    })
   }
 }));
 
@@ -92,8 +96,17 @@ describe('WeatherContext', () => {
     consoleSpy.mockRestore();
   });
 
-  it('provides initial state', () => {
-    const { result } = renderHook(() => useWeather(), { wrapper });
+  it('provides initial state', async () => {
+    const noLocationContext: LocationContextType = {
+      ...mockLocationContext,
+      coordinates: null,
+      ipLocation: null,
+      hasLocation: false
+    };
+    
+    const { result } = renderHook(() => useWeather(), {
+      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext })
+    });
     
     expect(result.current.data).toBeNull();
     expect(result.current.loading).toBe(false);
@@ -121,6 +134,7 @@ describe('WeatherContext', () => {
     const noLocationContext: LocationContextType = {
       ...mockLocationContext,
       coordinates: null,
+      ipLocation: null,
       hasLocation: false
     };
     
@@ -128,9 +142,9 @@ describe('WeatherContext', () => {
       wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext })
     });
     
-    // Wait a bit to ensure no fetch happens
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    // Advance timers to ensure no fetch happens
+    act(() => {
+      jest.advanceTimersByTime(1000);
     });
     
     expect(mockWeatherService.getWeatherByCoordinates).not.toHaveBeenCalled();
@@ -146,8 +160,8 @@ describe('WeatherContext', () => {
     const { result } = renderHook(() => useWeather(), { wrapper });
     
     await waitFor(() => {
-      expect(result.current.error).toBe('Failed to fetch weather data');
-    });
+      expect(result.current.error).toBe('Weather API error');
+    }, { timeout: 5000 });
     
     expect(result.current.data).toBeNull();
     expect(result.current.loading).toBe(false);
@@ -179,8 +193,8 @@ describe('WeatherContext', () => {
     const { result } = renderHook(() => useWeather(), { wrapper });
     
     await waitFor(() => {
-      expect(result.current.error).toBeTruthy();
-    });
+      expect(result.current.error).toBe('Weather API error');
+    }, { timeout: 5000 });
     
     act(() => {
       result.current.clearError();
@@ -209,6 +223,11 @@ describe('WeatherContext', () => {
   });
 
   it('implements caching to prevent frequent API calls', async () => {
+    // Mock Date.now to control time
+    const mockDateNow = jest.spyOn(Date, 'now');
+    const startTime = 1640000000000; // Fixed timestamp
+    mockDateNow.mockReturnValue(startTime);
+    
     mockWeatherService.getWeatherByCoordinates.mockResolvedValue(mockWeatherData);
     
     const { result } = renderHook(() => useWeather(), { wrapper });
@@ -219,12 +238,17 @@ describe('WeatherContext', () => {
     
     mockWeatherService.getWeatherByCoordinates.mockClear();
     
-    // Try to fetch again without force flag - should not call API
+    // Advance time by only 5 minutes (less than 10 minute cache expiry)
+    mockDateNow.mockReturnValue(startTime + 5 * 60 * 1000);
+    
+    // Try to fetch again without force flag - should not call API due to caching
     await act(async () => {
       await result.current.fetchWeather();
     });
     
     expect(mockWeatherService.getWeatherByCoordinates).not.toHaveBeenCalled();
+    
+    mockDateNow.mockRestore();
   });
 
   it('sets up auto-refresh interval', async () => {
@@ -270,23 +294,27 @@ describe('WeatherContext', () => {
   });
 
   it('updates weather when location changes', async () => {
-    mockWeatherService.getWeatherByCoordinates.mockResolvedValue(mockWeatherData);
+    // Start with no location first
+    const noLocationContext: LocationContextType = {
+      ...mockLocationContext,
+      coordinates: null,
+      ipLocation: null,
+      hasLocation: false
+    };
     
     const { result, rerender } = renderHook(() => useWeather(), { 
-      wrapper: ({ children }) => wrapper({ children, locationValue: mockLocationContext })
+      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext })
     });
     
-    await waitFor(() => {
-      expect(result.current.data).toEqual(mockWeatherData);
-    });
+    expect(result.current.data).toBeNull();
     
-    mockWeatherService.getWeatherByCoordinates.mockClear();
+    mockWeatherService.getWeatherByCoordinates.mockResolvedValue(mockWeatherData);
     
-    // Update location
+    // Update to have location - this should trigger a fetch
     const newLocationContext: LocationContextType = {
       ...mockLocationContext,
       coordinates: { latitude: 34.0522, longitude: -118.2437 },
-      lastUpdated: Date.now() + 1000
+      hasLocation: true
     };
     
     rerender({

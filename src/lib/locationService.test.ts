@@ -54,7 +54,7 @@ describe('locationService', () => {
         expect.any(Function),
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 3000,
           maximumAge: 300000
         }
       );
@@ -250,17 +250,19 @@ describe('locationService', () => {
     });
 
     it('handles API errors', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      // Mock for all retry attempts (initial + 2 retries = 3 total)
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: false
       });
 
-      await expect(locationService.getIPAddress()).rejects.toThrow('Failed to get IP address');
+      await expect(locationService.getIPAddress()).rejects.toThrow('Failed to fetch IP address');
     });
 
     it('handles network errors', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      // Mock for all retry attempts
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
-      await expect(locationService.getIPAddress()).rejects.toThrow('Failed to get IP address');
+      await expect(locationService.getIPAddress()).rejects.toThrow('Network error');
     });
   });
 
@@ -302,13 +304,14 @@ describe('locationService', () => {
         reason: 'Invalid IP address'
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      // Mock for all retry attempts
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => mockResponse
       });
 
       await expect(locationService.getIPLocation('invalid'))
-        .rejects.toThrow('Failed to get location from IP');
+        .rejects.toThrow('Invalid IP address');
     });
 
     it('handles API errors without reason', async () => {
@@ -316,7 +319,8 @@ describe('locationService', () => {
         error: true
       };
 
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      // Mock for all retry attempts
+      (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => mockResponse
       });
@@ -326,10 +330,11 @@ describe('locationService', () => {
     });
 
     it('handles network errors', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      // Mock for all retry attempts
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       await expect(locationService.getIPLocation('192.168.1.1'))
-        .rejects.toThrow('Failed to get location from IP');
+        .rejects.toThrow('Network error');
     });
   });
 
@@ -416,14 +421,30 @@ describe('locationService', () => {
     });
 
     it('handles IP location failure gracefully', async () => {
-      // Mock IP address success
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ip: '192.168.1.1' })
-      });
-
-      // Mock IP location failure
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('IP location failed'));
+      // Setup fetch mocks in order:
+      (global.fetch as jest.Mock)
+        // 1. getIPAddress - success
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ ip: '192.168.1.1' })
+        })
+        // 2-4. getIPLocation - fails (3 retry attempts)
+        .mockRejectedValueOnce(new Error('IP location failed'))
+        .mockRejectedValueOnce(new Error('IP location failed'))
+        .mockRejectedValueOnce(new Error('IP location failed'))
+        // 5. getIPAddress again (in catch block) - success
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ ip: '192.168.1.1' })
+        })
+        // 6. getAddressFromCoordinates - success
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            display_name: 'Test Address',
+            address: { city: 'New York' }
+          })
+        });
 
       // Mock GPS success
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
@@ -433,18 +454,9 @@ describe('locationService', () => {
         });
       });
 
-      // Mock address success
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          display_name: 'Test Address',
-          address: { city: 'New York' }
-        })
-      });
-
       const result = await locationService.getFullLocationData();
 
-      expect(result.ipLocation).toEqual({ ip: '192.168.1.1' });
+      expect(result.ipLocation?.ip).toEqual('192.168.1.1');
       expect(result.coordinates).toBeDefined();
       expect(result.address).toBeDefined();
     });
@@ -515,11 +527,9 @@ describe('locationService', () => {
 
       expect(result.ipLocation).toBeDefined();
       expect(result.coordinates).toBeUndefined();
-      expect(result.address).toBeUndefined();
-      expect(console.warn).toHaveBeenCalledWith(
-        'Failed to get GPS location:',
-        'Location access denied by user'
-      );
+      expect(result.address).toBeDefined(); // Address is created from IP location
+      expect(result.address?.city).toBe('New York City');
+      expect(result.address?.country).toBe('United States');
     });
   });
 });

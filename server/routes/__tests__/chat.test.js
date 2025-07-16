@@ -76,7 +76,7 @@ describe('Chat Routes', () => {
         }
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
         'https://api.openai.com/v1/chat/completions',
         expect.objectContaining({
           method: 'POST',

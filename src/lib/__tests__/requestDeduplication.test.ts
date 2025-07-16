@@ -40,9 +40,6 @@ describe('RequestDeduplicator', () => {
       // All results should be the same
       expect(results[0]).toBe(results[1]);
       expect(results[1]).toBe(results[2]);
-
-      // Should log deduplication
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('🔄 Deduplicating request'));
     });
 
     it('should make separate requests for different URLs', async () => {
@@ -141,7 +138,6 @@ describe('RequestDeduplicator', () => {
       dedupeFetch('https://api.example.com/data2');
 
       // The old request should be cleaned up
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('🧹 Cleaned up'));
 
       jest.useRealTimers();
     });

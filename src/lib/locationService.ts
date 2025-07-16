@@ -229,7 +229,10 @@ export const locationService = {
       // Try to at least get the IP
       try {
         const ip = await this.getIPAddress();
-        return { ip };
+        if (ip) {
+          return { ip };
+        }
+        return undefined;
       } catch (_ipError) {
         return undefined;
       }

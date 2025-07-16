@@ -32,9 +32,7 @@ router.post('/', async (req, res) => {
 
     // Validate SerpAPI key
     const serpApiKey = process.env.SERPAPI_KEY;
-    console.log('🔑 API Key check:', serpApiKey ? `Present (${serpApiKey.substring(0, 8)}...)` : 'Missing');
     if (!serpApiKey) {
-      console.error('SerpAPI key not configured');
       return res.status(500).json({
         error: 'Search service is not properly configured'
       });
@@ -59,7 +57,6 @@ router.post('/', async (req, res) => {
 
     // Make request to SerpAPI
     const requestUrl = `https://serpapi.com/search?${searchParams}`;
-    console.log('🌐 SerpAPI Request URL:', requestUrl);
     
     const response = await fetch(requestUrl, {
       method: 'GET',
@@ -68,11 +65,8 @@ router.post('/', async (req, res) => {
       }
     });
 
-    console.log('📡 SerpAPI Response Status:', response.status);
-    
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('❌ SerpAPI error:', response.status, errorData);
       
       // Don't expose internal error details to client
       return res.status(response.status).json({
@@ -82,8 +76,6 @@ router.post('/', async (req, res) => {
     }
 
     const data = await response.json();
-    console.log('✅ SerpAPI Response Data Keys:', Object.keys(data));
-    console.log('🔍 Organic Results Count:', data.organic_results?.length || 0);
     
     // Format and return search results
     const results = data.organic_results?.map(result => ({
@@ -114,7 +106,6 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Search endpoint error:', error);
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process search request'

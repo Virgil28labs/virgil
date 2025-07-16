@@ -21,7 +21,10 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: false
+      hasWeather: false,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: null
     });
 
     render(<Weather />);
@@ -37,7 +40,10 @@ describe('Weather', () => {
       error: 'Failed to fetch weather data',
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: false
+      hasWeather: false,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: null
     });
 
     render(<Weather />);
@@ -80,7 +86,10 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: true
+      hasWeather: true,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
 
     render(<Weather />);
@@ -105,14 +114,18 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: false
+      hasWeather: false,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: null
     });
 
     const { container } = render(<Weather />);
     
-    // When there's no data and no error, the widget should be empty
+    // When there's no data and no error, the widget shows a skeleton loader
     const weatherContent = container.querySelector('.weather-content');
-    expect(weatherContent).not.toBeInTheDocument();
+    expect(weatherContent).toBeInTheDocument();
+    expect(screen.getByTestId('skeleton-loader')).toBeInTheDocument();
   });
 
   it('has proper structure and accessibility', () => {
@@ -147,7 +160,10 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: true
+      hasWeather: true,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
 
     const { container } = render(<Weather />);
@@ -195,7 +211,10 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: true
+      hasWeather: true,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
 
     render(<Weather />);
@@ -236,7 +255,10 @@ describe('Weather', () => {
       error: null,
       unit: 'fahrenheit',
       toggleUnit: jest.fn(),
-      hasWeather: true
+      hasWeather: true,
+      fetchWeather: jest.fn(),
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
 
     render(<Weather />);

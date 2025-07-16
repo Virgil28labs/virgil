@@ -68,6 +68,9 @@ describe('useChat', () => {
     it('adds messages with unique IDs and timestamps', () => {
       const { result } = renderHook(() => useChat());
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
       let message1: ChatMessage;
       let message2: ChatMessage;
       
@@ -88,6 +91,9 @@ describe('useChat', () => {
   describe('Message Sending', () => {
     it('sends a message and receives response', async () => {
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       let response: ChatMessage | null;
       
@@ -117,6 +123,9 @@ describe('useChat', () => {
       const systemPrompt = 'You are a helpful assistant';
       const { result } = renderHook(() => useChat(systemPrompt));
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
       await act(async () => {
         await result.current.sendMessage('Hello!');
       });
@@ -130,6 +139,9 @@ describe('useChat', () => {
 
     it('sends message with custom options', async () => {
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       await act(async () => {
         await result.current.sendMessage('Hello!', {
@@ -151,6 +163,9 @@ describe('useChat', () => {
     it('throws error for empty message', async () => {
       const { result } = renderHook(() => useChat());
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
       await expect(
         act(async () => {
           await result.current.sendMessage('   ');
@@ -163,6 +178,9 @@ describe('useChat', () => {
       mockComplete.mockRejectedValue(error);
       
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       await expect(
         act(async () => {
@@ -180,6 +198,9 @@ describe('useChat', () => {
       mockComplete.mockResolvedValue({ id: '1', content: null });
       
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       let response: ChatMessage | null;
       
@@ -207,6 +228,9 @@ describe('useChat', () => {
     it('sends message with streaming response', async () => {
       const { result } = renderHook(() => useChat());
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
       let streamingMessage: ChatMessage;
       
       await act(async () => {
@@ -221,6 +245,9 @@ describe('useChat', () => {
 
     it('updates message content during streaming', async () => {
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       const messagePromise = act(async () => {
         return result.current.sendMessageStream('Hello!');
@@ -243,6 +270,8 @@ describe('useChat', () => {
     it('sets isTyping during streaming', async () => {
       const { result } = renderHook(() => useChat());
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       expect(result.current.isTyping).toBe(false);
       
       const messagePromise = act(async () => {
@@ -269,11 +298,20 @@ describe('useChat', () => {
       
       const { result } = renderHook(() => useChat());
       
-      await expect(
-        act(async () => {
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
+      let thrownError: Error | null = null;
+      
+      await act(async () => {
+        try {
           await result.current.sendMessageStream('Hello!');
-        })
-      ).rejects.toThrow('Stream Error');
+        } catch (err) {
+          thrownError = err as Error;
+        }
+      });
+      
+      expect(thrownError).toEqual(error);
       
       // Should remove failed streaming message and add error
       expect(result.current.messages).toHaveLength(2);
@@ -287,6 +325,9 @@ describe('useChat', () => {
     it('clears all messages', () => {
       const { result } = renderHook(() => useChat());
       
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
+      
       act(() => {
         result.current.addMessage('user', 'Message 1');
         result.current.addMessage('assistant', 'Response 1');
@@ -298,6 +339,9 @@ describe('useChat', () => {
 
     it('removes a specific message', () => {
       const { result } = renderHook(() => useChat());
+      
+      // Check that result.current is not null before proceeding
+      expect(result.current).not.toBeNull();
       
       let message1: ChatMessage;
       let message2: ChatMessage;

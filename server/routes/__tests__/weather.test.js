@@ -114,7 +114,7 @@ describe('Weather Routes', () => {
         cached: false
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('https://api.openweathermap.org/data/2.5/weather?lat=40.7128&lon=-74.006')
       );
     });
@@ -215,7 +215,7 @@ describe('Weather Routes', () => {
         cached: false
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('q=New%20York')
       );
     });
@@ -230,7 +230,7 @@ describe('Weather Routes', () => {
         .get('/api/v1/weather/city/London?country=UK')
         .expect(200);
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('q=London%2CUK')
       );
     });

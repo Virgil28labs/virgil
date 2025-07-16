@@ -1,14 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const { LLMProxy } = require('../services/llmProxy');
 const { RequestQueue } = require('../services/queue');
-const { validateRequest } = require('../middleware/validation');
+const { validateRequest, validateBatchRequest } = require('../middleware/validation');
 const { cacheMiddleware } = require('../middleware/cache');
 
-// Initialize services
-const llmProxy = new LLMProxy();
-const requestQueue = new RequestQueue();
+// Factory function for creating router with injected dependencies
+function createLLMRouter(llmProxyInstance, requestQueueInstance) {
+  const router = express.Router();
+  
+  // Use provided instances or create new ones
+  const llmProxy = llmProxyInstance || new LLMProxy();
+  const requestQueue = requestQueueInstance || new RequestQueue();
 
 // Specific rate limiter for LLM endpoints
 const llmLimiter = rateLimit({
@@ -122,21 +125,9 @@ router.post('/stream', validateRequest, async (req, res, next) => {
  * POST /api/v1/llm/batch
  * Batch completion endpoint for multiple requests
  */
-router.post('/batch', validateRequest, async (req, res, next) => {
+router.post('/batch', validateBatchRequest, async (req, res, next) => {
   try {
     const { requests } = req.body;
-
-    if (!Array.isArray(requests) || requests.length === 0) {
-      return res.status(400).json({
-        error: 'Invalid request: requests must be a non-empty array'
-      });
-    }
-
-    if (requests.length > 10) {
-      return res.status(400).json({
-        error: 'Batch size cannot exceed 10 requests'
-      });
-    }
 
     // Process all requests in parallel
     const results = await Promise.all(
@@ -204,4 +195,12 @@ router.post('/tokenize', async (req, res, next) => {
   }
 });
 
+  return router;
+}
+
+// Create default router instance for production use
+const router = createLLMRouter();
+
+// Export both the router and the factory for testing
 module.exports = router;
+module.exports.createLLMRouter = createLLMRouter;

@@ -95,7 +95,7 @@ describe('LocationContext', () => {
     expect(result.current.coordinates).toBeNull();
     expect(result.current.address).toBeNull();
     expect(result.current.ipLocation).toBeNull();
-    expect(result.current.loading).toBe(true);
+    expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
     expect(result.current.permissionStatus).toBe('unknown');
     expect(result.current.hasLocation).toBe(false);

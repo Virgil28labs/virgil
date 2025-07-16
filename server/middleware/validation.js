@@ -89,7 +89,7 @@ const validateBatchRequest = (req, res, next) => {
 
   if (requests.length > 10) {
     return res.status(400).json({
-      error: 'Maximum 10 requests allowed in a batch'
+      error: 'Batch size cannot exceed 10 requests'
     });
   }
 

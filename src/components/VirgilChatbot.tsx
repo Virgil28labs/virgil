@@ -652,7 +652,7 @@ RESPONSE RULES:
             placeholder="Type your message..."
             disabled={isTyping || isSearching}
             className="msg-input"
-            aria-label="Message input"
+            aria-label="Type your message to Virgil"
             aria-describedby={error ? "chat-error" : undefined}
             autoComplete="off"
           />

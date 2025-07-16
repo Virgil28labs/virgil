@@ -26,14 +26,12 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 router.get('/coordinates/:lat/:lon', async (req, res) => {
   try {
     const { lat, lon } = req.params;
-    console.log('🌤️ [Backend] Weather request received:', { lat, lon });
     
     // Validate coordinates
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lon);
     
     if (isNaN(latitude) || isNaN(longitude)) {
-      console.error('🌤️ [Backend] Invalid coordinates:', { lat, lon });
       return res.status(400).json({
         error: 'Invalid coordinates provided'
       });
@@ -44,7 +42,6 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
     const cached = weatherCache.get(cacheKey);
     
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('🌤️ [Backend] Using cached weather data');
       return res.json({
         success: true,
         data: cached.data,
@@ -54,13 +51,8 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
 
     // Validate API key
     const apiKey = process.env.OPENWEATHER_API_KEY;
-    console.log('🌤️ [Backend] API Key check:', { 
-      hasKey: !!apiKey, 
-      keyPrefix: apiKey ? apiKey.substring(0, 8) + '...' : 'none' 
-    });
     
     if (!apiKey) {
-      console.error('🌤️ [Backend] OpenWeather API key not configured');
       return res.status(500).json({
         error: 'Weather service is not properly configured'
       });
@@ -68,14 +60,11 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
 
     // Fetch from OpenWeatherMap
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`;
-    console.log('🌤️ [Backend] Making OpenWeather API call');
     
     const response = await fetch(apiUrl);
-    console.log('🌤️ [Backend] OpenWeather API response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('🌤️ [Backend] OpenWeather API error:', response.status, errorData);
       
       return res.status(response.status).json({
         error: 'Failed to fetch weather data',
@@ -124,7 +113,6 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Weather endpoint error:', error);
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process weather request'
@@ -164,7 +152,6 @@ router.get('/city/:city', async (req, res) => {
     // Validate API key
     const apiKey = process.env.OPENWEATHER_API_KEY;
     if (!apiKey) {
-      console.error('OpenWeather API key not configured');
       return res.status(500).json({
         error: 'Weather service is not properly configured'
       });
@@ -177,7 +164,6 @@ router.get('/city/:city', async (req, res) => {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('OpenWeather API error:', response.status, errorData);
       
       return res.status(response.status).json({
         error: 'Failed to fetch weather data',
@@ -226,7 +212,6 @@ router.get('/city/:city', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Weather endpoint error:', error);
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process weather request'
@@ -240,16 +225,11 @@ router.get('/city/:city', async (req, res) => {
  */
 router.get('/health', (req, res) => {
   const hasApiKey = !!process.env.OPENWEATHER_API_KEY;
-  const apiKeyPrefix = process.env.OPENWEATHER_API_KEY ? 
-    process.env.OPENWEATHER_API_KEY.substring(0, 8) + '...' : 'none';
-  
-  console.log('🌤️ [Backend] Weather health check called');
   
   res.json({
     status: hasApiKey ? 'healthy' : 'unhealthy',
     service: 'weather',
     configured: hasApiKey,
-    apiKeyPrefix,
     cacheSize: weatherCache.size,
     timestamp: new Date().toISOString()
   });
@@ -261,8 +241,6 @@ router.get('/health', (req, res) => {
  */
 router.get('/test', async (req, res) => {
   try {
-    console.log('🌤️ [Backend] Weather test endpoint called');
-    
     const apiKey = process.env.OPENWEATHER_API_KEY;
     if (!apiKey) {
       return res.status(500).json({
@@ -276,9 +254,6 @@ router.get('/test', async (req, res) => {
     const lon = -74.0060;
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
     
-    console.log('🌤️ [Backend] Testing with NYC coordinates:', { lat, lon });
-    console.log('🌤️ [Backend] API Key prefix:', apiKey.substring(0, 8) + '...');
-    
     const response = await fetch(apiUrl);
     const data = await response.json();
     
@@ -286,12 +261,10 @@ router.get('/test', async (req, res) => {
       success: response.ok,
       status: response.status,
       data: response.ok ? data : null,
-      error: !response.ok ? data : null,
-      apiKeyPrefix: apiKey.substring(0, 8) + '...'
+      error: !response.ok ? data : null
     });
     
   } catch (error) {
-    console.error('🌤️ [Backend] Test endpoint error:', error);
     res.status(500).json({
       error: error.message,
       success: false

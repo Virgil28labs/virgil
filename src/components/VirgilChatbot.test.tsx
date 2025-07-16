@@ -98,6 +98,12 @@ describe('VirgilChatbot', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
+    // Mock DOM methods
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      value: jest.fn(),
+      writable: true
+    });
+    
     // Default mock implementations
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
@@ -185,7 +191,7 @@ describe('VirgilChatbot', () => {
       expect(messagesArea).toHaveAttribute('aria-live', 'polite');
       
       // Check input area
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute('placeholder', 'Type your message...');
       
@@ -238,7 +244,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Hello Virgil');
       
       const form = input.closest('form')!;
@@ -259,7 +265,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Hello Virgil{Enter}');
       
       await waitFor(() => {
@@ -273,7 +279,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       const sendButton = screen.getByRole('button', { name: /send message/i });
       
       await user.type(input, '   ');
@@ -288,7 +294,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message');
       
       const sendButton = screen.getByRole('button', { name: /send message/i });
@@ -305,7 +311,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
       expect(screen.getByText('💭 Thinking...')).toBeInTheDocument();
@@ -378,9 +384,14 @@ describe('VirgilChatbot', () => {
       const modelButton = screen.getByText('GPT-4o Mini').closest('button')!;
       await user.click(modelButton);
       
-      expect(screen.getByRole('option', { name: /gpt-4o mini/i })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: /gpt-4o/i })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: /gpt-4 turbo/i })).toBeInTheDocument();
+      // Check that dropdown options are visible
+      const dropdown = screen.getByRole('listbox') || document.querySelector('.model-dropdown');
+      expect(dropdown).toBeInTheDocument();
+      
+      // Check for specific options within the dropdown
+      expect(screen.getAllByText('GPT-4o Mini')).toHaveLength(2); // One in button, one in dropdown
+      expect(screen.getByText('GPT-4o')).toBeInTheDocument();
+      expect(screen.getByText('GPT-4 Turbo')).toBeInTheDocument();
     });
 
     it('changes model when option is selected', async () => {
@@ -392,8 +403,12 @@ describe('VirgilChatbot', () => {
       const modelButton = screen.getByText('GPT-4o Mini').closest('button')!;
       await user.click(modelButton);
       
-      const gpt4Option = screen.getByRole('option', { name: /gpt-4o.*most capable/i });
-      await user.click(gpt4Option);
+      // Click the specific GPT-4o option (not the mini version)
+      const gpt4Options = screen.getAllByText('GPT-4o');
+      const gpt4OptionInDropdown = gpt4Options.find(option => 
+        option.closest('.model-option') !== null
+      )!;
+      await user.click(gpt4OptionInDropdown);
       
       expect(screen.getByText('GPT-4o')).toBeInTheDocument();
       expect(Storage.prototype.setItem).toHaveBeenCalledWith('virgil-selected-model', 'gpt-4o');
@@ -409,7 +424,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
       await waitFor(() => {
@@ -431,7 +446,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
       await waitFor(() => {
@@ -458,7 +473,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
       const typingStatus = await screen.findByRole('status', { name: /virgil is typing/i });
@@ -483,7 +498,7 @@ describe('VirgilChatbot', () => {
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
       
-      const input = screen.getByRole('textbox', { name: /type your message/i });
+      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Search for latest news{Enter}');
       
       expect(screen.getByText('🔍 Searching the web...')).toBeInTheDocument();

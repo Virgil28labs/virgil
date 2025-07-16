@@ -20,7 +20,7 @@ const mockUseKeyboardNavigation = useKeyboardNavigation as jest.MockedFunction<t
 const mockUser = {
   id: 'test-id',
   email: 'test@example.com',
-  created_at: '2024-01-01T00:00:00Z',
+  created_at: '2024-01-15T12:00:00Z', // Use mid-month, mid-day to avoid timezone edge cases
   user_metadata: {
     name: 'Test User',
     avatarUrl: 'https://example.com/avatar.jpg'
@@ -135,7 +135,7 @@ describe('UserProfileViewer', () => {
   it('displays member since date', () => {
     render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
     
-    expect(screen.getByText(/member since Jan 1, 2024/i)).toBeInTheDocument();
+    expect(screen.getByText('Member since Jan 15, 2024')).toBeInTheDocument();
   });
 
   it('displays avatar when available', () => {
@@ -240,7 +240,7 @@ describe('UserProfileViewer', () => {
       JSON.stringify({
         name: 'Test User',
         email: 'test@example.com',
-        memberSince: '2024-01-01T00:00:00Z',
+        memberSince: '2024-01-15T12:00:00Z',
         location: '123 Main St, New York, NY 10001, USA',
         weather: '72°F'
       }, null, 2)
