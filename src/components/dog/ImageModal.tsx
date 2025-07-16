@@ -1,15 +1,6 @@
-import { memo, useEffect, useCallback } from 'react'
-import type { DogImage } from './hooks/useDogApi'
+import { memo, useEffect, useCallback, useState } from 'react'
+import type { ImageModalProps } from '../../types'
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils'
-
-interface ImageModalProps {
-  dogs: DogImage[]
-  currentIndex: number | null
-  isFavorited: (url: string) => boolean
-  onClose: () => void
-  onNavigate: (index: number) => void
-  onFavoriteToggle: (dog: DogImage) => void
-}
 
 export const ImageModal = memo(function ImageModal({ 
   dogs, 
@@ -37,12 +28,17 @@ export const ImageModal = memo(function ImageModal({
     }
   }, [hasNext, currentIndex, onNavigate])
 
+  const [showCopied, setShowCopied] = useState(false)
+  const [showDownloaded, setShowDownloaded] = useState(false)
+
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
     stopEvent(e)
     if (!currentDog) return
     
     try {
       await downloadImage(currentDog.url, currentDog.breed)
+      setShowDownloaded(true)
+      setTimeout(() => setShowDownloaded(false), 2000)
     } catch (error) {
       console.error('Failed to download image:', error)
     }
@@ -54,6 +50,8 @@ export const ImageModal = memo(function ImageModal({
     
     try {
       await copyImageToClipboard(currentDog.url)
+      setShowCopied(true)
+      setTimeout(() => setShowCopied(false), 2000)
     } catch (error) {
       console.error('Failed to copy image:', error)
     }
@@ -125,15 +123,15 @@ export const ImageModal = memo(function ImageModal({
             aria-label="Download image"
             title="Download"
           >
-            ⬇️
+            {showDownloaded ? '✓' : '⬇️'}
           </button>
           <button
             className="doggo-modal-action"
             onClick={handleCopy}
-            aria-label="Copy image URL"
-            title="Copy URL"
+            aria-label="Copy image"
+            title="Copy image"
           >
-            📋
+            {showCopied ? '✓' : '📋'}
           </button>
         </div>
       </div>

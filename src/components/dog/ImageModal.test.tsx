@@ -57,7 +57,7 @@ describe('ImageModal', () => {
 
       expect(screen.getByLabelText('Remove from favorites')).toBeInTheDocument()
       expect(screen.getByLabelText('Download image')).toBeInTheDocument()
-      expect(screen.getByLabelText('Copy image URL')).toBeInTheDocument()
+      expect(screen.getByLabelText('Copy image')).toBeInTheDocument()
     })
 
     it('should render navigation buttons appropriately', () => {
@@ -196,7 +196,7 @@ describe('ImageModal', () => {
 
       render(<ImageModal {...defaultProps} />)
 
-      const copyButton = screen.getByLabelText('Copy image URL')
+      const copyButton = screen.getByLabelText('Copy image')
       await user.click(copyButton)
 
       expect(mockCopyImageToClipboard).toHaveBeenCalledWith('https://example.com/dog2.jpg')
@@ -209,7 +209,7 @@ describe('ImageModal', () => {
 
       render(<ImageModal {...defaultProps} />)
 
-      const copyButton = screen.getByLabelText('Copy image URL')
+      const copyButton = screen.getByLabelText('Copy image')
       await user.click(copyButton)
 
       await waitFor(() => {

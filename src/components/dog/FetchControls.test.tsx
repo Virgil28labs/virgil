@@ -278,8 +278,9 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} fetchCount={15 as any} />)
 
       const countSelect = screen.getByLabelText('Count:') as HTMLSelectElement
-      // HTML select will default to empty string when value doesn't match any option
-      expect(countSelect.value).toBe('')
+      // When an invalid value is provided to a controlled select,
+      // the browser defaults to the first available option
+      expect(countSelect.value).toBe('1')
     })
   })
 })

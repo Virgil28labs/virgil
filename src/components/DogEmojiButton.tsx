@@ -1,6 +1,6 @@
 import { useState, memo, useCallback, lazy, Suspense } from 'react'
 
-const DogGallery = lazy(() => import('./dog/DogGallery').then(module => ({ default: module.DogGallery })))
+const DogGallery = lazy(() => import('./dog/DogGalleryRefactored').then(module => ({ default: module.DogGallery })))
 
 export const DogEmojiButton = memo(function DogEmojiButton() {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)

@@ -295,9 +295,9 @@
 /* Dog Grid */
 .doggo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--doggo-spacing-lg);
-  padding: var(--doggo-spacing-xs);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--doggo-spacing-md);
+  padding: var(--doggo-spacing-sm);
 }
 
 .doggo-grid-item {
@@ -537,7 +537,7 @@
   }
 
   .doggo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 }
 
