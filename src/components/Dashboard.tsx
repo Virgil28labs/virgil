@@ -6,6 +6,7 @@ import { DateTime } from './DateTime'
 import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents'
 import { DogEmojiButton } from './DogEmojiButton'
 import { GiphyEmojiButton } from './GiphyEmojiButton'
+import { NasaApodButton } from './NasaApodButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
@@ -132,6 +133,9 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* Giphy Emoji Button */}
       <GiphyEmojiButton />
+      
+      {/* NASA APOD Button */}
+      <NasaApodButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
