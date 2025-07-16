@@ -33,7 +33,7 @@ export const DogGalleryTabs = memo(function DogGalleryTabs({
         title="Press 'g' for quick access"
       >
         <span>
-          My Collection {favoritesCount > 0 && `(♥ ${favoritesCount})`}
+          ❤️ Favorites {favoritesCount > 0 && `(${favoritesCount})`}
         </span>
       </button>
     </div>

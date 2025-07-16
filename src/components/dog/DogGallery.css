@@ -162,7 +162,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--violet-purple, #6c3baa) 0%, var(--soft-pink, #efb0c2) 100%);
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
   border-radius: var(--doggo-radius-md);
@@ -194,7 +194,7 @@
   background: var(--doggo-bg-tertiary);
   border-radius: var(--doggo-radius-lg);
   scrollbar-width: thin;
-  scrollbar-color: var(--violet-purple, #6c3baa) transparent;
+  scrollbar-color: #ff6b9d transparent;
 }
 
 .doggo-sanctuary-content::-webkit-scrollbar {
@@ -207,7 +207,7 @@
 }
 
 .doggo-sanctuary-content::-webkit-scrollbar-thumb {
-  background: var(--violet-purple, #6c3baa);
+  background: linear-gradient(180deg, #ff6b9d 0%, #ee5a6f 100%);
   border-radius: 4px;
 }
 
@@ -217,12 +217,7 @@
   align-items: center;
   gap: var(--doggo-spacing-lg);
   max-width: 800px;
-  margin: 0 auto var(--doggo-spacing-xl);
-  padding: var(--doggo-spacing-lg);
-  background: var(--doggo-bg-secondary);
-  border-radius: var(--doggo-radius-xl);
-  border: 1px solid rgba(178, 165, 193, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin: 0 auto var(--doggo-spacing-md);
   justify-content: center;
 }
 

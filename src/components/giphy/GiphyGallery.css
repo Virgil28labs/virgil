@@ -172,14 +172,14 @@
 
 .giphy-gallery-tab {
   flex: 1;
-  padding: var(--giphy-spacing-sm) var(--giphy-spacing-lg);
+  padding: var(--giphy-spacing-md) var(--giphy-spacing-xl);
   background: transparent;
   border: none;
   color: var(--lavender, #b2a5c1);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  border-radius: var(--giphy-radius-sm);
+  border-radius: var(--giphy-radius-md);
   transition: all var(--giphy-transition);
   position: relative;
   overflow: hidden;
@@ -193,7 +193,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--giphy-accent) 0%, var(--giphy-accent-light) 100%);
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
   border-radius: var(--giphy-radius-md);
@@ -207,7 +207,7 @@
   opacity: 1;
 }
 
-.giphy-gallery-tab > span {
+.giphy-gallery-tab span {
   position: relative;
   z-index: 1;
 }
@@ -234,11 +234,6 @@
   gap: var(--giphy-spacing-md);
   max-width: 700px;
   margin: 0 auto var(--giphy-spacing-md);
-  padding: var(--giphy-spacing-md);
-  background: var(--giphy-bg-secondary);
-  border-radius: var(--giphy-radius-lg);
-  border: 1px solid rgba(178, 165, 193, 0.2);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -321,7 +316,7 @@
   border-radius: var(--giphy-radius-md);
   scrollbar-width: thin;
   position: relative;
-  scrollbar-color: var(--giphy-accent) transparent;
+  scrollbar-color: #ff6b9d transparent;
 }
 
 .giphy-gallery-content::-webkit-scrollbar {
@@ -334,7 +329,7 @@
 }
 
 .giphy-gallery-content::-webkit-scrollbar-thumb {
-  background: var(--giphy-accent);
+  background: linear-gradient(180deg, #ff6b9d 0%, #ee5a6f 100%);
   border-radius: 4px;
 }
 

@@ -40,7 +40,6 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
               <span>🐕</span>
               Doggo Sanctuary
             </h2>
-            <p className="doggo-sanctuary-subtitle">Your personal collection of adorable companions</p>
           </div>
           <button 
             className="doggo-sanctuary-close" 

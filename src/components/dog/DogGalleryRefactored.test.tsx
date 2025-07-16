@@ -91,7 +91,6 @@ describe('DogGallery (Refactored)', () => {
     
     expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument()
     expect(screen.getByText('Doggo Sanctuary')).toBeInTheDocument()
-    expect(screen.getByText('Your personal collection of adorable companions')).toBeInTheDocument()
   })
 
   it('renders all sub-components', () => {
@@ -187,7 +186,7 @@ describe('DogGallery (Refactored)', () => {
     
     expect(screen.getByText('🐕')).toBeInTheDocument()
     expect(screen.getByText('Doggo Sanctuary')).toBeInTheDocument()
-    expect(screen.getByText('Your personal collection of adorable companions')).toBeInTheDocument()
+    // Subtitle removed for consistency
   })
 
   it('maintains state across renders', () => {

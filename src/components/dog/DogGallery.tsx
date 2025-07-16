@@ -58,7 +58,6 @@ export const DogGallery = memo(function DogGallery({ isOpen, onClose }: DogGalle
               <span>🐕</span>
               Doggo Sanctuary
             </h2>
-            <p className="doggo-sanctuary-subtitle">Your personal collection of adorable companions</p>
           </div>
           <button 
             className="doggo-sanctuary-close" 
@@ -89,7 +88,7 @@ export const DogGallery = memo(function DogGallery({ isOpen, onClose }: DogGalle
             aria-controls="gallery-panel"
             title="Press 'g' for quick access"
           >
-            <span>My Collection {favorites.length > 0 && `(♥ ${favorites.length})`}</span>
+            <span>❤️ Favorites {favorites.length > 0 && `(${favorites.length})`}</span>
           </button>
         </div>
 

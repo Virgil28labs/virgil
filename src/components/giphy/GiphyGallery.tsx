@@ -102,7 +102,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
           <div>
             <h2 className="giphy-gallery-title">
               <span>🎬</span>
-              GIF Gallery
+              GIPHY Gifs
             </h2>
           </div>
           <button 
@@ -112,16 +112,6 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
           >
             ×
           </button>
-        </div>
-
-        {/* Attribution (Required by Giphy) */}
-        <div className="giphy-attribution">
-          <span>Powered By</span>
-          <img 
-            src="https://developers.giphy.com/branch/master/static/api-logo.gif" 
-            alt="GIPHY"
-            className="giphy-logo"
-          />
         </div>
 
         {/* Tabs */}

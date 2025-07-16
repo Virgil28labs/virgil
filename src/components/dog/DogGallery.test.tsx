@@ -89,7 +89,6 @@ describe('DogGallery', () => {
 
       expect(screen.getByRole('dialog')).toBeInTheDocument()
       expect(screen.getByText('Doggo Sanctuary')).toBeInTheDocument()
-      expect(screen.getByText('Your personal collection of adorable companions')).toBeInTheDocument()
     })
 
     it('should not render when closed', () => {

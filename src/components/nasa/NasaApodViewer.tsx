@@ -1,6 +1,11 @@
 import React, { memo, useState, useEffect, useCallback } from 'react'
 import { nasaService } from '../../lib/nasaService'
 import type { ApodImage, NasaApodViewerProps } from '../../types'
+import { useNasaFavorites } from './hooks/useNasaFavorites'
+import { NasaApodTabs, type NasaTabType } from './NasaApodTabs'
+import { NasaApodGallery } from './NasaApodGallery'
+import { NasaApodImageView } from './NasaApodImageView'
+import { NasaApodModal } from './NasaApodModal'
 import './NasaApodViewer.css'
 
 export const NasaApodViewer = memo(function NasaApodViewer({ 
@@ -16,6 +21,17 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     initialDate || new Date().toISOString().split('T')[0]
   )
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
+  const [activeTab, setActiveTab] = useState<NasaTabType>('browse')
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
+  
+  // Favorites hook
+  const { 
+    favorites, 
+    favoriteCount, 
+    isFavorited, 
+    toggleFavorite, 
+    removeFavorite 
+  } = useNasaFavorites()
 
   // Load APOD for specific date
   const loadApodByDate = useCallback(async (date: string) => {
@@ -63,15 +79,24 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     }
   }, [selectedDate, loadApodByDate])
 
-  // Handle "Today" button click
-  const handleTodayClick = useCallback(async () => {
-    await loadTodaysApod()
-  }, [loadTodaysApod])
 
   // Toggle description expanded state
   const toggleDescription = useCallback(() => {
     setDescriptionExpanded(prev => !prev)
   }, [])
+  
+  // Handle favorite toggle
+  const handleFavoriteToggle = useCallback(() => {
+    if (currentApod) {
+      toggleFavorite(currentApod)
+    }
+  }, [currentApod, toggleFavorite])
+  
+  // Handle gallery item selection
+  const handleGallerySelect = useCallback((apod: ApodImage) => {
+    setActiveTab('browse')
+    loadApodByDate(apod.date)
+  }, [loadApodByDate])
 
   // Simple keyboard navigation - just ESC to close
   useEffect(() => {
@@ -101,6 +126,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
       setError(null)
       setImageLoading(true)
       setDescriptionExpanded(false)
+      setActiveTab('browse')
     }
   }, [isOpen])
 
@@ -126,26 +152,6 @@ export const NasaApodViewer = memo(function NasaApodViewer({
               <span>🔭</span>
               Astronomy Picture of the Day
             </h2>
-            <div className="nasa-apod-date-picker">
-              <input
-                type="date"
-                className="nasa-apod-date-input"
-                value={selectedDate}
-                onChange={handleDateChange}
-                min="1995-06-16"
-                max={new Date().toISOString().split('T')[0]}
-                disabled={loading}
-                aria-label="Select APOD date"
-              />
-              <button
-                className="nasa-apod-today-btn"
-                onClick={handleTodayClick}
-                disabled={loading || selectedDate === new Date().toISOString().split('T')[0]}
-                aria-label="Go to today's APOD"
-              >
-                Today
-              </button>
-            </div>
           </div>
           <button 
             className="nasa-apod-close" 
@@ -155,10 +161,47 @@ export const NasaApodViewer = memo(function NasaApodViewer({
             ×
           </button>
         </div>
+        
+        {/* Tab Navigation */}
+        <NasaApodTabs
+          activeTab={activeTab}
+          favoritesCount={favoriteCount}
+          onTabChange={setActiveTab}
+        />
 
-        {/* Content Area - Focus on Large Image Display */}
+        {/* Content Area */}
         <div className="nasa-apod-content">
-          {error ? (
+          {activeTab === 'gallery' ? (
+            <NasaApodGallery
+              favorites={favorites}
+              onRemoveFavorite={removeFavorite}
+              onSelectApod={handleGallerySelect}
+              onOpenModal={setSelectedImageIndex}
+            />
+          ) : (
+            <>
+              {/* Title and Date Picker Header */}
+              <div className="nasa-apod-controls">
+                <div className="nasa-apod-header-content">
+                  {currentApod && (
+                    <h3 className="nasa-apod-control-title">{currentApod.title}</h3>
+                  )}
+                  <div className="nasa-apod-date-wrapper">
+                    <input
+                      type="date"
+                      className="nasa-apod-date-input"
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                      min="1995-06-16"
+                      max={new Date().toISOString().split('T')[0]}
+                      disabled={loading}
+                      aria-label="Select APOD date"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {error ? (
             <div className="nasa-apod-error">
               <div className="nasa-apod-error-icon">⚠️</div>
               <div className="nasa-apod-error-message">{error}</div>
@@ -177,77 +220,53 @@ export const NasaApodViewer = memo(function NasaApodViewer({
             </div>
           ) : currentApod ? (
             <>
-              {/* Large Image Display - 85% of space */}
-              <div className="nasa-apod-image-container">
-                {imageLoading && (
-                  <div className="nasa-apod-image-skeleton">
-                    <div className="nasa-apod-skeleton-shimmer" />
-                  </div>
-                )}
-                {currentApod.mediaType === 'image' ? (
-                  <img
-                    src={currentApod.hdImageUrl || currentApod.imageUrl}
-                    alt={currentApod.title}
-                    className="nasa-apod-image"
-                    onLoad={handleImageLoad}
-                    onError={handleImageError}
-                    style={{ display: imageLoading ? 'none' : 'block' }}
-                  />
-                ) : (
-                  <iframe
-                    src={currentApod.imageUrl}
-                    title={currentApod.title}
-                    className="nasa-apod-video"
-                    onLoad={handleImageLoad}
-                    style={{ display: imageLoading ? 'none' : 'block' }}
-                  />
-                )}
-              </div>
-
-              {/* Minimal Metadata */}
-              <div className="nasa-apod-metadata">
-                <div className="nasa-apod-info">
-                  <h3 className="nasa-apod-image-title">{currentApod.title}</h3>
-                  <p className="nasa-apod-date">
-                    {new Date(currentApod.date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric', 
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </p>
-                  {currentApod.copyright && (
-                    <p className="nasa-apod-copyright">© {currentApod.copyright}</p>
+              <NasaApodImageView
+                apod={currentApod}
+                isFavorited={isFavorited(currentApod.id)}
+                onFavoriteToggle={handleFavoriteToggle}
+                imageLoading={imageLoading}
+                onImageLoad={handleImageLoad}
+                onImageError={handleImageError}
+              />
+              
+              {/* Expandable Description */}
+              {currentApod.explanation && (
+                <div className="nasa-apod-description">
+                  {descriptionExpanded ? (
+                    <p className="nasa-apod-description-full">
+                      {currentApod.explanation}
+                    </p>
+                  ) : (
+                    <p className="nasa-apod-description-preview">
+                      {currentApod.explanation}
+                    </p>
                   )}
-                  
-                  {/* Expandable Description */}
-                  {currentApod.explanation && (
-                    <div className="nasa-apod-description">
-                      {descriptionExpanded ? (
-                        <p className="nasa-apod-description-full">
-                          {currentApod.explanation}
-                        </p>
-                      ) : (
-                        <p className="nasa-apod-description-preview">
-                          {currentApod.explanation}
-                        </p>
-                      )}
-                      <button
-                        className={`nasa-apod-description-toggle ${descriptionExpanded ? 'expanded' : ''}`}
-                        onClick={toggleDescription}
-                        aria-label={descriptionExpanded ? 'Show less description' : 'Show full description'}
-                      >
-                        <span>{descriptionExpanded ? 'Show less' : 'Read more'}</span>
-                        <span className="nasa-apod-description-toggle-icon">▼</span>
-                      </button>
-                    </div>
-                  )}
+                  <button
+                    className={`nasa-apod-description-toggle ${descriptionExpanded ? 'expanded' : ''}`}
+                    onClick={toggleDescription}
+                    aria-label={descriptionExpanded ? 'Show less description' : 'Show full description'}
+                  >
+                    <span>{descriptionExpanded ? 'Show less' : 'Read more'}</span>
+                    <span className="nasa-apod-description-toggle-icon">▼</span>
+                  </button>
                 </div>
-              </div>
+              )}
             </>
           ) : null}
+            </>
+          )}
         </div>
       </div>
+
+      {/* NASA APOD Modal */}
+      <NasaApodModal
+        favorites={favorites}
+        currentIndex={selectedImageIndex}
+        isFavorited={isFavorited}
+        onClose={() => setSelectedImageIndex(null)}
+        onNavigate={setSelectedImageIndex}
+        onFavoriteToggle={toggleFavorite}
+      />
     </div>
   )
 })
