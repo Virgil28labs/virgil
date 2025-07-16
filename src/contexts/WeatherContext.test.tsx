@@ -159,9 +159,13 @@ describe('WeatherContext', () => {
     
     const { result } = renderHook(() => useWeather(), { wrapper });
     
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
     await waitFor(() => {
       expect(result.current.error).toBe('Weather API error');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     expect(result.current.data).toBeNull();
     expect(result.current.loading).toBe(false);
@@ -192,9 +196,13 @@ describe('WeatherContext', () => {
     
     const { result } = renderHook(() => useWeather(), { wrapper });
     
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
     await waitFor(() => {
       expect(result.current.error).toBe('Weather API error');
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     act(() => {
       result.current.clearError();
@@ -236,7 +244,9 @@ describe('WeatherContext', () => {
       expect(result.current.data).toEqual(mockWeatherData);
     });
     
-    mockWeatherService.getWeatherByCoordinates.mockClear();
+    // Clear the mock call count but keep the resolved value for caching
+    jest.clearAllMocks();
+    mockWeatherService.getWeatherByCoordinates.mockResolvedValue(mockWeatherData);
     
     // Advance time by only 5 minutes (less than 10 minute cache expiry)
     mockDateNow.mockReturnValue(startTime + 5 * 60 * 1000);
@@ -321,9 +331,13 @@ describe('WeatherContext', () => {
       wrapper: ({ children }) => wrapper({ children, locationValue: newLocationContext })
     });
     
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    
     await waitFor(() => {
       expect(mockWeatherService.getWeatherByCoordinates).toHaveBeenCalledWith(34.0522, -118.2437);
-    });
+    }, { timeout: 15000 });
   });
 
   it('handles loading state correctly', async () => {

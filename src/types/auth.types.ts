@@ -42,11 +42,3 @@ export interface SignUpFormData {
 export interface AuthFormProps {
   onSuccess?: () => void;
 }
-
-export interface AuthError {
-  message: string;
-  status?: number;
-}
-
-export type AuthLoadingState = boolean;
-export type AuthMessage = string;

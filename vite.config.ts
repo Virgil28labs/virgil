@@ -45,7 +45,7 @@ export default defineConfig({
           }
           
           // Services and utilities
-          if (id.includes('services/llm') || id.includes('lib/locationService') || id.includes('lib/mapsService')) {
+          if (id.includes('services/llm') || id.includes('lib/locationService')) {
             return 'services';
           }
           

@@ -12,9 +12,6 @@ module.exports = {
     '^.+\\.(js|jsx)$': '<rootDir>/jest-transformer.cjs'
   },
   moduleNameMapper: {
-    // Mock problematic ESM modules
-    '^isows$': '<rootDir>/src/lib/__mocks__/isows.js',
-    
     // Handle CSS imports (CSS modules)
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     

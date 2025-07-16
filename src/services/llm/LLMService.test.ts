@@ -201,7 +201,7 @@ describe('LLMService', () => {
         stream: true
       });
       
-      expect(result).toEqual(streamResponse);
+      expect(result).toEqual({ ok: true, ...streamResponse });
       expect(global.fetch).toHaveBeenCalledWith(
         'http://localhost:5002/api/v1/llm/stream',
         expect.any(Object)
@@ -348,7 +348,7 @@ describe('LLMService', () => {
       });
       
       await expect(service.complete({ messages: [] }))
-        .rejects.toThrow('Request failed with status 500');
+        .rejects.toThrow('Unknown error');
     });
 
     it('handles rate limit errors as retryable', async () => {

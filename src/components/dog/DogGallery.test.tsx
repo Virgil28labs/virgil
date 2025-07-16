@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DogGallery } from './DogGallery'
 import { useDogApi } from './hooks/useDogApi'
@@ -396,19 +396,23 @@ describe('DogGallery', () => {
       fireEvent.click(screen.getByRole('tab', { name: /My Collection/i }))
       
       // Use f shortcut
-      shortcuts['f']()
+      act(() => {
+        shortcuts['f']()
+      })
 
       // Should be back on fetch tab
-      expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toHaveClass('active')
+      expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toHaveClass('doggo-sanctuary-tab active')
     })
 
     it('should handle g key for gallery tab', () => {
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0]
-      shortcuts['g']()
+      act(() => {
+        shortcuts['g']()
+      })
 
-      expect(screen.getByRole('tab', { name: /My Collection/i })).toHaveClass('active')
+      expect(screen.getByRole('tab', { name: /My Collection/i })).toHaveClass('doggo-sanctuary-tab active')
     })
 
     it('should close image modal with Escape when modal is open', async () => {

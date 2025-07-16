@@ -77,17 +77,6 @@ export interface CollisionResult {
   element?: UIElement;
 }
 
-export interface TextMeasurement {
-  width: number;
-  height: number;
-}
-
-export interface TextBounds {
-  top: number;
-  baseline: number;
-  height: number;
-}
-
 export type WallSide = 'left' | 'right' | null;
 
 export type MascotEmoji = '🦝' | '🐾' | '🍃' | '🌰' | '🗑️' | '🌙' | '🐻' | '🍯';

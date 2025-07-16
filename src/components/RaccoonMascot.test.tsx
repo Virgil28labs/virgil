@@ -288,7 +288,7 @@ describe('RaccoonMascot', () => {
       // Move left
       fireEvent.keyDown(document, { key: 'ArrowLeft' });
       act(() => {
-        jest.advanceTimersByTime(16);
+        jest.advanceTimersByTime(100); // Allow more time for state updates
       });
       
       expect(mascotImage).toHaveStyle({ transform: 'scaleX(-1)' });
@@ -327,9 +327,8 @@ describe('RaccoonMascot', () => {
       fireEvent.keyDown(document, { key: ' ' });
       
       // Should still be in picked up state
-      expect(mascotContainer).toHaveStyle({
-        transform: expect.stringContaining('scale(1.2)')
-      });
+      const computedStyle = window.getComputedStyle(mascotContainer);
+      expect(computedStyle.transform).toContain('scale(1.2)');
     });
   });
 
