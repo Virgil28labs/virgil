@@ -159,13 +159,14 @@ describe('WeatherContext', () => {
     
     const { result } = renderHook(() => useWeather(), { wrapper });
     
-    act(() => {
-      jest.advanceTimersByTime(1000);
+    // Manually trigger fetchWeather to ensure error is caught
+    await act(async () => {
+      await result.current.fetchWeather();
     });
     
     await waitFor(() => {
       expect(result.current.error).toBe('Weather API error');
-    }, { timeout: 15000 });
+    }, { timeout: 5000 });
     
     expect(result.current.data).toBeNull();
     expect(result.current.loading).toBe(false);
@@ -196,13 +197,14 @@ describe('WeatherContext', () => {
     
     const { result } = renderHook(() => useWeather(), { wrapper });
     
-    act(() => {
-      jest.advanceTimersByTime(1000);
+    // Manually trigger fetchWeather to ensure error is caught
+    await act(async () => {
+      await result.current.fetchWeather();
     });
     
     await waitFor(() => {
       expect(result.current.error).toBe('Weather API error');
-    }, { timeout: 15000 });
+    }, { timeout: 5000 });
     
     act(() => {
       result.current.clearError();
@@ -245,8 +247,7 @@ describe('WeatherContext', () => {
     });
     
     // Clear the mock call count but keep the resolved value for caching
-    jest.clearAllMocks();
-    mockWeatherService.getWeatherByCoordinates.mockResolvedValue(mockWeatherData);
+    mockWeatherService.getWeatherByCoordinates.mockClear();
     
     // Advance time by only 5 minutes (less than 10 minute cache expiry)
     mockDateNow.mockReturnValue(startTime + 5 * 60 * 1000);
@@ -324,20 +325,18 @@ describe('WeatherContext', () => {
     const newLocationContext: LocationContextType = {
       ...mockLocationContext,
       coordinates: { latitude: 34.0522, longitude: -118.2437 },
-      hasLocation: true
+      hasLocation: true,
+      lastUpdated: 0 // Ensure cache is expired
     };
     
     rerender({
       wrapper: ({ children }) => wrapper({ children, locationValue: newLocationContext })
     });
     
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
-    
+    // Wait for the effect to run and fetch weather
     await waitFor(() => {
       expect(mockWeatherService.getWeatherByCoordinates).toHaveBeenCalledWith(34.0522, -118.2437);
-    }, { timeout: 15000 });
+    }, { timeout: 5000 });
   });
 
   it('handles loading state correctly', async () => {

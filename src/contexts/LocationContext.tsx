@@ -178,6 +178,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
     fetchLocationData,
     requestLocationPermission,
     clearError,
+    hasLocation: !!(state.coordinates || state.ipLocation),
     hasGPSLocation: !!state.coordinates,
     hasIPLocation: !!state.ipLocation,
     initialized: true  // Always initialized after mount

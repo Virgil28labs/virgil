@@ -68,7 +68,7 @@ describe('useFocusManagement', () => {
 
       const focusableElements = result.current.getFocusableElements();
 
-      expect(focusableElements).toHaveLength(5); // input1, button1, select1, textarea1, link1, div1
+      expect(focusableElements).toHaveLength(6); // input1, button1, select1, textarea1, link1, div1
       expect(focusableElements.map(el => el.id)).toEqual([
         'input1',
         'button1',

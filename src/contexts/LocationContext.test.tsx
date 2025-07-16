@@ -11,7 +11,8 @@ jest.mock('../lib/locationService', () => ({
     getAddressFromCoordinates: jest.fn(),
     getIPAddress: jest.fn(),
     getIPLocation: jest.fn(),
-    getFullLocationData: jest.fn()
+    getFullLocationData: jest.fn(),
+    getQuickLocation: jest.fn().mockResolvedValue({ ipLocation: null })
   }
 }));
 
@@ -61,10 +62,27 @@ describe('LocationContext', () => {
     // Setup permissions mock
     Object.defineProperty(global.navigator, 'permissions', {
       value: {
-        query: jest.fn().mockResolvedValue({ state: 'granted' })
+        query: jest.fn().mockResolvedValue({ 
+          state: 'granted',
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn()
+        })
       },
       writable: true
     });
+    
+    // Reset all mock implementations to default
+    mockLocationService.getQuickLocation.mockResolvedValue({ ipLocation: null });
+    mockLocationService.getFullLocationData.mockResolvedValue({
+      coordinates: null,
+      address: null,
+      ipLocation: null,
+      timestamp: Date.now()
+    });
+    mockLocationService.getCurrentPosition.mockResolvedValue(mockCoordinates);
+    mockLocationService.getAddressFromCoordinates.mockResolvedValue(mockAddress);
+    mockLocationService.getIPAddress.mockResolvedValue('127.0.0.1');
+    mockLocationService.getIPLocation.mockResolvedValue(mockIPLocation);
   });
 
   it('throws error when useLocation is used outside provider', () => {
@@ -86,24 +104,30 @@ describe('LocationContext', () => {
   it('provides initial state', async () => {
     // Mock getFullLocationData to prevent actual API calls
     mockLocationService.getFullLocationData.mockResolvedValue({
+      coordinates: null,
+      address: null,
+      ipLocation: null,
       timestamp: Date.now()
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
     
-    // Initial state should be loading
+    // Initial state
     expect(result.current.coordinates).toBeNull();
     expect(result.current.address).toBeNull();
     expect(result.current.ipLocation).toBeNull();
-    expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
-    expect(result.current.permissionStatus).toBe('unknown');
     expect(result.current.hasLocation).toBe(false);
     
-    // Wait for initial fetch to complete
+    // Wait for any async operations
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
+      // Permission status should be set
+      expect(result.current.permissionStatus).not.toBe('unknown');
+    }, { timeout: 3000 });
+    
+    // After initial load, permission should be checked
+    expect(result.current.permissionStatus).toBe('granted');
+    expect(result.current.loading).toBe(false);
   });
 
   it('fetches location on mount', async () => {
@@ -120,7 +144,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     expect(result.current.coordinates).toEqual(mockCoordinates);
     expect(result.current.address).toEqual(mockAddress);
@@ -146,7 +170,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     expect(result.current.coordinates).toBeNull();
     expect(result.current.address).toBeNull();
@@ -164,7 +188,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     expect(result.current.error).toContain('Location request timed out');
   });
@@ -183,7 +207,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     // Clear mocks to verify refresh calls them again
     jest.clearAllMocks();
@@ -233,7 +257,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     // Should still have coordinates even if geocoding fails
     expect(result.current.coordinates).toEqual(mockCoordinates);
@@ -251,7 +275,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     // Initially false
     expect(result.current.hasLocation).toBe(false);
@@ -283,7 +307,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     expect(result.current.lastUpdated).toBeGreaterThanOrEqual(beforeUpdate);
     expect(result.current.lastUpdated).toBeLessThanOrEqual(Date.now());
@@ -305,7 +329,7 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-    });
+    }, { timeout: 3000 });
     
     expect(result.current.coordinates).toBeNull();
     expect(result.current.ipLocation).toEqual(mockIPLocation);

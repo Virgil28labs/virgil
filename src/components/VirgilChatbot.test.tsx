@@ -307,6 +307,18 @@ describe('VirgilChatbot', () => {
 
     it('shows typing indicator while waiting for response', async () => {
       const user = userEvent.setup();
+      
+      // Mock a delayed response to ensure typing indicator is visible
+      (dedupeFetch as jest.Mock).mockImplementation(() => 
+        new Promise(resolve => setTimeout(() => resolve({
+          ok: true,
+          json: async () => ({
+            success: true,
+            message: { content: 'Hello! I am Virgil, your helpful assistant.' }
+          })
+        }), 100))
+      );
+      
       render(<VirgilChatbot />);
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
@@ -314,11 +326,15 @@ describe('VirgilChatbot', () => {
       const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
-      expect(screen.getByText('💭 Thinking...')).toBeInTheDocument();
+      // Wait for the typing indicator to appear
+      await waitFor(() => {
+        expect(screen.getByText('💭 Thinking...')).toBeInTheDocument();
+      });
       
+      // Then wait for it to disappear when response arrives
       await waitFor(() => {
         expect(screen.queryByText('💭 Thinking...')).not.toBeInTheDocument();
-      });
+      }, { timeout: 300 });
     });
   });
 
@@ -384,14 +400,18 @@ describe('VirgilChatbot', () => {
       const modelButton = screen.getByText('GPT-4o Mini').closest('button')!;
       await user.click(modelButton);
       
-      // Check that dropdown options are visible
-      const dropdown = screen.getByRole('listbox') || document.querySelector('.model-dropdown');
+      // Check that dropdown is visible
+      const dropdown = document.querySelector('.model-dropdown');
       expect(dropdown).toBeInTheDocument();
       
       // Check for specific options within the dropdown
-      expect(screen.getAllByText('GPT-4o Mini')).toHaveLength(2); // One in button, one in dropdown
-      expect(screen.getByText('GPT-4o')).toBeInTheDocument();
-      expect(screen.getByText('GPT-4 Turbo')).toBeInTheDocument();
+      const modelOptions = screen.getAllByRole('option');
+      expect(modelOptions).toHaveLength(3);
+      
+      // Check that all models are shown
+      expect(screen.getByRole('option', { name: /GPT-4o Mini.*Fast and efficient/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /GPT-4o.*Most capable model/i })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: /GPT-4 Turbo.*Balanced performance/i })).toBeInTheDocument();
     });
 
     it('changes model when option is selected', async () => {
@@ -464,11 +484,23 @@ describe('VirgilChatbot', () => {
       
       expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Virgil AI Assistant');
       expect(screen.getByRole('log')).toHaveAttribute('aria-label', 'Chat messages');
-      expect(screen.getByRole('textbox')).toHaveAttribute('aria-label', 'Message input');
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-label', 'Type your message to Virgil');
     });
 
     it('announces message status changes', async () => {
       const user = userEvent.setup();
+      
+      // Mock a delayed response to ensure typing indicator is visible
+      (dedupeFetch as jest.Mock).mockImplementation(() => 
+        new Promise(resolve => setTimeout(() => resolve({
+          ok: true,
+          json: async () => ({
+            success: true,
+            message: { content: 'Response message' }
+          })
+        }), 100))
+      );
+      
       render(<VirgilChatbot />);
       
       await user.click(screen.getByRole('button', { name: /open chat/i }));
@@ -476,8 +508,14 @@ describe('VirgilChatbot', () => {
       const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
       await user.type(input, 'Test message{Enter}');
       
-      const typingStatus = await screen.findByRole('status', { name: /virgil is typing/i });
-      expect(typingStatus).toBeInTheDocument();
+      // Wait for typing status to appear
+      const typingStatus = await screen.findByRole('status');
+      expect(typingStatus).toHaveAttribute('aria-label', 'Virgil is typing');
+      
+      // Wait for response to complete
+      await waitFor(() => {
+        expect(screen.getByText('Response message')).toBeInTheDocument();
+      });
     });
   });
 
