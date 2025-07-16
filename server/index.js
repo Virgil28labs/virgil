@@ -46,6 +46,7 @@ const chatRoutes = require('./routes/chat');
 const weatherRoutes = require('./routes/weather');
 const searchRoutes = require('./routes/search');
 const elevationRoutes = require('./routes/elevation');
+const rhythmRoutes = require('./routes/rhythm');
 
 // Mount routes
 app.use('/api/v1/llm', llmRoutes);
@@ -55,6 +56,7 @@ app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/elevation', elevationRoutes);
+app.use('/api/v1/rhythm', rhythmRoutes);
 
 // Error handling middleware
 app.use((err, req, res, _next) => {
@@ -99,6 +101,7 @@ const server = app.listen(PORT, () => {
   console.log(`  POST /api/v1/search - Web search endpoint`);
   console.log(`  GET /api/v1/search/health - Search service health check`);
   console.log(`  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates`);
+  console.log(`  POST /api/v1/rhythm/generate - AI-powered rhythm generation`);
 });
 
 // Graceful shutdown

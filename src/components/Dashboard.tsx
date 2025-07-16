@@ -7,6 +7,7 @@ import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyCom
 import { DogEmojiButton } from './DogEmojiButton'
 import { GiphyEmojiButton } from './GiphyEmojiButton'
 import { NasaApodButton } from './NasaApodButton'
+import { RhythmMachineButton } from './RhythmMachineButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
@@ -136,6 +137,9 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* NASA APOD Button */}
       <NasaApodButton />
+      
+      {/* Rhythm Machine Button */}
+      <RhythmMachineButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
