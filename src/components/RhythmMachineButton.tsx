@@ -37,7 +37,7 @@ export const RhythmMachineButton = memo(function RhythmMachineButton() {
           justifyContent: 'center',
           cursor: 'pointer',
           position: 'fixed',
-          top: '12.5rem', // Position below the NASA button
+          top: '12rem', // Position below the NASA button
           right: 'calc(2rem - 10px)',
           zIndex: 1000,
           opacity: hovered ? 1 : 0.8,

@@ -33,7 +33,7 @@ export const GiphyEmojiButton = memo(function GiphyEmojiButton() {
           justifyContent: 'center',
           cursor: 'pointer',
           position: 'fixed',
-          top: '7.5rem', // Position below the dog button
+          top: '7rem', // Position below the dog button
           right: 'calc(2rem - 10px)',
           zIndex: 1000,
           opacity: hovered ? 1 : 0.8,

@@ -37,7 +37,7 @@ export const NasaApodButton = memo(function NasaApodButton() {
           justifyContent: 'center',
           cursor: 'pointer',
           position: 'fixed',
-          top: '10rem', // Position below the Giphy button
+          top: '9.5rem', // Position below the Giphy button
           right: 'calc(2rem - 10px)',
           zIndex: 1000,
           opacity: hovered ? 1 : 0.8,
