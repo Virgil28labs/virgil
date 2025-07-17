@@ -76,7 +76,7 @@ export const Dashboard = memo(function Dashboard() {
         👤
       </button>
       <DateTime />
-      <Suspense fallback={<LoadingFallback message="Loading weather..." size="small" variant="skeleton" />}>
+      <Suspense fallback={null}>
         <LazyWeather />
       </Suspense>
 

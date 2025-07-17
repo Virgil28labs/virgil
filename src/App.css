@@ -1421,20 +1421,24 @@ a:focus-visible,
 
 /* Weather Widget Styles */
 .weather-widget {
-  position: fixed;
-  top: 20px;
-  right: 80px;
+  position: fixed !important;
+  top: 20px !important;
+  right: 80px !important;
+  left: auto !important;
+  bottom: auto !important;
   background: rgba(108, 59, 170, 0.1);
   border: 1px solid rgba(108, 59, 170, 0.3);
   border-radius: 12px;
   padding: 12px 20px;
   cursor: pointer;
   transition: all 0.3s ease, opacity 0.15s ease;
-  z-index: 10;
+  z-index: 1000;
   backdrop-filter: blur(10px);
   min-width: 150px;
   text-align: center;
   opacity: 1;
+  /* Reset any transform that might be inherited */
+  transform: none !important;
   /* Enhanced for raccoon interaction */
   will-change: transform, box-shadow, background, border-color;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -1443,8 +1447,12 @@ a:focus-visible,
 .weather-widget:hover {
   background: rgba(108, 59, 170, 0.15);
   border-color: rgba(108, 59, 170, 0.5);
-  transform: translateY(-2px);
+  transform: translateY(-2px) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Ensure position stays fixed */
+  position: fixed !important;
+  top: 20px !important;
+  right: 80px !important;
 }
 
 /* Special state when raccoon is interacting - consistent purple theme */
@@ -1453,6 +1461,10 @@ a:focus-visible,
   border-color: rgba(108, 59, 170, 0.6) !important;
   box-shadow: 0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6) !important;
   transform: scale(1.1) translateY(-3px) !important;
+  /* Ensure position stays fixed */
+  position: fixed !important;
+  top: 20px !important;
+  right: 80px !important;
 }
 
 .weather-content {
@@ -1506,8 +1518,8 @@ a:focus-visible,
 /* Mobile responsiveness for weather widget */
 @media (max-width: 768px) {
   .weather-widget {
-    top: 15px;
-    right: 60px;
+    top: 15px !important;
+    right: 60px !important;
     padding: 8px 16px;
     min-width: 120px;
   }
@@ -1528,8 +1540,8 @@ a:focus-visible,
 /* Very small screens - stack weather below power button */
 @media (max-width: 480px) {
   .weather-widget {
-    top: 60px;
-    right: 20px;
+    top: 60px !important;
+    right: 20px !important;
     min-width: 100px;
     padding: 6px 12px;
   }
