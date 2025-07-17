@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocation } from '../contexts/LocationContext'
 import { useWeather } from '../contexts/WeatherContext'
@@ -27,7 +27,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
   const { profile, loading: profileLoading, saving, saveSuccess, updateField, updateAddress } = useUserProfile()
 
   // Calculate profile completion
-  const calculateProfileCompletion = useCallback(() => {
+  const profileCompletion = useMemo(() => {
     const fields = [
       profile.nickname,
       profile.fullName,
@@ -145,13 +145,13 @@ export const UserProfileViewer = memo(function UserProfileViewer({
               />
               <path
                 className="completion-progress"
-                strokeDasharray={`${calculateProfileCompletion()}, 100`}
+                strokeDasharray={`${profileCompletion}, 100`}
                 d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
               />
             </svg>
-            <div className="completion-text">{calculateProfileCompletion()}%</div>
+            <div className="completion-text">{profileCompletion}%</div>
           </div>
           <div className="profile-user-details">
             <div className="profile-user-name">{profile.fullName || profile.nickname || 'User'}</div>
