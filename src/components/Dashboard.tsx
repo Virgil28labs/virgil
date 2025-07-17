@@ -65,16 +65,7 @@ export const Dashboard = memo(function Dashboard() {
   return (
     <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">
       {/* Fixed positioned elements */}
-      <VirgilTextLogo />
-      <button 
-        className={`user-profile-toggle ${showProfileViewer ? 'active' : ''}`}
-        onClick={() => setShowProfileViewer(true)}
-        aria-label="View user profile"
-        title="View user profile"
-        data-keyboard-nav
-      >
-        👤
-      </button>
+      <VirgilTextLogo onClick={() => setShowProfileViewer(true)} />
       <DateTime />
       <Suspense fallback={null}>
         <LazyWeather />
