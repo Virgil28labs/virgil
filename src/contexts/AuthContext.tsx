@@ -64,10 +64,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const { data: { user: refreshedUser } } = await supabase.auth.getUser()
+      setUser(refreshedUser)
+    } catch (error) {
+      console.error('Error refreshing user:', error)
+    }
+  }
+
   const value: AuthContextValue = {
     user,
     loading,
-    signOut
+    signOut,
+    refreshUser
   }
 
   return (

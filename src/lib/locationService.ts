@@ -144,23 +144,30 @@ export const locationService = {
   },
 
   async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch elevation data');
+    return retryWithBackoff(
+      async () => {
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`
+        );
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch elevation data');
+        }
+        
+        const data = await response.json();
+        return {
+          elevation: data.elevation,
+          elevationFeet: data.elevationFeet
+        };
+      },
+      {
+        maxRetries: 2,
+        initialDelay: 500,
+        onRetry: (_attempt, _error) => {
+          // Retry silently
+        }
       }
-      
-      const data = await response.json();
-      return {
-        elevation: data.elevation,
-        elevationFeet: data.elevationFeet
-      };
-    } catch (_error) {
-      throw new Error('Failed to get elevation data');
-    }
+    );
   },
 
   async getQuickLocation(): Promise<LocationData> {

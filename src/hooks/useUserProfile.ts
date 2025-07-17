@@ -45,6 +45,14 @@ export const useUserProfile = () => {
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
+  const justSavedRef = useRef(false)
+  const profileRef = useRef(profile)
+  const saveProfileRef = useRef<() => Promise<void>>()
+
+  // Keep profileRef updated
+  useEffect(() => {
+    profileRef.current = profile
+  }, [profile])
 
   // Generate unique ID based on name and date of birth
   const generateUniqueId = useCallback((fullName: string, dob: string): string => {
@@ -74,10 +82,18 @@ export const useUserProfile = () => {
     const loadProfile = async () => {
       if (!user) return
       
+      // Skip loading if we just saved to prevent race condition
+      if (justSavedRef.current) {
+        console.log('Skipping profile reload after save')
+        justSavedRef.current = false
+        return
+      }
+      
       setLoading(true)
       try {
         // Get user metadata
         const metadata = user.user_metadata || {}
+        console.log('Loading profile from Supabase metadata:', metadata)
         
         // Set profile with existing data
         setProfile(prev => ({
@@ -132,7 +148,9 @@ export const useUserProfile = () => {
       clearTimeout(saveTimeoutRef.current)
     }
     saveTimeoutRef.current = setTimeout(() => {
-      saveProfile()
+      if (saveProfileRef.current) {
+        saveProfileRef.current()
+      }
     }, 500) // 500ms debounce
   }, [generateUniqueId])
 
@@ -151,7 +169,9 @@ export const useUserProfile = () => {
       clearTimeout(saveTimeoutRef.current)
     }
     saveTimeoutRef.current = setTimeout(() => {
-      saveProfile()
+      if (saveProfileRef.current) {
+        saveProfileRef.current()
+      }
     }, 500)
   }, [])
 
@@ -159,33 +179,62 @@ export const useUserProfile = () => {
   const saveProfile = useCallback(async () => {
     if (!user) return
     
+    const currentProfile = profileRef.current
+    console.log('saveProfile called with data:', currentProfile)
+    
+    // Set flag to prevent reload during save
+    justSavedRef.current = true
+    
     setSaving(true)
     try {
+      // Get current user to preserve existing metadata
+      const { data: { user: currentUser }, error: getUserError } = await supabase.auth.getUser()
+      
+      if (getUserError) throw getUserError
+      
+      const currentMetadata = currentUser?.user_metadata || {}
+      
       const { error } = await supabase.auth.updateUser({
         data: {
-          nickname: profile.nickname,
-          fullName: profile.fullName,
-          dateOfBirth: profile.dateOfBirth,
-          phone: profile.phone,
-          gender: profile.gender,
-          maritalStatus: profile.maritalStatus,
-          uniqueId: profile.uniqueId,
-          address: profile.address,
-          name: profile.nickname || profile.fullName // Keep name field for compatibility
+          ...currentMetadata, // Preserve all existing metadata fields
+          nickname: currentProfile.nickname,
+          fullName: currentProfile.fullName,
+          dateOfBirth: currentProfile.dateOfBirth,
+          phone: currentProfile.phone,
+          gender: currentProfile.gender,
+          maritalStatus: currentProfile.maritalStatus,
+          uniqueId: currentProfile.uniqueId,
+          address: currentProfile.address,
+          name: currentProfile.nickname || currentProfile.fullName // Keep name field for compatibility
         }
       })
       
       if (error) throw error
+      
+      // Verify the save by fetching the updated user
+      const { data: { user: updatedUser }, error: verifyError } = await supabase.auth.getUser()
+      if (verifyError) {
+        console.error('Error verifying profile save:', verifyError)
+      } else {
+        console.log('Profile saved successfully. Updated metadata:', updatedUser?.user_metadata)
+      }
       
       // Show success indicator
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 2000)
     } catch (error) {
       console.error('Error saving profile:', error)
+      // Reset flag on error
+      justSavedRef.current = false
     } finally {
       setSaving(false)
     }
-  }, [user, profile])
+  }, [user])
+
+  // Update saveProfileRef
+  useEffect(() => {
+    saveProfileRef.current = saveProfile
+  }, [saveProfile])
 
   // Cleanup
   useEffect(() => {

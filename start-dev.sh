@@ -176,6 +176,16 @@ handle_interrupt() {
 
 # Main execution
 main() {
+    # Parse command line arguments
+    local no_monitor=false
+    for arg in "$@"; do
+        case $arg in
+            --no-monitor)
+                no_monitor=true
+                ;;
+        esac
+    done
+    
     # Banner
     echo -e "${BLUE}🚀 Virgil Development Environment${NC}"
     echo
@@ -262,6 +272,11 @@ main() {
     echo "   Logs: tail -f logs/*.log"
     echo
     echo "Press Ctrl+C to stop"
+    
+    # If --no-monitor flag is set, exit successfully
+    if $no_monitor; then
+        exit 0
+    fi
     
     # Keep running and monitor ports
     while true; do

@@ -67,7 +67,10 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
     if (!value) return placeholder
     if (type === 'date' && !isEditing) {
       try {
-        const date = new Date(value)
+        // Parse date string as local date by adding time component
+        // This prevents timezone shifting when displaying dates
+        const [year, month, day] = value.split('-').map(Number)
+        const date = new Date(year, month - 1, day) // month is 0-indexed
         return date.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',

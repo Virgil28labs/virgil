@@ -1,9 +1,10 @@
-import React, { memo, useState, useCallback } from 'react'
+import React, { memo, useState, useCallback, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useToast } from '../hooks/useToast'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
 import type { User } from '../types/auth.types'
+import '../styles/UserProfile.css'
 
 interface UserProfileProps {
   onBack?: () => void;
@@ -23,12 +24,13 @@ interface PasswordFormData {
 }
 
 export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProps) {
-  const { user, signOut } = useAuth()
+  const { user, signOut, refreshUser } = useAuth()
   const { success: showSuccess, error: showError, warning: showWarning, info: showInfo } = useToast()
-  const [isEditing, setIsEditing] = useState(false)
+  const [isLocked, setIsLocked] = useState(true)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [profileData, setProfileData] = useState<ProfileFormData>({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
@@ -40,6 +42,19 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
     newPassword: '',
     confirmPassword: ''
   })
+
+  // Sync profile data with user metadata when user changes
+  // Only update if we don't have unsaved changes to prevent losing user input
+  useEffect(() => {
+    if (user && !hasUnsavedChanges) {
+      setProfileData({
+        name: user.user_metadata?.name || '',
+        email: user.email || '',
+        bio: user.user_metadata?.bio || '',
+        avatarUrl: user.user_metadata?.avatarUrl || ''
+      })
+    }
+  }, [user, hasUnsavedChanges])
 
   const formatDate = useCallback((dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -82,6 +97,7 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
       reader.onload = (e) => {
         const result = e.target?.result as string
         setProfileData(prev => ({ ...prev, avatarUrl: result }))
+        setHasUnsavedChanges(true)
       }
       reader.readAsDataURL(file)
       
@@ -97,16 +113,26 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
 
   const handleRemoveAvatar = useCallback(() => {
     setProfileData(prev => ({ ...prev, avatarUrl: '' }))
+    setHasUnsavedChanges(true)
   }, [])
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleProfileSave = async () => {
+    if (!hasUnsavedChanges) return
+    
     setLoading(true)
 
     try {
-      // Update user metadata
+      // Get current user to preserve existing metadata
+      const { data: { user: currentUser }, error: getUserError } = await supabase.auth.getUser()
+      
+      if (getUserError) throw getUserError
+      
+      const currentMetadata = currentUser?.user_metadata || {}
+      
+      // Update user metadata - merge with existing data
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
+          ...currentMetadata, // Preserve all existing metadata fields
           name: profileData.name,
           bio: profileData.bio,
           avatarUrl: profileData.avatarUrl
@@ -131,7 +157,9 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
         showSuccess('Profile updated successfully!')
       }
 
-      setIsEditing(false)
+      // Don't refresh immediately - let the UI show the saved data
+      // The auth state will update automatically via onAuthStateChange
+      setHasUnsavedChanges(false)
     } catch (error: any) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Profile update error:', error)
@@ -141,6 +169,19 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
       setLoading(false)
     }
   }
+
+  const handleLockToggle = useCallback(async () => {
+    if (!isLocked && hasUnsavedChanges) {
+      // Auto-save when locking
+      await handleProfileSave()
+    }
+    setIsLocked(!isLocked)
+  }, [isLocked, hasUnsavedChanges])
+
+  const handleInputChange = useCallback((field: keyof ProfileFormData, value: string) => {
+    setProfileData(prev => ({ ...prev, [field]: value }))
+    setHasUnsavedChanges(true)
+  }, [])
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -224,8 +265,8 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
   const { containerRef } = useKeyboardNavigation({
     enabled: true,
     onEscape: () => {
-      if (isEditing) {
-        setIsEditing(false)
+      if (!isLocked) {
+        setIsLocked(true)
       } else if (isChangingPassword) {
         setIsChangingPassword(false)
       } else {
@@ -302,91 +343,61 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
         <div className="profile-section">
           <h2>Profile Information</h2>
           
-          {!isEditing ? (
-            <div className="profile-display">
-              <div className="profile-field">
-                <label>Name</label>
-                <p>{profileData.name || 'Not set'}</p>
-              </div>
-              <div className="profile-field">
-                <label>Email</label>
-                <p>{user.email}</p>
-              </div>
-              <div className="profile-field">
-                <label>Bio</label>
-                <p>{profileData.bio || 'No bio set'}</p>
-              </div>
-              <div className="profile-field">
-                <label>Member Since</label>
-                <p>{formatDate(user.created_at)}</p>
-              </div>
-              
-              <button 
-                className="edit-button"
-                onClick={() => setIsEditing(true)}
+          <button
+            className={`lock-button ${isLocked ? '' : 'unlocked'} ${loading ? 'saving' : ''}`}
+            onClick={handleLockToggle}
+            disabled={loading}
+            aria-label={isLocked ? 'Unlock profile for editing' : 'Lock profile and save changes'}
+            data-keyboard-nav
+          >
+            {loading ? '⏳' : (isLocked ? '🔒' : '🔓')}
+          </button>
+          
+          <div className="profile-form">
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input
+                id="name"
+                type="text"
+                value={profileData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                disabled={isLocked}
+                required
                 data-keyboard-nav
-              >
-                Edit Profile
-              </button>
+              />
             </div>
-          ) : (
-            <form onSubmit={handleProfileSubmit} className="profile-form">
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input
-                  id="name"
-                  type="text"
-                  value={profileData.name}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                  data-keyboard-nav
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  value={profileData.email}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  data-keyboard-nav
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="bio">Bio</label>
-                <textarea
-                  id="bio"
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                  rows={3}
-                  placeholder="Tell us about yourself..."
-                  data-keyboard-nav
-                />
-              </div>
-              
-              <div className="form-actions">
-                <button 
-                  type="submit" 
-                  className="save-button"
-                  disabled={loading}
-                  data-keyboard-nav
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-                <button 
-                  type="button" 
-                  className="cancel-button"
-                  onClick={() => setIsEditing(false)}
-                  data-keyboard-nav
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
+            
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={profileData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                disabled={isLocked}
+                required
+                data-keyboard-nav
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="bio">Bio</label>
+              <textarea
+                id="bio"
+                value={profileData.bio}
+                onChange={(e) => handleInputChange('bio', e.target.value)}
+                disabled={isLocked}
+                rows={3}
+                placeholder="Tell us about yourself..."
+                data-keyboard-nav
+              />
+            </div>
+            
+            <div className="profile-field">
+              <label>Member Since</label>
+              <p>{formatDate(user.created_at)}</p>
+            </div>
+          </div>
         </div>
 
         {/* Password Section */}
