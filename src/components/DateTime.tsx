@@ -1,9 +1,11 @@
 import { useState, useEffect, memo, useMemo } from 'react'
+import { TimezoneWidget } from './timezone'
 
 /**
  * DateTime Component
  * 
  * Displays current local time and date with real-time updates
+ * Now includes timezone widget functionality with click and hover interactions
  * Positioned in center-top of dashboard between logo and power button
  * Memoized and optimized to prevent unnecessary parent re-renders
  */
@@ -36,10 +38,16 @@ export const DateTime = memo(function DateTime() {
   }), [])
 
   return (
-    <div className="datetime-display">
-      <div className="time">{formatters.time(currentTime)}</div>
-      <div className="date">{formatters.date(currentTime)}</div>
-      <div className="day">{formatters.day(currentTime)}</div>
-    </div>
+    <TimezoneWidget 
+      className="datetime-widget"
+      hoverDelay={150}
+      clickToOpen={true}
+    >
+      <div className="datetime-display">
+        <div className="time">{formatters.time(currentTime)}</div>
+        <div className="date">{formatters.date(currentTime)}</div>
+        <div className="day">{formatters.day(currentTime)}</div>
+      </div>
+    </TimezoneWidget>
   )
 })
