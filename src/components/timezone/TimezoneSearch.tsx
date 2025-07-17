@@ -226,3 +226,5 @@ const TimezoneSearch = memo(function TimezoneSearch({
   )
 })
 
+export { TimezoneSearch }
+

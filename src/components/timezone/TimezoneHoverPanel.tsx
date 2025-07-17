@@ -90,3 +90,5 @@ const PositionedTimezoneHoverPanel = memo(function PositionedTimezoneHoverPanel(
     </div>
   )
 })
+
+export { PositionedTimezoneHoverPanel }
