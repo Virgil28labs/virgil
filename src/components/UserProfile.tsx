@@ -28,6 +28,7 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
   const [isEditing, setIsEditing] = useState(false)
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
   const [profileData, setProfileData] = useState<ProfileFormData>({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
@@ -201,6 +202,21 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
       showError(error.message || 'Failed to delete account')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return
+    
+    setIsSigningOut(true)
+    try {
+      const { error } = await signOut()
+      if (error) {
+        console.error('Failed to sign out:', error)
+        showError('Failed to sign out. Please try again.')
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign out:', error)
     }
   }
 
@@ -449,10 +465,11 @@ export const UserProfile = memo(function UserProfile({ onBack }: UserProfileProp
           <div className="account-actions">
             <button 
               className="sign-out-button"
-              onClick={signOut}
+              onClick={handleSignOut}
               data-keyboard-nav
+              disabled={isSigningOut}
             >
-              Sign Out
+              {isSigningOut ? 'Signing Out...' : 'Sign Out'}
             </button>
             
             <button 

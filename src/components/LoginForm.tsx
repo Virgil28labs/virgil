@@ -31,9 +31,13 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
 
   // Load saved email on component mount
   useEffect(() => {
-    const savedEmail = localStorage.getItem('virgil_email')
-    if (savedEmail) {
-      setFormData(prev => ({ ...prev, email: savedEmail }))
+    try {
+      const savedEmail = localStorage.getItem('virgil_email')
+      if (savedEmail) {
+        setFormData(prev => ({ ...prev, email: savedEmail }))
+      }
+    } catch {
+      // Ignore localStorage errors
     }
   }, [])
 
@@ -69,7 +73,11 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
         setMessage('Login successful!')
         
         // Save email for next time
-        localStorage.setItem('virgil_email', formData.email.trim().toLowerCase())
+        try {
+          localStorage.setItem('virgil_email', formData.email.trim().toLowerCase())
+        } catch {
+          // Ignore localStorage errors
+        }
         
         // Clear only password, keep email
         setFormData(prev => ({ ...prev, password: '' }))
@@ -87,7 +95,7 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
   }
 
   return (
-    <div ref={containerRef} className="login-form" role="form" aria-labelledby="login-title">
+    <div ref={containerRef as React.RefObject<HTMLDivElement>} className="login-form" role="form" aria-labelledby="login-title">
       <h2 id="login-title">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">

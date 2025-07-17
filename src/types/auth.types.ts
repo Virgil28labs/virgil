@@ -25,7 +25,7 @@ export interface User {
 export interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error?: Error }>;
 }
 
 export interface LoginFormData {

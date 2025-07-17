@@ -17,19 +17,39 @@ export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth()
   const { address, ipLocation, coordinates, loading: locationLoading } = useLocation()
   const [showProfileViewer, setShowProfileViewer] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
-    const saved = localStorage.getItem('elevationUnit')
-    return (saved === 'feet' || saved === 'meters') ? saved : 'meters'
+    try {
+      const saved = localStorage.getItem('elevationUnit')
+      return (saved === 'feet' || saved === 'meters') ? saved : 'meters'
+    } catch {
+      return 'meters'
+    }
   })
 
 
   const toggleElevationUnit = useCallback(() => {
     setElevationUnit(prev => {
       const newUnit = prev === 'meters' ? 'feet' : 'meters'
-      localStorage.setItem('elevationUnit', newUnit)
+      try {
+        localStorage.setItem('elevationUnit', newUnit)
+      } catch (e) {
+        console.warn('Failed to save elevation unit preference:', e)
+      }
       return newUnit
     })
   }, [])
+
+  const handleSignOut = useCallback(async () => {
+    if (isSigningOut) return // Prevent multiple clicks
+    
+    setIsSigningOut(true)
+    const { error } = await signOut()
+    if (error) {
+      console.error('Sign out error:', error)
+    }
+    setIsSigningOut(false)
+  }, [signOut, isSigningOut])
 
   // Removed system prompt functionality - moved to VirgilChatbot
 
@@ -43,7 +63,7 @@ export const Dashboard = memo(function Dashboard() {
   });
 
   return (
-    <div ref={containerRef} className="dashboard" role="main" aria-label="Dashboard">
+    <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">
       {/* Fixed positioned elements */}
       <VirgilTextLogo />
       <button 
@@ -62,14 +82,15 @@ export const Dashboard = memo(function Dashboard() {
 
       {/* Power button */}
       <button 
-        className="power-button" 
-        onClick={signOut} 
-        title="Sign Out"
-        aria-label="Sign out of your account"
+        className={`power-button ${isSigningOut ? 'signing-out' : ''}`}
+        onClick={handleSignOut} 
+        title={isSigningOut ? "Signing out..." : "Sign Out"}
+        aria-label={isSigningOut ? "Signing out..." : "Sign out of your account"}
         data-keyboard-nav
+        disabled={isSigningOut}
       >
         <div className="power-icon" aria-hidden="true"></div>
-        <span className="sr-only">Sign Out</span>
+        <span className="sr-only">{isSigningOut ? "Signing out..." : "Sign Out"}</span>
       </button>
 
       {/* Main content */}

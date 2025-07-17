@@ -25,7 +25,11 @@ const VirgilChatbot = memo(function VirgilChatbot() {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [customSystemPrompt, setCustomSystemPrompt] = useState<string>(() => {
     // Load from localStorage on component mount
-    return localStorage.getItem('virgil-custom-system-prompt') || ''
+    try {
+      return localStorage.getItem('virgil-custom-system-prompt') || ''
+    } catch {
+      return ''
+    }
   });
   
   const { user } = useAuth();
@@ -68,9 +72,13 @@ const VirgilChatbot = memo(function VirgilChatbot() {
 
   // Load saved model from localStorage
   useEffect(() => {
-    const savedModel = localStorage.getItem('virgil-selected-model');
-    if (savedModel && models.find(m => m.id === savedModel)) {
-      setSelectedModel(savedModel);
+    try {
+      const savedModel = localStorage.getItem('virgil-selected-model');
+      if (savedModel && models.find(m => m.id === savedModel)) {
+        setSelectedModel(savedModel);
+      }
+    } catch {
+      // Ignore localStorage errors
     }
   }, []);
 
@@ -200,7 +208,11 @@ RESPONSE RULES:
 
   const handleModelChange = useCallback((modelId: string) => {
     setSelectedModel(modelId);
-    localStorage.setItem('virgil-selected-model', modelId);
+    try {
+      localStorage.setItem('virgil-selected-model', modelId);
+    } catch {
+      // Ignore localStorage errors
+    }
     setShowModelDropdown(false);
   }, []);
 
@@ -478,7 +490,11 @@ RESPONSE RULES:
                     <button 
                       className="chatbot-prompt-btn save"
                       onClick={() => {
-                        localStorage.setItem('virgil-custom-system-prompt', customSystemPrompt);
+                        try {
+                          localStorage.setItem('virgil-custom-system-prompt', customSystemPrompt);
+                        } catch {
+                          // Ignore localStorage errors
+                        }
                         setShowProfileDropdown(false);
                       }}
                     >

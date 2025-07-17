@@ -53,8 +53,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signOut = async (): Promise<void> => {
-    await supabase.auth.signOut()
+  const signOut = async (): Promise<{ error?: Error }> => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      return {}
+    } catch (error) {
+      console.error('Sign out error:', error)
+      return { error: error as Error }
+    }
   }
 
   const value: AuthContextValue = {

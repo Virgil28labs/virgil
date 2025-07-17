@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocation } from '../contexts/LocationContext'
 import { useWeather } from '../contexts/WeatherContext'
@@ -16,6 +16,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
   const { user, signOut } = useAuth()
   const { address, ipLocation, hasGPSLocation } = useLocation()
   const { data: weatherData, unit: weatherUnit } = useWeather()
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   // Handle click outside to close
   useEffect(() => {
@@ -59,6 +60,17 @@ export const UserProfileViewer = memo(function UserProfileViewer({
     }
     navigator.clipboard?.writeText(JSON.stringify(profileData, null, 2))
   }, [user, address, ipLocation, weatherData, weatherUnit])
+
+  const handleSignOut = useCallback(async () => {
+    if (isSigningOut) return
+    
+    setIsSigningOut(true)
+    const { error } = await signOut()
+    if (error) {
+      console.error('Sign out error:', error)
+    }
+    setIsSigningOut(false)
+  }, [signOut, isSigningOut])
 
   if (!isOpen || !user) {
     return null
@@ -143,11 +155,12 @@ export const UserProfileViewer = memo(function UserProfileViewer({
               📋 Copy Profile Data
             </button>
             <button 
-              className="profile-action-btn signout"
-              onClick={signOut}
+              className={`profile-action-btn signout ${isSigningOut ? 'signing-out' : ''}`}
+              onClick={handleSignOut}
               data-keyboard-nav
+              disabled={isSigningOut}
             >
-              🚪 Sign Out
+              🚪 {isSigningOut ? 'Signing Out...' : 'Sign Out'}
             </button>
           </div>
         </div>
