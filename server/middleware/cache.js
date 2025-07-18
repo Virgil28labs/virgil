@@ -79,7 +79,7 @@ class ResponseCache {
     }
 
     if (cleaned > 0) {
-      console.log(`Cache cleanup: removed ${cleaned} expired entries`);
+      // Cache cleanup: removed expired entries
     }
   }
 

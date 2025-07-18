@@ -4,6 +4,8 @@ const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+const logger = require('./lib/logger');
+const { errorHandler, NotFoundError } = require('./lib/errors');
 
 const app = express();
 
@@ -58,46 +60,27 @@ app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/elevation', elevationRoutes);
 app.use('/api/v1/rhythm', rhythmRoutes);
 
-// Error handling middleware
-app.use((err, req, res, _next) => {
-  console.error('Error:', err);
-  
-  // Don't leak error details in production
-  const isDev = process.env.NODE_ENV !== 'production';
-  
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message || 'Internal server error',
-      status: err.status || 500,
-      ...(isDev && { stack: err.stack })
-    }
-  });
+// 404 handler
+app.use((req, res, next) => {
+  next(new NotFoundError(`Endpoint not found: ${req.path}`));
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: {
-      message: 'Endpoint not found',
-      status: 404,
-      path: req.path
-    }
-  });
-});
+// Error handling middleware
+app.use(errorHandler);
 
 // Server startup with initialization
 const PORT = process.env.LLM_SERVER_PORT || 5002;
 
 // Pre-startup checks
 async function performStartupChecks() {
-  console.log('🔍 Performing startup checks...');
+  logger.log('🔍 Performing startup checks...');
   
   // Check required environment variables
   const requiredEnvVars = ['NODE_ENV'];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   
   if (missingVars.length > 0) {
-    console.warn(`⚠️  Missing optional environment variables: ${missingVars.join(', ')}`);
+    logger.warn(`⚠️  Missing optional environment variables: ${missingVars.join(', ')}`);
   }
   
   // Initialize services

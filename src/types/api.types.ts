@@ -52,11 +52,19 @@ export interface HealthResponse {
 }
 
 // Analytics Types
+export interface AnalyticsEventProperties {
+  category?: string;
+  action?: string;
+  label?: string;
+  value?: number;
+  [key: string]: string | number | boolean | undefined;
+}
+
 export interface AnalyticsEvent {
   event: string;
   userId?: string;
   timestamp: string;
-  properties?: Record<string, any>;
+  properties?: AnalyticsEventProperties;
 }
 
 export interface AnalyticsResponse {
@@ -74,7 +82,11 @@ export interface LLMCompleteRequest {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
-  context?: Record<string, any>;
+  context?: {
+    conversation_id?: string;
+    session_id?: string;
+    metadata?: Record<string, string | number | boolean>;
+  };
   provider: string;
 }
 

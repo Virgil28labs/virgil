@@ -58,7 +58,6 @@ export interface LocationContextValue extends LocationState {
   hasIPLocation: boolean;
 }
 
-export type LocationContextType = LocationContextValue;
 
 export type PermissionStatus = 'granted' | 'denied' | 'unknown' | 'unavailable';
 
@@ -69,10 +68,12 @@ export type LocationActionType =
   | 'SET_PERMISSION_STATUS'
   | 'CLEAR_ERROR';
 
-export interface LocationAction {
-  type: LocationActionType;
-  payload?: any;
-}
+export type LocationAction =
+  | { type: 'SET_LOCATION'; payload: Coordinates }
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_PERMISSION'; payload: PermissionStatus }
+  | { type: 'CLEAR_ERROR' };
 
 export interface GeolocationError {
   code: number;

@@ -4,6 +4,7 @@ const { LLMProxy } = require('../services/llmProxy');
 const { RequestQueue } = require('../services/queue');
 const { validateRequest, validateBatchRequest } = require('../middleware/validation');
 const { cacheMiddleware } = require('../middleware/cache');
+const { asyncHandler, ValidationError } = require('../lib/errors');
 
 // Factory function for creating router with injected dependencies
 function createLLMRouter(llmProxyInstance, requestQueueInstance) {
@@ -30,8 +31,7 @@ router.use(llmLimiter);
  * POST /api/v1/llm/complete
  * Standard text completion endpoint
  */
-router.post('/complete', validateRequest, cacheMiddleware, async (req, res, next) => {
-  try {
+router.post('/complete', validateRequest, cacheMiddleware, asyncHandler(async (req, res) => {
     const {
       messages,
       model = process.env.VITE_DEFAULT_MODEL || 'gpt-4o-mini',
@@ -61,18 +61,13 @@ router.post('/complete', validateRequest, cacheMiddleware, async (req, res, next
       usage: result.usage,
       cached: res.locals.cached || false
     });
-
-  } catch (error) {
-    next(error);
-  }
-});
+}));
 
 /**
  * POST /api/v1/llm/stream
  * Streaming completion endpoint
  */
-router.post('/stream', validateRequest, async (req, res, next) => {
-  try {
+router.post('/stream', validateRequest, asyncHandler(async (req, res) => {
     const {
       messages,
       model = process.env.VITE_DEFAULT_MODEL || 'gpt-4o-mini',
@@ -113,20 +108,13 @@ router.post('/stream', validateRequest, async (req, res, next) => {
     // Send completion signal
     res.write('data: [DONE]\n\n');
     res.end();
-
-  } catch (error) {
-    // For streaming, we need to send error in SSE format
-    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
-    res.end();
-  }
-});
+}));
 
 /**
  * POST /api/v1/llm/batch
  * Batch completion endpoint for multiple requests
  */
-router.post('/batch', validateBatchRequest, async (req, res, next) => {
-  try {
+router.post('/batch', validateBatchRequest, asyncHandler(async (req, res) => {
     const { requests } = req.body;
 
     // Process all requests in parallel
@@ -141,36 +129,26 @@ router.post('/batch', validateBatchRequest, async (req, res, next) => {
       success: true,
       data: results
     });
-
-  } catch (error) {
-    next(error);
-  }
-});
+}));
 
 /**
  * GET /api/v1/llm/models
  * Get available models
  */
-router.get('/models', async (req, res, next) => {
-  try {
+router.get('/models', asyncHandler(async (req, res) => {
     const models = await llmProxy.getAvailableModels();
     
     res.json({
       success: true,
       data: models
     });
-
-  } catch (error) {
-    next(error);
-  }
-});
+}));
 
 /**
  * POST /api/v1/llm/tokenize
  * Count tokens in text
  */
-router.post('/tokenize', async (req, res, next) => {
-  try {
+router.post('/tokenize', asyncHandler(async (req, res) => {
     const { text, model = 'gpt-4o-mini' } = req.body;
 
     if (!text) {
@@ -189,11 +167,7 @@ router.post('/tokenize', async (req, res, next) => {
         tokenCount
       }
     });
-
-  } catch (error) {
-    next(error);
-  }
-});
+}));
 
   return router;
 }

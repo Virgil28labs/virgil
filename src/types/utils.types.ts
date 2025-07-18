@@ -3,8 +3,6 @@
  * General purpose types and helpers
  */
 
-
-
 // Common Utility Types
 export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;
@@ -12,12 +10,9 @@ export type KeyOf<T> = keyof T;
 export type ValueOf<T> = T[keyof T];
 
 // Function Types
-export type AsyncFunction<T = void> = (...args: any[]) => Promise<T>;
+export type AsyncFunction<T = void, Args extends unknown[] = unknown[]> = (...args: Args) => Promise<T>;
 export type VoidFunction = () => void;
 export type Callback<T = void> = (value: T) => void;
-
-
-
 
 // Cache Types
 export interface CacheEntry<T> {
@@ -43,9 +38,14 @@ export interface ThrottleOptions {
 }
 
 // Generic Error Types
+export interface ErrorDetails {
+  field?: string;
+  reason?: string;
+  context?: Record<string, unknown>;
+}
+
 export interface CustomError extends Error {
   code?: string;
   status?: number;
-  details?: any;
+  details?: ErrorDetails;
 }
-

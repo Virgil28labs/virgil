@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -30,7 +30,7 @@ const validateEmail = (email: string): boolean => {
 
 const validatePhone = (phone: string): boolean => {
   // Allow various phone formats: +1234567890, (123) 456-7890, 123-456-7890, etc.
-  const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{4,6}$/
+  const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{4,6}$/
   return phone === '' || phoneRegex.test(phone.replace(/\s/g, ''))
 }
 
@@ -95,7 +95,6 @@ export const useUserProfile = () => {
       
       // Skip loading if we just saved to prevent race condition
       if (skipNextLoadRef.current) {
-        console.log('Skipping profile reload after save')
         skipNextLoadRef.current = false
         return
       }
@@ -104,7 +103,7 @@ export const useUserProfile = () => {
       try {
         // Get user metadata
         const metadata = user.user_metadata || {}
-        console.log('Loading profile from Supabase metadata:', metadata)
+        // Loading profile from Supabase metadata
         
         // Set profile with existing data
         setProfile(prev => ({
@@ -150,7 +149,6 @@ export const useUserProfile = () => {
     saveTimeoutRef.current = setTimeout(async () => {
       if (!user) return
       
-      console.log('Saving profile:', profileData)
       skipNextLoadRef.current = true
       setSaving(true)
       
@@ -184,7 +182,7 @@ export const useUserProfile = () => {
         if (verifyError) {
           console.error('Error verifying profile save:', verifyError)
         } else {
-          console.log('Profile saved successfully. Updated metadata:', updatedUser?.user_metadata)
+          // Profile saved successfully
         }
         
         // Show success indicator

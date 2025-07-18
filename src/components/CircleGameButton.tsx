@@ -1,47 +1,32 @@
-import { useState, memo, useCallback, lazy, Suspense } from 'react'
-import styles from './CircleGameButton.module.css'
-import { CircleErrorBoundary } from './circle/CircleErrorBoundary'
+import { lazy } from 'react';
+import { EmojiButton } from './common/EmojiButton';
+import { CircleErrorBoundary } from './circle/CircleErrorBoundary';
 
-const DrawPerfectCircle = lazy(() => import('./circle/DrawPerfectCircle').then(module => ({ default: module.DrawPerfectCircle })))
+const DrawPerfectCircle = lazy(() => 
+  import('./circle/DrawPerfectCircle').then(module => ({ 
+    default: module.DrawPerfectCircle 
+  }))
+);
 
-export const CircleGameButton = memo(function CircleGameButton() {
-  const [isViewerOpen, setIsViewerOpen] = useState(false)
+const CircleGameWrapper = ({ onClose }: { onClose: () => void }) => (
+  <CircleErrorBoundary>
+    <DrawPerfectCircle isOpen={true} onClose={onClose} />
+  </CircleErrorBoundary>
+);
 
-  const handleClick = useCallback(() => {
-    setIsViewerOpen(true)
-  }, [])
-
-  const handleClose = useCallback(() => {
-    setIsViewerOpen(false)
-  }, [])
-
-  return (
-    <>
-      <button
-        aria-label="Open Perfect Circle Game - Test your drawing skills!"
-        onClick={handleClick}
-        className={styles.button}
-        title="Draw Perfect Circle - Can you draw a perfect circle?"
-      >
-        <span className={styles.emoji}>
-          ⭕
-        </span>
-      </button>
-      
-      {isViewerOpen && (
-        <CircleErrorBoundary>
-          <Suspense fallback={
-            <div className={styles.loadingBackdrop}>
-              <div className={styles.loadingContainer}>
-                <div className={styles.loadingSpinner} />
-                <span>Loading circle game...</span>
-              </div>
-            </div>
-          }>
-            <DrawPerfectCircle isOpen={isViewerOpen} onClose={handleClose} />
-          </Suspense>
-        </CircleErrorBoundary>
-      )}
-    </>
-  )
-})
+export const CircleGameButton = () => (
+  <EmojiButton
+    emoji="⭕"
+    ariaLabel="Open Perfect Circle Game - Test your drawing skills!"
+    GalleryComponent={CircleGameWrapper}
+    position={{ top: '14.5rem', right: 'calc(2rem - 10px)' }}
+    hoverScale={1.15}
+    hoverColor={{
+      background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(255, 143, 179, 0.3) 100%)',
+      border: 'rgba(255, 107, 157, 0.6)',
+      glow: 'rgba(255, 107, 157, 0.4)'
+    }}
+    title="Draw Perfect Circle - Can you draw a perfect circle?"
+    className="opacity-80 hover:opacity-100"
+  />
+);

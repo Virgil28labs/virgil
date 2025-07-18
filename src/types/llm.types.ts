@@ -17,7 +17,11 @@ export interface LLMRequest {
   maxTokens?: number;
   stream?: boolean;
   systemPrompt?: string;
-  context?: Record<string, any>;
+  context?: {
+    conversation_id?: string;
+    session_id?: string;
+    metadata?: Record<string, string | number | boolean>;
+  };
   cacheKey?: string;
   enableCache?: boolean;
   provider?: LLMProvider;

@@ -16,29 +16,13 @@ createRoot(rootElement).render(
 // Register service worker for caching and offline support
 if (import.meta.env.PROD) {
   registerServiceWorker({
-    onSuccess: () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('App is ready for offline use');
-      }
-    },
-    onUpdate: () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('New app version available');
-      }
-    }
+    onSuccess: () => {},
+    onUpdate: () => {}
   });
 }
 
 // Setup network monitoring
 setupNetworkMonitoring({
-  onOnline: () => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Connection restored');
-    }
-  },
-  onOffline: () => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Connection lost - using cached content');
-    }
-  }
+  onOnline: () => {},
+  onOffline: () => {}
 });

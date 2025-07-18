@@ -25,9 +25,7 @@ export function registerServiceWorker(config?: ServiceWorkerConfig) {
 
       if (isLocalhost) {
         checkValidServiceWorker(swUrl, config);
-        navigator.serviceWorker.ready.then(() => {
-          console.log('Service worker registered in development mode');
-        });
+        navigator.serviceWorker.ready.then(() => {});
       } else {
         registerValidSW(swUrl, config);
       }
@@ -47,12 +45,10 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              console.log('New content is available; please refresh.');
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              console.log('Content is cached for offline use.');
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
               }
@@ -61,9 +57,7 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
         };
       };
     })
-    .catch((error) => {
-      console.error('Error during service worker registration:', error);
-    });
+    .catch(() => {});
 }
 
 function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
@@ -85,9 +79,7 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {
-      console.log('No internet connection found. App is running in offline mode.');
-    });
+    .catch(() => {});
 }
 
 export function unregisterServiceWorker() {
@@ -96,9 +88,7 @@ export function unregisterServiceWorker() {
       .then((registration) => {
         registration.unregister();
       })
-      .catch((error) => {
-        console.error(error.message);
-      });
+      .catch(() => {});
   }
 }
 
@@ -106,12 +96,10 @@ export function unregisterServiceWorker() {
 export function setupNetworkMonitoring(config?: ServiceWorkerConfig) {
   const updateOnlineStatus = () => {
     if (navigator.onLine) {
-      console.log('App is online');
       if (config && config.onOnline) {
         config.onOnline();
       }
     } else {
-      console.log('App is offline');
       if (config && config.onOffline) {
         config.onOffline();
       }

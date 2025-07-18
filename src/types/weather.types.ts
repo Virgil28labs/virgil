@@ -52,10 +52,12 @@ export type WeatherActionType =
   | 'TOGGLE_UNIT'
   | 'CLEAR_ERROR';
 
-export interface WeatherAction {
-  type: WeatherActionType;
-  payload?: any;
-}
+export type WeatherAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_WEATHER_DATA'; payload: WeatherData }
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'TOGGLE_UNIT' }
+  | { type: 'CLEAR_ERROR' };
 
 // OpenWeatherMap API Response Types
 export interface OpenWeatherResponse {
