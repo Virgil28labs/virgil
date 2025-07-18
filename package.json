@@ -19,7 +19,8 @@
     "type-check": "tsc --noEmit",
     "check-env": "./check-env.sh",
     "cleanup-ports": "./cleanup-ports.sh",
-    "diagnose": "./diagnose.sh"
+    "diagnose": "./diagnose.sh",
+    "css:monitor": "node scripts/css-monitor.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
@@ -62,6 +63,8 @@
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
     "postcss": "^8.5.6",
+    "postcss-combine-media-query": "^2.0.0",
+    "postcss-merge-rules": "^7.0.6",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
     "ts-jest": "^29.4.0",
