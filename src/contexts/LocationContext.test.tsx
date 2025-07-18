@@ -12,7 +12,10 @@ jest.mock('../lib/locationService', () => ({
     getIPAddress: jest.fn(),
     getIPLocation: jest.fn(),
     getFullLocationData: jest.fn(),
-    getQuickLocation: jest.fn().mockResolvedValue({ ipLocation: null })
+    getQuickLocation: jest.fn().mockResolvedValue({ 
+      ipLocation: undefined,
+      timestamp: Date.now()
+    })
   }
 }));
 
@@ -27,19 +30,22 @@ const mockGeolocation = {
 
 const mockCoordinates = {
   latitude: 40.7128,
-  longitude: -74.0060
+  longitude: -74.0060,
+  accuracy: 10,
+  timestamp: Date.now()
 };
 
 const mockAddress = {
   street: '123 Main St',
+  house_number: '123',
   city: 'New York',
-  state: 'NY',
+  postcode: '10001',
   country: 'USA',
-  postalCode: '10001',
   formatted: '123 Main St, New York, NY 10001, USA'
 };
 
 const mockIPLocation = {
+  ip: '127.0.0.1',
   city: 'New York',
   region: 'NY',
   country: 'US',
@@ -72,11 +78,14 @@ describe('LocationContext', () => {
     });
     
     // Reset all mock implementations to default
-    mockLocationService.getQuickLocation.mockResolvedValue({ ipLocation: null });
+    mockLocationService.getQuickLocation.mockResolvedValue({ 
+      ipLocation: undefined,
+      timestamp: Date.now()
+    });
     mockLocationService.getFullLocationData.mockResolvedValue({
-      coordinates: null,
-      address: null,
-      ipLocation: null,
+      coordinates: undefined,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     mockLocationService.getCurrentPosition.mockResolvedValue(mockCoordinates);
@@ -104,9 +113,9 @@ describe('LocationContext', () => {
   it('provides initial state', async () => {
     // Mock getFullLocationData to prevent actual API calls
     mockLocationService.getFullLocationData.mockResolvedValue({
-      coordinates: null,
-      address: null,
-      ipLocation: null,
+      coordinates: undefined,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     
@@ -162,6 +171,8 @@ describe('LocationContext', () => {
     
     // Mock getFullLocationData to return only IP location (simulating GPS denied)
     mockLocationService.getFullLocationData.mockResolvedValue({
+      coordinates: undefined,
+      address: undefined,
       ipLocation: mockIPLocation,
       timestamp: Date.now()
     });
@@ -250,6 +261,8 @@ describe('LocationContext', () => {
     // Mock getFullLocationData to return partial data (only coordinates)
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     
@@ -268,6 +281,9 @@ describe('LocationContext', () => {
   it('calculates hasLocation correctly', async () => {
     // Start with no location data
     mockLocationService.getFullLocationData.mockResolvedValue({
+      coordinates: undefined,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     
@@ -283,6 +299,8 @@ describe('LocationContext', () => {
     // Update mock to return coordinates
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     
@@ -300,6 +318,8 @@ describe('LocationContext', () => {
     
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
+      address: undefined,
+      ipLocation: undefined,
       timestamp: Date.now()
     });
     
@@ -321,6 +341,8 @@ describe('LocationContext', () => {
     
     // Mock getFullLocationData to return only IP location (no GPS available)
     mockLocationService.getFullLocationData.mockResolvedValue({
+      coordinates: undefined,
+      address: undefined,
       ipLocation: mockIPLocation,
       timestamp: Date.now()
     });

@@ -9,7 +9,6 @@ import { dedupeFetch } from '../lib/requestDeduplication';
 import { searchService } from '../lib/searchService';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
-import { useResponsive, useViewport } from '../hooks/useResponsive';
 import './VirgilChatbot.css';
 
 const VirgilChatbot = memo(function VirgilChatbot() {

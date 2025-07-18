@@ -4,8 +4,7 @@ import type {
   GiphyGif, 
   GiphyImage, 
   GiphySearchParams, 
-  GiphyTrendingParams,
-  GiphyServiceError 
+  GiphyTrendingParams
 } from '../types/giphy.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';

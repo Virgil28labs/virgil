@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense, type FC } from 'react';
+import React, { useState, Suspense, type FC } from 'react';
 import { cn } from '@/lib/utils';
 
 interface EmojiButtonProps {

@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      await response.json().catch(() => ({}));
       
       // Don't expose internal error details to client
       return res.status(response.status).json({
@@ -105,7 +105,7 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process search request'

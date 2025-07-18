@@ -21,6 +21,7 @@ export interface UserMetadata {
   maritalStatus?: string;
   uniqueId?: string;
   address?: UserAddress;
+  avatarUrl?: string;
 }
 
 export interface AppMetadata {

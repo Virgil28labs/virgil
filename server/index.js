@@ -88,23 +88,29 @@ async function performStartupChecks() {
     // Initialize cache
     const cache = require('./middleware/cache').cache;
     if (cache) {
+      /* eslint-disable-next-line no-console */
       console.log('✅ Cache service initialized');
     } else {
+      /* eslint-disable-next-line no-console */
       console.warn('⚠️  Cache service not available');
     }
     
     // Initialize queue
     const { RequestQueue } = require('./services/queue');
     if (RequestQueue) {
+      /* eslint-disable-next-line no-console */
       console.log('✅ Queue service initialized');
     } else {
+      /* eslint-disable-next-line no-console */
       console.warn('⚠️  Queue service not available');
     }
     
   } catch (error) {
+    /* eslint-disable-next-line no-console */
     console.warn('⚠️  Service initialization warnings:', error.message);
   }
   
+  /* eslint-disable-next-line no-console */
   console.log('✅ Startup checks completed');
 }
 
@@ -114,6 +120,7 @@ async function startServer() {
     await performStartupChecks();
     
     const server = app.listen(PORT, () => {
+      /* eslint-disable no-console */
       console.log(`🚀 Virgil LLM Server running on port ${PORT}`);
       console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🏥 Health check: http://localhost:${PORT}/api/v1/health`);
@@ -131,10 +138,12 @@ async function startServer() {
       console.log(`  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates`);
       console.log(`  POST /api/v1/rhythm/generate - AI-powered rhythm generation`);
       console.log('🎯 Server ready to accept connections');
+      /* eslint-enable no-console */
     });
     
     return server;
   } catch (error) {
+    /* eslint-disable-next-line no-console */
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
@@ -145,12 +154,14 @@ let server;
 startServer().then(srv => {
   server = srv;
 }).catch(error => {
+  /* eslint-disable-next-line no-console */
   console.error('❌ Fatal startup error:', error);
   process.exit(1);
 });
 
 // Graceful shutdown
 const gracefulShutdown = () => {
+  /* eslint-disable no-console */
   console.log('🛑 Received shutdown signal, closing server gracefully...');
   
   if (server) {
@@ -168,6 +179,7 @@ const gracefulShutdown = () => {
     console.log('⚠️  Server not yet initialized, exiting immediately');
     process.exit(0);
   }
+  /* eslint-enable no-console */
 };
 
 process.on('SIGTERM', gracefulShutdown);

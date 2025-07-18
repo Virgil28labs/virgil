@@ -79,6 +79,7 @@ async function cacheFirstStrategy(request) {
     return networkResponse;
   } catch (error) {
     // If both cache and network fail, return offline page or error
+    /* eslint-disable-next-line no-console */
     console.error('Cache First strategy failed:', error);
     throw error;
   }
@@ -125,5 +126,6 @@ self.addEventListener('sync', (event) => {
 
 async function handleBackgroundSync() {
   // Handle offline actions when back online
+  /* eslint-disable-next-line no-console */
   console.log('Background sync triggered');
 }

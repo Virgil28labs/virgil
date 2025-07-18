@@ -92,11 +92,6 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     }
   }, [currentApod, toggleFavorite])
   
-  // Handle gallery item selection
-  const handleGallerySelect = useCallback((apod: ApodImage) => {
-    setActiveTab('browse')
-    loadApodByDate(apod.date)
-  }, [loadApodByDate])
 
   // Simple keyboard navigation - just ESC to close
   useEffect(() => {
@@ -175,7 +170,6 @@ export const NasaApodViewer = memo(function NasaApodViewer({
             <NasaApodGallery
               favorites={favorites}
               onRemoveFavorite={removeFavorite}
-              onSelectApod={handleGallerySelect}
               onOpenModal={setSelectedImageIndex}
             />
           ) : (

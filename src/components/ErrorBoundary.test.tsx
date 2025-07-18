@@ -70,7 +70,7 @@ describe('ErrorBoundary', () => {
 
     expect(console.error).toHaveBeenCalled();
     // React logs multiple console errors when an error boundary catches an error
-    expect(console.error).toHaveBeenCalledTimes(console.error.mock.calls.length);
+    expect(console.error).toHaveBeenCalledTimes((console.error as jest.Mock).mock.calls.length);
   });
 
   it('allows manual reset via Try Again button', () => {

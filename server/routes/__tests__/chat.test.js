@@ -109,7 +109,7 @@ describe('Chat Routes', () => {
         })
         .expect(200);
 
-      const fetchCall = mockFetch.mock.calls[0];
+      const fetchCall = fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
       
       expect(requestBody).toMatchObject({

@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { PomodoroStats as Stats } from '../../types/pomodoro.types'
 import { getStreakIntensity } from './utils/pomodoroUtils'
 

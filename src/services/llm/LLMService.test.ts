@@ -13,7 +13,7 @@ global.fetch = jest.fn();
 
 const mockCache = ResponseCache as jest.MockedClass<typeof ResponseCache>;
 const mockRateLimiter = RateLimiter as jest.MockedClass<typeof RateLimiter>;
-const mockEventEmitter = EventEmitter as jest.MockedClass<typeof EventEmitter>;
+// const mockEventEmitter = EventEmitter as jest.MockedClass<typeof EventEmitter>;
 
 describe('LLMService', () => {
   let service: LLMService;

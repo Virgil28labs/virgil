@@ -370,7 +370,7 @@ describe('RequestQueue', () => {
       // Add a failing request
       try {
         await queue.add(failFn, { retryAttempts: 1 });
-      } catch (e) {
+      } catch {
         // Expected
       }
       

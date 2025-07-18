@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState, useMemo } from 'react'
+import { memo, useCallback, useEffect, useState, useMemo } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocation } from '../contexts/LocationContext'
 import { useWeather } from '../contexts/WeatherContext'
@@ -18,8 +18,8 @@ export const UserProfileViewer = memo(function UserProfileViewer({
   onClose 
 }: UserProfileViewerProps) {
   const { user, signOut } = useAuth()
-  const { address, ipLocation, hasGPSLocation } = useLocation()
-  const { data: weatherData, unit: weatherUnit } = useWeather()
+  const { ipLocation } = useLocation()
+  useWeather()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [activeTab, setActiveTab] = useState<'user' | 'virgil'>('user')
   const [showAddress, setShowAddress] = useState(false)
@@ -77,16 +77,6 @@ export const UserProfileViewer = memo(function UserProfileViewer({
     onEscape: onClose
   })
 
-  const copyProfileData = useCallback(() => {
-    const profileData = {
-      name: user?.user_metadata?.name,
-      email: user?.email,
-      memberSince: user?.created_at,
-      location: address?.formatted || ipLocation?.city,
-      weather: weatherData ? `${weatherData.temperature}°${weatherUnit === 'fahrenheit' ? 'F' : 'C'}` : null
-    }
-    navigator.clipboard?.writeText(JSON.stringify(profileData, null, 2))
-  }, [user, address, ipLocation, weatherData, weatherUnit])
 
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return
@@ -107,7 +97,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
     <>
       <div className="profile-backdrop" onClick={onClose} aria-hidden="true" />
       <div 
-        ref={containerRef} 
+        ref={containerRef as React.RefObject<HTMLDivElement>} 
         className="user-profile-viewer" 
         role="dialog" 
         aria-modal="true"

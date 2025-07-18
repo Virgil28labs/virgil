@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ImageModal } from './ImageModal'
@@ -192,7 +191,7 @@ describe('ImageModal', () => {
 
     it('should copy image URL', async () => {
       const user = userEvent.setup()
-      mockCopyImageToClipboard.mockResolvedValueOnce(undefined)
+      mockCopyImageToClipboard.mockResolvedValueOnce(true)
 
       render(<ImageModal {...defaultProps} />)
 

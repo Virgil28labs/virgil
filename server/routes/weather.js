@@ -64,7 +64,7 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
     const response = await fetch(apiUrl);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      await response.json().catch(() => ({}));
       
       return res.status(response.status).json({
         error: 'Failed to fetch weather data',
@@ -112,7 +112,7 @@ router.get('/coordinates/:lat/:lon', async (req, res) => {
       cached: false
     });
 
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process weather request'
@@ -163,7 +163,7 @@ router.get('/city/:city', async (req, res) => {
     );
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      await response.json().catch(() => ({}));
       
       return res.status(response.status).json({
         error: 'Failed to fetch weather data',
@@ -211,7 +211,7 @@ router.get('/city/:city', async (req, res) => {
       cached: false
     });
 
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process weather request'

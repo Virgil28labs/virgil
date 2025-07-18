@@ -70,7 +70,8 @@ export const useCamera = () => {
       
       // If timer is set, start countdown
       if (cameraState.timer && cameraState.timer > 0) {
-        await new Promise(resolve => setTimeout(resolve, cameraState.timer * 1000))
+        const timerSeconds = cameraState.timer
+        await new Promise(resolve => setTimeout(resolve, timerSeconds * 1000))
       }
 
       const photoDataUrl = cameraRef.current.takePhoto()

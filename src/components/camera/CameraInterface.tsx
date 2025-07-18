@@ -173,7 +173,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
   // Handle camera errors
   useEffect(() => {
     if (cameraState.error) {
-      onError(typeof cameraState.error === 'string' ? cameraState.error : cameraState.error.message)
+      onError(cameraState.error || 'Unknown camera error')
     }
   }, [cameraState.error, onError])
 
@@ -210,7 +210,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
         <div className="camera-error">
           <div className="error-icon">📷</div>
           <h3>Camera Error</h3>
-          <p>{typeof cameraState.error === 'string' ? cameraState.error : cameraState.error.message}</p>
+          <p>{cameraState.error || 'Unknown camera error'}</p>
           <button 
             className="retry-btn"
             onClick={retryCamera}

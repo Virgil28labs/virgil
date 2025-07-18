@@ -222,19 +222,21 @@ export const useHabits = () => {
       let unlocked = false
       
       switch (achievement.requirement.type) {
-        case 'total-checkins':
+        case 'total-checkins': {
           const totalCheckIns = habits.reduce((sum, h) => sum + h.checkIns.length, 0)
           progress = Math.min(100, (totalCheckIns / achievement.requirement.value) * 100)
           unlocked = totalCheckIns >= achievement.requirement.value
           break
+        }
           
-        case 'streak':
+        case 'streak': {
           const maxStreak = Math.max(...habits.map(h => h.streak))
           progress = Math.min(100, (maxStreak / achievement.requirement.value) * 100)
           unlocked = maxStreak >= achievement.requirement.value
           break
+        }
           
-        case 'perfect-week':
+        case 'perfect-week': {
           const recentPerfectDays = perfectDays.filter(day => {
             const dayDate = new Date(day)
             const weekAgo = new Date()
@@ -244,6 +246,7 @@ export const useHabits = () => {
           progress = Math.min(100, (recentPerfectDays / achievement.requirement.value) * 100)
           unlocked = recentPerfectDays >= achievement.requirement.value
           break
+        }
           
         case 'all-habits':
           progress = Math.min(100, (habits.length / achievement.requirement.value) * 100)

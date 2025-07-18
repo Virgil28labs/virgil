@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  TimerState,
   SessionType,
   PomodoroState,
   PomodoroSession,
@@ -30,7 +29,7 @@ export const usePomodoroTimer = ({
   })
 
   // Refs for accurate timing
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>(undefined)
   const lastTickRef = useRef<number>(Date.now())
   const accumulatedTimeRef = useRef<number>(0)
 

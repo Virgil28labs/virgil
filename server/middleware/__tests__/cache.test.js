@@ -1,5 +1,4 @@
 const { ResponseCache, cache, cacheMiddleware, cacheRoutes } = require('../cache');
-const crypto = require('crypto');
 const request = require('supertest');
 const express = require('express');
 

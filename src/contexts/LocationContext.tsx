@@ -1,12 +1,9 @@
 import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { locationService } from '../lib/locationService'
 import type { 
-  LocationContextType, 
+  LocationContextValue, 
   LocationState, 
-  LocationAction,
-  Coordinates,
-  Address,
-  IPLocation 
+  LocationAction
 } from '../types/location.types'
 
 /**
@@ -23,7 +20,7 @@ import type {
  * - Data caching with refresh intervals
  */
 
-export const LocationContext = createContext<LocationContextType | undefined>(undefined)
+export const LocationContext = createContext<LocationContextValue | undefined>(undefined)
 
 const locationReducer = (state: LocationState, action: LocationAction): LocationState => {
   switch (action.type) {
@@ -173,7 +170,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
 
 
   // Memoized context value to prevent unnecessary re-renders (performance optimization)
-  const value: LocationContextType = useMemo(() => ({
+  const value: LocationContextValue = useMemo(() => ({
     ...state,
     fetchLocationData,
     requestLocationPermission,
@@ -196,7 +193,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
   )
 }
 
-export function useLocation(): LocationContextType {
+export function useLocation(): LocationContextValue {
   const context = useContext(LocationContext)
   if (!context) {
     throw new Error('useLocation must be used within a LocationProvider')

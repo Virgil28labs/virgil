@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgressIndicator } from './ProgressIndicator';
 
@@ -149,7 +148,7 @@ describe('ProgressIndicator', () => {
       <ProgressIndicator progress={50} color="red" variant="linear" />
     );
     
-    const progressFill = container.querySelector('[role="progressbar"] > div');
+    const progressFill = container.querySelector('[role="progressbar"] > div') as HTMLElement;
     expect(progressFill).toBeTruthy();
     expect(progressFill?.style.backgroundColor).toBe('red');
   });

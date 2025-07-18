@@ -1,5 +1,3 @@
-import type { DogImage } from '../hooks/useDogApi'
-
 // Common event handler for stopping propagation
 export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
   e.preventDefault()

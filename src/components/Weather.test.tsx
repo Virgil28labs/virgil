@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Weather } from './Weather';
 import { useWeather } from '../contexts/WeatherContext';

@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, FormEvent, ChangeEvent } from 'react'
+import React, { useState, useEffect, memo, FormEvent, ChangeEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { useFocusManagement } from '../hooks/useFocusManagement'
 

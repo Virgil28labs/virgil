@@ -65,6 +65,7 @@ export const ToastNotification = memo(function ToastNotification({
       }, duration);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [duration, persistent]);
 
   const handleDismiss = () => {

@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react'
-import { useKeyboardShortcuts } from './useKeyboardShortcuts'
+import { useKeyboardShortcuts, type KeyboardShortcuts } from './useKeyboardShortcuts'
 
 describe('useKeyboardShortcuts', () => {
   let addEventListenerSpy: jest.SpyInstance
@@ -40,7 +40,7 @@ describe('useKeyboardShortcuts', () => {
 
     it('should update event listener when shortcuts change', () => {
       const { rerender } = renderHook(
-        ({ shortcuts }) => useKeyboardShortcuts(shortcuts),
+        (props: { shortcuts: KeyboardShortcuts }) => useKeyboardShortcuts(props.shortcuts),
         {
           initialProps: { shortcuts: { 'Escape': jest.fn() } }
         }
@@ -49,7 +49,7 @@ describe('useKeyboardShortcuts', () => {
       expect(addEventListenerSpy).toHaveBeenCalledTimes(1)
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(0)
 
-      rerender({ shortcuts: { 'Enter': jest.fn() } })
+      rerender({ shortcuts: { 'ArrowLeft': jest.fn() } })
 
       expect(addEventListenerSpy).toHaveBeenCalledTimes(2)
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(1)

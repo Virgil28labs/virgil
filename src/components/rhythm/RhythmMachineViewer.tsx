@@ -9,8 +9,7 @@ import {
   BAR_LENGTHS,
   DrumType,
   type DrumSound,
-  type SavedPattern,
-  type BarLength
+  type SavedPattern
 } from './rhythm.types'
 
 interface RhythmMachineViewerProps {

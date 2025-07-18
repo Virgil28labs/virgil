@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import {
   LazyRaccoonMascot,
   LazyVirgilChatbot,
@@ -123,7 +123,7 @@ describe('LazyComponents', () => {
       
       expect(weatherService).toBeDefined();
       expect(weatherService.getWeatherByCoordinates).toBeDefined();
-      expect(weatherService.formatTemperature).toBeDefined();
+      expect(weatherService.convertTemperature).toBeDefined();
     });
 
     it('lazy loads the search service', async () => {
@@ -131,7 +131,7 @@ describe('LazyComponents', () => {
       
       expect(searchService).toBeDefined();
       expect(searchService.search).toBeDefined();
-      expect(searchService.formatResults).toBeDefined();
+      expect(searchService.formatSearchResults).toBeDefined();
     });
 
     it('lazy loads the location service', async () => {

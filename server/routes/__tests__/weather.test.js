@@ -139,7 +139,7 @@ describe('Weather Routes', () => {
         .expect(200);
 
       expect(response.body.cached).toBe(true);
-      expect(mockFetch).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     it('should return 400 for invalid coordinates', async () => {
@@ -254,7 +254,7 @@ describe('Weather Routes', () => {
         .expect(200);
 
       expect(response.body.cached).toBe(true);
-      expect(mockFetch).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
     });
 
     it('should return 500 when API key is missing', async () => {

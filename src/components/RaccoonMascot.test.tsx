@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RaccoonMascot } from './RaccoonMascot';
 import { useLocation } from '../contexts/LocationContext';
-import type { LocationContextType } from '../types/location.types';
+import type { LocationContextValue } from '../types/location.types';
 
 // Mock LocationContext
 jest.mock('../contexts/LocationContext', () => ({
@@ -27,7 +26,7 @@ Object.defineProperty(window, 'innerHeight', {
 });
 
 // Mock requestAnimationFrame
-const mockRequestAnimationFrame = (callback: FrameRequestCallback) => {
+const mockRequestAnimationFrame = (callback: (time: number) => void) => {
   setTimeout(() => callback(Date.now()), 16); // 60fps
   return 1;
 };
@@ -41,7 +40,7 @@ global.Audio = jest.fn().mockImplementation(() => ({
 }));
 
 // Test data
-const mockLocationData: Partial<LocationContextType> = {
+const mockLocationData: Partial<LocationContextValue> = {
   address: {
     formatted: '123 Test St, New York, NY 10001',
     street: 'Test St',
@@ -334,7 +333,6 @@ describe('RaccoonMascot', () => {
 
   describe('Drag and Drop', () => {
     it('allows dragging the mascot', async () => {
-      const _user = userEvent.setup({ delay: null });
       render(<RaccoonMascot />);
       
       const mascotContainer = screen.getByAltText('Racoon Mascot').parentElement!;

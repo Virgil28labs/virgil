@@ -1,9 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { AuthContextType } from '../types/auth.types';
-import type { LocationContextType } from '../types/location.types';
-import type { WeatherContextType, WeatherData } from '../types/weather.types';
 
 // Mock all dependencies before importing the component
 jest.mock('../lib/requestDeduplication', () => ({
@@ -59,40 +55,6 @@ const mockUser = {
   user_metadata: { name: 'Test User' }
 } as any;
 
-const mockCoordinates = {
-  latitude: 40.7128,
-  longitude: -74.006,
-  accuracy: 10
-};
-
-const mockAddress = {
-  formatted: '123 Test St, New York, NY 10001',
-  street: 'Test St',
-  house_number: '123',
-  city: 'New York',
-  postcode: '10001',
-  country: 'USA'
-} as any;
-
-const mockIPLocation = {
-  ip: '192.168.1.1',
-  city: 'New York',
-  region: 'NY',
-  country: 'USA',
-  timezone: 'America/New_York'
-} as any;
-
-const mockWeatherData: WeatherData = {
-  temperature: 72,
-  feelsLike: 70,
-  condition: { main: 'Clear', description: 'Clear sky', icon: '01d', id: 800 },
-  humidity: 45,
-  windSpeed: 10,
-  cityName: 'New York',
-  country: 'US',
-  dataSource: 'coords' as const,
-  timestamp: new Date().toISOString()
-};
 
 describe('VirgilChatbot', () => {
   beforeEach(() => {

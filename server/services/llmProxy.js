@@ -192,7 +192,7 @@ class LLMProxy extends EventEmitter {
           stream
         };
 
-      case 'anthropic':
+      case 'anthropic': {
         // Convert to Anthropic format
         const systemMessage = messages.find(m => m.role === 'system');
         const nonSystemMessages = messages.filter(m => m.role !== 'system');
@@ -205,6 +205,7 @@ class LLMProxy extends EventEmitter {
           temperature,
           stream
         };
+      }
 
       case 'ollama':
         return {
@@ -284,7 +285,7 @@ class LLMProxy extends EventEmitter {
               if (content) {
                 yield { content, done: false };
               }
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -295,12 +296,12 @@ class LLMProxy extends EventEmitter {
     }
   }
 
-  async *parseAnthropicStream(stream) {
+  async *parseAnthropicStream() {
     // Similar implementation for Anthropic streaming
     // ... implementation details ...
   }
 
-  async *parseGenericStream(stream) {
+  async *parseGenericStream() {
     // Generic streaming implementation
     // ... implementation details ...
   }
@@ -322,7 +323,7 @@ class LLMProxy extends EventEmitter {
     return models;
   }
 
-  async countTokens(text, model = 'gpt-4o-mini') {
+  async countTokens(text) {
     // Simple token estimation (more accurate methods can be implemented)
     // Average: ~4 characters per token for English text
     return Math.ceil(text.length / 4);

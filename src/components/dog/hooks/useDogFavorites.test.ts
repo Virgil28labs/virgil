@@ -212,7 +212,6 @@ describe('useDogFavorites', () => {
   describe('multiple hook instances', () => {
     it('should share favorites between multiple hook instances', () => {
       const { result: result1 } = renderHook(() => useDogFavorites())
-      const { result: result2 } = renderHook(() => useDogFavorites())
 
       // Add favorite in first instance
       act(() => {

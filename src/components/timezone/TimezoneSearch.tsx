@@ -196,7 +196,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
             searchResults.map((timezone, index) => (
               <li
                 key={timezone.timezone}
-                ref={el => suggestionRefs.current[index] = el}
+                ref={el => { suggestionRefs.current[index] = el; }}
                 id={`timezone-suggestion-${index}`}
                 className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
                 role="option"

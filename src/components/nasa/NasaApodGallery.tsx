@@ -10,14 +10,12 @@ import {
 interface NasaApodGalleryProps {
   favorites: ApodImage[]
   onRemoveFavorite: (apodId: string) => void
-  onSelectApod: (apod: ApodImage) => void
   onOpenModal: (index: number) => void
 }
 
 export const NasaApodGallery = memo(function NasaApodGallery({
   favorites,
   onRemoveFavorite,
-  onSelectApod,
   onOpenModal
 }: NasaApodGalleryProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null)

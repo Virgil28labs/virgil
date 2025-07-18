@@ -144,30 +144,46 @@ export const locationService = {
   },
 
   async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
-    return retryWithBackoff(
-      async () => {
-        const response = await fetch(
-          `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`
-        );
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch elevation data');
+    try {
+      return await retryWithBackoff(
+        async () => {
+          const response = await fetch(
+            `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`,
+            {
+              signal: AbortSignal.timeout(5000) // 5 second timeout
+            }
+          );
+          
+          if (!response.ok) {
+            console.warn(`Elevation API error: ${response.status} ${response.statusText}`);
+            throw new Error(`Failed to fetch elevation data: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Validate response data
+          if (typeof data.elevation !== 'number' || typeof data.elevationFeet !== 'number') {
+            console.warn('Invalid elevation data received:', data);
+            throw new Error('Invalid elevation data format');
+          }
+          
+          return {
+            elevation: data.elevation,
+            elevationFeet: data.elevationFeet
+          };
+        },
+        {
+          maxRetries: 2,
+          initialDelay: 500,
+          onRetry: (attempt, error) => {
+            console.warn(`Retrying elevation fetch (attempt ${attempt}):`, error.message);
+          }
         }
-        
-        const data = await response.json();
-        return {
-          elevation: data.elevation,
-          elevationFeet: data.elevationFeet
-        };
-      },
-      {
-        maxRetries: 2,
-        initialDelay: 500,
-        onRetry: (_attempt, _error) => {
-          // Retry silently
-        }
-      }
-    );
+      );
+    } catch (error) {
+      console.error('Failed to fetch elevation:', error);
+      throw error;
+    }
   },
 
   async getQuickLocation(): Promise<LocationData> {
@@ -267,6 +283,10 @@ export const locationService = {
           elevation: elevationResult.value.elevation,
           elevationUnit: 'meters'
         };
+      } else {
+        console.warn('Elevation fetch failed:', elevationResult.reason);
+        // Still return coordinates without elevation
+        result.coordinates = coords;
       }
       
       return result;

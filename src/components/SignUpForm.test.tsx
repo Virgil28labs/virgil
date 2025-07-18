@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SignUpForm } from './SignUpForm';
@@ -287,8 +286,6 @@ describe('SignUpForm', () => {
 
   it('has proper accessibility attributes', () => {
     render(<SignUpForm />);
-    
-    const form = screen.getByRole('form');
     
     const nameInput = screen.getByLabelText('Name:');
     expect(nameInput).toHaveAttribute('type', 'text');

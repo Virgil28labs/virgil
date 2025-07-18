@@ -16,7 +16,7 @@ export const PomodoroApp: React.FC<PomodoroModalProps> = ({ isOpen, onClose }) =
   const [isNightMode, setIsNightMode] = useState(shouldUseNightMode())
 
   // Initialize hooks
-  const { settings, updateSetting, updateSettings, resetSettings, enableNotifications } = usePomodoroSettings()
+  const { settings, updateSetting, resetSettings, enableNotifications } = usePomodoroSettings()
   const { stats, addCompletedSession, updateDailyGoal, resetStats } = usePomodoroStats()
   
   // Timer hook with callbacks
@@ -153,7 +153,6 @@ export const PomodoroApp: React.FC<PomodoroModalProps> = ({ isOpen, onClose }) =
             onPause={timer.pauseTimer}
             onReset={timer.resetTimer}
             onSkip={timer.skipSession}
-            onSettingsClick={() => setShowSettings(true)} // Now handled in header
           />
         </div>
 

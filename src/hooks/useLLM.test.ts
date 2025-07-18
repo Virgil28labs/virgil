@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useLLM } from './useLLM';
 import { llmService } from '../services/llm';
 import type { LLMResponse } from '../types/llm.types';
@@ -282,7 +282,7 @@ describe('useLLM', () => {
         const stream = result.current.completeStream({ messages: [] });
         // Start consuming but don't await
         (async () => {
-          for await (const chunk of stream) {
+          for await (const _chunk of stream) {
             // Process chunks
           }
         })();
@@ -463,7 +463,7 @@ describe('useLLM', () => {
       await act(async () => {
         try {
           await result.current.complete({ messages: [] });
-        } catch (e) {
+        } catch (_e) {
           // Let the hook set the error state
         }
       });
@@ -544,7 +544,7 @@ describe('useLLM', () => {
         const stream = result.current.completeStream({ messages: [] });
         // Start consuming but don't await
         (async () => {
-          for await (const chunk of stream) {
+          for await (const _chunk of stream) {
             // Process chunks
           }
         })();

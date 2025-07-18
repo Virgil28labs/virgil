@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, Suspense } from 'react'
+import React, { memo, useCallback, useState, Suspense } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocation } from '../contexts/LocationContext'
 import { VirgilTextLogo } from './VirgilTextLogo'

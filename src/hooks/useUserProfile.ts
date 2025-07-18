@@ -178,7 +178,7 @@ export const useUserProfile = () => {
         if (error) throw error
         
         // Verify the save by fetching the updated user
-        const { data: { user: updatedUser }, error: verifyError } = await supabase.auth.getUser()
+        const { error: verifyError } = await supabase.auth.getUser()
         if (verifyError) {
           console.error('Error verifying profile save:', verifyError)
         } else {

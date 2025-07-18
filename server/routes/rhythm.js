@@ -2,7 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { LLMProxy } = require('../services/llmProxy');
 const { RequestQueue } = require('../services/queue');
-const { validateRequest } = require('../middleware/validation');
+// const { validateRequest } = require('../middleware/validation');
 
 // Custom validation for rhythm generation
 const validateRhythmRequest = (req, res, next) => {
@@ -146,7 +146,7 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
         // Invalid category from LLM - using default
       }
       
-    } catch (error) {
+    } catch {
       // LLM response parsing failed - using default
     }
     

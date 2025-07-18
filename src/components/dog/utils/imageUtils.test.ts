@@ -122,10 +122,13 @@ describe('imageUtils', () => {
       createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas)
 
       // Mock clipboard API
-      global.navigator.clipboard = {
-        write: jest.fn(),
-        writeText: jest.fn()
-      } as any
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          write: jest.fn(),
+          writeText: jest.fn()
+        },
+        writable: true
+      })
 
       global.ClipboardItem = jest.fn() as any
     })

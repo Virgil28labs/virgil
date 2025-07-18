@@ -3,7 +3,7 @@ import type { CameraError, CameraSettings } from '../../../types/camera.types'
 export class CameraUtils {
   static async checkCameraPermission(): Promise<boolean> {
     try {
-      const result = await navigator.permissions.query({ name: 'camera' as PermissionName })
+      const result = await navigator.permissions.query({ name: 'camera' as any })
       return result.state === 'granted'
     } catch (error) {
       console.warn('Permission API not supported, checking via getUserMedia')

@@ -2,7 +2,6 @@ import { memo, useState, useCallback } from 'react'
 import { useHabits } from '../../hooks/useHabits'
 import { HabitCard } from './HabitCard'
 import { AddHabitForm } from './AddHabitForm'
-import type { Habit } from '../../types/habit.types'
 import './MinimalHabitTracker.css'
 
 interface MinimalHabitTrackerProps {

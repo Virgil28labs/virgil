@@ -76,10 +76,6 @@ export function DogGalleryProvider({ children, isOpen = false }: DogGalleryProvi
     dispatch({ type: 'SET_SELECTED_IMAGE_INDEX', payload: index })
   }, [])
 
-  const _resetState = useCallback(() => {
-    dispatch({ type: 'RESET_STATE' })
-  }, [])
-
   // Enhanced fetch function that uses current state
   const handleFetchDogs = useCallback((breed?: string, count?: number) => {
     const breedToUse = breed !== undefined ? breed : state.selectedBreed

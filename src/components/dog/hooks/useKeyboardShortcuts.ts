@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-interface KeyboardShortcuts {
+export interface KeyboardShortcuts {
   'Escape'?: () => void
   'ArrowLeft'?: () => void
   'ArrowRight'?: () => void

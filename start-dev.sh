@@ -237,6 +237,7 @@ Usage: $0 [OPTIONS]
 
 Options:
   --no-monitor    Start servers and exit (don't monitor)
+  --skip-deps     Skip dependency installation checks (faster startup)
   --help, -h      Show this help message
 
 Environment Variables:
@@ -260,10 +261,14 @@ EOF
 main() {
     # Parse command line arguments
     local no_monitor=false
+    local skip_deps=false
     for arg in "$@"; do
         case $arg in
             --no-monitor)
                 no_monitor=true
+                ;;
+            --skip-deps)
+                skip_deps=true
                 ;;
             --help|-h)
                 show_help
@@ -317,16 +322,20 @@ main() {
     fi
     
     # Smart dependency check - only install if missing or package.json is newer
-    if [[ ! -d "$PROJECT_ROOT/node_modules" ]] || 
-       [[ "$PROJECT_ROOT/package.json" -nt "$PROJECT_ROOT/node_modules" ]]; then
-        log_info "Installing frontend dependencies..."
-        (cd "$PROJECT_ROOT" && npm install) || exit 1
-    fi
-    
-    if [[ ! -d "$PROJECT_ROOT/server/node_modules" ]] || 
-       [[ "$PROJECT_ROOT/server/package.json" -nt "$PROJECT_ROOT/server/node_modules" ]]; then
-        log_info "Installing backend dependencies..."
-        (cd "$PROJECT_ROOT/server" && npm install) || exit 1
+    if ! $skip_deps; then
+        if [[ ! -d "$PROJECT_ROOT/node_modules" ]] || 
+           [[ "$PROJECT_ROOT/package.json" -nt "$PROJECT_ROOT/node_modules" ]]; then
+            log_info "Installing frontend dependencies..."
+            (cd "$PROJECT_ROOT" && npm install) || exit 1
+        fi
+        
+        if [[ ! -d "$PROJECT_ROOT/server/node_modules" ]] || 
+           [[ "$PROJECT_ROOT/server/package.json" -nt "$PROJECT_ROOT/server/node_modules" ]]; then
+            log_info "Installing backend dependencies..."
+            (cd "$PROJECT_ROOT/server" && npm install) || exit 1
+        fi
+    else
+        log_info "Skipping dependency checks (--skip-deps)"
     fi
     
     # Start servers in parallel

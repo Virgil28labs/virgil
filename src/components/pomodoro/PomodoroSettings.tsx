@@ -1,5 +1,5 @@
-import React, { memo, useState } from 'react'
-import { PomodoroSettings as Settings, DURATION_CONSTRAINTS, DEFAULT_POMODORO_SETTINGS } from '../../types/pomodoro.types'
+import { memo, useState } from 'react'
+import { PomodoroSettings as Settings, DURATION_CONSTRAINTS } from '../../types/pomodoro.types'
 import { parseDurationValue } from './utils/pomodoroUtils'
 
 interface PomodoroSettingsProps {

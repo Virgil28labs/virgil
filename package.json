@@ -16,6 +16,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "type-check": "tsc --noEmit",
     "check-env": "./check-env.sh",
     "cleanup-ports": "./cleanup-ports.sh",
     "diagnose": "./diagnose.sh"
@@ -38,6 +39,7 @@
     "@eslint/js": "^9.29.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.11",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",

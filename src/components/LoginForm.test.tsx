@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LoginForm } from './LoginForm';
@@ -55,7 +54,6 @@ describe('LoginForm', () => {
   });
 
   it('validates empty fields when bypassing HTML validation', async () => {
-    const _user = userEvent.setup();
     const { container } = render(<LoginForm />);
     
     // Bypass HTML5 validation by calling submit directly

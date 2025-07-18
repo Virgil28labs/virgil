@@ -184,7 +184,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
       {shouldShowHoverPanel && (
         <PositionedTimezoneHoverPanel
           isVisible={isHoverPanelVisible && !isModalOpen}
-          triggerRef={triggerRef}
+          triggerRef={triggerRef as React.RefObject<HTMLDivElement>}
           className="timezone-widget-panel"
         />
       )}

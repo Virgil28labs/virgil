@@ -112,7 +112,7 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
   const checkPermission = async (name: string): Promise<PermissionState | 'unknown'> => {
     try {
       if ('permissions' in navigator) {
-        const result = await navigator.permissions.query({ name: name as PermissionName })
+        const result = await navigator.permissions.query({ name: name as any })
         return result.state
       }
     } catch {

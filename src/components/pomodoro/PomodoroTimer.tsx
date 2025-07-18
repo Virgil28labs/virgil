@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { 
   formatTime, 
   getSessionTypeName, 
@@ -22,7 +22,6 @@ interface PomodoroTimerProps {
   onPause: () => void
   onReset: () => void
   onSkip: () => void
-  onSettingsClick: () => void
 }
 
 export const PomodoroTimer = memo(function PomodoroTimer({
@@ -36,10 +35,9 @@ export const PomodoroTimer = memo(function PomodoroTimer({
   onStart,
   onPause,
   onReset,
-  onSkip,
-  onSettingsClick
+  onSkip
 }: PomodoroTimerProps) {
-  const [showPhrase, setShowPhrase] = useState(true)
+  const [showPhrase] = useState(true)
   const [currentPhrase, setCurrentPhrase] = useState<{ text: string; author?: string } | null>(null)
 
   // SVG dimensions

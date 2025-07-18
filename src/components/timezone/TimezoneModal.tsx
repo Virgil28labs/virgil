@@ -8,7 +8,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { TimezoneSearch } from './TimezoneSearch'
 import { useTimezones, useTimezoneFormatters } from './useTimezones'
-import { getTimezoneInfo } from './timezoneData'
 
 interface TimezoneModalProps {
   isOpen: boolean
@@ -32,12 +31,11 @@ const TimezoneModal = memo(function TimezoneModal({
     addTimezone,
     removeTimezone,
     updateTimezoneLabel,
-    reorderTimezones,
     clearAllTimezones,
     canAddMoreTimezones
   } = useTimezones()
 
-  const { formatTime, formatRelativeTime } = useTimezoneFormatters()
+  const { formatTime } = useTimezoneFormatters()
 
   // Focus management
   useEffect(() => {
@@ -134,23 +132,6 @@ const TimezoneModal = memo(function TimezoneModal({
     }
   }, [handleSaveLabel, handleCancelEditing])
 
-  // Handle timezone reordering
-  const handleMoveUp = useCallback((index: number) => {
-    if (index > 0) {
-      reorderTimezones(index, index - 1)
-    }
-  }, [reorderTimezones])
-
-  const handleMoveDown = useCallback((index: number) => {
-    if (index < selectedTimezones.length - 1) {
-      reorderTimezones(index, index + 1)
-    }
-  }, [reorderTimezones, selectedTimezones.length])
-
-  // Get local time for relative comparison
-  const localTime = timezonesWithTime.length > 0 
-    ? timezonesWithTime[0].currentTime.setZone('local')
-    : null
 
   if (!isOpen) return null
 
@@ -216,8 +197,7 @@ const TimezoneModal = memo(function TimezoneModal({
               </div>
             ) : (
               <ul className="timezone-list" role="list">
-                {timezonesWithTime.map((timezone, index) => {
-                  const timezoneInfo = getTimezoneInfo(timezone.timezone)
+                {timezonesWithTime.map((timezone) => {
                   const isEditing = editingId === timezone.id
 
                   return (

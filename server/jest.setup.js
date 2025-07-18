@@ -1,4 +1,5 @@
 /* eslint-env jest */
+/* global beforeAll, afterAll, afterEach, jest */
 // Set test environment
 process.env.NODE_ENV = 'test';
 

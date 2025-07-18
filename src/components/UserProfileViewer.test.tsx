@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { UserProfileViewer } from './UserProfileViewer';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
@@ -95,7 +94,8 @@ describe('UserProfileViewer', () => {
     mockUseAuth.mockReturnValue({
       user: mockUser,
       loading: false,
-      signOut: mockSignOut
+      signOut: mockSignOut,
+      refreshUser: jest.fn()
     });
     
     mockUseLocation.mockReturnValue(mockLocationData);
@@ -108,20 +108,24 @@ describe('UserProfileViewer', () => {
       toggleUnit: jest.fn(),
       hasWeather: true,
       fetchWeather: jest.fn(),
-      clearError: jest.fn()
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
     
     mockUseKeyboardNavigation.mockReturnValue({
       containerRef: { current: null },
-      activeIndex: 0,
-      setActiveIndex: jest.fn()
+      focusFirst: jest.fn(),
+      focusLast: jest.fn(),
+      focusNext: jest.fn(),
+      focusPrevious: jest.fn(),
+      focusElement: jest.fn()
     });
   });
 
   it('renders nothing when closed', () => {
-    const { container } = render(<UserProfileViewer isOpen={false} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen={false} onClose={mockOnClose} />);
     
-    expect(container.firstChild).toBeNull();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('renders user profile when open', () => {
@@ -149,7 +153,8 @@ describe('UserProfileViewer', () => {
     mockUseAuth.mockReturnValue({
       user: { ...mockUser, user_metadata: { ...mockUser.user_metadata, avatarUrl: '' } },
       loading: false,
-      signOut: mockSignOut
+      signOut: mockSignOut,
+      refreshUser: jest.fn()
     });
     
     render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
@@ -161,7 +166,8 @@ describe('UserProfileViewer', () => {
     mockUseAuth.mockReturnValue({
       user: { ...mockUser, user_metadata: {} },
       loading: false,
-      signOut: mockSignOut
+      signOut: mockSignOut,
+      refreshUser: jest.fn()
     });
     
     render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
@@ -213,7 +219,8 @@ describe('UserProfileViewer', () => {
       toggleUnit: jest.fn(),
       hasWeather: true,
       fetchWeather: jest.fn(),
-      clearError: jest.fn()
+      clearError: jest.fn(),
+      lastUpdated: Date.now()
     });
     
     render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
@@ -256,7 +263,7 @@ describe('UserProfileViewer', () => {
   });
 
   it('closes when clicking outside', () => {
-    const { container } = render(
+    render(
       <div>
         <UserProfileViewer isOpen={true} onClose={mockOnClose} />
         <button>Outside button</button>
@@ -309,7 +316,8 @@ describe('UserProfileViewer', () => {
     mockUseAuth.mockReturnValue({
       user: { ...mockUser, user_metadata: {} },
       loading: false,
-      signOut: mockSignOut
+      signOut: mockSignOut,
+      refreshUser: jest.fn()
     });
     
     render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);

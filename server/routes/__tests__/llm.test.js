@@ -171,7 +171,7 @@ describe('LLM Routes', () => {
     });
 
     it('should handle errors properly', async () => {
-      const errorMiddleware = (err, req, res, next) => {
+      const errorMiddleware = (err, req, res) => {
         res.status(500).json({ error: err.message });
       };
       app.use(errorMiddleware);
@@ -344,7 +344,7 @@ describe('LLM Routes', () => {
     });
 
     it('should handle errors when fetching models', async () => {
-      const errorMiddleware = (err, req, res, next) => {
+      const errorMiddleware = (err, req, res) => {
         res.status(500).json({ error: err.message });
       };
       app.use(errorMiddleware);

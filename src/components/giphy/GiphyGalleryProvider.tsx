@@ -4,8 +4,7 @@ import type {
   GiphyContextType, 
   GiphyState, 
   GiphyAction, 
-  GiphyImage, 
-  GiphyLoadingState 
+  GiphyImage
 } from '../../types'
 
 // Initial state

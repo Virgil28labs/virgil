@@ -1,5 +1,5 @@
-import React, { createContext, useContext } from 'react';
-import type { WeatherContextType } from '../WeatherContext';
+import React, { createContext } from 'react';
+import type { WeatherContextType } from '../../types/weather.types';
 
 // Mock implementation of useWeather hook
 const mockUseWeather = jest.fn<WeatherContextType, []>();
@@ -11,7 +11,10 @@ mockUseWeather.mockReturnValue({
   error: null,
   unit: 'fahrenheit',
   toggleUnit: jest.fn(),
-  hasWeather: false
+  hasWeather: false,
+  fetchWeather: jest.fn(),
+  clearError: jest.fn(),
+  lastUpdated: null
 });
 
 export const useWeather = mockUseWeather;
