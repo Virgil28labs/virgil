@@ -77,16 +77,26 @@ const calculateStreak = (checkIns: string[]): number => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   
+  const mostRecent = new Date(sortedDates[0])
+  mostRecent.setHours(0, 0, 0, 0)
+  
+  // Calculate days since most recent check-in
+  const daysSinceLastCheckIn = Math.floor((today.getTime() - mostRecent.getTime()) / (1000 * 60 * 60 * 24))
+  
+  // If last check-in was more than 1 day ago, streak is broken
+  if (daysSinceLastCheckIn > 1) return 0
+  
+  // Count consecutive days from most recent check-in
   for (let i = 0; i < sortedDates.length; i++) {
     const checkDate = new Date(sortedDates[i])
     checkDate.setHours(0, 0, 0, 0)
     
-    const expectedDate = new Date(today)
-    expectedDate.setDate(today.getDate() - streak)
+    const expectedDate = new Date(mostRecent)
+    expectedDate.setDate(mostRecent.getDate() - i)
     
     if (checkDate.getTime() === expectedDate.getTime()) {
       streak++
-    } else if (streak > 0 && checkDate < expectedDate) {
+    } else {
       break
     }
   }
