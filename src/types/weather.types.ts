@@ -4,7 +4,7 @@
  */
 
 export interface WeatherCondition {
-  id: number;
+  id?: number;
   main: string;
   description: string;
   icon: string;
@@ -30,8 +30,24 @@ export interface WeatherData {
   timestamp: number;
 }
 
+export interface ForecastDay {
+  date: string;
+  tempMin: number;
+  tempMax: number;
+  condition: WeatherCondition;
+  humidity: number;
+  windSpeed: number;
+}
+
+export interface ForecastData {
+  cityName: string;
+  country: string;
+  forecasts: ForecastDay[];
+}
+
 export interface WeatherState {
   data: WeatherData | null;
+  forecast: ForecastData | null;
   loading: boolean;
   error: string | null;
   lastUpdated: number | null;
@@ -48,6 +64,7 @@ export interface WeatherContextType extends WeatherState {
 export type WeatherActionType = 
   | 'SET_LOADING'
   | 'SET_WEATHER_DATA'
+  | 'SET_FORECAST_DATA'
   | 'SET_ERROR'
   | 'TOGGLE_UNIT'
   | 'CLEAR_ERROR';
@@ -55,6 +72,7 @@ export type WeatherActionType =
 export type WeatherAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_WEATHER_DATA'; payload: WeatherData }
+  | { type: 'SET_FORECAST_DATA'; payload: ForecastData }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'TOGGLE_UNIT' }
   | { type: 'CLEAR_ERROR' };

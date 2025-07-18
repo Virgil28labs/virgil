@@ -1,4 +1,4 @@
-import type { WeatherData } from '../types/weather.types';
+import type { WeatherData, ForecastData } from '../types/weather.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 
@@ -7,6 +7,7 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 class WeatherService {
   private cache: Map<string, { data: WeatherData; timestamp: number }> = new Map();
+  private forecastCache: Map<string, { data: ForecastData; timestamp: number }> = new Map();
 
   constructor() {}
 
@@ -131,6 +132,125 @@ class WeatherService {
 
 
   /**
+   * Get weather forecast by coordinates
+   */
+  async getForecastByCoordinates(lat: number, lon: number): Promise<ForecastData> {
+    const cacheKey = `forecast-${lat.toFixed(2)}-${lon.toFixed(2)}`;
+    
+    // Check cache first
+    const cached = this.forecastCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+
+    const apiUrl = `${BACKEND_API_BASE}/weather/forecast/coordinates/${lat}/${lon}`;
+
+    try {
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await dedupeFetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            timeout: 10000
+          });
+
+          if (!res.ok) {
+            let errorText = 'Unknown error';
+            try {
+              const errorData = await res.json();
+              errorText = errorData.error || errorData.message || `HTTP ${res.status}`;
+            } catch {
+              errorText = await res.text().catch(() => `HTTP ${res.status}`);
+            }
+            throw new Error(errorText);
+          }
+          
+          return res;
+        },
+        {
+          maxRetries: 3,
+          initialDelay: 1000,
+          onRetry: () => {
+            // Retry silently
+          }
+        }
+      );
+
+      const result = await response.json();
+      
+      if (!result.success || !result.data) {
+        throw new Error('Invalid forecast response');
+      }
+
+      const forecastData = result.data;
+
+      // Cache the result
+      this.forecastCache.set(cacheKey, {
+        data: forecastData,
+        timestamp: Date.now()
+      });
+
+      return forecastData;
+    } catch (error: any) {
+      console.error('Forecast fetch error:', error);
+      throw new Error('Failed to fetch forecast data');
+    }
+  }
+
+  /**
+   * Get weather forecast by city name
+   */
+  async getForecastByCity(city: string, country?: string): Promise<ForecastData> {
+    const location = country ? `${city},${country}` : city;
+    const cacheKey = `forecast-city-${location.toLowerCase()}`;
+    
+    // Check cache first
+    const cached = this.forecastCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+
+    try {
+      const url = country 
+        ? `${BACKEND_API_BASE}/weather/forecast/city/${encodeURIComponent(city)}?country=${encodeURIComponent(country)}`
+        : `${BACKEND_API_BASE}/weather/forecast/city/${encodeURIComponent(city)}`;
+        
+      const response = await dedupeFetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Forecast API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (!result.success || !result.data) {
+        throw new Error('Invalid forecast response');
+      }
+
+      const forecastData = result.data;
+
+      // Cache the result
+      this.forecastCache.set(cacheKey, {
+        data: forecastData,
+        timestamp: Date.now()
+      });
+
+      return forecastData;
+    } catch (error: any) {
+      console.error('Forecast fetch error:', error);
+      throw new Error('Failed to fetch forecast data');
+    }
+  }
+
+  /**
    * Convert temperature between Celsius and Fahrenheit
    */
   convertTemperature(temp: number, toCelsius: boolean): number {
@@ -169,6 +289,7 @@ class WeatherService {
    */
   clearCache(): void {
     this.cache.clear();
+    this.forecastCache.clear();
   }
 }
 

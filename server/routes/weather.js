@@ -236,6 +236,236 @@ router.get('/health', (req, res) => {
 });
 
 /**
+ * GET /api/v1/weather/forecast/coordinates/:lat/:lon
+ * Get 5-day weather forecast by coordinates
+ */
+router.get('/forecast/coordinates/:lat/:lon', async (req, res) => {
+  try {
+    const { lat, lon } = req.params;
+    
+    // Validate coordinates
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
+    
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({
+        error: 'Invalid coordinates provided'
+      });
+    }
+
+    // Check cache
+    const cacheKey = `forecast-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
+    const cached = weatherCache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return res.json({
+        success: true,
+        data: cached.data,
+        cached: true
+      });
+    }
+
+    // Validate API key
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    
+    if (!apiKey) {
+      return res.status(500).json({
+        error: 'Weather service is not properly configured'
+      });
+    }
+
+    // Fetch from OpenWeatherMap forecast API
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`;
+    
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      await response.json().catch(() => ({}));
+      
+      return res.status(response.status).json({
+        error: 'Failed to fetch forecast data',
+        status: response.status
+      });
+    }
+
+    const data = await response.json();
+    
+    // Process 3-hour forecast data into daily summaries
+    const dailyForecasts = processForecastData(data);
+    
+    // Update cache
+    weatherCache.set(cacheKey, {
+      data: dailyForecasts,
+      timestamp: Date.now()
+    });
+
+    res.json({
+      success: true,
+      data: dailyForecasts,
+      cached: false
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to process forecast request'
+    });
+  }
+});
+
+/**
+ * GET /api/v1/weather/forecast/city/:city
+ * Get 5-day weather forecast by city name
+ */
+router.get('/forecast/city/:city', async (req, res) => {
+  try {
+    const { city } = req.params;
+    const { country } = req.query;
+    
+    if (!city) {
+      return res.status(400).json({
+        error: 'City name is required'
+      });
+    }
+
+    // Build location string
+    const location = country ? `${city},${country}` : city;
+    const cacheKey = `forecast-city-${location.toLowerCase()}`;
+    
+    // Check cache
+    const cached = weatherCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return res.json({
+        success: true,
+        data: cached.data,
+        cached: true
+      });
+    }
+
+    // Validate API key
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({
+        error: 'Weather service is not properly configured'
+      });
+    }
+
+    // Fetch from OpenWeatherMap forecast API
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(location)}&appid=${apiKey}&units=imperial`
+    );
+
+    if (!response.ok) {
+      await response.json().catch(() => ({}));
+      
+      return res.status(response.status).json({
+        error: 'Failed to fetch forecast data',
+        status: response.status
+      });
+    }
+
+    const data = await response.json();
+    
+    // Process 3-hour forecast data into daily summaries
+    const dailyForecasts = processForecastData(data);
+    
+    // Update cache
+    weatherCache.set(cacheKey, {
+      data: dailyForecasts,
+      timestamp: Date.now()
+    });
+
+    res.json({
+      success: true,
+      data: dailyForecasts,
+      cached: false
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to process forecast request'
+    });
+  }
+});
+
+/**
+ * Process 3-hour forecast data into daily summaries
+ */
+function processForecastData(data) {
+  const dailyData = {};
+  
+  // Group forecast data by day
+  data.list.forEach(item => {
+    const date = new Date(item.dt * 1000);
+    const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    if (!dailyData[dayKey]) {
+      dailyData[dayKey] = {
+        date: dayKey,
+        temps: [],
+        conditions: [],
+        icons: [],
+        descriptions: [],
+        humidity: [],
+        windSpeed: []
+      };
+    }
+    
+    dailyData[dayKey].temps.push(item.main.temp);
+    dailyData[dayKey].conditions.push(item.weather[0].main);
+    dailyData[dayKey].icons.push(item.weather[0].icon);
+    dailyData[dayKey].descriptions.push(item.weather[0].description);
+    dailyData[dayKey].humidity.push(item.main.humidity);
+    dailyData[dayKey].windSpeed.push(item.wind.speed);
+  });
+  
+  // Convert to array and calculate daily summaries
+  const forecasts = Object.values(dailyData).map(day => {
+    // Find min/max temperatures
+    const tempMin = Math.round(Math.min(...day.temps));
+    const tempMax = Math.round(Math.max(...day.temps));
+    
+    // Find most common weather condition
+    const conditionCounts = {};
+    day.conditions.forEach(condition => {
+      conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
+    });
+    const mainCondition = Object.entries(conditionCounts)
+      .sort((a, b) => b[1] - a[1])[0][0];
+    
+    // Find corresponding icon for main condition
+    const conditionIndex = day.conditions.findIndex(c => c === mainCondition);
+    const icon = day.icons[conditionIndex];
+    const description = day.descriptions[conditionIndex];
+    
+    // Calculate averages
+    const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b) / day.humidity.length);
+    const avgWindSpeed = Math.round(day.windSpeed.reduce((a, b) => a + b) / day.windSpeed.length);
+    
+    return {
+      date: day.date,
+      tempMin,
+      tempMax,
+      condition: {
+        main: mainCondition,
+        description,
+        icon: icon.replace('n', 'd') // Always use day icons for consistency
+      },
+      humidity: avgHumidity,
+      windSpeed: avgWindSpeed
+    };
+  });
+  
+  // Return only next 5 days
+  return {
+    cityName: data.city.name,
+    country: data.city.country,
+    forecasts: forecasts.slice(0, 5)
+  };
+}
+
+/**
  * GET /api/v1/weather/test
  * Test endpoint with hardcoded coordinates
  */

@@ -5,7 +5,8 @@ import type {
   WeatherContextType, 
   WeatherState, 
   WeatherAction,
-  WeatherData 
+  WeatherData,
+  ForecastData 
 } from '../types/weather.types';
 
 /**
@@ -36,6 +37,11 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
         error: null,
         lastUpdated: Date.now()
       };
+    case 'SET_FORECAST_DATA':
+      return { 
+        ...state, 
+        forecast: action.payload
+      };
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
     case 'TOGGLE_UNIT':
@@ -52,6 +58,7 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
 
 const initialState: WeatherState = {
   data: null,
+  forecast: null,
   loading: false,  // Start with loading false to allow initial fetch
   error: null,
   lastUpdated: null,
@@ -87,6 +94,15 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       try {
         const fallbackWeatherData = await weatherService.getWeatherByCoordinates(37.7749, -122.4194);
         dispatch({ type: 'SET_WEATHER_DATA', payload: fallbackWeatherData });
+        
+        // Also fetch forecast for fallback location
+        try {
+          const fallbackForecastData = await weatherService.getForecastByCoordinates(37.7749, -122.4194);
+          dispatch({ type: 'SET_FORECAST_DATA', payload: fallbackForecastData });
+        } catch (forecastError) {
+          console.error('Failed to fetch fallback forecast:', forecastError);
+        }
+        
         return;
       } catch (fallbackError: any) {
         dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
@@ -106,11 +122,35 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           coordinates.latitude,
           coordinates.longitude
         );
+        
+        // Fetch forecast data in parallel
+        try {
+          const forecastData = await weatherService.getForecastByCoordinates(
+            coordinates.latitude,
+            coordinates.longitude
+          );
+          dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
+        } catch (forecastError) {
+          // Log but don't fail if forecast fails
+          console.error('Failed to fetch forecast:', forecastError);
+        }
       } else if (ipLocation?.city) {
         weatherData = await weatherService.getWeatherByCity(
           ipLocation.city,
           ipLocation.country
         );
+        
+        // Fetch forecast data in parallel
+        try {
+          const forecastData = await weatherService.getForecastByCity(
+            ipLocation.city,
+            ipLocation.country
+          );
+          dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
+        } catch (forecastError) {
+          // Log but don't fail if forecast fails
+          console.error('Failed to fetch forecast:', forecastError);
+        }
       } else {
         throw new Error('No location available');
       }
@@ -165,15 +205,34 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     return state.data;
   }, [state.data, state.unit]);
 
+  // Convert forecast temperatures based on unit preference
+  const displayForecast = useMemo((): ForecastData | null => {
+    if (!state.forecast) return null;
+
+    if (state.unit === 'celsius') {
+      return {
+        ...state.forecast,
+        forecasts: state.forecast.forecasts.map(day => ({
+          ...day,
+          tempMin: weatherService.convertTemperature(day.tempMin, true),
+          tempMax: weatherService.convertTemperature(day.tempMax, true)
+        }))
+      };
+    }
+
+    return state.forecast;
+  }, [state.forecast, state.unit]);
+
   // Memoized context value to prevent unnecessary re-renders (performance optimization)
   const value: WeatherContextType = useMemo(() => ({
     ...state,
     data: displayData,
+    forecast: displayForecast,
     fetchWeather,
     toggleUnit,
     clearError,
     hasWeather: !!state.data
-  }), [state, displayData, fetchWeather, toggleUnit, clearError]);
+  }), [state, displayData, displayForecast, fetchWeather, toggleUnit, clearError]);
 
   return (
     <WeatherContext.Provider value={value}>
