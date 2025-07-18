@@ -10,6 +10,8 @@ import { NasaApodButton } from './NasaApodButton'
 import { RhythmMachineButton } from './RhythmMachineButton'
 import { CircleGameButton } from './CircleGameButton'
 import { StreakTrackerButton } from './StreakTrackerButton'
+import { CameraEmojiButton } from './camera/CameraEmojiButton'
+import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
@@ -160,6 +162,12 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* Streak Tracker Button */}
       <StreakTrackerButton />
+      
+      {/* Camera Button */}
+      <CameraEmojiButton />
+      
+      {/* Pomodoro Timer Button */}
+      <PomodoroEmojiButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
