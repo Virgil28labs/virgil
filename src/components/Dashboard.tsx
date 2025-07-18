@@ -9,6 +9,7 @@ import { GiphyEmojiButton } from './GiphyEmojiButton'
 import { NasaApodButton } from './NasaApodButton'
 import { RhythmMachineButton } from './RhythmMachineButton'
 import { CircleGameButton } from './CircleGameButton'
+import { StreakTrackerButton } from './StreakTrackerButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
@@ -156,6 +157,9 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* Circle Game Button */}
       <CircleGameButton />
+      
+      {/* Streak Tracker Button */}
+      <StreakTrackerButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
