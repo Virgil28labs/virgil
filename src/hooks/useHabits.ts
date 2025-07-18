@@ -369,6 +369,54 @@ export const useHabits = () => {
     Math.max(best, habit.longestStreak), 0
   )
   
+  // Calculate when the best streak started
+  const bestStreakStartDate = useCallback(() => {
+    // Find the habit with the longest streak
+    const habitWithBestStreak = userData.habits.reduce((best, habit) => 
+      habit.longestStreak > (best?.longestStreak || 0) ? habit : best
+    , null as Habit | null)
+    
+    if (!habitWithBestStreak || habitWithBestStreak.longestStreak === 0) {
+      return null
+    }
+    
+    // Sort check-ins chronologically
+    const sortedCheckIns = [...habitWithBestStreak.checkIns].sort()
+    if (sortedCheckIns.length === 0) return null
+    
+    let longestStreakStart = sortedCheckIns[0]
+    let longestStreakLength = 0
+    let currentStreakStart = sortedCheckIns[0]
+    let currentStreakLength = 1
+    
+    // Find the longest consecutive streak
+    for (let i = 1; i < sortedCheckIns.length; i++) {
+      const prevDate = new Date(sortedCheckIns[i - 1])
+      const currDate = new Date(sortedCheckIns[i])
+      const daysDiff = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24))
+      
+      if (daysDiff === 1) {
+        // Continue current streak
+        currentStreakLength++
+      } else {
+        // Streak broken
+        if (currentStreakLength > longestStreakLength) {
+          longestStreakLength = currentStreakLength
+          longestStreakStart = currentStreakStart
+        }
+        currentStreakStart = sortedCheckIns[i]
+        currentStreakLength = 1
+      }
+    }
+    
+    // Check final streak
+    if (currentStreakLength > longestStreakLength) {
+      longestStreakStart = currentStreakStart
+    }
+    
+    return longestStreakStart
+  }, [userData.habits])()
+  
   return {
     // Data
     habits: userData.habits,
@@ -377,7 +425,8 @@ export const useHabits = () => {
     stats: {
       ...userData.stats,
       totalCheckIns: dynamicTotalCheckIns,
-      currentStreak: bestStreak
+      currentStreak: bestStreak,
+      bestStreakStartDate
     },
     
     // Actions

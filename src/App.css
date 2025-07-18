@@ -697,6 +697,14 @@ html, body {
   margin-bottom: 0.1rem;
 }
 
+.datetime-display .time-seconds {
+  font-size: 30%;
+  font-weight: 300;
+  color: #b3b3b3;
+  vertical-align: super;
+  margin-left: 0.1em;
+}
+
 .datetime-display .date {
   font-size: clamp(0.8rem, 2vw, 1rem);
   font-weight: 400;
@@ -717,6 +725,10 @@ html, body {
   
   .datetime-display .time {
     font-size: clamp(1rem, 2.5vw, 1.4rem);
+  }
+  
+  .datetime-display .time-seconds {
+    font-size: 30%;
   }
   
   .datetime-display .date {

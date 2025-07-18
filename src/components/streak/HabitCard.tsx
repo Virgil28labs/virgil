@@ -126,7 +126,7 @@ export const HabitCard = memo(function HabitCard({
           <div className="habit-emoji">{habit.emoji}</div>
           <div className="habit-name">{habit.name}</div>
         
-        <div className="habit-streak">
+        <div className={`habit-streak ${habit.streak > 0 ? 'has-streak' : ''}`}>
           <span className={`streak-icon ${checkedToday ? 'active' : 'inactive'}`}>
             🔥
           </span>

@@ -51,13 +51,28 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             <span className="header-icon">🔥</span>
             Habit Streaks
           </h2>
-          <button
-            className="close-button"
-            onClick={onClose}
-            aria-label="Close habit tracker"
-          >
-            ×
-          </button>
+          <div className="header-actions">
+            <button
+              className="reset-button"
+              onClick={() => {
+                if (window.confirm('Reset all habits and start fresh? This cannot be undone.')) {
+                  localStorage.removeItem('virgil_habits');
+                  window.location.reload();
+                }
+              }}
+              aria-label="Reset all habits"
+              title="Reset all habits"
+            >
+              ↺
+            </button>
+            <button
+              className="close-button"
+              onClick={onClose}
+              aria-label="Close habit tracker"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         {/* Stats Summary */}
@@ -70,7 +85,17 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             <span className="stat-value">{stats.totalCheckIns}</span>
             <span className="stat-label">Check-ins</span>
           </div>
-          <div className="stat">
+          <div 
+            className="stat best-streak-stat"
+            data-start-date={
+              stats.bestStreakStartDate 
+                ? `Started ${new Date(stats.bestStreakStartDate).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}`
+                : ''
+            }
+          >
             <span className="stat-value">{stats.currentStreak}</span>
             <span className="stat-label">Best Streak</span>
           </div>
