@@ -79,6 +79,7 @@ router.get('/summary', (req, res) => {
     });
 
   } catch (error) {
+    console.error('Analytics summary error:', error);
     res.status(500).json({ error: 'Failed to generate summary' });
   }
 });
@@ -101,6 +102,7 @@ router.get('/usage', (req, res) => {
     });
 
   } catch (error) {
+    console.error('Analytics usage error:', error);
     res.status(500).json({ error: 'Failed to calculate usage' });
   }
 });
@@ -129,6 +131,7 @@ router.get('/errors', (req, res) => {
     });
 
   } catch (error) {
+    console.error('Analytics errors fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch errors' });
   }
 });
@@ -145,6 +148,21 @@ function trackLLMRequest(event) {
   
   if (provider) {
     analytics.usage.byProvider[provider] = (analytics.usage.byProvider[provider] || 0) + 1;
+  }
+  
+  // Track token usage if available
+  if (tokens && typeof tokens === 'number') {
+    analytics.usage.totalTokens = (analytics.usage.totalTokens || 0) + tokens;
+  }
+  
+  // Track latency metrics if available
+  if (latency && typeof latency === 'number') {
+    if (!analytics.usage.latency) {
+      analytics.usage.latency = { total: 0, count: 0, avg: 0 };
+    }
+    analytics.usage.latency.total += latency;
+    analytics.usage.latency.count += 1;
+    analytics.usage.latency.avg = analytics.usage.latency.total / analytics.usage.latency.count;
   }
   
   analytics.requests.push({

@@ -10,7 +10,7 @@ interface State {
 }
 
 export class CircleErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  public override state: State = {
     hasError: false
   }
 

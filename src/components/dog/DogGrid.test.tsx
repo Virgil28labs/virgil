@@ -1,5 +1,4 @@
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { DogGrid } from './DogGrid'
 import type { DogImage } from './hooks/useDogApi'
 
@@ -58,7 +57,7 @@ describe('DogGrid', () => {
       expect(DogCard).toHaveBeenCalledTimes(3)
       
       // First dog
-      expect((DogCard as jest.Mock).mock.calls[0][0]).toMatchObject({
+      expect((DogCard as unknown as jest.Mock).mock.calls[0][0]).toMatchObject({
         dog: mockDogs[0],
         index: 0,
         isFavorited: false,
@@ -67,7 +66,7 @@ describe('DogGrid', () => {
       })
       
       // Second dog (favorited)
-      expect((DogCard as jest.Mock).mock.calls[1][0]).toMatchObject({
+      expect((DogCard as unknown as jest.Mock).mock.calls[1][0]).toMatchObject({
         dog: mockDogs[1],
         index: 1,
         isFavorited: true,
@@ -76,7 +75,7 @@ describe('DogGrid', () => {
       })
       
       // Third dog
-      expect((DogCard as jest.Mock).mock.calls[2][0]).toMatchObject({
+      expect((DogCard as unknown as jest.Mock).mock.calls[2][0]).toMatchObject({
         dog: mockDogs[2],
         index: 2,
         isFavorited: false,
@@ -108,7 +107,7 @@ describe('DogGrid', () => {
       render(<DogGrid {...defaultProps} />)
       
       // Get the onImageClick handler passed to first DogCard
-      const firstDogCardCall = (DogCard as jest.Mock).mock.calls[0][0]
+      const firstDogCardCall = (DogCard as unknown as jest.Mock).mock.calls[0][0]
       
       // Call the handler
       firstDogCardCall.onImageClick()
@@ -121,7 +120,7 @@ describe('DogGrid', () => {
       render(<DogGrid {...defaultProps} />)
       
       // Get the onFavoriteToggle handler passed to second DogCard
-      const secondDogCardCall = (DogCard as jest.Mock).mock.calls[1][0]
+      const secondDogCardCall = (DogCard as unknown as jest.Mock).mock.calls[1][0]
       
       // Create a mock event
       const mockEvent = { stopPropagation: jest.fn() }
@@ -138,8 +137,8 @@ describe('DogGrid', () => {
       render(<DogGrid {...defaultProps} />)
       
       // Click all images
-      mockDogs.forEach((dog, index) => {
-        const dogCardCall = (DogCard as jest.Mock).mock.calls[index][0]
+      mockDogs.forEach((_dog, index) => {
+        const dogCardCall = (DogCard as unknown as jest.Mock).mock.calls[index][0]
         dogCardCall.onImageClick()
       })
       
@@ -155,8 +154,8 @@ describe('DogGrid', () => {
       const mockEvent = { stopPropagation: jest.fn() }
       
       // Toggle all favorites
-      mockDogs.forEach((dog, index) => {
-        const dogCardCall = (DogCard as jest.Mock).mock.calls[index][0]
+      mockDogs.forEach((_dog, index) => {
+        const dogCardCall = (DogCard as unknown as jest.Mock).mock.calls[index][0]
         dogCardCall.onFavoriteToggle(mockEvent)
       })
       
@@ -172,7 +171,7 @@ describe('DogGrid', () => {
     it('should not re-render when props are the same', () => {
       const { rerender } = render(<DogGrid {...defaultProps} />)
       
-      const initialCallCount = (DogCard as jest.Mock).mock.calls.length
+      const initialCallCount = (DogCard as unknown as jest.Mock).mock.calls.length
       
       // Re-render with same props
       rerender(<DogGrid {...defaultProps} />)
@@ -200,7 +199,7 @@ describe('DogGrid', () => {
       rerender(<DogGrid {...defaultProps} isFavorited={newIsFavorited} />)
       
       // Check that all dogs are now marked as favorited
-      const lastThreeCalls = (DogCard as jest.Mock).mock.calls.slice(-3)
+      const lastThreeCalls = (DogCard as unknown as jest.Mock).mock.calls.slice(-3)
       lastThreeCalls.forEach(call => {
         expect(call[0].isFavorited).toBe(true)
       })
@@ -209,12 +208,12 @@ describe('DogGrid', () => {
     it('should maintain handler references when re-rendering with same callbacks', () => {
       const { rerender } = render(<DogGrid {...defaultProps} />)
       
-      const firstRenderHandlers = (DogCard as jest.Mock).mock.calls[0][0]
+      const firstRenderHandlers = (DogCard as unknown as jest.Mock).mock.calls[0][0]
       
       // Re-render with same props
       rerender(<DogGrid {...defaultProps} />)
       
-      const secondRenderHandlers = (DogCard as jest.Mock).mock.calls[0][0]
+      const secondRenderHandlers = (DogCard as unknown as jest.Mock).mock.calls[0][0]
       
       // Handlers should be the same reference due to useCallback
       expect(firstRenderHandlers.onFavoriteToggle).toBe(secondRenderHandlers.onFavoriteToggle)

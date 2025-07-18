@@ -85,38 +85,106 @@ app.use((req, res) => {
   });
 });
 
-// Server configuration
+// Server startup with initialization
 const PORT = process.env.LLM_SERVER_PORT || 5002;
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Virgil LLM Server running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('📋 Available endpoints:');
-  console.log(`  POST /api/v1/llm/complete - Text completion`);
-  console.log(`  POST /api/v1/llm/stream - Streaming completion`);
-  console.log(`  POST /api/v1/chat - Secure chat endpoint`);
-  console.log(`  GET /api/v1/health - Health check`);
-  console.log(`  POST /api/v1/analytics/track - Analytics tracking`);
-  console.log(`  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates`);
-  console.log(`  GET /api/v1/weather/city/:city - Weather by city`);
-  console.log(`  POST /api/v1/search - Web search endpoint`);
-  console.log(`  GET /api/v1/search/health - Search service health check`);
-  console.log(`  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates`);
-  console.log(`  POST /api/v1/rhythm/generate - AI-powered rhythm generation`);
+
+// Pre-startup checks
+async function performStartupChecks() {
+  console.log('🔍 Performing startup checks...');
+  
+  // Check required environment variables
+  const requiredEnvVars = ['NODE_ENV'];
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.warn(`⚠️  Missing optional environment variables: ${missingVars.join(', ')}`);
+  }
+  
+  // Initialize services
+  try {
+    // Initialize cache
+    const cache = require('./middleware/cache').cache;
+    if (cache) {
+      console.log('✅ Cache service initialized');
+    } else {
+      console.warn('⚠️  Cache service not available');
+    }
+    
+    // Initialize queue
+    const { RequestQueue } = require('./services/queue');
+    if (RequestQueue) {
+      console.log('✅ Queue service initialized');
+    } else {
+      console.warn('⚠️  Queue service not available');
+    }
+    
+  } catch (error) {
+    console.warn('⚠️  Service initialization warnings:', error.message);
+  }
+  
+  console.log('✅ Startup checks completed');
+}
+
+// Start server with proper initialization
+async function startServer() {
+  try {
+    await performStartupChecks();
+    
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Virgil LLM Server running on port ${PORT}`);
+      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🏥 Health check: http://localhost:${PORT}/api/v1/health`);
+      console.log(`⚡ Ready check: http://localhost:${PORT}/api/v1/health/ready`);
+      console.log('📋 Available endpoints:');
+      console.log(`  POST /api/v1/llm/complete - Text completion`);
+      console.log(`  POST /api/v1/llm/stream - Streaming completion`);
+      console.log(`  POST /api/v1/chat - Secure chat endpoint`);
+      console.log(`  GET /api/v1/health - Health check`);
+      console.log(`  POST /api/v1/analytics/track - Analytics tracking`);
+      console.log(`  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates`);
+      console.log(`  GET /api/v1/weather/city/:city - Weather by city`);
+      console.log(`  POST /api/v1/search - Web search endpoint`);
+      console.log(`  GET /api/v1/search/health - Search service health check`);
+      console.log(`  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates`);
+      console.log(`  POST /api/v1/rhythm/generate - AI-powered rhythm generation`);
+      console.log('🎯 Server ready to accept connections');
+    });
+    
+    return server;
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the server
+let server;
+startServer().then(srv => {
+  server = srv;
+}).catch(error => {
+  console.error('❌ Fatal startup error:', error);
+  process.exit(1);
 });
 
 // Graceful shutdown
 const gracefulShutdown = () => {
   console.log('🛑 Received shutdown signal, closing server gracefully...');
-  server.close(() => {
-    console.log('✅ Server closed');
-    process.exit(0);
-  });
   
-  // Force close after 10 seconds
-  setTimeout(() => {
-    console.error('❌ Could not close connections in time, forcefully shutting down');
-    process.exit(1);
-  }, 10000);
+  if (server) {
+    server.close(() => {
+      console.log('✅ Server closed');
+      process.exit(0);
+    });
+    
+    // Force close after 10 seconds
+    setTimeout(() => {
+      console.error('❌ Could not close connections in time, forcefully shutting down');
+      process.exit(1);
+    }, 10000);
+  } else {
+    console.log('⚠️  Server not yet initialized, exiting immediately');
+    process.exit(0);
+  }
 };
 
 process.on('SIGTERM', gracefulShutdown);

@@ -1,5 +1,4 @@
-import React from 'react'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DogGallery } from './DogGallery'
 import { useDogApi } from './hooks/useDogApi'
@@ -26,7 +25,7 @@ jest.mock('./FetchControls', () => ({
 jest.mock('./DogGrid', () => ({
   DogGrid: jest.fn(({ dogs, onImageClick, onFavoriteToggle }) => (
     <div data-testid="dog-grid">
-      {dogs.map((dog: DogImage, index: number) => (
+      {dogs.map((dog: DogImage, _index: number) => (
         <div key={dog.id} data-testid={`dog-${dog.id}`}>
           <button onClick={() => onImageClick(dog.url)}>View {dog.breed}</button>
           <button onClick={() => onFavoriteToggle(dog)}>Toggle Favorite</button>
@@ -381,7 +380,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen={true} onClose={onClose} />)
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0]
-      shortcuts['Escape']()
+      shortcuts['Escape']?.()
 
       expect(onClose).toHaveBeenCalledTimes(1)
     })
@@ -396,7 +395,7 @@ describe('DogGallery', () => {
       
       // Use f shortcut
       act(() => {
-        shortcuts['f']()
+        shortcuts['f']?.()
       })
 
       // Should be back on fetch tab
@@ -408,7 +407,7 @@ describe('DogGallery', () => {
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0]
       act(() => {
-        shortcuts['g']()
+        shortcuts['g']?.()
       })
 
       expect(screen.getByRole('tab', { name: /My Collection/i })).toHaveClass('doggo-sanctuary-tab active')
@@ -422,9 +421,6 @@ describe('DogGallery', () => {
       await user.click(screen.getByText('View akita'))
       expect(screen.getByTestId('image-modal')).toBeInTheDocument()
 
-      // Get the Escape handler
-      const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0]
-      
       // Simulate having selectedImageIndex set (would be 0 after clicking View akita)
       // The component would pass a different Escape handler when modal is open
       // For this test, we'll verify the modal closes

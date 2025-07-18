@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import App from './App';
 
 // Mock the lazy loaded components
@@ -17,7 +18,6 @@ jest.mock('./components/Dashboard', () => ({
 
 // Mock contexts
 jest.mock('./contexts/AuthContext', () => {
-  const React = require('react');
   const mockUseAuth = jest.fn(() => ({
     user: null,
     loading: false,
@@ -25,17 +25,17 @@ jest.mock('./contexts/AuthContext', () => {
   }));
   
   return {
-    AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    AuthProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     useAuth: mockUseAuth
   };
 });
 
 jest.mock('./contexts/LocationContext', () => ({
-  LocationProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  LocationProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>
 }));
 
 jest.mock('./contexts/WeatherContext', () => ({
-  WeatherProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  WeatherProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>
 }));
 
 jest.mock('./hooks/useToast', () => ({

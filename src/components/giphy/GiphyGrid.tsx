@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { GiphyCard } from './GiphyCard'
-import type { GiphyGridProps } from '../../types'
+import type { GiphyGridProps } from '../../types/giphy.types'
 
 export const GiphyGrid = memo(function GiphyGrid({
   gifs,

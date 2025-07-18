@@ -1,5 +1,5 @@
 import { memo, useState, useEffect } from 'react'
-import type { GiphySearchControlsProps } from '../../types'
+import type { GiphySearchControlsProps } from '../../types/giphy.types'
 
 export const GiphySearchControls = memo(function GiphySearchControls({
   searchQuery,

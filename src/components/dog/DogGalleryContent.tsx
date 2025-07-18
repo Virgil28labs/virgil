@@ -3,7 +3,6 @@ import { FetchControls } from './FetchControls'
 import { DogGrid } from './DogGrid'
 import { DogImageStates } from './DogImageStates'
 import { useDogGallery } from './DogGalleryProvider'
-import type { DogImage } from '../../types'
 
 export const DogGalleryContent = memo(function DogGalleryContent() {
   const {

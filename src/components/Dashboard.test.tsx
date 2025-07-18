@@ -46,7 +46,8 @@ const mockUser = {
 const mockAuthValue = {
   user: mockUser,
   loading: false,
-  signOut: mockSignOut
+  signOut: mockSignOut,
+  refreshUser: jest.fn()
 };
 
 const mockLocationValue = {

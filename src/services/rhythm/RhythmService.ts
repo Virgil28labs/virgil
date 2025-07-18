@@ -1,5 +1,4 @@
 import { LLMService } from '../llm/LLMService';
-import type { LLMResponse } from '../../types/llm.types';
 
 export interface RhythmPattern {
   pattern: boolean[][]; // 5 drums x N steps
@@ -19,11 +18,11 @@ export interface RhythmGenerationOptions {
 }
 
 export class RhythmService {
-  private llmService: LLMService;
+  private _llmService: LLMService;
   private baseUrl: string;
 
   constructor() {
-    this.llmService = new LLMService();
+    this._llmService = new LLMService();
     this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
   }
 

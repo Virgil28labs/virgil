@@ -76,7 +76,7 @@ export function DogGalleryProvider({ children, isOpen = false }: DogGalleryProvi
     dispatch({ type: 'SET_SELECTED_IMAGE_INDEX', payload: index })
   }, [])
 
-  const resetState = useCallback(() => {
+  const _resetState = useCallback(() => {
     dispatch({ type: 'RESET_STATE' })
   }, [])
 

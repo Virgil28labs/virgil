@@ -1,6 +1,6 @@
 import React, { memo, useState, useEffect, useCallback } from 'react'
 import { nasaService } from '../../lib/nasaService'
-import type { ApodImage, NasaApodViewerProps } from '../../types'
+import type { ApodImage, NasaApodViewerProps } from '../../types/nasa.types'
 import { useNasaFavorites } from './hooks/useNasaFavorites'
 import { NasaApodTabs, type NasaTabType } from './NasaApodTabs'
 import { NasaApodGallery } from './NasaApodGallery'

@@ -52,7 +52,7 @@ class WeatherService {
         {
           maxRetries: 3,
           initialDelay: 1000,
-          onRetry: (_attempt, _error) => {
+          onRetry: () => {
             // Retry silently
           }
         }
@@ -73,7 +73,8 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (_error: any) {
+    } catch (error: any) {
+      console.error('Weather fetch error:', error);
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -122,7 +123,8 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (_error: any) {
+    } catch (error: any) {
+      console.error('Weather fetch error:', error);
       throw new Error('Failed to fetch weather data');
     }
   }

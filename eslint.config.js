@@ -21,7 +21,11 @@ export default [
     },
     rules: {
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
     },
   },
   {
@@ -99,7 +103,11 @@ export default [
         { allowConstantExport: true },
       ],
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        varsIgnorePattern: '^[A-Z_]',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },

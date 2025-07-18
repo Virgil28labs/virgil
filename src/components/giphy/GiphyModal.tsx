@@ -1,6 +1,6 @@
 import { memo, useEffect, useCallback, useState } from 'react'
 import { giphyService } from '../../lib/giphyService'
-import type { GiphyModalProps } from '../../types'
+import type { GiphyModalProps } from '../../types/giphy.types'
 
 export const GiphyModal = memo(function GiphyModal({ 
   gifs, 

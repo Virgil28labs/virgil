@@ -1,8 +1,84 @@
+@import "tailwindcss";
+
+/* Theme configuration for Tailwind v4 */
+@theme {
+  --color-brand-dark-purple: #2D2640;
+  --color-brand-light-purple: #5B518B;
+  --color-brand-accent-purple: #8A7FBE;
+  --color-brand-soft-purple: #B9B3DB;
+  --color-brand-pale-purple: #E8E5F5;
+  
+  --color-background: hsl(249 20% 14%);
+  --color-foreground: hsl(0 0% 95%);
+  
+  --color-card: hsl(249 20% 14%);
+  --color-card-foreground: hsl(0 0% 95%);
+  
+  --color-popover: hsl(249 20% 14%);
+  --color-popover-foreground: hsl(0 0% 95%);
+  
+  --color-primary: hsl(251 34% 67%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  --color-secondary: hsl(251 28% 45%);
+  --color-secondary-foreground: hsl(0 0% 100%);
+  
+  --color-muted: hsl(249 20% 20%);
+  --color-muted-foreground: hsl(0 0% 64%);
+  
+  --color-accent: hsl(251 34% 67%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  
+  --color-destructive: hsl(0 84% 60%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  --color-border: hsl(251 28% 35%);
+  --color-input: hsl(251 28% 35%);
+  --color-ring: hsl(251 34% 67%);
+  
+  --radius-sm: calc(0.5rem - 4px);
+  --radius-md: calc(0.5rem - 2px);
+  --radius-lg: 0.5rem;
+  --radius: 0.5rem;
+}
+
+/* CSS variables for ShadCN UI compatibility */
+:root {
+  --background: 249 20% 14%;
+  --foreground: 0 0% 95%;
+  --card: 249 20% 14%;
+  --card-foreground: 0 0% 95%;
+  --popover: 249 20% 14%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 251 34% 67%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 251 28% 45%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 249 20% 20%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 251 34% 67%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 251 28% 35%;
+  --input: 251 28% 35%;
+  --ring: 251 34% 67%;
+  --radius: 0.5rem;
+  
+  /* Virgil brand colors */
+  --brand-dark-purple: #2D2640;
+  --brand-light-purple: #5B518B;
+  --brand-accent-purple: #8A7FBE;
+  --brand-soft-purple: #B9B3DB;
+  --brand-pale-purple: #E8E5F5;
+}
+
 /* Basic reset for Virgil application */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  @apply border-border;
+}
+body {
+  @apply bg-background text-foreground;
 }
 
 html, body {

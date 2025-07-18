@@ -10,6 +10,11 @@ readonly PID_DIR="$PROJECT_ROOT/.pids"
 readonly FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 readonly BACKEND_PORT="${BACKEND_PORT:-5002}"
 
+# Timeout configurations (in seconds)
+readonly HEALTH_CHECK_TIMEOUT="${VIRGIL_HEALTH_TIMEOUT:-15}"
+readonly CURL_TIMEOUT="${VIRGIL_CURL_TIMEOUT:-5}"
+readonly STARTUP_DELAY="${VIRGIL_STARTUP_DELAY:-0.5}"
+
 # Colors (if terminal supports them)
 if [[ -t 1 ]]; then
     readonly GREEN='\033[0;32m'
@@ -63,33 +68,72 @@ get_port_pid() {
 }
 
 
-# Wait for server to be ready
+# Wait for server to be ready with progressive health checks
 wait_for_server() {
     local url=$1
     local port=$2
-    local timeout=100  # 10 seconds in 100ms intervals
+    local server_name=$3
+    local timeout_iterations=$((HEALTH_CHECK_TIMEOUT * 10))  # Convert to 100ms intervals
     local count=0
+    local last_error=""
     
     # Give server a moment to start binding to port
-    sleep 0.5
+    sleep "$STARTUP_DELAY"
     
-    while [ $count -lt $timeout ]; do
-        if curl -sf "$url" >/dev/null 2>&1; then
-            # Add extra delay for backend to fully initialize all routes
+    while [ $count -lt $timeout_iterations ]; do
+        # Progressive health check with specific timeout
+        if curl -sf --max-time "$CURL_TIMEOUT" --connect-timeout 2 "$url" >/dev/null 2>&1; then
+            # Backend gets additional validation
             if [[ "$port" == "$BACKEND_PORT" ]]; then
-                sleep 1.0  # Increased from 0.5s to 1s for better stability
-                # Set environment flag to signal backend is ready
-                export VITE_BACKEND_READY=true
+                log_info "Backend responding, validating readiness..."
+                
+                # Test multiple endpoints to ensure full initialization
+                local ready_check_url="http://localhost:$BACKEND_PORT/api/v1/health/ready"
+                if curl -sf --max-time "$CURL_TIMEOUT" "$ready_check_url" >/dev/null 2>&1; then
+                    export VITE_BACKEND_READY=true
+                    sleep 0.5  # Brief stabilization delay
+                    return 0
+                else
+                    echo -n "R"  # Readiness check failed
+                fi
+            else
+                # Frontend is ready when it responds
+                return 0
             fi
-            return 0
+        else
+            # Capture more specific error information
+            local curl_exit_code=$?
+            case $curl_exit_code in
+                7) last_error="Connection refused" ;;
+                28) last_error="Timeout" ;;
+                52) last_error="Empty response" ;;
+                *) last_error="HTTP error (code: $curl_exit_code)" ;;
+            esac
         fi
         
         sleep 0.1
         ((count++))
         
-        # Progress indicator every 0.5s
-        [[ $((count % 5)) -eq 0 ]] && echo -n "."
+        # Progress indicator every 0.5s with more informative display
+        if [[ $((count % 5)) -eq 0 ]]; then
+            local elapsed=$((count / 10))
+            echo -n ".$elapsed"
+        fi
     done
+    
+    # Timeout reached - provide detailed error information
+    log_error "$server_name failed to start within ${HEALTH_CHECK_TIMEOUT}s"
+    if [[ -n "$last_error" ]]; then
+        log_error "Last error: $last_error"
+    fi
+    
+    # Additional diagnostics for backend
+    if [[ "$port" == "$BACKEND_PORT" ]]; then
+        log_error "Backend diagnostics:"
+        echo "  Port check:" $(lsof -i ":$port" 2>/dev/null | grep LISTEN || echo "Not listening")
+        echo "  Health URL: $url"
+        echo "  Process check:" $(ps aux | grep "server.*index.js" | grep -v grep || echo "Not found")
+    fi
     
     return 1
 }
@@ -99,13 +143,18 @@ start_backend() {
     log_info "Starting backend server..."
     (cd "$PROJECT_ROOT/server" && npm run dev > "$LOG_DIR/backend.log" 2>&1) &
     echo -n "   Waiting for backend"
-    if wait_for_server "http://localhost:$BACKEND_PORT/api/v1/health" "$BACKEND_PORT"; then
+    if wait_for_server "http://localhost:$BACKEND_PORT/api/v1/health" "$BACKEND_PORT" "Backend"; then
         echo " ✓"
+        log_success "Backend server ready at http://localhost:$BACKEND_PORT"
         return 0
     else
         echo " ✗"
-        log_error "Backend failed to start"
-        tail -10 "$LOG_DIR/backend.log" 2>/dev/null
+        log_error "Backend failed to start within ${HEALTH_CHECK_TIMEOUT}s"
+        echo
+        log_error "Recent backend logs:"
+        tail -15 "$LOG_DIR/backend.log" 2>/dev/null | sed 's/^/  /'
+        echo
+        log_error "Try: tail -f logs/backend.log (in another terminal)"
         return 1
     fi
 }
@@ -115,13 +164,18 @@ start_frontend() {
     log_info "Starting frontend server..."
     (cd "$PROJECT_ROOT" && npm run dev > "$LOG_DIR/frontend.log" 2>&1) &
     echo -n "   Waiting for frontend"
-    if wait_for_server "http://localhost:$FRONTEND_PORT" "$FRONTEND_PORT"; then
+    if wait_for_server "http://localhost:$FRONTEND_PORT" "$FRONTEND_PORT" "Frontend"; then
         echo " ✓"
+        log_success "Frontend server ready at http://localhost:$FRONTEND_PORT"
         return 0
     else
         echo " ✗"
-        log_error "Frontend failed to start"
-        tail -10 "$LOG_DIR/frontend.log" 2>/dev/null
+        log_error "Frontend failed to start within ${HEALTH_CHECK_TIMEOUT}s"
+        echo
+        log_error "Recent frontend logs:"
+        tail -15 "$LOG_DIR/frontend.log" 2>/dev/null | sed 's/^/  /'
+        echo
+        log_error "Try: tail -f logs/frontend.log (in another terminal)"
         return 1
     fi
 }
@@ -174,6 +228,34 @@ handle_interrupt() {
     exit 0
 }
 
+# Show help
+show_help() {
+    cat << EOF
+Virgil Development Environment Startup Script
+
+Usage: $0 [OPTIONS]
+
+Options:
+  --no-monitor    Start servers and exit (don't monitor)
+  --help, -h      Show this help message
+
+Environment Variables:
+  FRONTEND_PORT          Frontend port (default: 3000)
+  BACKEND_PORT           Backend port (default: 5002)
+  VIRGIL_HEALTH_TIMEOUT  Health check timeout in seconds (default: 15)
+  VIRGIL_CURL_TIMEOUT    Individual curl timeout in seconds (default: 5)
+  VIRGIL_STARTUP_DELAY   Initial startup delay in seconds (default: 0.5)
+
+Examples:
+  $0                                    # Normal startup with monitoring
+  $0 --no-monitor                       # Start and exit
+  VIRGIL_HEALTH_TIMEOUT=30 $0           # Extended timeout for slow systems
+  FRONTEND_PORT=3001 BACKEND_PORT=5003 $0  # Custom ports
+
+For troubleshooting, run: ./diagnose.sh
+EOF
+}
+
 # Main execution
 main() {
     # Parse command line arguments
@@ -182,6 +264,15 @@ main() {
         case $arg in
             --no-monitor)
                 no_monitor=true
+                ;;
+            --help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                echo "Use --help for usage information"
+                exit 1
                 ;;
         esac
     done

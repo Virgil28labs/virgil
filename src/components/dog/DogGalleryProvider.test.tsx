@@ -1,4 +1,4 @@
-import { render, screen, act, renderHook } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { DogGalleryProvider, useDogGallery } from './DogGalleryProvider'
 import { useDogApi } from './hooks/useDogApi'
 import { useDogFavorites } from './hooks/useDogFavorites'
@@ -46,7 +46,6 @@ function TestComponent() {
     setSelectedImageIndex,
     fetchDogs,
     fetchBreeds,
-    isFavorited,
     toggleFavorite
   } = useDogGallery()
 
