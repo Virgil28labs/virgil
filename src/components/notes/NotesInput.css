@@ -1,0 +1,124 @@
+/* NotesInput.css - Minimalist input with Virgil styling */
+
+.notes-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notes-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  background: rgba(245, 245, 245, 0.05);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  border-radius: var(--radius-large);
+  padding: 0.75rem 1rem;
+  transition: all var(--transition-normal);
+}
+
+.notes-input-wrapper:hover {
+  background: rgba(245, 245, 245, 0.08);
+  border-color: rgba(178, 165, 193, 0.3);
+}
+
+.notes-input-wrapper.focused {
+  background: rgba(245, 245, 245, 0.1);
+  border-color: var(--brand-accent-purple);
+  box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.1);
+  transform: translateY(-1px);
+}
+
+.notes-input-icon {
+  font-size: 1.2rem;
+  margin-right: 0.75rem;
+  margin-top: 0.1rem;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.notes-input-wrapper.focused .notes-input-icon {
+  opacity: 1;
+}
+
+.notes-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--brand-light-gray);
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+  min-height: 1.5rem;
+  max-height: 120px;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.notes-input::placeholder {
+  color: rgba(178, 165, 193, 0.6);
+  transition: color var(--transition-normal);
+}
+
+.notes-input-wrapper.focused .notes-input::placeholder {
+  color: rgba(178, 165, 193, 0.8);
+}
+
+.notes-submit-button {
+  background: var(--brand-accent-purple);
+  color: var(--brand-light-gray);
+  border: none;
+  border-radius: var(--radius-medium);
+  padding: 0.4rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  opacity: 0.9;
+}
+
+.notes-submit-button:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(108, 59, 170, 0.3);
+}
+
+.notes-submit-button:active {
+  transform: translateY(0);
+}
+
+.notes-input-hint {
+  font-size: 0.75rem;
+  color: rgba(178, 165, 193, 0.5);
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.notes-input-form:hover .notes-input-hint,
+.notes-input-wrapper.focused ~ .notes-input-hint {
+  opacity: 1;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .notes-input-wrapper {
+    padding: 0.625rem 0.875rem;
+  }
+  
+  .notes-input-icon {
+    font-size: 1.1rem;
+    margin-right: 0.625rem;
+  }
+  
+  .notes-input {
+    font-size: 0.95rem;
+  }
+  
+  .notes-input-hint {
+    font-size: 0.7rem;
+  }
+}

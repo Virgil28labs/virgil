@@ -12,6 +12,7 @@ import { CircleGameButton } from './CircleGameButton'
 import { StreakTrackerButton } from './StreakTrackerButton'
 import { CameraEmojiButton } from './camera/CameraEmojiButton'
 import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton'
+import { NotesEmojiButton } from './notes/NotesEmojiButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
@@ -168,6 +169,9 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* Pomodoro Timer Button */}
       <PomodoroEmojiButton />
+      
+      {/* Notes Button */}
+      <NotesEmojiButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>

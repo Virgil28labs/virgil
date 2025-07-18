@@ -1,0 +1,91 @@
+/**
+ * Styles for the Notes error boundary component
+ */
+
+.notes-error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.notes-error-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.notes-error-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.notes-error-message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.notes-error-details {
+  background: rgba(255, 0, 0, 0.05);
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.notes-error-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.notes-error-details pre {
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+.notes-error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.notes-error-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notes-error-button.primary {
+  background: var(--primary-color, #007bff);
+  color: white;
+}
+
+.notes-error-button.primary:hover {
+  background: var(--primary-hover, #0056b3);
+  transform: translateY(-1px);
+}
+
+.notes-error-button.secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.notes-error-button.secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
