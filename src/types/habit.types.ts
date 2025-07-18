@@ -8,8 +8,6 @@ export interface Habit {
   lastCheckIn: string | null
   checkIns: string[]
   createdAt: string
-  frequency: 'daily' | 'weekly' | 'custom'
-  targetDays?: number[] // 0-6 for weekly, specific days for custom
 }
 
 // Achievement types
@@ -39,12 +37,6 @@ export interface UserHabitsData {
     currentStreak: number // across all habits
     perfectDays: string[] // days when all habits were completed
   }
-}
-
-// Motivational messages based on progress
-export interface Message {
-  message: string
-  emoji: string
 }
 
 // Emoji suggestions for habit creation

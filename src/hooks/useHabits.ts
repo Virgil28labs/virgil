@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { 
   Habit, 
   UserHabitsData, 
-  Achievement, 
-  Message
+  Achievement
 } from '../types/habit.types'
 
 const STORAGE_KEY = 'virgil_habits'
@@ -52,24 +51,6 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     requirement: { type: 'all-habits', value: 5 }
   }
 ]
-
-// Messages based on overall progress
-const getMessage = (totalStreak: number, perfectToday: boolean): Message => {
-  if (perfectToday) {
-    return { 
-      message: "Perfect day! All habits completed", 
-      emoji: "🌟"
-    }
-  }
-  
-  if (totalStreak === 0) return { message: "Start your journey today", emoji: "✨" }
-  if (totalStreak < 3) return { message: "Building momentum", emoji: "🔥" }
-  if (totalStreak < 7) return { message: "Keep the streak alive", emoji: "💪" }
-  if (totalStreak < 14) return { message: "You're on fire!", emoji: "🔥" }
-  if (totalStreak < 30) return { message: "Unstoppable force", emoji: "🚀" }
-  if (totalStreak < 60) return { message: "Habit master", emoji: "👑" }
-  return { message: "Legendary discipline", emoji: "🏆" }
-}
 
 // Check if can check in today
 const canCheckInToday = (lastCheckIn: string | null): boolean => {
@@ -167,8 +148,7 @@ export const useHabits = () => {
       longestStreak: 0,
       lastCheckIn: null,
       checkIns: [],
-      createdAt: new Date().toISOString(),
-      frequency: 'daily'
+      createdAt: new Date().toISOString()
     }
     
     setUserData(prev => ({

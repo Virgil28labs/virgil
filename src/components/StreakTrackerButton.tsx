@@ -107,14 +107,6 @@ export const StreakTrackerButton = memo(function StreakTrackerButton() {
           <MinimalHabitTracker isOpen={isViewerOpen} onClose={handleClose} />
         </Suspense>
       )}
-      
-      {/* Add the spin animation for the loading fallback */}
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </>
   )
 })

@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect } from 'react'
+import { memo, useCallback, useState } from 'react'
 import type { Habit } from '../../types/habit.types'
 
 interface HabitCardProps {
@@ -8,7 +8,6 @@ interface HabitCardProps {
   onUpdate: (habitId: string, updates: { name?: string; emoji?: string }) => void
   onDelete: (habitId: string) => void
   onUndo?: (habitId: string) => void
-  isPending?: boolean
 }
 
 export const HabitCard = memo(function HabitCard({
@@ -17,8 +16,7 @@ export const HabitCard = memo(function HabitCard({
   onCheckIn,
   onUpdate,
   onDelete,
-  onUndo,
-  isPending = false
+  onUndo
 }: HabitCardProps) {
   const [showActions, setShowActions] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -68,7 +66,6 @@ export const HabitCard = memo(function HabitCard({
         habit-card 
         ${checkedToday ? 'checked' : ''} 
         ${canCheckIn && !checkedToday ? 'can-check' : ''}
-        ${checkedToday ? 'pending' : ''}
         ${isEditing ? 'editing' : ''}
       `}
       onMouseEnter={() => setShowActions(true)}
