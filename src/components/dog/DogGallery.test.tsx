@@ -100,13 +100,14 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
       expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: /My Collection/i })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /Favorites/i })).toBeInTheDocument()
     })
 
     it('should show favorites count in gallery tab', () => {
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
-      expect(screen.getByText('My Collection (♥ 1)')).toBeInTheDocument()
+      // The tab shows "❤️ Favorites (1)"
+      expect(screen.getByText(/Favorites.*\(1\)/)).toBeInTheDocument()
     })
 
     it('should render close button', () => {
@@ -133,7 +134,7 @@ describe('DogGallery', () => {
       const user = userEvent.setup()
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
-      await user.click(screen.getByRole('tab', { name: /My Collection/i }))
+      await user.click(screen.getByRole('tab', { name: /Favorites/i }))
 
       expect(screen.getByTestId('dog-fav-1')).toBeInTheDocument()
       expect(screen.queryByTestId('dog-dog-1')).not.toBeInTheDocument()
@@ -186,7 +187,7 @@ describe('DogGallery', () => {
 
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
-      await user.click(screen.getByRole('tab', { name: /My Collection/i }))
+      await user.click(screen.getByRole('tab', { name: /Favorites/i }))
 
       expect(screen.getByText('Your Doggo Sanctuary is empty!')).toBeInTheDocument()
       expect(screen.getByText('Start by fetching some adorable friends')).toBeInTheDocument()
@@ -235,9 +236,9 @@ describe('DogGallery', () => {
       expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toHaveAttribute('aria-selected', 'true')
 
       // Switch to gallery
-      await user.click(screen.getByRole('tab', { name: /My Collection/i }))
+      await user.click(screen.getByRole('tab', { name: /Favorites/i }))
 
-      expect(screen.getByRole('tab', { name: /My Collection/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /Favorites/i })).toHaveAttribute('aria-selected', 'true')
       expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toHaveAttribute('aria-selected', 'false')
     })
 
@@ -324,7 +325,7 @@ describe('DogGallery', () => {
 
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
-      await user.click(screen.getByRole('tab', { name: /My Collection/i }))
+      await user.click(screen.getByRole('tab', { name: /Favorites/i }))
       await user.click(screen.getByText('Go Fetch →'))
 
       expect(screen.getByRole('tab', { name: /Fetch Doggos/i })).toHaveAttribute('aria-selected', 'true')
@@ -391,7 +392,7 @@ describe('DogGallery', () => {
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0]
       
       // Switch to gallery first
-      fireEvent.click(screen.getByRole('tab', { name: /My Collection/i }))
+      fireEvent.click(screen.getByRole('tab', { name: /Favorites/i }))
       
       // Use f shortcut
       act(() => {
@@ -410,7 +411,7 @@ describe('DogGallery', () => {
         shortcuts['g']?.()
       })
 
-      expect(screen.getByRole('tab', { name: /My Collection/i })).toHaveClass('doggo-sanctuary-tab active')
+      expect(screen.getByRole('tab', { name: /Favorites/i })).toHaveClass('doggo-sanctuary-tab active')
     })
 
     it('should close image modal with Escape when modal is open', async () => {
@@ -461,7 +462,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen={true} onClose={jest.fn()} />)
 
       const fetchTab = screen.getByRole('tab', { name: /Fetch Doggos/i })
-      const galleryTab = screen.getByRole('tab', { name: /My Collection/i })
+      const galleryTab = screen.getByRole('tab', { name: /Favorites/i })
 
       // Click rapidly
       await user.click(galleryTab)
