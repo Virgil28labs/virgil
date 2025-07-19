@@ -1,11 +1,5 @@
-import { lazy } from 'react'
 import { EmojiButton } from '../common/EmojiButton'
-
-const PomodoroApp = lazy(() => 
-  import('./PomodoroApp').then(module => ({ 
-    default: module.PomodoroApp 
-  }))
-)
+import { PomodoroApp } from './PomodoroApp'
 
 const PomodoroAppWrapper = ({ onClose }: { onClose: () => void }) => (
   <PomodoroApp isOpen={true} onClose={onClose} />
@@ -19,11 +13,11 @@ export const PomodoroEmojiButton = () => (
     position={{ top: '9.5rem', left: '1.9rem' }}
     hoverScale={1.15}
     hoverColor={{
-      background: 'linear-gradient(135deg, rgba(239, 176, 194, 0.3) 0%, rgba(108, 59, 170, 0.3) 100%)',
-      border: 'rgba(108, 59, 170, 0.6)',
+      background: 'linear-gradient(135deg, rgba(239, 176, 194, 0.3) 0%, rgba(178, 165, 193, 0.3) 100%)',
+      border: 'rgba(239, 176, 194, 0.6)',
       glow: 'rgba(239, 176, 194, 0.4)'
     }}
-    title="Pomodoro Timer - Focus with the power of tomatoes!"
+    title="Pomodoro Timer"
     className="opacity-80 hover:opacity-100"
   />
 )
