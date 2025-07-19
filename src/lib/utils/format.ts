@@ -9,10 +9,46 @@ export function formatNumber(num: number): string {
 
 /**
  * Format a date to a readable string
+ * @param date The date to format
+ * @param options Intl format options or 'full' for date+time
  */
-export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
+export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions | 'full'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (options === 'full') {
+    // Full date and time format
+    return dateObj.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
   return dateObj.toLocaleDateString(undefined, options);
+}
+
+/**
+ * Format a timestamp into a relative time string
+ * @param timestamp The timestamp to format
+ * @returns Formatted string like "just now", "5 mins ago", "2 days ago"
+ */
+export function formatRelativeTime(timestamp: Date | string | number): string {
+  const now = new Date();
+  const past = new Date(timestamp);
+  const diffMs = now.getTime() - past.getTime();
+  
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  
+  return formatDate(past);
 }
 
 /**
@@ -79,19 +115,3 @@ export function toTitleCase(text: string): string {
     .join(' ');
 }
 
-/**
- * Format percentage with specified decimal places
- */
-export function formatPercentage(value: number, decimals = 1): string {
-  return `${(value * 100).toFixed(decimals)}%`;
-}
-
-/**
- * Format currency
- */
-export function formatCurrency(amount: number, currency = 'USD', locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(amount);
-}

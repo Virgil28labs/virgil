@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "vite",
     "dev-full": "./start-dev.sh",
-    "dev-quick": "./start-dev-background.sh",
+    "dev-fast": "./start-dev-fast.sh",
+    "dev-bg": "./start-dev-background.sh",
     "backend": "cd server && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dev-fast": "vite --force",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -25,12 +25,10 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
     "@types/luxon": "^3.6.2",
-    "express": "^5.1.0",
     "luxon": "^3.7.1",
     "react": "^19.1.0",
     "react-camera-pro": "^1.4.0",
-    "react-dom": "^19.1.0",
-    "styled-components": "^6.1.19"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
