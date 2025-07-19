@@ -8,15 +8,15 @@
   --nasa-spacing-lg: 1.25rem;
   --nasa-spacing-xl: 1.5rem;
   --nasa-spacing-2xl: 2rem;
-  
+
   --nasa-radius-sm: 0.75rem;
   --nasa-radius-md: 1.25rem;
   --nasa-radius-lg: 1.5rem;
   --nasa-radius-xl: 2rem;
   --nasa-radius-full: 50%;
-  
+
   --nasa-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Virgil brand colors */
   --nasa-bg-primary: rgba(57, 41, 62, 0.8);
   --nasa-bg-secondary: rgba(45, 34, 51, 0.4);
@@ -31,27 +31,48 @@
 
 /* Animations */
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(30px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes heartPop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 /* Main Container */
@@ -81,7 +102,7 @@
   max-height: 900px;
   display: flex;
   flex-direction: column;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -237,10 +258,12 @@
 .nasa-apod-skeleton-shimmer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, 
-    rgba(178, 165, 193, 0.1) 0%, 
-    rgba(178, 165, 193, 0.2) 50%, 
-    rgba(178, 165, 193, 0.1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(178, 165, 193, 0.1) 0%,
+    rgba(178, 165, 193, 0.2) 50%,
+    rgba(178, 165, 193, 0.1) 100%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -322,7 +345,6 @@
   background: rgba(178, 165, 193, 0.15);
   border-color: rgba(178, 165, 193, 0.3);
 }
-
 
 /* Minimal Metadata - 15% of space */
 .nasa-apod-metadata {
@@ -762,53 +784,53 @@
   .nasa-apod-modal {
     padding: var(--nasa-spacing-sm);
   }
-  
+
   .nasa-apod-modal-info {
     bottom: -50px;
     font-size: 0.9rem;
   }
-  
+
   .nasa-apod-modal-title {
     font-size: 1rem;
   }
-  
+
   .nasa-apod-modal-actions {
     bottom: var(--nasa-spacing-sm);
   }
-  
+
   .nasa-apod-modal-action {
     width: 2.5rem;
     height: 2.5rem;
     font-size: 1.1rem;
   }
-  
+
   .nasa-apod-modal-close {
     width: 3rem;
     height: 3rem;
     font-size: 1.5rem;
   }
-  
+
   .nasa-apod-modal-nav {
     width: 3rem;
     height: 3rem;
     font-size: 2rem;
   }
-  
+
   .nasa-apod-modal-counter {
     font-size: 0.8rem;
   }
-  
+
   .nasa-apod-modal-description {
     max-width: 90vw;
     max-height: 200px;
     padding: var(--nasa-spacing-md);
     bottom: calc(var(--nasa-spacing-sm) * 3 + 2.5rem);
   }
-  
+
   .nasa-apod-modal-description h4 {
     font-size: 1rem;
   }
-  
+
   .nasa-apod-modal-description p {
     font-size: 0.85rem;
   }
@@ -844,10 +866,14 @@
 }
 
 .nasa-apod-tab::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--nasa-accent) 0%, var(--nasa-accent-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--nasa-accent) 0%,
+    var(--nasa-accent-light) 100%
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
   border-radius: var(--nasa-radius-md);
@@ -1111,7 +1137,7 @@
 }
 
 .nasa-apod-gallery-item::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
@@ -1122,7 +1148,7 @@
 
 .nasa-apod-gallery-item:hover {
   transform: translateY(-5px) scale(1.03);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.3),
     0 0 0 1px var(--nasa-border);
 }
@@ -1154,7 +1180,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
 }
 
 .nasa-apod-gallery-video-icon {
@@ -1304,23 +1334,23 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: var(--nasa-spacing-md);
   }
-  
+
   .nasa-apod-gallery-thumbnail {
     height: 120px;
   }
-  
+
   .nasa-apod-actions {
     flex-wrap: wrap;
   }
-  
+
   .nasa-apod-action-label {
     display: none;
   }
-  
+
   .nasa-apod-tabs {
     padding: 0;
   }
-  
+
   .nasa-apod-tab {
     padding: var(--nasa-spacing-sm);
     font-size: 0.9rem;

@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from "react";
 
 interface EditableDataPointProps {
-  icon: string
-  label: string
-  value: string
-  onChange: (value: string) => void
-  type?: 'text' | 'date' | 'tel' | 'email'
-  placeholder?: string
-  readOnly?: boolean
-  className?: string
+  icon: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: "text" | "date" | "tel" | "email";
+  placeholder?: string;
+  readOnly?: boolean;
+  className?: string;
 }
 
 export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
@@ -16,72 +16,72 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
   label,
   value,
   onChange,
-  type = 'text',
-  placeholder = 'Not set',
+  type = "text",
+  placeholder = "Not set",
   readOnly = false,
-  className = ''
+  className = "",
 }) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [localValue, setLocalValue] = useState(value)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isEditing, setIsEditing] = useState(false);
+  const [localValue, setLocalValue] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setLocalValue(value)
-  }, [value])
+    setLocalValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
+      inputRef.current.focus();
+      inputRef.current.select();
     }
-  }, [isEditing])
+  }, [isEditing]);
 
   const handleClick = () => {
     if (!readOnly && !isEditing) {
-      setIsEditing(true)
+      setIsEditing(true);
     }
-  }
+  };
 
   const handleBlur = () => {
-    setIsEditing(false)
+    setIsEditing(false);
     if (localValue !== value) {
-      onChange(localValue)
+      onChange(localValue);
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleBlur()
-    } else if (e.key === 'Escape') {
-      setLocalValue(value)
-      setIsEditing(false)
+    if (e.key === "Enter") {
+      handleBlur();
+    } else if (e.key === "Escape") {
+      setLocalValue(value);
+      setIsEditing(false);
     }
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalValue(e.target.value)
-  }
+    setLocalValue(e.target.value);
+  };
 
   // Format display value for dates
   const displayValue = () => {
-    if (!value) return placeholder
-    if (type === 'date' && !isEditing) {
+    if (!value) return placeholder;
+    if (type === "date" && !isEditing) {
       try {
         // Parse date string as local date by adding time component
         // This prevents timezone shifting when displaying dates
-        const [year, month, day] = value.split('-').map(Number)
-        const date = new Date(year, month - 1, day) // month is 0-indexed
-        return date.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        })
+        const [year, month, day] = value.split("-").map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
       } catch {
-        return value
+        return value;
       }
     }
-    return value
-  }
+    return value;
+  };
 
   return (
     <div className={`data-point editable ${className}`}>
@@ -99,15 +99,15 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
           aria-label={label}
         />
       ) : (
-        <span 
-          className={`data-value ${!value ? 'placeholder' : ''} ${readOnly ? 'readonly' : ''}`}
+        <span
+          className={`data-value ${!value ? "placeholder" : ""} ${readOnly ? "readonly" : ""}`}
           onClick={handleClick}
-          role={readOnly ? undefined : 'button'}
+          role={readOnly ? undefined : "button"}
           tabIndex={readOnly ? undefined : 0}
           onKeyDown={(e) => {
-            if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
-              e.preventDefault()
-              handleClick()
+            if (!readOnly && (e.key === "Enter" || e.key === " ")) {
+              e.preventDefault();
+              handleClick();
             }
           }}
           aria-label={`${label}: ${displayValue()}, click to edit`}
@@ -117,5 +117,5 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
         </span>
       )}
     </div>
-  )
-}
+  );
+};

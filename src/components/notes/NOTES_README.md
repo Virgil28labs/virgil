@@ -33,6 +33,7 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Two-Layer Tag System
 
 ### Layer 1: Life Domains (WHERE)
+
 - **work** - Career, professional, education
 - **health** - Physical & mental wellness
 - **money** - Finance, budgeting, expenses
@@ -41,6 +42,7 @@ The Notes application is a sophisticated note-taking system built with React and
 - **life** - Home, hobbies, daily routines
 
 ### Layer 2: Action Types (WHAT)
+
 - **task** - Actionable to-dos
 - **note** - Information, reference
 - **idea** - Creative thoughts
@@ -50,6 +52,7 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Features
 
 ### AI Integration
+
 - Powered by GPT-4o-mini
 - Automatic tag generation
 - Task extraction from natural language
@@ -57,12 +60,14 @@ The Notes application is a sophisticated note-taking system built with React and
 - Configurable via settings
 
 ### Task Management
+
 - Checkbox syntax support: `[ ]` and `[x]`
 - AI-extracted tasks
 - Toggle completion status
 - Task progress tracking
 
 ### Performance Optimizations
+
 - React.memo for component memoization
 - useMemo for expensive computations
 - Virtual scrolling ready (useVirtualization hook)
@@ -70,12 +75,14 @@ The Notes application is a sophisticated note-taking system built with React and
 - Efficient re-render prevention
 
 ### Keyboard Shortcuts
+
 - `Cmd/Ctrl + Enter` - Submit note
 - `Cmd/Ctrl + K` - Toggle search
 - `Cmd/Ctrl + ,` - Toggle settings
 - `Esc` - Close search or modal
 
 ### Error Handling
+
 - Comprehensive error boundary
 - User-friendly error messages
 - Graceful degradation
@@ -85,23 +92,27 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Utility Functions
 
 ### Task Utilities (`utils/taskUtils.ts`)
+
 - `extractTasksFromContent` - Parse checkbox tasks
 - `extractFallbackTasks` - Natural language task detection
 - `mergeTasksWithAI` - Deduplicate manual and AI tasks
 - `toggleTaskAtIndex` - Safe task state updates
 
 ### Tag Patterns (`utils/tagPatterns.ts`)
+
 - `detectTags` - Keyword-based tag detection
 - `detectActionType` - Linguistic pattern matching
 - `validateTags` - Type-safe tag validation
 - `validateActionType` - Action type validation
 
 ### Date Utilities (`utils/dateUtils.ts`)
+
 - `formatRelativeTime` - Human-friendly timestamps
 - `isSameDay` - Date comparison
 - `formatDate` - Consistent date formatting
 
 ### Type Guards (`utils/typeGuards.ts`)
+
 - Runtime type checking
 - Safe JSON parsing
 - Data sanitization
@@ -110,6 +121,7 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Configuration
 
 ### Constants (`constants.ts`)
+
 - AI service configuration
 - Storage settings
 - UI configuration
@@ -117,18 +129,21 @@ The Notes application is a sophisticated note-taking system built with React and
 - Keyboard shortcuts
 
 ### Environment Variables
+
 - `NODE_ENV` - Development/production mode
 - API endpoints configured in LLMService
 
 ## Testing
 
 ### Unit Tests
+
 - Task utility functions
 - Tag pattern matching
 - Type guard validation
 - Date formatting
 
 ### Integration Tests
+
 - Component interaction
 - State management
 - Storage operations
@@ -137,18 +152,21 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Development Guidelines
 
 ### Code Style
+
 - TypeScript strict mode
 - Comprehensive JSDoc comments
 - Functional components with hooks
 - Immutable state updates
 
 ### Performance Best Practices
+
 - Minimize re-renders with React.memo
 - Use useCallback for stable references
 - Batch state updates
 - Lazy load heavy components
 
 ### Error Handling
+
 - Always use try-catch for async operations
 - Provide user-friendly error messages
 - Log errors for debugging
@@ -157,6 +175,7 @@ The Notes application is a sophisticated note-taking system built with React and
 ## Future Enhancements
 
 ### Planned Features
+
 - Export/import functionality
 - Cloud sync capabilities
 - Advanced search with filters
@@ -165,6 +184,7 @@ The Notes application is a sophisticated note-taking system built with React and
 - Collaborative notes
 
 ### Performance Improvements
+
 - Implement virtual scrolling for large lists
 - Add service worker for offline support
 - Optimize bundle size with code splitting
@@ -190,7 +210,9 @@ The Notes application is a sophisticated note-taking system built with React and
    - Disable AI if not needed
 
 ### Debug Mode
+
 Enable development mode to see:
+
 - Detailed error stack traces
 - Component render counts
 - State update logs
@@ -199,33 +221,35 @@ Enable development mode to see:
 ## API Reference
 
 ### useNotesStore Hook
+
 ```typescript
 const {
-  entries,        // All note entries
-  isLoading,      // Loading state
-  error,          // Current error
-  processingIds,  // AI processing queue
-  addEntry,       // Add new note
-  updateEntry,    // Update existing note
-  toggleTask,     // Toggle task completion
-  deleteEntry,    // Delete note
-  aiEnabled,      // AI status
-  toggleAI,       // Toggle AI
-  clearError      // Clear error state
-} = useNotesStore()
+  entries, // All note entries
+  isLoading, // Loading state
+  error, // Current error
+  processingIds, // AI processing queue
+  addEntry, // Add new note
+  updateEntry, // Update existing note
+  toggleTask, // Toggle task completion
+  deleteEntry, // Delete note
+  aiEnabled, // AI status
+  toggleAI, // Toggle AI
+  clearError, // Clear error state
+} = useNotesStore();
 ```
 
 ### Entry Interface
+
 ```typescript
 interface Entry {
-  id: string
-  timestamp: Date
-  content: string
-  tags: TagType[]
-  actionType?: ActionType
-  tasks: Task[]
-  aiProcessed: boolean
-  isEdited: boolean
+  id: string;
+  timestamp: Date;
+  content: string;
+  tags: TagType[];
+  actionType?: ActionType;
+  tasks: Task[];
+  aiProcessed: boolean;
+  isEdited: boolean;
 }
 ```
 

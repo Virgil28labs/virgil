@@ -1,5 +1,5 @@
-import { memo, useState, useEffect } from 'react'
-import type { GiphySearchControlsProps } from '../../types/giphy.types'
+import { memo, useState, useEffect } from "react";
+import type { GiphySearchControlsProps } from "../../types/giphy.types";
 
 export const GiphySearchControls = memo(function GiphySearchControls({
   searchQuery,
@@ -7,33 +7,33 @@ export const GiphySearchControls = memo(function GiphySearchControls({
   isLoading,
   onSearchChange,
   onRatingChange,
-  onSearch
+  onSearch,
 }: GiphySearchControlsProps) {
-  const [inputValue, setInputValue] = useState(searchQuery)
+  const [inputValue, setInputValue] = useState(searchQuery);
 
   // Sync input value with prop changes
   useEffect(() => {
-    setInputValue(searchQuery)
-  }, [searchQuery])
+    setInputValue(searchQuery);
+  }, [searchQuery]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setInputValue(value)
-    onSearchChange(value)
-  }
+    const value = e.target.value;
+    setInputValue(value);
+    onSearchChange(value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (inputValue.trim()) {
-      onSearch()
+      onSearch();
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e)
+    if (e.key === "Enter") {
+      handleSubmit(e);
     }
-  }
+  };
 
   return (
     <form className="giphy-search-controls" onSubmit={handleSubmit}>
@@ -50,11 +50,13 @@ export const GiphySearchControls = memo(function GiphySearchControls({
         autoComplete="off"
         spellCheck="false"
       />
-      
+
       <select
         className="giphy-rating-select"
         value={rating}
-        onChange={(e) => onRatingChange(e.target.value as 'g' | 'pg' | 'pg-13' | 'r')}
+        onChange={(e) =>
+          onRatingChange(e.target.value as "g" | "pg" | "pg-13" | "r")
+        }
         disabled={isLoading}
         aria-label="Content rating filter"
       >
@@ -63,7 +65,7 @@ export const GiphySearchControls = memo(function GiphySearchControls({
         <option value="pg-13">PG-13 - Parents Strongly Cautioned</option>
         <option value="r">R - Restricted</option>
       </select>
-      
+
       <button
         type="submit"
         className="giphy-search-btn"
@@ -71,23 +73,25 @@ export const GiphySearchControls = memo(function GiphySearchControls({
         aria-label="Search for GIFs"
       >
         {isLoading ? (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span 
-              style={{ 
-                width: '16px', 
-                height: '16px', 
-                border: '2px solid rgba(255,255,255,0.3)', 
-                borderTop: '2px solid white', 
-                borderRadius: '50%', 
-                animation: 'spin 1s linear infinite' 
+          <span
+            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+          >
+            <span
+              style={{
+                width: "16px",
+                height: "16px",
+                border: "2px solid rgba(255,255,255,0.3)",
+                borderTop: "2px solid white",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
               }}
             />
             Searching...
           </span>
         ) : (
-          'Search'
+          "Search"
         )}
       </button>
     </form>
-  )
-})
+  );
+});

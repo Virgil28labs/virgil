@@ -136,12 +136,16 @@
 }
 
 .notes-checkbox:checked ~ .notes-checkbox-custom {
-  background: linear-gradient(135deg, var(--brand-accent-pink), var(--brand-accent-purple));
+  background: linear-gradient(
+    135deg,
+    var(--brand-accent-pink),
+    var(--brand-accent-purple)
+  );
   border-color: transparent;
 }
 
 .notes-checkbox:checked ~ .notes-checkbox-custom::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -294,7 +298,7 @@
   .notes-entry {
     padding: 1rem;
   }
-  
+
   .notes-entry-actions {
     opacity: 1;
   }

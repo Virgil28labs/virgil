@@ -3,7 +3,7 @@
  * In production, this could be replaced with a service like Sentry or LogRocket
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LoggerConfig {
   isDevelopment: boolean;
@@ -15,10 +15,11 @@ class Logger {
 
   constructor() {
     this.config = {
-      isDevelopment: process.env.NODE_ENV === 'development',
-      enabledLevels: process.env.NODE_ENV === 'development' 
-        ? ['debug', 'info', 'warn', 'error']
-        : ['warn', 'error']
+      isDevelopment: process.env.NODE_ENV === "development",
+      enabledLevels:
+        process.env.NODE_ENV === "development"
+          ? ["debug", "info", "warn", "error"]
+          : ["warn", "error"],
     };
   }
 
@@ -32,27 +33,27 @@ class Logger {
   }
 
   debug(message: string, data?: any): void {
-    if (this.shouldLog('debug')) {
-      console.log(this.formatMessage('debug', message), data || '');
+    if (this.shouldLog("debug")) {
+      console.log(this.formatMessage("debug", message), data || "");
     }
   }
 
   info(message: string, data?: any): void {
-    if (this.shouldLog('info')) {
-      console.info(this.formatMessage('info', message), data || '');
+    if (this.shouldLog("info")) {
+      console.info(this.formatMessage("info", message), data || "");
     }
   }
 
   warn(message: string, data?: any): void {
-    if (this.shouldLog('warn')) {
-      console.warn(this.formatMessage('warn', message), data || '');
+    if (this.shouldLog("warn")) {
+      console.warn(this.formatMessage("warn", message), data || "");
     }
   }
 
   error(message: string, error?: any): void {
-    if (this.shouldLog('error')) {
-      console.error(this.formatMessage('error', message), error || '');
-      
+    if (this.shouldLog("error")) {
+      console.error(this.formatMessage("error", message), error || "");
+
       // In production, this could send to error tracking service
       if (!this.config.isDevelopment && error) {
         // Example: Sentry.captureException(error);

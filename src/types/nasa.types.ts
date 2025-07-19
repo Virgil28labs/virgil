@@ -5,7 +5,7 @@ export interface NasaApodResponse {
   date: string; // YYYY-MM-DD format
   explanation: string; // Detailed explanation of the image
   hdurl?: string; // High-resolution image URL (optional)
-  media_type: 'image' | 'video'; // Type of media returned
+  media_type: "image" | "video"; // Type of media returned
   service_version: string; // API service version (typically "v1")
   title: string; // Title of the image
   url: string; // Regular resolution image/video URL
@@ -21,7 +21,7 @@ export interface ApodImage {
   explanation: string;
   imageUrl: string; // Regular resolution image URL
   hdImageUrl?: string; // High-resolution image URL
-  mediaType: 'image' | 'video';
+  mediaType: "image" | "video";
   copyright?: string;
   concepts?: string[];
   isHD: boolean; // Whether HD version is available
@@ -45,7 +45,7 @@ export interface ApodDateRangeParams {
 }
 
 // Loading states
-export type ApodLoadingState = 'idle' | 'loading' | 'success' | 'error';
+export type ApodLoadingState = "idle" | "loading" | "success" | "error";
 
 // Component Props
 export interface NasaApodViewerProps {
@@ -101,11 +101,11 @@ export interface ApodContextType {
   error: string | null;
   showHD: boolean;
   isZoomed: boolean;
-  
+
   // Navigation state
   history: string[]; // Date history for back navigation
   favorites: ApodImage[]; // Favorited APODs
-  
+
   // Actions
   loadApod: (date?: string) => Promise<void>;
   loadTodaysApod: () => Promise<void>;
@@ -121,16 +121,16 @@ export interface ApodContextType {
 
 // Action types for reducer
 export type ApodAction =
-  | { type: 'SET_LOADING'; payload: ApodLoadingState }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_CURRENT_APOD'; payload: ApodImage }
-  | { type: 'SET_CURRENT_DATE'; payload: string }
-  | { type: 'SET_SHOW_HD'; payload: boolean }
-  | { type: 'SET_IS_ZOOMED'; payload: boolean }
-  | { type: 'ADD_TO_HISTORY'; payload: string }
-  | { type: 'TOGGLE_FAVORITE'; payload: ApodImage }
-  | { type: 'SET_FAVORITES'; payload: ApodImage[] }
-  | { type: 'CLEAR_ERROR' };
+  | { type: "SET_LOADING"; payload: ApodLoadingState }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_CURRENT_APOD"; payload: ApodImage }
+  | { type: "SET_CURRENT_DATE"; payload: string }
+  | { type: "SET_SHOW_HD"; payload: boolean }
+  | { type: "SET_IS_ZOOMED"; payload: boolean }
+  | { type: "ADD_TO_HISTORY"; payload: string }
+  | { type: "TOGGLE_FAVORITE"; payload: ApodImage }
+  | { type: "SET_FAVORITES"; payload: ApodImage[] }
+  | { type: "CLEAR_ERROR" };
 
 // State interface for reducer
 export interface ApodState {
@@ -161,7 +161,7 @@ export interface ApodServiceConfig {
 
 // Utility types
 export interface ApodDownloadOptions {
-  quality: 'regular' | 'hd';
+  quality: "regular" | "hd";
   filename?: string;
 }
 
@@ -182,33 +182,33 @@ export interface ApodDatePreset {
 // Notable APOD dates for quick access
 export const NOTABLE_APOD_DATES: ApodDatePreset[] = [
   {
-    id: 'first',
-    label: 'First APOD',
-    date: '1995-06-16',
-    description: 'The very first Astronomy Picture of the Day'
+    id: "first",
+    label: "First APOD",
+    date: "1995-06-16",
+    description: "The very first Astronomy Picture of the Day",
   },
   {
-    id: 'hubble-deep-field',
-    label: 'Hubble Deep Field',
-    date: '1996-01-15',
-    description: 'The famous Hubble Deep Field image'
+    id: "hubble-deep-field",
+    label: "Hubble Deep Field",
+    date: "1996-01-15",
+    description: "The famous Hubble Deep Field image",
   },
   {
-    id: 'pale-blue-dot',
-    label: 'Pale Blue Dot',
-    date: '2020-02-14',
-    description: 'Voyager 1\'s iconic Earth photograph'
+    id: "pale-blue-dot",
+    label: "Pale Blue Dot",
+    date: "2020-02-14",
+    description: "Voyager 1's iconic Earth photograph",
   },
   {
-    id: 'black-hole',
-    label: 'First Black Hole Image',
-    date: '2019-04-10',
-    description: 'First image of a black hole from Event Horizon Telescope'
-  }
+    id: "black-hole",
+    label: "First Black Hole Image",
+    date: "2019-04-10",
+    description: "First image of a black hole from Event Horizon Telescope",
+  },
 ];
 
 // Constants
-export const APOD_API_BASE_URL = 'https://api.nasa.gov/planetary/apod';
-export const APOD_FIRST_DATE = '1995-06-16'; // First APOD date
+export const APOD_API_BASE_URL = "https://api.nasa.gov/planetary/apod";
+export const APOD_FIRST_DATE = "1995-06-16"; // First APOD date
 export const APOD_DEFAULT_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 export const APOD_MAX_EXPLANATION_PREVIEW = 200; // Characters for preview

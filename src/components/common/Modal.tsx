@@ -1,50 +1,56 @@
-import React, { useCallback, useEffect } from 'react'
-import './Modal.css'
+import React, { useCallback, useEffect } from "react";
+import "./Modal.css";
 
 interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title: string | React.ReactNode
-  children: React.ReactNode
-  className?: string
-  size?: 'small' | 'medium' | 'large'
+  isOpen: boolean;
+  onClose: () => void;
+  title: string | React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  size?: "small" | "medium" | "large";
 }
 
-export const Modal: React.FC<ModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
-  className = '',
-  size = 'medium' 
+export const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className = "",
+  size = "medium",
 }) => {
   // Handle escape key
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
+      if (e.key === "Escape") {
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [isOpen, onClose])
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [isOpen, onClose]);
 
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose()
-    }
-  }, [onClose])
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className={`modal-panel modal-${size} ${className}`} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`modal-panel modal-${size} ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          {typeof title === 'string' ? (
+          {typeof title === "string" ? (
             <h2 className="modal-title">{title}</h2>
           ) : (
             <div className="modal-title">{title}</div>
@@ -57,10 +63,8 @@ export const Modal: React.FC<ModalProps> = ({
             ×
           </button>
         </div>
-        <div className="modal-content">
-          {children}
-        </div>
+        <div className="modal-content">{children}</div>
       </div>
     </div>
-  )
-}
+  );
+};

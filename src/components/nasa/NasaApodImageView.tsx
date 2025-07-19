@@ -1,15 +1,15 @@
-import { memo, useState, useCallback } from 'react'
-import type { ApodImage } from '../../types/nasa.types'
-import { NasaApodFavoriteOverlay } from './NasaApodFavoriteOverlay'
-import { NasaApodActionOverlay } from './NasaApodActionOverlay'
+import { memo, useState, useCallback } from "react";
+import type { ApodImage } from "../../types/nasa.types";
+import { NasaApodFavoriteOverlay } from "./NasaApodFavoriteOverlay";
+import { NasaApodActionOverlay } from "./NasaApodActionOverlay";
 
 interface NasaApodImageViewProps {
-  apod: ApodImage
-  isFavorited: boolean
-  onFavoriteToggle: () => void
-  imageLoading: boolean
-  onImageLoad: () => void
-  onImageError: () => void
+  apod: ApodImage;
+  isFavorited: boolean;
+  onFavoriteToggle: () => void;
+  imageLoading: boolean;
+  onImageLoad: () => void;
+  onImageError: () => void;
 }
 
 export const NasaApodImageView = memo(function NasaApodImageView({
@@ -18,33 +18,33 @@ export const NasaApodImageView = memo(function NasaApodImageView({
   onFavoriteToggle,
   imageLoading,
   onImageLoad,
-  onImageError
+  onImageError,
 }: NasaApodImageViewProps) {
-  const [isZoomed, setIsZoomed] = useState(false)
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const handleImageClick = useCallback(() => {
-    if (apod.mediaType === 'image') {
-      setIsZoomed(!isZoomed)
+    if (apod.mediaType === "image") {
+      setIsZoomed(!isZoomed);
     }
-  }, [apod.mediaType, isZoomed])
+  }, [apod.mediaType, isZoomed]);
 
   return (
-    <div className={`nasa-apod-image-wrapper ${isZoomed ? 'zoomed' : ''}`}>
+    <div className={`nasa-apod-image-wrapper ${isZoomed ? "zoomed" : ""}`}>
       <div className="nasa-apod-image-container" onClick={handleImageClick}>
         {imageLoading && (
           <div className="nasa-apod-image-skeleton">
             <div className="nasa-apod-skeleton-shimmer" />
           </div>
         )}
-        
-        {apod.mediaType === 'image' ? (
+
+        {apod.mediaType === "image" ? (
           <img
             src={apod.hdImageUrl || apod.imageUrl}
             alt={apod.title}
             className="nasa-apod-image"
             onLoad={onImageLoad}
             onError={onImageError}
-            style={{ display: imageLoading ? 'none' : 'block' }}
+            style={{ display: imageLoading ? "none" : "block" }}
           />
         ) : (
           <iframe
@@ -52,16 +52,16 @@ export const NasaApodImageView = memo(function NasaApodImageView({
             title={apod.title}
             className="nasa-apod-video"
             onLoad={onImageLoad}
-            style={{ display: imageLoading ? 'none' : 'block' }}
+            style={{ display: imageLoading ? "none" : "block" }}
           />
         )}
-        
+
         {/* Overlays */}
         <NasaApodFavoriteOverlay
           isFavorited={isFavorited}
           onFavoriteToggle={onFavoriteToggle}
         />
-        
+
         <NasaApodActionOverlay apod={apod} />
       </div>
 
@@ -72,5 +72,5 @@ export const NasaApodImageView = memo(function NasaApodImageView({
         </div>
       )}
     </div>
-  )
-})
+  );
+});

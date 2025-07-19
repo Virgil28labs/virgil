@@ -3,7 +3,7 @@
  * Common UI patterns and component props
  */
 
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react";
 
 export interface BaseComponentProps {
   className?: string;
@@ -23,33 +23,33 @@ export interface ErrorState {
 
 export interface MessageState {
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: "success" | "error" | "info";
   visible: boolean;
 }
 
 export interface FormFieldProps {
   label: string;
   name: string;
-  type?: 'text' | 'email' | 'password' | 'number';
+  type?: "text" | "email" | "password" | "number";
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
   error?: string;
-  'aria-describedby'?: string;
+  "aria-describedby"?: string;
   autoComplete?: string;
 }
 
 export interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit" | "reset";
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'small' | 'medium' | 'large';
-  'aria-label'?: string;
+  variant?: "primary" | "secondary" | "danger";
+  size?: "small" | "medium" | "large";
+  "aria-label"?: string;
   className?: string;
 }
 
@@ -58,7 +58,7 @@ export interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   closeOnOverlayClick?: boolean;
 }
 
@@ -77,12 +77,12 @@ export interface DropdownProps {
 export interface TooltipProps {
   content: string;
   children: ReactNode;
-  position?: 'top' | 'bottom' | 'left' | 'right';
+  position?: "top" | "bottom" | "left" | "right";
   delay?: number;
 }
 
 export interface DateTimeDisplayProps {
-  format?: 'full' | 'time' | 'date';
+  format?: "full" | "time" | "date";
   updateInterval?: number;
 }
 

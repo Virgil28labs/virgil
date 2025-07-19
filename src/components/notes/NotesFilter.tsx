@@ -3,24 +3,24 @@
  * Provides tag-based filtering and text search functionality
  */
 
-import React, { useState, useCallback } from 'react'
-import { FilterType, ActionFilterType } from './types'
-import { DOMAIN_FILTERS, ACTION_FILTERS } from './constants'
-import './NotesFilter.css'
+import React, { useState, useCallback } from "react";
+import { FilterType, ActionFilterType } from "./types";
+import { DOMAIN_FILTERS, ACTION_FILTERS } from "./constants";
+import "./NotesFilter.css";
 
 interface NotesFilterProps {
   /** Currently active filter */
-  activeFilter: FilterType
+  activeFilter: FilterType;
   /** Callback when filter changes */
-  onFilterChange: (filter: FilterType) => void
+  onFilterChange: (filter: FilterType) => void;
   /** Currently active action filter */
-  activeActionFilter?: ActionFilterType
+  activeActionFilter?: ActionFilterType;
   /** Callback when action filter changes */
-  onActionFilterChange?: (filter: ActionFilterType) => void
+  onActionFilterChange?: (filter: ActionFilterType) => void;
   /** Current search query */
-  searchQuery: string
+  searchQuery: string;
   /** Callback when search query changes */
-  onSearchChange: (query: string) => void
+  onSearchChange: (query: string) => void;
 }
 
 /**
@@ -29,35 +29,46 @@ interface NotesFilterProps {
  * - Clear visual feedback for active states
  * - Accessible search toggle
  */
-export const NotesFilter = ({ 
-  activeFilter, 
+export const NotesFilter = ({
+  activeFilter,
   onFilterChange,
-  activeActionFilter = 'all',
+  activeActionFilter = "all",
   onActionFilterChange,
   searchQuery,
-  onSearchChange 
+  onSearchChange,
 }: NotesFilterProps) => {
-  const [showSearch, setShowSearch] = useState(false)
+  const [showSearch, setShowSearch] = useState(false);
 
-  const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setShowSearch(false)
-      onSearchChange('')
-    }
-  }, [onSearchChange])
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowSearch(false);
+        onSearchChange("");
+      }
+    },
+    [onSearchChange],
+  );
 
   // Use centralized filter constants
-  const filters = DOMAIN_FILTERS
-  const actionFilters = ACTION_FILTERS
+  const filters = DOMAIN_FILTERS;
+  const actionFilters = ACTION_FILTERS;
 
   return (
-    <div className="notes-filter-container" role="toolbar" aria-label="Note filters">
-      <div className="notes-filter-bar" role="tablist" aria-label="Filter by tag">
-        {filters.map(filter => (
+    <div
+      className="notes-filter-container"
+      role="toolbar"
+      aria-label="Note filters"
+    >
+      <div
+        className="notes-filter-bar"
+        role="tablist"
+        aria-label="Filter by tag"
+      >
+        {filters.map((filter) => (
           <button
             key={filter.value}
             onClick={() => onFilterChange(filter.value as FilterType)}
-            className={`notes-filter-button ${activeFilter === filter.value ? 'active' : ''}`}
+            className={`notes-filter-button ${activeFilter === filter.value ? "active" : ""}`}
             aria-label={`Filter by ${filter.label}`}
             aria-pressed={activeFilter === filter.value}
             role="tab"
@@ -66,10 +77,10 @@ export const NotesFilter = ({
             {filter.label}
           </button>
         ))}
-        
+
         <button
           onClick={() => setShowSearch(!showSearch)}
-          className={`notes-search-toggle ${showSearch ? 'active' : ''}`}
+          className={`notes-search-toggle ${showSearch ? "active" : ""}`}
           aria-label="Toggle search"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -83,14 +94,20 @@ export const NotesFilter = ({
           </svg>
         </button>
       </div>
-      
+
       {onActionFilterChange && (
-        <div className="notes-filter-bar notes-action-filters" role="tablist" aria-label="Filter by action type">
-          {actionFilters.map(filter => (
+        <div
+          className="notes-filter-bar notes-action-filters"
+          role="tablist"
+          aria-label="Filter by action type"
+        >
+          {actionFilters.map((filter) => (
             <button
               key={filter.value}
-              onClick={() => onActionFilterChange(filter.value as ActionFilterType)}
-              className={`notes-filter-button ${activeActionFilter === filter.value ? 'active' : ''}`}
+              onClick={() =>
+                onActionFilterChange(filter.value as ActionFilterType)
+              }
+              className={`notes-filter-button ${activeActionFilter === filter.value ? "active" : ""}`}
               aria-label={`Filter by ${filter.label}`}
               aria-pressed={activeActionFilter === filter.value}
               role="tab"
@@ -117,16 +134,18 @@ export const NotesFilter = ({
           />
           {searchQuery && (
             <button
-              onClick={() => onSearchChange('')}
+              onClick={() => onSearchChange("")}
               className="notes-search-clear"
               aria-label="Clear search"
             >
               ×
             </button>
           )}
-          <span id="search-hint" className="sr-only">Press Escape to close search</span>
+          <span id="search-hint" className="sr-only">
+            Press Escape to close search
+          </span>
         </div>
       )}
     </div>
-  )
-}
+  );
+};

@@ -5,13 +5,13 @@
 
 :root {
   /* Core Colors */
-  --deep-plum: #39293e;      /* Backgrounds, dark sections */
-  --lavender: #b2a5c1;       /* Soft accents, hover states */
-  --violet-purple: #6c3baa;  /* CTAs, active states, links */
-  --off-white: #f5f5f5;      /* Primary text, light backgrounds */
-  --silver-grey: #b3b3b3;    /* Borders, dividers, disabled states */
-  --soft-pink: #efb0c2;      /* Special highlights, success states */
-  
+  --deep-plum: #39293e; /* Backgrounds, dark sections */
+  --lavender: #b2a5c1; /* Soft accents, hover states */
+  --violet-purple: #6c3baa; /* CTAs, active states, links */
+  --off-white: #f5f5f5; /* Primary text, light backgrounds */
+  --silver-grey: #b3b3b3; /* Borders, dividers, disabled states */
+  --soft-pink: #efb0c2; /* Special highlights, success states */
+
   /* Legacy variable mappings for backward compatibility */
   --brand-dark-purple: var(--deep-plum);
   --brand-light-purple: var(--lavender);
@@ -19,7 +19,7 @@
   --brand-medium-gray: var(--silver-grey);
   --brand-accent-purple: var(--violet-purple);
   --brand-accent-pink: var(--soft-pink);
-  
+
   /* Semantic Colors */
   --color-background: var(--deep-plum);
   --color-surface: var(--off-white);
@@ -29,23 +29,35 @@
   --color-text-primary: var(--off-white);
   --color-text-secondary: var(--silver-grey);
   --color-border: var(--silver-grey);
-  
+
   /* Gradients */
-  --gradient-plum-lavender: linear-gradient(135deg, var(--deep-plum) 0%, var(--lavender) 100%);
-  --gradient-violet-pink: linear-gradient(135deg, var(--violet-purple) 0%, var(--soft-pink) 100%);
-  --gradient-subtle: linear-gradient(180deg, var(--off-white) 0%, rgba(178, 165, 193, 0.1) 100%);
-  
+  --gradient-plum-lavender: linear-gradient(
+    135deg,
+    var(--deep-plum) 0%,
+    var(--lavender) 100%
+  );
+  --gradient-violet-pink: linear-gradient(
+    135deg,
+    var(--violet-purple) 0%,
+    var(--soft-pink) 100%
+  );
+  --gradient-subtle: linear-gradient(
+    180deg,
+    var(--off-white) 0%,
+    rgba(178, 165, 193, 0.1) 100%
+  );
+
   /* Elevations (Shadows) */
   --elevation-1: 0 2px 4px rgba(57, 41, 62, 0.1);
   --elevation-2: 0 4px 8px rgba(57, 41, 62, 0.15);
   --elevation-3: 0 8px 16px rgba(57, 41, 62, 0.2);
   --elevation-hover: 0 6px 12px rgba(108, 59, 170, 0.15);
-  
+
   /* Transitions */
   --transition-fast: 200ms ease-in-out;
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
-  
+
   /* Border Radius */
   --radius-small: 4px;
   --radius-medium: 8px;

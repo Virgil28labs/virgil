@@ -2,7 +2,7 @@
  * Centralized localStorage utility with error handling and type safety
  */
 
-import { logger } from './logger';
+import { logger } from "./logger";
 
 type StorageKey = string;
 type StorageValue = any;
@@ -14,7 +14,7 @@ interface StorageItem<T> {
 }
 
 class Storage {
-  private prefix = 'virgil_';
+  private prefix = "virgil_";
 
   /**
    * Get a value from localStorage with error handling
@@ -27,7 +27,7 @@ class Storage {
       }
 
       const parsed: StorageItem<T> = JSON.parse(item);
-      
+
       // Check if item has expired
       if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
         this.remove(key);
@@ -48,11 +48,11 @@ class Storage {
     try {
       const item: StorageItem<T> = {
         value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       if (expirationMinutes) {
-        item.expiresAt = Date.now() + (expirationMinutes * 60 * 1000);
+        item.expiresAt = Date.now() + expirationMinutes * 60 * 1000;
       }
 
       localStorage.setItem(this.prefix + key, JSON.stringify(item));
@@ -82,14 +82,14 @@ class Storage {
   clear(): boolean {
     try {
       const keys = Object.keys(localStorage);
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key.startsWith(this.prefix)) {
           localStorage.removeItem(key);
         }
       });
       return true;
     } catch (error) {
-      logger.error('Failed to clear localStorage', error);
+      logger.error("Failed to clear localStorage", error);
       return false;
     }
   }
@@ -106,8 +106,8 @@ class Storage {
    */
   keys(): string[] {
     return Object.keys(localStorage)
-      .filter(key => key.startsWith(this.prefix))
-      .map(key => key.substring(this.prefix.length));
+      .filter((key) => key.startsWith(this.prefix))
+      .map((key) => key.substring(this.prefix.length));
   }
 
   /**
@@ -123,7 +123,7 @@ class Storage {
    */
   getTotalSize(): number {
     let total = 0;
-    this.keys().forEach(key => {
+    this.keys().forEach((key) => {
       total += this.getSize(key);
     });
     return total;
@@ -135,18 +135,18 @@ export const storage = new Storage();
 
 // Storage keys used across the app
 export const STORAGE_KEYS = {
-  USER_PROFILE: 'userProfile',
-  FAVORITE_DOGS: 'favoriteDogs',
-  NOTES: 'notes',
-  NOTE_CATEGORIES: 'noteCategories',
-  HABITS: 'habits',
-  USER_TIMEZONE: 'userTimezone',
-  WEATHER_UNIT: 'weatherUnit',
-  THEME: 'theme',
-  LANGUAGE: 'language',
-  CAMERA_PERMISSION: 'cameraPermission',
-  LOCATION_PERMISSION: 'locationPermission',
-  NOTIFICATION_PERMISSION: 'notificationPermission'
+  USER_PROFILE: "userProfile",
+  FAVORITE_DOGS: "favoriteDogs",
+  NOTES: "notes",
+  NOTE_CATEGORIES: "noteCategories",
+  HABITS: "habits",
+  USER_TIMEZONE: "userTimezone",
+  WEATHER_UNIT: "weatherUnit",
+  THEME: "theme",
+  LANGUAGE: "language",
+  CAMERA_PERMISSION: "cameraPermission",
+  LOCATION_PERMISSION: "locationPermission",
+  NOTIFICATION_PERMISSION: "notificationPermission",
 } as const;
 
-export type StorageKeyType = typeof STORAGE_KEYS[keyof typeof STORAGE_KEYS];
+export type StorageKeyType = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

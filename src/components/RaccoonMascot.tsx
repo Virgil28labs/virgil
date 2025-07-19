@@ -85,15 +85,15 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    */
   const resetSleepTimer = useCallback(() => {
     lastActivityTime.current = Date.now();
-    
+
     // Clear existing sleep timer
     if (sleepTimer.current) {
       clearTimeout(sleepTimer.current);
       sleepTimer.current = null;
     }
-    
+
     // Wake up if sleeping
-    setIsSleeping(current => {
+    setIsSleeping((current) => {
       if (current) {
         setSleepingEmojis([]);
         if (sleepEmojiTimer.current) {
@@ -104,15 +104,20 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }
       return current;
     });
-    
+
     // Start new 10-second sleep timer
     sleepTimer.current = setTimeout(() => {
       // Check current state before sleeping
-      setPosition(currentPos => {
-        setIsPickedUp(currentPickedUp => {
-          setIsDragging(currentDragging => {
-            setCharging(currentCharging => {
-              if (!currentPickedUp && !currentDragging && !currentCharging && currentPos.y >= PHYSICS.GROUND_Y - 5) {
+      setPosition((currentPos) => {
+        setIsPickedUp((currentPickedUp) => {
+          setIsDragging((currentDragging) => {
+            setCharging((currentCharging) => {
+              if (
+                !currentPickedUp &&
+                !currentDragging &&
+                !currentCharging &&
+                currentPos.y >= PHYSICS.GROUND_Y - 5
+              ) {
                 setIsSleeping(true);
                 startSleepingAnimation();
               }
@@ -132,7 +137,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    */
   const startSleepingAnimation = useCallback(() => {
     sleepEmojiCounter.current = 0;
-    
+
     // Add initial floating emojis
     const initialEmojis = [
       { id: sleepEmojiCounter.current++, delay: 0 },
@@ -140,10 +145,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       { id: sleepEmojiCounter.current++, delay: 1.0 },
     ];
     setSleepingEmojis(initialEmojis);
-    
+
     // Continue spawning new emojis every 2.5 seconds
     sleepEmojiTimer.current = setInterval(() => {
-      setSleepingEmojis(prev => {
+      setSleepingEmojis((prev) => {
         // Keep max 3 emojis, remove oldest and add new one
         const newEmojis = prev.length >= 3 ? prev.slice(1) : prev;
         return [...newEmojis, { id: sleepEmojiCounter.current++, delay: 0 }];
@@ -152,7 +157,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   }, []);
 
   // Physics State
-  const [position, setPosition] = useState<Position>({ x: 20, y: PHYSICS.GROUND_Y });
+  const [position, setPosition] = useState<Position>({
+    x: 20,
+    y: PHYSICS.GROUND_Y,
+  });
   const [velocity, setVelocity] = useState<Velocity>({ x: 0, y: 0 });
   const [jumpsUsed, setJumpsUsed] = useState<number>(0);
   const [isOnWall, setIsOnWall] = useState<boolean>(false);
@@ -174,7 +182,9 @@ const RaccoonMascot = memo(function RaccoonMascot() {
 
   // Sleeping Animation State
   const [isSleeping, setIsSleeping] = useState<boolean>(false);
-  const [sleepingEmojis, setSleepingEmojis] = useState<Array<{ id: number; delay: number }>>([]);
+  const [sleepingEmojis, setSleepingEmojis] = useState<
+    Array<{ id: number; delay: number }>
+  >([]);
   const lastActivityTime = useRef<number>(Date.now());
   const sleepTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sleepEmojiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -345,16 +355,16 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   const handleClick = () => {
     // Reset sleep timer on interaction
     resetSleepTimer();
-    
+
     // Show the GIF modal
     setVisualState((prev) => ({ ...prev, showGif: true }));
 
     if (!isPickedUp) {
       setIsPickedUp(true);
-      setVisualState((prev) => ({ 
-        ...prev, 
+      setVisualState((prev) => ({
+        ...prev,
         bounceCount: prev.bounceCount + 1,
-        showSparkles: true 
+        showSparkles: true,
       }));
 
       // Play a cute sound effect (if supported)
@@ -369,7 +379,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }
 
       // Hide sparkles after animation
-      setTimeout(() => setVisualState((prev) => ({ ...prev, showSparkles: false })), 1000);
+      setTimeout(
+        () => setVisualState((prev) => ({ ...prev, showSparkles: false })),
+        1000,
+      );
 
       // Drop the mascot after 2 seconds
       setTimeout(() => {
@@ -466,7 +479,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     };
   }, [detectUIElements]);
 
-
   // Physics loop for gravity, movement, and jumping
   useEffect(() => {
     if (isPickedUp || isDragging) return;
@@ -544,7 +556,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
 
         // UI Element Collision Detection
         let landedOnUI = false;
-        // let currentElement = null;
 
         for (const uiElement of uiElements) {
           const raccoonRight = x + 80;
@@ -687,7 +698,11 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           if (charge > 0) {
             vy = -PHYSICS.JUMP_FORCE * (1 + charge);
             setCharge(0);
-          } else if (keys.current.jump && jumpsUsed < PHYSICS.MAX_JUMPS && !charging) {
+          } else if (
+            keys.current.jump &&
+            jumpsUsed < PHYSICS.MAX_JUMPS &&
+            !charging
+          ) {
             vy = -PHYSICS.JUMP_FORCE;
             setJumpsUsed(1);
           }
@@ -743,10 +758,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isPickedUp) return;
-      
+
       // Reset sleep timer on any keyboard activity
       resetSleepTimer();
-      
+
       if (e.key === " " || e.key === "Spacebar") {
         if (position.y === PHYSICS.GROUND_Y && !charging) {
           setCharging(true);
@@ -794,7 +809,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   useEffect(() => {
     // Start initial sleep timer
     resetSleepTimer();
-    
+
     // Cleanup timers on unmount
     return () => {
       if (sleepTimer.current) {
@@ -805,7 +820,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }
     };
   }, []); // Only run on mount/unmount
-
 
   const raccoonMascotStyles = `
     @keyframes bounce {
@@ -939,23 +953,24 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         )}
 
         {/* Sleeping zzz emojis */}
-        {isSleeping && sleepingEmojis.map((emoji) => (
-          <div
-            key={emoji.id}
-            style={{
-              position: "absolute",
-              top: -10,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "20px",
-              pointerEvents: "none",
-              animation: `floating-zzz 3s ease-out infinite`,
-              animationDelay: `${emoji.delay}s`,
-            }}
-          >
-            💤
-          </div>
-        ))}
+        {isSleeping &&
+          sleepingEmojis.map((emoji) => (
+            <div
+              key={emoji.id}
+              style={{
+                position: "absolute",
+                top: -10,
+                left: "50%",
+                transform: "translateX(-50%)",
+                fontSize: "20px",
+                pointerEvents: "none",
+                animation: `floating-zzz 3s ease-out infinite`,
+                animationDelay: `${emoji.delay}s`,
+              }}
+            >
+              💤
+            </div>
+          ))}
 
         {/* Wall stick indicator */}
         {isOnWall && (
@@ -1123,7 +1138,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
               style={{
                 width: `${(charge / PHYSICS.CHARGE_MAX) * 100}%`,
                 height: "100%",
-                background: "linear-gradient(90deg, var(--brand-light-purple), var(--brand-accent-purple))",
+                background:
+                  "linear-gradient(90deg, var(--brand-light-purple), var(--brand-accent-purple))",
                 transition: "width 0.1s",
               }}
             />

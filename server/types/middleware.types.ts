@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
 // Validation Types
 export interface ValidationRule {
   field: string;
-  type: 'string' | 'number' | 'boolean' | 'array' | 'object';
+  type: "string" | "number" | "boolean" | "array" | "object";
   required?: boolean;
   min?: number;
   max?: number;
@@ -66,7 +66,7 @@ export interface SecurityOptions {
 // Logging Types
 export interface LogEntry {
   timestamp: string;
-  level: 'info' | 'warn' | 'error' | 'debug';
+  level: "info" | "warn" | "error" | "debug";
   message: string;
   meta?: Record<string, any>;
   requestId?: string;

@@ -10,7 +10,9 @@ export type KeyOf<T> = keyof T;
 export type ValueOf<T> = T[keyof T];
 
 // Function Types
-export type AsyncFunction<T = void, Args extends unknown[] = unknown[]> = (...args: Args) => Promise<T>;
+export type AsyncFunction<T = void, Args extends unknown[] = unknown[]> = (
+  ...args: Args
+) => Promise<T>;
 export type VoidFunction = () => void;
 export type Callback<T = void> = (value: T) => void;
 

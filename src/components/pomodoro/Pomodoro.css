@@ -1,7 +1,7 @@
 /* Pomodoro Timer - Virgil Design System */
 
 /* Import core variables */
-@import '../../styles/variables.css';
+@import "../../styles/variables.css";
 
 /* Backdrop - Consistent with other modals */
 .pomodoro-backdrop {
@@ -16,7 +16,11 @@
   z-index: 2000;
   animation: fadeIn 0.3s ease-out;
   padding: 60px;
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Montserrat",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 /* Main Panel - Glass effect matching Dog Gallery */
@@ -27,7 +31,7 @@
   padding: 1.5rem;
   width: 480px;
   max-width: calc(100vw - 120px);
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -73,7 +77,6 @@
   color: var(--off-white);
   transform: rotate(90deg);
 }
-
 
 /* Session Mode Toggle */
 .mode-indicator {
@@ -169,7 +172,7 @@
 /* Clock Numbers */
 .clock-number {
   transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .clock-number.active {
@@ -177,7 +180,6 @@
   font-weight: 700;
   font-size: 18px;
 }
-
 
 .time-display {
   font-size: 3rem;
@@ -292,7 +294,6 @@
   opacity: 1;
 }
 
-
 /* Tomato Progress */
 .tomato-progress {
   display: flex;
@@ -360,7 +361,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Montserrat",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 .preset-btn:hover {
@@ -393,7 +398,7 @@
   border-radius: 2rem;
   font-size: 1rem;
   font-weight: 600;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -482,76 +487,123 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes tomatoBounce {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-5px) rotate(-5deg); }
-  75% { transform: translateY(-5px) rotate(5deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(5deg);
+  }
 }
 
 @keyframes breathe {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
     transform: scale(1.05);
   }
 }
 
 @keyframes arcGlow {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes centerPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 @keyframes secondTick {
-  0% { opacity: 1; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes orbit {
   from {
-    transform: rotate(var(--rotation, 0deg)) translateX(var(--distance, 160px)) rotate(calc(var(--rotation, 0deg) * -1));
+    transform: rotate(var(--rotation, 0deg)) translateX(var(--distance, 160px))
+      rotate(calc(var(--rotation, 0deg) * -1));
   }
   to {
-    transform: rotate(calc(var(--rotation, 0deg) + 360deg)) translateX(var(--distance, 160px)) rotate(calc(var(--rotation, 0deg) * -1 - 360deg));
+    transform: rotate(calc(var(--rotation, 0deg) + 360deg))
+      translateX(var(--distance, 160px))
+      rotate(calc(var(--rotation, 0deg) * -1 - 360deg));
   }
 }
 
 @keyframes fadeInOut {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes tomatoGrow {
-  0% { transform: scale(0) rotate(0deg); }
-  50% { transform: scale(1.3) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.3) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
 }
 
 @keyframes timerPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.98); opacity: 0.8; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
 }
 
 @keyframes particleFloat {
@@ -572,25 +624,25 @@
     min-height: auto;
     padding: 1.5rem;
   }
-  
+
   .visual-clock {
     width: 280px;
     height: 280px;
   }
-  
+
   .clock-svg {
     width: 280px;
     height: 280px;
   }
-  
+
   .time-display {
     font-size: 3rem;
   }
-  
+
   .motivational-text {
     font-size: 0.75rem;
   }
-  
+
   .quote-backdrop {
     font-size: 0.75rem;
     max-width: 90%;

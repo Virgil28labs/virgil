@@ -12,8 +12,9 @@ export function isValidEmail(email: string): boolean {
  * Validate phone number (various formats)
  */
 export function isValidPhone(phone: string): boolean {
-  const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{4,6}$/;
-  return phoneRegex.test(phone.replace(/\s/g, ''));
+  const phoneRegex =
+    /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{4,6}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ""));
 }
 
 /**
@@ -67,37 +68,37 @@ export function validatePassword(password: string): PasswordStrength {
   if (password.length >= 8) {
     score += 1;
   } else {
-    feedback.push('Password must be at least 8 characters long');
+    feedback.push("Password must be at least 8 characters long");
   }
 
   if (/[a-z]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain lowercase letters');
+    feedback.push("Password must contain lowercase letters");
   }
 
   if (/[A-Z]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain uppercase letters');
+    feedback.push("Password must contain uppercase letters");
   }
 
   if (/[0-9]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain numbers');
+    feedback.push("Password must contain numbers");
   }
 
   if (/[^a-zA-Z0-9]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password should contain special characters');
+    feedback.push("Password should contain special characters");
   }
 
   return {
     isValid: score >= 4,
     score,
-    feedback
+    feedback,
   };
 }
 
@@ -106,9 +107,9 @@ export function validatePassword(password: string): PasswordStrength {
  */
 export function sanitizeInput(input: string): string {
   return input
-    .replace(/[<>]/g, '') // Remove potential HTML tags
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove event handlers
+    .replace(/[<>]/g, "") // Remove potential HTML tags
+    .replace(/javascript:/gi, "") // Remove javascript: protocol
+    .replace(/on\w+\s*=/gi, "") // Remove event handlers
     .trim();
 }
 
@@ -116,8 +117,8 @@ export function sanitizeInput(input: string): string {
  * Validate credit card number using Luhn algorithm
  */
 export function isValidCreditCard(cardNumber: string): boolean {
-  const digits = cardNumber.replace(/\D/g, '');
-  
+  const digits = cardNumber.replace(/\D/g, "");
+
   if (digits.length < 13 || digits.length > 19) {
     return false;
   }

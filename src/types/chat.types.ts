@@ -5,7 +5,7 @@
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: string;
   streaming?: boolean;
@@ -63,7 +63,7 @@ export interface ExportData {
   summary: ConversationSummary;
 }
 
-export type ExportFormat = 'json' | 'markdown';
+export type ExportFormat = "json" | "markdown";
 
 export interface ChatError {
   message: string;

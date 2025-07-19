@@ -1,30 +1,37 @@
-import { Entry } from './types'
-import { NotesEntry } from './NotesEntry'
-import './NotesList.css'
+import { Entry } from "./types";
+import { NotesEntry } from "./NotesEntry";
+import "./NotesList.css";
 
 interface NotesListProps {
-  entries: Entry[]
-  onToggleTask: (entryId: string, taskIndex: number) => void
-  onUpdateEntry: (id: string, updates: Partial<Entry>) => void
-  onDeleteEntry: (id: string) => void
-  processingIds?: Set<string>
+  entries: Entry[];
+  onToggleTask: (entryId: string, taskIndex: number) => void;
+  onUpdateEntry: (id: string, updates: Partial<Entry>) => void;
+  onDeleteEntry: (id: string) => void;
+  processingIds?: Set<string>;
 }
 
-export const NotesList = ({ entries, onToggleTask, onUpdateEntry, onDeleteEntry, processingIds }: NotesListProps) => {
-
+export const NotesList = ({
+  entries,
+  onToggleTask,
+  onUpdateEntry,
+  onDeleteEntry,
+  processingIds,
+}: NotesListProps) => {
   if (entries.length === 0) {
     return (
       <div className="notes-empty">
         <span className="notes-empty-icon">📝</span>
         <p className="notes-empty-text">No notes yet</p>
-        <p className="notes-empty-hint">Start typing above to capture your first thought</p>
+        <p className="notes-empty-hint">
+          Start typing above to capture your first thought
+        </p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="notes-list">
-      {entries.map(entry => (
+      {entries.map((entry) => (
         <NotesEntry
           key={entry.id}
           entry={entry}
@@ -35,5 +42,5 @@ export const NotesList = ({ entries, onToggleTask, onUpdateEntry, onDeleteEntry,
         />
       ))}
     </div>
-  )
-}
+  );
+};

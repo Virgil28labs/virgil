@@ -1,16 +1,16 @@
-import { memo } from 'react'
+import { memo } from "react";
 
 interface FetchControlsProps {
-  selectedBreed: string
-  fetchCount: number
-  breeds: string[]
-  loading: boolean
-  onBreedChange: (breed: string) => void
-  onCountChange: (count: number) => void
-  onFetch: () => void
+  selectedBreed: string;
+  fetchCount: number;
+  breeds: string[];
+  loading: boolean;
+  onBreedChange: (breed: string) => void;
+  onCountChange: (count: number) => void;
+  onFetch: () => void;
 }
 
-const FETCH_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const
+const FETCH_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 export const FetchControls = memo(function FetchControls({
   selectedBreed,
@@ -19,7 +19,7 @@ export const FetchControls = memo(function FetchControls({
   loading,
   onBreedChange,
   onCountChange,
-  onFetch
+  onFetch,
 }: FetchControlsProps) {
   return (
     <div className="doggo-fetch-controls">
@@ -34,7 +34,7 @@ export const FetchControls = memo(function FetchControls({
           onChange={(e) => onBreedChange(e.target.value)}
         >
           <option value="">Random Mix</option>
-          {breeds.map(breed => (
+          {breeds.map((breed) => (
             <option key={breed} value={breed}>
               {breed.charAt(0).toUpperCase() + breed.slice(1)}
             </option>
@@ -52,19 +52,17 @@ export const FetchControls = memo(function FetchControls({
           value={fetchCount}
           onChange={(e) => onCountChange(Number(e.target.value))}
         >
-          {FETCH_COUNTS.map(num => (
-            <option key={num} value={num}>{num}</option>
+          {FETCH_COUNTS.map((num) => (
+            <option key={num} value={num}>
+              {num}
+            </option>
           ))}
         </select>
       </div>
 
-      <button
-        className="doggo-fetch-btn"
-        onClick={onFetch}
-        disabled={loading}
-      >
-        {loading ? 'Fetching...' : 'Fetch'}
+      <button className="doggo-fetch-btn" onClick={onFetch} disabled={loading}>
+        {loading ? "Fetching..." : "Fetch"}
       </button>
     </div>
-  )
-})
+  );
+});

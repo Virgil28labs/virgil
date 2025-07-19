@@ -1,34 +1,39 @@
-const fetch = require('node-fetch');
-const { EventEmitter } = require('events');
+const fetch = require("node-fetch");
+const { EventEmitter } = require("events");
 
 class LLMProxy extends EventEmitter {
   constructor() {
     super();
     this.providers = {
       openai: {
-        url: 'https://api.openai.com/v1/chat/completions',
+        url: "https://api.openai.com/v1/chat/completions",
         headers: () => ({
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
         }),
-        models: ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo-preview']
+        models: [
+          "gpt-4o-mini",
+          "gpt-3.5-turbo",
+          "gpt-4",
+          "gpt-4-turbo-preview",
+        ],
       },
       anthropic: {
-        url: 'https://api.anthropic.com/v1/messages',
+        url: "https://api.anthropic.com/v1/messages",
         headers: () => ({
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'Content-Type': 'application/json'
+          "x-api-key": process.env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
         }),
-        models: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus']
+        models: ["claude-3-haiku", "claude-3-sonnet", "claude-3-opus"],
       },
       ollama: {
-        url: `${process.env.OLLAMA_BASE_URL || 'http://localhost:11434'}/api/chat`,
+        url: `${process.env.OLLAMA_BASE_URL || "http://localhost:11434"}/api/chat`,
         headers: () => ({
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         }),
-        models: ['llama2', 'mistral', 'codellama']
-      }
+        models: ["llama2", "mistral", "codellama"],
+      },
     };
   }
 
@@ -39,8 +44,8 @@ class LLMProxy extends EventEmitter {
       temperature,
       maxTokens,
       systemPrompt,
-      provider = 'openai',
-      stream = false
+      provider = "openai",
+      stream = false,
     } = options;
 
     const startTime = Date.now();
@@ -48,7 +53,7 @@ class LLMProxy extends EventEmitter {
     try {
       // Format messages with system prompt if provided
       const formattedMessages = this.formatMessages(messages, systemPrompt);
-      
+
       // Get provider configuration
       const providerConfig = this.providers[provider];
       if (!providerConfig) {
@@ -61,15 +66,15 @@ class LLMProxy extends EventEmitter {
         model,
         temperature,
         maxTokens,
-        stream
+        stream,
       });
 
       // Make the request
       const response = await fetch(providerConfig.url, {
-        method: 'POST',
+        method: "POST",
         headers: providerConfig.headers(),
         body: JSON.stringify(requestBody),
-        timeout: 30000 // 30 second timeout
+        timeout: 30000, // 30 second timeout
       });
 
       if (!response.ok) {
@@ -84,24 +89,23 @@ class LLMProxy extends EventEmitter {
       const result = this.parseResponse(provider, data);
 
       // Emit analytics event
-      this.emit('request', {
+      this.emit("request", {
         provider,
         model,
         latency,
-        tokens: result.usage?.total_tokens || 0
+        tokens: result.usage?.total_tokens || 0,
       });
 
       return result;
-
     } catch (error) {
       const latency = Date.now() - startTime;
-      
+
       // Emit error event
-      this.emit('error', {
+      this.emit("error", {
         provider,
         model,
         error: error.message,
-        latency
+        latency,
       });
 
       throw error;
@@ -115,13 +119,13 @@ class LLMProxy extends EventEmitter {
       temperature,
       maxTokens,
       systemPrompt,
-      provider = 'openai'
+      provider = "openai",
     } = options;
 
     try {
       const formattedMessages = this.formatMessages(messages, systemPrompt);
       const providerConfig = this.providers[provider];
-      
+
       if (!providerConfig) {
         throw new Error(`Unknown provider: ${provider}`);
       }
@@ -131,13 +135,13 @@ class LLMProxy extends EventEmitter {
         model,
         temperature,
         maxTokens,
-        stream: true
+        stream: true,
       });
 
       const response = await fetch(providerConfig.url, {
-        method: 'POST',
+        method: "POST",
         headers: providerConfig.headers(),
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -146,19 +150,18 @@ class LLMProxy extends EventEmitter {
       }
 
       // Stream parsing logic based on provider
-      if (provider === 'openai') {
+      if (provider === "openai") {
         yield* this.parseOpenAIStream(response.body);
-      } else if (provider === 'anthropic') {
+      } else if (provider === "anthropic") {
         yield* this.parseAnthropicStream(response.body);
       } else {
         yield* this.parseGenericStream(response.body);
       }
-
     } catch (error) {
-      this.emit('error', {
+      this.emit("error", {
         provider,
         model,
-        error: error.message
+        error: error.message,
       });
       throw error;
     }
@@ -168,54 +171,51 @@ class LLMProxy extends EventEmitter {
     if (!systemPrompt) return messages;
 
     // Check if first message is already a system message
-    if (messages[0]?.role === 'system') {
+    if (messages[0]?.role === "system") {
       return messages;
     }
 
     // Prepend system prompt
-    return [
-      { role: 'system', content: systemPrompt },
-      ...messages
-    ];
+    return [{ role: "system", content: systemPrompt }, ...messages];
   }
 
   buildRequestBody(provider, options) {
     const { messages, model, temperature, maxTokens, stream } = options;
 
     switch (provider) {
-      case 'openai':
+      case "openai":
         return {
           model,
           messages,
           temperature,
           max_tokens: maxTokens,
-          stream
+          stream,
         };
 
-      case 'anthropic': {
+      case "anthropic": {
         // Convert to Anthropic format
-        const systemMessage = messages.find(m => m.role === 'system');
-        const nonSystemMessages = messages.filter(m => m.role !== 'system');
-        
+        const systemMessage = messages.find((m) => m.role === "system");
+        const nonSystemMessages = messages.filter((m) => m.role !== "system");
+
         return {
           model,
           messages: nonSystemMessages,
           system: systemMessage?.content,
           max_tokens: maxTokens,
           temperature,
-          stream
+          stream,
         };
       }
 
-      case 'ollama':
+      case "ollama":
         return {
           model,
           messages,
           options: {
             temperature,
-            num_predict: maxTokens
+            num_predict: maxTokens,
           },
-          stream
+          stream,
         };
 
       default:
@@ -225,34 +225,34 @@ class LLMProxy extends EventEmitter {
 
   parseResponse(provider, data) {
     switch (provider) {
-      case 'openai':
+      case "openai":
         return {
           content: data.choices[0].message.content,
           usage: data.usage,
           model: data.model,
-          finish_reason: data.choices[0].finish_reason
+          finish_reason: data.choices[0].finish_reason,
         };
 
-      case 'anthropic':
+      case "anthropic":
         return {
           content: data.content[0].text,
           usage: {
             prompt_tokens: data.usage.input_tokens,
             completion_tokens: data.usage.output_tokens,
-            total_tokens: data.usage.input_tokens + data.usage.output_tokens
+            total_tokens: data.usage.input_tokens + data.usage.output_tokens,
           },
           model: data.model,
-          finish_reason: data.stop_reason
+          finish_reason: data.stop_reason,
         };
 
-      case 'ollama':
+      case "ollama":
         return {
           content: data.message.content,
           usage: {
-            total_tokens: data.eval_count || 0
+            total_tokens: data.eval_count || 0,
           },
           model: data.model,
-          finish_reason: 'stop'
+          finish_reason: "stop",
         };
 
       default:
@@ -263,7 +263,7 @@ class LLMProxy extends EventEmitter {
   async *parseOpenAIStream(stream) {
     const reader = stream.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
+    let buffer = "";
 
     try {
       while (true) {
@@ -271,13 +271,13 @@ class LLMProxy extends EventEmitter {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             const data = line.slice(6);
-            if (data === '[DONE]') return;
+            if (data === "[DONE]") return;
 
             try {
               const parsed = JSON.parse(data);
@@ -308,13 +308,14 @@ class LLMProxy extends EventEmitter {
 
   async getAvailableModels() {
     const models = {};
-    
+
     for (const [provider, config] of Object.entries(this.providers)) {
       // Check if provider is configured
-      const isConfigured = provider === 'ollama' || 
-        (provider === 'openai' && process.env.OPENAI_API_KEY) ||
-        (provider === 'anthropic' && process.env.ANTHROPIC_API_KEY);
-      
+      const isConfigured =
+        provider === "ollama" ||
+        (provider === "openai" && process.env.OPENAI_API_KEY) ||
+        (provider === "anthropic" && process.env.ANTHROPIC_API_KEY);
+
       if (isConfigured) {
         models[provider] = config.models;
       }

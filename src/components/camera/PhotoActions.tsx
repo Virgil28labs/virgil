@@ -1,14 +1,14 @@
-import React, { useState, useCallback } from 'react'
-import type { SavedPhoto } from '../../types/camera.types'
-import { CameraUtils } from './utils/cameraUtils'
-import { PhotoExport } from './utils/photoExport'
+import React, { useState, useCallback } from "react";
+import type { SavedPhoto } from "../../types/camera.types";
+import { CameraUtils } from "./utils/cameraUtils";
+import { PhotoExport } from "./utils/photoExport";
 
 interface PhotoActionsProps {
-  photo: SavedPhoto
-  onFavoriteToggle: (photoId: string) => void
-  onDelete: (photoId: string) => void
-  onClose?: () => void
-  className?: string
+  photo: SavedPhoto;
+  onFavoriteToggle: (photoId: string) => void;
+  onDelete: (photoId: string) => void;
+  onClose?: () => void;
+  className?: string;
 }
 
 export const PhotoActions: React.FC<PhotoActionsProps> = ({
@@ -16,53 +16,54 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
   onFavoriteToggle,
   onDelete,
   onClose,
-  className = ''
+  className = "",
 }) => {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleFavoriteToggle = useCallback(() => {
-    onFavoriteToggle(photo.id)
-  }, [onFavoriteToggle, photo.id])
+    onFavoriteToggle(photo.id);
+  }, [onFavoriteToggle, photo.id]);
 
   const handleDownload = useCallback(async () => {
     try {
-      setIsProcessing(true)
-      const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp)
-      await CameraUtils.downloadPhoto(photo.dataUrl, filename)
+      setIsProcessing(true);
+      const filename =
+        photo.name || CameraUtils.generatePhotoName(photo.timestamp);
+      await CameraUtils.downloadPhoto(photo.dataUrl, filename);
     } catch (error) {
-      console.error('Error downloading photo:', error)
+      console.error("Error downloading photo:", error);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }, [photo])
+  }, [photo]);
 
   const handleShare = useCallback(async () => {
     try {
-      setIsProcessing(true)
-      await PhotoExport.shareSinglePhoto(photo)
+      setIsProcessing(true);
+      await PhotoExport.shareSinglePhoto(photo);
     } catch (error) {
-      console.error('Error sharing photo:', error)
+      console.error("Error sharing photo:", error);
       // Fallback to download if share is not supported
-      handleDownload()
+      handleDownload();
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }, [photo, handleDownload])
+  }, [photo, handleDownload]);
 
   const handleDeleteClick = useCallback(() => {
-    setShowDeleteConfirm(true)
-  }, [])
+    setShowDeleteConfirm(true);
+  }, []);
 
   const handleDeleteConfirm = useCallback(() => {
-    onDelete(photo.id)
-    setShowDeleteConfirm(false)
-    onClose?.()
-  }, [onDelete, photo.id, onClose])
+    onDelete(photo.id);
+    setShowDeleteConfirm(false);
+    onClose?.();
+  }, [onDelete, photo.id, onClose]);
 
   const handleDeleteCancel = useCallback(() => {
-    setShowDeleteConfirm(false)
-  }, [])
+    setShowDeleteConfirm(false);
+  }, []);
 
   if (showDeleteConfirm) {
     return (
@@ -87,7 +88,7 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -95,16 +96,16 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
       <div className="photo-actions-grid">
         {/* Favorite Action */}
         <button
-          className={`photo-action-btn favorite-action ${photo.isFavorite ? 'favorited' : ''}`}
+          className={`photo-action-btn favorite-action ${photo.isFavorite ? "favorited" : ""}`}
           onClick={handleFavoriteToggle}
           disabled={isProcessing}
-          title={photo.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          title={
+            photo.isFavorite ? "Remove from favorites" : "Add to favorites"
+          }
         >
-          <span className="action-icon">
-            {photo.isFavorite ? '❤️' : '🤍'}
-          </span>
+          <span className="action-icon">{photo.isFavorite ? "❤️" : "🤍"}</span>
           <span className="action-label">
-            {photo.isFavorite ? 'Favorited' : 'Favorite'}
+            {photo.isFavorite ? "Favorited" : "Favorite"}
           </span>
         </button>
 
@@ -151,14 +152,14 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
               {new Date(photo.timestamp).toLocaleDateString()}
             </span>
           </div>
-          
+
           <div className="metadata-item">
             <span className="metadata-label">Time:</span>
             <span className="metadata-value">
               {new Date(photo.timestamp).toLocaleTimeString()}
             </span>
           </div>
-          
+
           {photo.size && (
             <div className="metadata-item">
               <span className="metadata-label">Size:</span>
@@ -167,7 +168,7 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
               </span>
             </div>
           )}
-          
+
           {photo.width && photo.height && (
             <div className="metadata-item">
               <span className="metadata-label">Dimensions:</span>
@@ -199,5 +200,5 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

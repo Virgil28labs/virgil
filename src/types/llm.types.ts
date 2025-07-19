@@ -4,7 +4,7 @@
  */
 
 export interface LLMMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   id?: string;
   timestamp?: string;
@@ -79,10 +79,10 @@ export interface LLMError {
   message: string;
   status?: number;
   code?: string;
-  type?: 'rate_limit' | 'api_error' | 'network_error' | 'invalid_request';
+  type?: "rate_limit" | "api_error" | "network_error" | "invalid_request";
 }
 
-export type LLMProvider = 'openai' | 'anthropic' | 'ollama';
+export type LLMProvider = "openai" | "anthropic" | "ollama";
 
 export interface LLMProviderConfig {
   url: string;

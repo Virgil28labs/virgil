@@ -1,24 +1,27 @@
-import { memo, useCallback } from 'react'
-import { DogCard } from './DogCard'
-import type { DogImage } from './hooks/useDogApi'
+import { memo, useCallback } from "react";
+import { DogCard } from "./DogCard";
+import type { DogImage } from "./hooks/useDogApi";
 
 interface DogGridProps {
-  dogs: DogImage[]
-  isFavorited: (url: string) => boolean
-  onImageClick: (url: string) => void
-  onFavoriteToggle: (dog: DogImage) => void
+  dogs: DogImage[];
+  isFavorited: (url: string) => boolean;
+  onImageClick: (url: string) => void;
+  onFavoriteToggle: (dog: DogImage) => void;
 }
 
-export const DogGrid = memo(function DogGrid({ 
-  dogs, 
-  isFavorited, 
-  onImageClick, 
-  onFavoriteToggle 
+export const DogGrid = memo(function DogGrid({
+  dogs,
+  isFavorited,
+  onImageClick,
+  onFavoriteToggle,
 }: DogGridProps) {
-  const handleFavoriteToggle = useCallback((e: React.MouseEvent, dog: DogImage) => {
-    e.stopPropagation()
-    onFavoriteToggle(dog)
-  }, [onFavoriteToggle])
+  const handleFavoriteToggle = useCallback(
+    (e: React.MouseEvent, dog: DogImage) => {
+      e.stopPropagation();
+      onFavoriteToggle(dog);
+    },
+    [onFavoriteToggle],
+  );
 
   return (
     <div className="doggo-grid">
@@ -33,5 +36,5 @@ export const DogGrid = memo(function DogGrid({
         />
       ))}
     </div>
-  )
-})
+  );
+});

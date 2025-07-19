@@ -14,7 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    
+
     /* Strict Type Checking Options */
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -28,7 +28,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": false,
-    
+
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
@@ -41,14 +41,8 @@
 
     "types": ["node", "express"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.js"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["node_modules", "dist"],
   "ts-node": {
     "esm": false
   }

@@ -5,6 +5,7 @@
 The Notes app uses a refined two-dimensional tagging system that combines **Life Categories** (WHERE in your life) with **Action Types** (WHAT kind of content).
 
 ### Layer 1: Life Categories (6 domains)
+
 1. **WORK** - Career, professional projects, education, business
 2. **HEALTH** - Physical & mental wellness, fitness, medical
 3. **MONEY** - Finance, budgeting, investments, expenses
@@ -13,6 +14,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 6. **LIFE** - Home, hobbies, daily routines, lifestyle
 
 ### Layer 2: Action Types (5 types)
+
 1. **TASK** - Actionable to-dos, things that need to be done
 2. **NOTE** - Information, facts, reference material
 3. **IDEA** - Creative thoughts, brainstorms, possibilities
@@ -22,6 +24,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 ## Example Entries with Two-Layer Tags
 
 ### TASK Examples (Actionable Items)
+
 - "Meeting with client about Q4 deliverables" → **work** + **task**
 - "Call mom about birthday plans" → **people** + **task**
 - "Schedule doctor appointment for checkup" → **health** + **task**
@@ -30,6 +33,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 - "Clean the garage this weekend" → **life** + **task**
 
 ### NOTE Examples (Information & Reference)
+
 - "Q4 revenue target is $2M" → **work** + **note**
 - "Mom's birthday is June 15" → **people** + **note**
 - "Blood pressure reading: 120/80" → **health** + **note**
@@ -38,6 +42,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 - "WiFi password: HomeNetwork123" → **life** + **note**
 
 ### IDEA Examples (Creative Thoughts)
+
 - "What if we pivot our product strategy?" → **work** + **idea**
 - "Maybe organize a surprise party for Sarah" → **people** + **idea**
 - "Could try intermittent fasting" → **health** + **idea**
@@ -46,6 +51,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 - "Garden design with raised beds" → **life** + **idea**
 
 ### GOAL Examples (Long-term Objectives)
+
 - "Become team lead by end of year" → **work** + **goal**
 - "Strengthen relationship with siblings" → **people** + **goal**
 - "Run a marathon by next summer" → **health** + **goal**
@@ -54,6 +60,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 - "Renovate kitchen by 2025" → **life** + **goal**
 
 ### REFLECT Examples (Journal Entries)
+
 - "Today's presentation went better than expected" → **work** + **reflect**
 - "Grateful for time with family this weekend" → **people** + **reflect**
 - "Feeling stronger after consistent workouts" → **health** + **reflect**
@@ -71,6 +78,7 @@ The Notes app uses a refined two-dimensional tagging system that combines **Life
 ## Natural Language Examples
 
 The system understands context naturally:
+
 - "I should call the dentist" → **health** + **task**
 - "Remember: project deadline is Friday" → **work** + **note**
 - "Excited about learning Python!" → **growth** + **reflect**

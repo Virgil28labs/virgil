@@ -22,7 +22,7 @@ export interface ApiError {
 // Chat API Types
 export interface ChatRequest {
   messages: Array<{
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant" | "system";
     content: string;
   }>;
   model?: string;
@@ -33,7 +33,7 @@ export interface ChatRequest {
 export interface ChatResponse {
   success: boolean;
   message: {
-    role: 'assistant';
+    role: "assistant";
     content: string;
   };
   usage?: {
@@ -45,7 +45,7 @@ export interface ChatResponse {
 
 // Health Check Types
 export interface HealthResponse {
-  status: 'healthy' | 'unhealthy';
+  status: "healthy" | "unhealthy";
   service: string;
   configured: boolean;
   timestamp: string;
@@ -75,7 +75,7 @@ export interface AnalyticsResponse {
 // LLM API Types (for internal server use)
 export interface LLMCompleteRequest {
   messages: Array<{
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant" | "system";
     content: string;
   }>;
   model: string;

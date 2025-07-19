@@ -5,14 +5,16 @@
 The Virgil brand uses a sophisticated palette of purples, pinks, and neutral tones. All colors are available as CSS variables and TypeScript constants.
 
 ### Core Palette
+
 - **Deep Plum** (`#39293e`): Primary backgrounds, dark sections
-- **Lavender** (`#b2a5c1`): Soft accents, hover states  
+- **Lavender** (`#b2a5c1`): Soft accents, hover states
 - **Violet Purple** (`#6c3baa`): CTAs, active states, links
 - **Off White** (`#f5f5f5`): Primary text, light backgrounds
 - **Silver Grey** (`#b3b3b3`): Borders, dividers, disabled states
 - **Soft Pink** (`#efb0c2`): Special highlights, success states
 
 ### Usage
+
 ```css
 /* CSS */
 .cta-button {
@@ -42,9 +44,9 @@ import { Logo } from '@/components/Logo';
 <Logo width={100} onClick={() => navigate('/')} />
 
 // With custom styling
-<Logo 
-  width={120} 
-  className="header-logo" 
+<Logo
+  width={120}
+  className="header-logo"
   style={{ marginBottom: '1rem' }}
 />
 ```
@@ -80,8 +82,8 @@ import { Logo } from '@/components/Logo';
 If you need to use the logo assets directly:
 
 ```tsx
-import VirgilLogoSvg from '@/assets/brand/virgil-logo-optimized.svg';
-import VirgilLogoPng from '@/assets/brand/Virgil-Logo.png';
+import VirgilLogoSvg from "@/assets/brand/virgil-logo-optimized.svg";
+import VirgilLogoPng from "@/assets/brand/Virgil-Logo.png";
 ```
 
 ## Typography
@@ -89,11 +91,13 @@ import VirgilLogoPng from '@/assets/brand/Virgil-Logo.png';
 The design system uses system fonts for optimal performance and readability:
 
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
-             'Helvetica Neue', Arial, sans-serif;
+font-family:
+  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+  Arial, sans-serif;
 ```
 
 ### Font Weights
+
 - Regular (400): Body text
 - Medium (500): Subheadings, emphasis
 - Semibold (600): Headings, CTAs
@@ -146,7 +150,7 @@ transition: all var(--transition-slow);
 The design system is mobile-first with these breakpoints:
 
 - Mobile: < 640px
-- Tablet: 640px - 1024px  
+- Tablet: 640px - 1024px
 - Desktop: > 1024px
 
 Use CSS custom properties that automatically adjust for different screen sizes.

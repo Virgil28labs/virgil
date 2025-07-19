@@ -9,7 +9,7 @@ export interface Coordinates {
   accuracy: number;
   timestamp: number;
   elevation?: number; // in meters
-  elevationUnit?: 'meters' | 'feet';
+  elevationUnit?: "meters" | "feet";
 }
 
 export interface Address {
@@ -58,22 +58,21 @@ export interface LocationContextValue extends LocationState {
   hasIPLocation: boolean;
 }
 
+export type PermissionStatus = "granted" | "denied" | "unknown" | "unavailable";
 
-export type PermissionStatus = 'granted' | 'denied' | 'unknown' | 'unavailable';
-
-export type LocationActionType = 
-  | 'SET_LOADING'
-  | 'SET_LOCATION_DATA'
-  | 'SET_ERROR'
-  | 'SET_PERMISSION_STATUS'
-  | 'CLEAR_ERROR';
+export type LocationActionType =
+  | "SET_LOADING"
+  | "SET_LOCATION_DATA"
+  | "SET_ERROR"
+  | "SET_PERMISSION_STATUS"
+  | "CLEAR_ERROR";
 
 export type LocationAction =
-  | { type: 'SET_LOCATION'; payload: Coordinates }
-  | { type: 'SET_ERROR'; payload: string }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_PERMISSION'; payload: PermissionStatus }
-  | { type: 'CLEAR_ERROR' };
+  | { type: "SET_LOCATION"; payload: Coordinates }
+  | { type: "SET_ERROR"; payload: string }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_PERMISSION"; payload: PermissionStatus }
+  | { type: "CLEAR_ERROR" };
 
 export interface GeolocationError {
   code: number;

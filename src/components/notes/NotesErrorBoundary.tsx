@@ -3,22 +3,22 @@
  * Catches errors in child components and displays user-friendly messages
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { NotesError, ErrorType } from './types'
-import './NotesErrorBoundary.css'
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { NotesError, ErrorType } from "./types";
+import "./NotesErrorBoundary.css";
 
 interface Props {
-  children: ReactNode
+  children: ReactNode;
   /** Fallback UI to show when an error occurs */
-  fallback?: (error: Error, reset: () => void) => ReactNode
+  fallback?: (error: Error, reset: () => void) => ReactNode;
   /** Callback when an error is caught */
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
-  errorInfo: ErrorInfo | null
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 /**
@@ -27,33 +27,33 @@ interface State {
  */
 export class NotesErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
+    super(props);
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null
-    }
+      errorInfo: null,
+    };
   }
 
   static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
       error,
-      errorInfo: null
-    }
+      errorInfo: null,
+    };
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error('Notes Error Boundary caught:', error, errorInfo)
-    
+    console.error("Notes Error Boundary caught:", error, errorInfo);
+
     // Update state with error info
     this.setState({
-      errorInfo
-    })
-    
+      errorInfo,
+    });
+
     // Call optional error handler
-    this.props.onError?.(error, errorInfo)
+    this.props.onError?.(error, errorInfo);
   }
 
   /**
@@ -63,9 +63,9 @@ export class NotesErrorBoundary extends Component<Props, State> {
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null
-    })
-  }
+      errorInfo: null,
+    });
+  };
 
   /**
    * Get user-friendly error message
@@ -74,26 +74,26 @@ export class NotesErrorBoundary extends Component<Props, State> {
     if (error instanceof NotesError) {
       switch (error.type) {
         case ErrorType.STORAGE_ERROR:
-          return 'Unable to access your notes storage. Please refresh the page.'
+          return "Unable to access your notes storage. Please refresh the page.";
         case ErrorType.AI_SERVICE_ERROR:
-          return 'AI processing failed. Your note has been saved without AI features.'
+          return "AI processing failed. Your note has been saved without AI features.";
         case ErrorType.NETWORK_ERROR:
-          return 'Network connection issue. Please check your internet connection.'
+          return "Network connection issue. Please check your internet connection.";
         case ErrorType.VALIDATION_ERROR:
-          return 'Invalid data detected. Please try again.'
+          return "Invalid data detected. Please try again.";
         default:
-          return 'An unexpected error occurred. Please refresh the page.'
+          return "An unexpected error occurred. Please refresh the page.";
       }
     }
-    
-    return 'Something went wrong. Please refresh the page or try again later.'
+
+    return "Something went wrong. Please refresh the page or try again later.";
   }
 
   override render() {
     if (this.state.hasError && this.state.error) {
       // Use custom fallback if provided
       if (this.props.fallback) {
-        return this.props.fallback(this.state.error, this.reset)
+        return this.props.fallback(this.state.error, this.reset);
       }
 
       // Default error UI
@@ -104,9 +104,9 @@ export class NotesErrorBoundary extends Component<Props, State> {
             <p className="notes-error-message">
               {this.getErrorMessage(this.state.error)}
             </p>
-            
+
             {/* Show technical details in development */}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === "development" && (
               <details className="notes-error-details">
                 <summary>Technical Details</summary>
                 <pre>{this.state.error.stack}</pre>
@@ -115,7 +115,7 @@ export class NotesErrorBoundary extends Component<Props, State> {
                 )}
               </details>
             )}
-            
+
             <div className="notes-error-actions">
               <button
                 onClick={this.reset}
@@ -132,10 +132,10 @@ export class NotesErrorBoundary extends Component<Props, State> {
             </div>
           </div>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
@@ -143,20 +143,20 @@ export class NotesErrorBoundary extends Component<Props, State> {
  * Hook for error handling in functional components
  */
 export function useErrorHandler() {
-  const [error, setError] = React.useState<Error | null>(null)
+  const [error, setError] = React.useState<Error | null>(null);
 
   const resetError = React.useCallback(() => {
-    setError(null)
-  }, [])
+    setError(null);
+  }, []);
 
   const captureError = React.useCallback((error: Error) => {
-    setError(error)
-  }, [])
+    setError(error);
+  }, []);
 
   // Throw error to be caught by error boundary
   if (error) {
-    throw error
+    throw error;
   }
 
-  return { captureError, resetError }
+  return { captureError, resetError };
 }

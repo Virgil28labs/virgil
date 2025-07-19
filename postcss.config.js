@@ -1,9 +1,9 @@
 export default {
   plugins: {
-    '@tailwindcss/postcss': {},
+    "@tailwindcss/postcss": {},
     autoprefixer: {},
     // Safe CSS optimizations
-    'postcss-merge-rules': {}, // Merges duplicate CSS rules
-    'postcss-combine-media-query': {}, // Combines duplicate media queries
+    "postcss-merge-rules": {}, // Merges duplicate CSS rules
+    "postcss-combine-media-query": {}, // Combines duplicate media queries
   },
-}
+};

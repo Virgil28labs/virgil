@@ -3,18 +3,18 @@
  * Displays note content with formatting, tasks, tags, and actions
  */
 
-import { useState, useCallback, useMemo, memo } from 'react'
-import { Entry } from './types'
-import { DeleteConfirmModal } from './DeleteConfirmModal'
-import { formatRelativeTime } from './utils/dateUtils'
-import './NotesEntry.css'
+import { useState, useCallback, useMemo, memo } from "react";
+import { Entry } from "./types";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { formatRelativeTime } from "./utils/dateUtils";
+import "./NotesEntry.css";
 
 interface NotesEntryProps {
-  entry: Entry
-  onToggleTask: (entryId: string, taskIndex: number) => void
-  onUpdate: (id: string, updates: Partial<Entry>) => void
-  onDelete: (id: string) => void
-  isProcessing?: boolean
+  entry: Entry;
+  onToggleTask: (entryId: string, taskIndex: number) => void;
+  onUpdate: (id: string, updates: Partial<Entry>) => void;
+  onDelete: (id: string) => void;
+  isProcessing?: boolean;
 }
 
 /**
@@ -24,30 +24,39 @@ interface NotesEntryProps {
  * - Edit and delete actions
  * - Relative time display
  * - AI processing indicator
- * 
+ *
  * Performance optimized with React.memo and useMemo
  */
-const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProcessing = false }: NotesEntryProps) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editContent, setEditContent] = useState(entry.content)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+const NotesEntryComponent = ({
+  entry,
+  onToggleTask,
+  onUpdate,
+  onDelete,
+  isProcessing = false,
+}: NotesEntryProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(entry.content);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Format timestamp
-  const formattedTime = useMemo(() => formatRelativeTime(entry.timestamp), [entry.timestamp])
+  const formattedTime = useMemo(
+    () => formatRelativeTime(entry.timestamp),
+    [entry.timestamp],
+  );
 
   // Parse content to render checkboxes
   const renderedContent = useMemo(() => {
-    const lines = entry.content.split('\n')
-    let taskIndex = 0
+    const lines = entry.content.split("\n");
+    let taskIndex = 0;
 
     return lines.map((line, lineIndex) => {
       // Check if this line is a checkbox
-      const checkboxMatch = line.match(/^(?:[-*]\s*)?\[([ x])\]\s*(.+)/)
-      
+      const checkboxMatch = line.match(/^(?:[-*]\s*)?\[([ x])\]\s*(.+)/);
+
       if (checkboxMatch) {
-        const currentTaskIndex = taskIndex++
-        const task = entry.tasks[currentTaskIndex]
-        
+        const currentTaskIndex = taskIndex++;
+        const task = entry.tasks[currentTaskIndex];
+
         return (
           <div key={lineIndex} className="notes-task-line">
             <label className="notes-checkbox-label">
@@ -59,54 +68,61 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
                 aria-label={`Task: ${checkboxMatch[2].trim()}`}
               />
               <span className="notes-checkbox-custom"></span>
-              <span className={`notes-task-text ${task?.completed ? 'completed' : ''}`}>
+              <span
+                className={`notes-task-text ${task?.completed ? "completed" : ""}`}
+              >
                 {checkboxMatch[2].trim()}
               </span>
             </label>
           </div>
-        )
+        );
       }
 
       // Regular text line
       return (
         <p key={lineIndex} className="notes-text-line">
-          {line || '\u00A0'} {/* Non-breaking space for empty lines */}
+          {line || "\u00A0"} {/* Non-breaking space for empty lines */}
         </p>
-      )
-    })
-  }, [entry.content, entry.tasks, entry.id, onToggleTask])
+      );
+    });
+  }, [entry.content, entry.tasks, entry.id, onToggleTask]);
 
   const handleSave = useCallback(() => {
     if (editContent.trim() !== entry.content) {
-      onUpdate(entry.id, { content: editContent.trim() })
+      onUpdate(entry.id, { content: editContent.trim() });
     }
-    setIsEditing(false)
-  }, [editContent, entry.content, entry.id, onUpdate])
+    setIsEditing(false);
+  }, [editContent, entry.content, entry.id, onUpdate]);
 
   const handleCancel = useCallback(() => {
-    setEditContent(entry.content)
-    setIsEditing(false)
-  }, [entry.content])
+    setEditContent(entry.content);
+    setIsEditing(false);
+  }, [entry.content]);
 
   const handleDeleteConfirm = useCallback(() => {
-    onDelete(entry.id)
-    setShowDeleteConfirm(false)
-  }, [entry.id, onDelete])
+    onDelete(entry.id);
+    setShowDeleteConfirm(false);
+  }, [entry.id, onDelete]);
 
   return (
-    <article 
-      className={`notes-entry ${isProcessing ? 'ai-processing' : ''}`}
+    <article
+      className={`notes-entry ${isProcessing ? "ai-processing" : ""}`}
       aria-label={`Note from ${formattedTime}`}
     >
       <header className="notes-entry-header">
         <time className="notes-entry-time">
           {formattedTime}
-          {isProcessing && <span className="notes-processing-indicator"> • Processing...</span>}
+          {isProcessing && (
+            <span className="notes-processing-indicator"> • Processing...</span>
+          )}
         </time>
         {(entry.tags.length > 0 || entry.actionType) && (
           <div className="notes-entry-tags">
             {entry.actionType && (
-              <span className="notes-action-type" title={`Action type: ${entry.actionType}`}>
+              <span
+                className="notes-action-type"
+                title={`Action type: ${entry.actionType}`}
+              >
                 {entry.actionType}
               </span>
             )}
@@ -117,7 +133,9 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
             ))}
           </div>
         )}
-        {entry.isEdited && <span className="notes-edited-indicator">edited</span>}
+        {entry.isEdited && (
+          <span className="notes-edited-indicator">edited</span>
+        )}
       </header>
 
       <div className="notes-entry-content">
@@ -142,29 +160,35 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
         ) : (
           <>
             {renderedContent}
-            {entry.tasks.filter(task => task.extracted).length > 0 && (
+            {entry.tasks.filter((task) => task.extracted).length > 0 && (
               <div className="notes-extracted-tasks">
                 <p className="notes-extracted-label">AI-extracted tasks:</p>
-                {entry.tasks.filter(task => task.extracted).map((task, index) => (
-                  <div key={index} className="notes-task-line">
-                    <label className="notes-checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => {
-                          const taskIndex = entry.tasks.findIndex(t => t === task)
-                          onToggleTask(entry.id, taskIndex)
-                        }}
-                        className="notes-checkbox"
-                        aria-label={`AI task: ${task.text}`}
-                      />
-                      <span className="notes-checkbox-custom"></span>
-                      <span className={`notes-task-text ${task.completed ? 'completed' : ''}`}>
-                        {task.text}
-                      </span>
-                    </label>
-                  </div>
-                ))}
+                {entry.tasks
+                  .filter((task) => task.extracted)
+                  .map((task, index) => (
+                    <div key={index} className="notes-task-line">
+                      <label className="notes-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => {
+                            const taskIndex = entry.tasks.findIndex(
+                              (t) => t === task,
+                            );
+                            onToggleTask(entry.id, taskIndex);
+                          }}
+                          className="notes-checkbox"
+                          aria-label={`AI task: ${task.text}`}
+                        />
+                        <span className="notes-checkbox-custom"></span>
+                        <span
+                          className={`notes-task-text ${task.completed ? "completed" : ""}`}
+                        >
+                          {task.text}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
               </div>
             )}
           </>
@@ -198,8 +222,8 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
         onCancel={() => setShowDeleteConfirm(false)}
       />
     </article>
-  )
-}
+  );
+};
 
 // Memoize component to prevent unnecessary re-renders
 export const NotesEntry = memo(NotesEntryComponent, (prevProps, nextProps) => {
@@ -212,8 +236,9 @@ export const NotesEntry = memo(NotesEntryComponent, (prevProps, nextProps) => {
     prevProps.entry.isEdited === nextProps.entry.isEdited &&
     prevProps.entry.actionType === nextProps.entry.actionType &&
     // Check if any task completion status changed
-    prevProps.entry.tasks.every((task, index) => 
-      task.completed === nextProps.entry.tasks[index]?.completed
+    prevProps.entry.tasks.every(
+      (task, index) =>
+        task.completed === nextProps.entry.tasks[index]?.completed,
     )
-  )
-})
+  );
+});

@@ -12,20 +12,23 @@ export function formatNumber(num: number): string {
  * @param date The date to format
  * @param options Intl format options or 'full' for date+time
  */
-export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions | 'full'): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
-  if (options === 'full') {
+export function formatDate(
+  date: Date | string,
+  options?: Intl.DateTimeFormatOptions | "full",
+): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
+  if (options === "full") {
     // Full date and time format
     return dateObj.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
-  
+
   return dateObj.toLocaleDateString(undefined, options);
 }
 
@@ -38,24 +41,27 @@ export function formatRelativeTime(timestamp: Date | string | number): string {
   const now = new Date();
   const past = new Date(timestamp);
   const diffMs = now.getTime() - past.getTime();
-  
+
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+
   return formatDate(past);
 }
 
 /**
  * Format a time to a readable string
  */
-export function formatTime(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+export function formatTime(
+  date: Date | string,
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   return dateObj.toLocaleTimeString(undefined, options);
 }
 
@@ -63,15 +69,15 @@ export function formatTime(date: Date | string, options?: Intl.DateTimeFormatOpt
  * Format bytes to human readable format
  */
 export function formatBytes(bytes: number, decimals = 2): string {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) return "0 Bytes";
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
 /**
@@ -92,7 +98,11 @@ export function formatDuration(ms: number): string {
 /**
  * Truncate text to a specified length with ellipsis
  */
-export function truncate(text: string, maxLength: number, suffix = '...'): string {
+export function truncate(
+  text: string,
+  maxLength: number,
+  suffix = "...",
+): string {
   if (text.length <= maxLength) return text;
   return text.substring(0, maxLength - suffix.length) + suffix;
 }
@@ -109,9 +119,8 @@ export function capitalize(text: string): string {
  */
 export function toTitleCase(text: string): string {
   return text
-    .replace(/[-_]/g, ' ')
-    .split(' ')
-    .map(word => capitalize(word))
-    .join(' ');
+    .replace(/[-_]/g, " ")
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
 }
-

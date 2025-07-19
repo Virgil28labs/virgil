@@ -1,34 +1,34 @@
 // Set up process.env for compatibility
-process.env.NODE_ENV = 'test';
+process.env.NODE_ENV = "test";
 
 // Mock import.meta for Vite environment variables before any imports
-Object.defineProperty(globalThis, 'import', {
+Object.defineProperty(globalThis, "import", {
   value: {
     meta: {
       env: {
-        VITE_SUPABASE_URL: 'https://test.supabase.co',
-        VITE_SUPABASE_ANON_KEY: 'test-key',
-        VITE_LLM_API_URL: 'http://localhost:5002/api/v1',
-        VITE_DOG_API_URL: 'https://dog.ceo/api/breeds/image/random',
-        VITE_DOG_DOCS_URL: 'https://dog.ceo/dog-api/',
-        VITE_GOOGLE_MAPS_API_KEY: 'test-google-maps-key',
-        BASE_URL: '/',
-        PROD: false
-      }
-    }
+        VITE_SUPABASE_URL: "https://test.supabase.co",
+        VITE_SUPABASE_ANON_KEY: "test-key",
+        VITE_LLM_API_URL: "http://localhost:5002/api/v1",
+        VITE_DOG_API_URL: "https://dog.ceo/api/breeds/image/random",
+        VITE_DOG_DOCS_URL: "https://dog.ceo/dog-api/",
+        VITE_GOOGLE_MAPS_API_KEY: "test-google-maps-key",
+        BASE_URL: "/",
+        PROD: false,
+      },
+    },
   },
   writable: true,
-  configurable: true
+  configurable: true,
 });
 
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
-import '@testing-library/jest-dom';
-import 'whatwg-fetch';
+import "@testing-library/jest-dom";
+import "whatwg-fetch";
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -43,9 +43,9 @@ Object.defineProperty(window, 'matchMedia', {
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   root: Element | null = null;
-  rootMargin: string = '0px';
+  rootMargin: string = "0px";
   thresholds: ReadonlyArray<number> = [0];
-  
+
   constructor() {}
   disconnect() {}
   observe() {}
@@ -94,7 +94,7 @@ const geolocationMock = {
 (global.navigator as any).geolocation = geolocationMock;
 
 // Mock crypto.getRandomValues (needed for Supabase)
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(global, "crypto", {
   value: {
     getRandomValues: (arr: any[]) => {
       for (let i = 0; i < arr.length; i++) {
@@ -102,12 +102,12 @@ Object.defineProperty(global, 'crypto', {
       }
       return arr;
     },
-    subtle: {} // Mock subtle crypto API if needed
+    subtle: {}, // Mock subtle crypto API if needed
   },
 });
 
 // Mock TextEncoder/TextDecoder for streaming tests
-if (typeof TextEncoder === 'undefined') {
+if (typeof TextEncoder === "undefined") {
   global.TextEncoder = class TextEncoder {
     encode(input: string): Uint8Array {
       const encoded = new Uint8Array(input.length);
@@ -119,7 +119,7 @@ if (typeof TextEncoder === 'undefined') {
   } as any;
 }
 
-if (typeof TextDecoder === 'undefined') {
+if (typeof TextDecoder === "undefined") {
   global.TextDecoder = class TextDecoder {
     decode(input: Uint8Array): string {
       return String.fromCharCode(...Array.from(input));
@@ -134,8 +134,8 @@ const originalWarn = console.warn;
 beforeAll(() => {
   console.error = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render')
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: ReactDOM.render")
     ) {
       return;
     }
@@ -143,9 +143,9 @@ beforeAll(() => {
   };
   console.warn = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      (args[0].includes('componentWillReceiveProps') ||
-       args[0].includes('componentWillUpdate'))
+      typeof args[0] === "string" &&
+      (args[0].includes("componentWillReceiveProps") ||
+        args[0].includes("componentWillUpdate"))
     ) {
       return;
     }
@@ -171,7 +171,10 @@ afterEach(() => {
 const originalConsoleError = console.error;
 beforeEach(() => {
   console.error = (...args) => {
-    if (typeof args[0] === 'string' && args[0].includes('ReactDOM.createRoot')) {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("ReactDOM.createRoot")
+    ) {
       return;
     }
     originalConsoleError.call(console, ...args);
