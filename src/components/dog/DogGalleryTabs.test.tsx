@@ -16,14 +16,14 @@ describe('DogGalleryTabs', () => {
     render(<DogGalleryTabs {...defaultProps} />)
     
     expect(screen.getByText('Fetch Doggos')).toBeInTheDocument()
-    expect(screen.getByText('My Collection')).toBeInTheDocument()
+    expect(screen.getByText(/❤️ Favorites/)).toBeInTheDocument()
   })
 
   it('marks fetch tab as active when activeTab is fetch', () => {
     render(<DogGalleryTabs {...defaultProps} activeTab="fetch" />)
     
     const fetchTab = screen.getByRole('tab', { name: /Fetch Doggos/i })
-    const galleryTab = screen.getByRole('tab', { name: /My Collection/i })
+    const galleryTab = screen.getByRole('tab', { name: /❤️ Favorites/i })
     
     expect(fetchTab).toHaveClass('active')
     expect(fetchTab).toHaveAttribute('aria-selected', 'true')
@@ -35,7 +35,7 @@ describe('DogGalleryTabs', () => {
     render(<DogGalleryTabs {...defaultProps} activeTab="gallery" />)
     
     const fetchTab = screen.getByRole('tab', { name: /Fetch Doggos/i })
-    const galleryTab = screen.getByRole('tab', { name: /My Collection/i })
+    const galleryTab = screen.getByRole('tab', { name: /❤️ Favorites/i })
     
     expect(galleryTab).toHaveClass('active')
     expect(galleryTab).toHaveAttribute('aria-selected', 'true')
@@ -56,7 +56,7 @@ describe('DogGalleryTabs', () => {
     const mockOnTabChange = jest.fn()
     render(<DogGalleryTabs {...defaultProps} onTabChange={mockOnTabChange} />)
     
-    fireEvent.click(screen.getByRole('tab', { name: /My Collection/i }))
+    fireEvent.click(screen.getByRole('tab', { name: /❤️ Favorites/i }))
     
     expect(mockOnTabChange).toHaveBeenCalledWith('gallery')
   })
@@ -64,14 +64,13 @@ describe('DogGalleryTabs', () => {
   it('displays favorites count when favoritesCount > 0', () => {
     render(<DogGalleryTabs {...defaultProps} favoritesCount={5} />)
     
-    expect(screen.getByText('My Collection (♥ 5)')).toBeInTheDocument()
+    expect(screen.getByText(/❤️ Favorites \(5\)/)).toBeInTheDocument()
   })
 
   it('does not display favorites count when favoritesCount is 0', () => {
     render(<DogGalleryTabs {...defaultProps} favoritesCount={0} />)
     
-    expect(screen.getByText('My Collection')).toBeInTheDocument()
-    expect(screen.queryByText(/♥/)).not.toBeInTheDocument()
+    expect(screen.getByText(/❤️ Favorites$/)).toBeInTheDocument()
   })
 
   it('has proper accessibility attributes', () => {
@@ -81,7 +80,7 @@ describe('DogGalleryTabs', () => {
     expect(tabList).toBeInTheDocument()
     
     const fetchTab = screen.getByRole('tab', { name: /Fetch Doggos/i })
-    const galleryTab = screen.getByRole('tab', { name: /My Collection/i })
+    const galleryTab = screen.getByRole('tab', { name: /❤️ Favorites/i })
     
     expect(fetchTab).toHaveAttribute('aria-controls', 'fetch-panel')
     expect(fetchTab).toHaveAttribute('title', "Press 'f' for quick access")
@@ -94,7 +93,7 @@ describe('DogGalleryTabs', () => {
     render(<DogGalleryTabs {...defaultProps} />)
     
     const fetchTab = screen.getByRole('tab', { name: /Fetch Doggos/i })
-    const galleryTab = screen.getByRole('tab', { name: /My Collection/i })
+    const galleryTab = screen.getByRole('tab', { name: /❤️ Favorites/i })
     
     expect(fetchTab).toHaveAttribute('title', "Press 'f' for quick access")
     expect(galleryTab).toHaveAttribute('title', "Press 'g' for quick access")

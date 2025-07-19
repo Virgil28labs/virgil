@@ -66,10 +66,12 @@ describe('CircleGameButton', () => {
     render(<CircleGameButton />);
     const button = screen.getByRole('button', { name: /open perfect circle game/i });
     
-    expect(button).toHaveClass('button');
+    // EmojiButton uses Tailwind classes
+    expect(button).toHaveClass('touch-manipulation');
+    expect(button).toHaveClass('select-none');
     
     const emoji = button.querySelector('span');
-    expect(emoji).toHaveClass('emoji');
+    expect(emoji).toBeInTheDocument();
   });
 
   it('closes the circle game when close button is clicked', async () => {
@@ -134,7 +136,8 @@ describe('CircleGameButton', () => {
     render(<CircleGameButton />);
     const button = screen.getByRole('button', { name: /open perfect circle game/i });
     
-    // Check that the button has the correct CSS class
-    expect(button).toHaveClass('button');
+    // Check that the button has the correct CSS classes from EmojiButton
+    expect(button).toHaveClass('touch-manipulation');
+    expect(button).toHaveClass('select-none');
   });
 });

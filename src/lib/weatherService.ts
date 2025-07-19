@@ -23,7 +23,7 @@ class WeatherService {
       return cached.data;
     }
 
-    const apiUrl = `${BACKEND_API_BASE}/weather/coordinates/${lat}/${lon}`;
+    const apiUrl = `${BACKEND_API_BASE}/weather?lat=${lat}&lon=${lon}`;
 
     try {
       const response = await retryWithBackoff(
@@ -94,9 +94,12 @@ class WeatherService {
     }
 
     try {
-      const url = country 
-        ? `${BACKEND_API_BASE}/weather/city/${encodeURIComponent(city)}?country=${encodeURIComponent(country)}`
-        : `${BACKEND_API_BASE}/weather/city/${encodeURIComponent(city)}`;
+      const params = new URLSearchParams({ city });
+      if (country) {
+        params.append('country', country);
+      }
+      
+      const url = `${BACKEND_API_BASE}/weather?${params.toString()}`;
         
       const response = await dedupeFetch(url, {
         method: 'GET',
@@ -143,7 +146,7 @@ class WeatherService {
       return cached.data;
     }
 
-    const apiUrl = `${BACKEND_API_BASE}/weather/forecast/coordinates/${lat}/${lon}`;
+    const apiUrl = `${BACKEND_API_BASE}/weather/forecast?lat=${lat}&lon=${lon}`;
 
     try {
       const response = await retryWithBackoff(
@@ -214,9 +217,12 @@ class WeatherService {
     }
 
     try {
-      const url = country 
-        ? `${BACKEND_API_BASE}/weather/forecast/city/${encodeURIComponent(city)}?country=${encodeURIComponent(country)}`
-        : `${BACKEND_API_BASE}/weather/forecast/city/${encodeURIComponent(city)}`;
+      const params = new URLSearchParams({ city });
+      if (country) {
+        params.append('country', country);
+      }
+      
+      const url = `${BACKEND_API_BASE}/weather/forecast?${params.toString()}`;
         
       const response = await dedupeFetch(url, {
         method: 'GET',

@@ -54,6 +54,11 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
   useEffect(() => {
     const name = userName || 'Champion'
     
+    if (showCelebration) {
+      setMotivationalMessage(`Fantastic work, ${name}! You crushed it! 🎉`)
+      return
+    }
+    
     if (!isRunning) {
       setMotivationalMessage('')
       return
@@ -70,10 +75,6 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
       setMotivationalMessage(`Almost done, ${name}! You've got this 🔥`)
     } else if (progress >= 90 && progress < 95) {
       setMotivationalMessage(`Final minute, ${name}! Finish strong 🏁`)
-    }
-    
-    if (showCelebration) {
-      setMotivationalMessage(`Fantastic work, ${name}! You crushed it! 🎉`)
     }
   }, [progress, isRunning, showCelebration, userName])
   
@@ -473,7 +474,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
         
         {/* Single container for presets OR message */}
         <div className="interaction-container">
-          {!isRunning ? (
+          {!isRunning && !showCelebration ? (
             <div className="preset-buttons">
               {PRESET_TIMES.map(minutes => (
                 <button 

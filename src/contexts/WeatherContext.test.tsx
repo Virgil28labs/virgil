@@ -81,7 +81,9 @@ describe('WeatherContext', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 
@@ -248,16 +250,16 @@ describe('WeatherContext', () => {
     // The lastUpdated should be set
     expect(result.current.hasWeather).toBe(true);
     
-    // Verify initial call
-    const initialCallCount = mockWeatherService.getWeatherByCoordinates.mock.calls.length;
+    // Clear the mock to start fresh
+    mockWeatherService.getWeatherByCoordinates.mockClear();
     
     // Try to fetch again immediately - should not call API due to caching
     await act(async () => {
       await result.current.fetchWeather();
     });
     
-    // Should not have made another call due to cache
-    expect(mockWeatherService.getWeatherByCoordinates).toHaveBeenCalledTimes(initialCallCount);
+    // Should have 0 calls since we cleared the mock and cache prevented the call
+    expect(mockWeatherService.getWeatherByCoordinates).toHaveBeenCalledTimes(0);
   });
 
   it('sets up auto-refresh interval', async () => {

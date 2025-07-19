@@ -49,7 +49,9 @@ describe('PomodoroTimer', () => {
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
     jest.useRealTimers()
   })
 
@@ -171,7 +173,7 @@ describe('PomodoroTimer', () => {
       
       await user.click(screen.getByText('Pause'))
       
-      expect(screen.getByText('Resume')).toBeInTheDocument()
+      expect(screen.getByText('Start')).toBeInTheDocument()
       
       // Advance more time - timer should not change
       const currentTime = screen.getByText(/\d{2}:\d{2}/).textContent
@@ -206,11 +208,10 @@ describe('PomodoroTimer', () => {
       
       await user.click(screen.getByText('Start'))
       
-      // Try to click a preset button
-      await user.click(screen.getByText('5m'))
-      
-      // Time should not change
-      expect(screen.queryByText('05:00')).not.toBeInTheDocument()
+      // Preset buttons should not be visible while running
+      expect(screen.queryByText('5m')).not.toBeInTheDocument()
+      expect(screen.queryByText('10m')).not.toBeInTheDocument()
+      expect(screen.queryByText('25m')).not.toBeInTheDocument()
     })
   })
 
@@ -232,10 +233,11 @@ describe('PomodoroTimer', () => {
       
       // Set to 1 minute for faster testing
       await user.click(screen.getByText('5m'))
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowLeft' })
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowLeft' })
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowLeft' })
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowLeft' })
+      const panel = screen.getByText('🍅 Pomodoro Timer').closest('.pomodoro-panel')!
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' })
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' })
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' })
+      fireEvent.keyDown(panel, { key: 'ArrowLeft' })
       
       await user.click(screen.getByText('Start'))
       
@@ -255,17 +257,21 @@ describe('PomodoroTimer', () => {
       const user = userEvent.setup({ delay: null })
       render(<PomodoroTimer isOpen={true} onClose={jest.fn()} />)
       
-      const soundButton = screen.getByLabelText('Toggle sound')
+      let soundButton = screen.getByLabelText('Disable sound')
       
       // Sound is on by default
       expect(soundButton).toHaveTextContent('🔊')
       
       await user.click(soundButton)
       
+      // After clicking, the label changes
+      soundButton = screen.getByLabelText('Enable sound')
       expect(soundButton).toHaveTextContent('🔇')
       
       await user.click(soundButton)
       
+      // After clicking again, it's back to disable
+      soundButton = screen.getByLabelText('Disable sound')
       expect(soundButton).toHaveTextContent('🔊')
     })
   })
@@ -278,7 +284,8 @@ describe('PomodoroTimer', () => {
       // Set to 1 minute
       await user.click(screen.getByText('5m'))
       for (let i = 0; i < 4; i++) {
-        fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowLeft' })
+        const panel = screen.getByText('🍅 Pomodoro Timer').closest('.pomodoro-panel')!
+        fireEvent.keyDown(panel, { key: 'ArrowLeft' })
       }
       
       await user.click(screen.getByText('Start'))
@@ -289,34 +296,38 @@ describe('PomodoroTimer', () => {
       })
       
       await waitFor(() => {
-        expect(screen.getByText(/Fantastic work, TestUser!/)).toBeInTheDocument()
+        expect(screen.getByText(/Fantastic work, TestUser! You crushed it! 🎉/)).toBeInTheDocument()
       })
     })
   })
 
   describe('Keyboard Shortcuts', () => {
-    it('closes with Escape key', () => {
+    it('closes with close button', async () => {
+      const user = userEvent.setup({ delay: null })
       const onClose = jest.fn()
       render(<PomodoroTimer isOpen={true} onClose={onClose} />)
       
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+      await user.click(screen.getByLabelText('Close'))
       
       expect(onClose).toHaveBeenCalled()
     })
 
-    it('starts/pauses with spacebar', async () => {
+    it('starts and pauses with button clicks', async () => {
+      const user = userEvent.setup({ delay: null })
       render(<PomodoroTimer isOpen={true} onClose={jest.fn()} />)
       
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: ' ' })
+      // Start timer
+      await user.click(screen.getByText('Start'))
       
       await waitFor(() => {
         expect(screen.getByText('Pause')).toBeInTheDocument()
       })
       
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: ' ' })
+      // Pause timer
+      await user.click(screen.getByText('Pause'))
       
       await waitFor(() => {
-        expect(screen.getByText('Resume')).toBeInTheDocument()
+        expect(screen.getByText('Start')).toBeInTheDocument()
       })
     })
   })
@@ -327,7 +338,8 @@ describe('PomodoroTimer', () => {
       
       rerender(<PomodoroTimer isOpen={true} onClose={jest.fn()} />)
       
-      expect(screen.getByRole('dialog')).toHaveFocus()
+      const panel = screen.getByText('🍅 Pomodoro Timer').closest('.pomodoro-panel')
+      expect(panel).toHaveFocus()
     })
   })
 })

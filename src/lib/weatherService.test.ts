@@ -69,7 +69,7 @@ describe('weatherService', () => {
 
       expect(result).toEqual(mockWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledWith(
-        'http://localhost:5002/api/v1/weather/coordinates/40.7128/-74.006',
+        'http://localhost:5002/api/v1/weather?lat=40.7128&lon=-74.006',
         {
           method: 'GET',
           headers: {
@@ -205,7 +205,7 @@ describe('weatherService', () => {
 
       expect(result).toEqual(mockWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledWith(
-        'http://localhost:5002/api/v1/weather/city/New%20York',
+        'http://localhost:5002/api/v1/weather?city=New+York',
         {
           method: 'GET',
           headers: {
@@ -229,7 +229,7 @@ describe('weatherService', () => {
 
       expect(result).toEqual(mockWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledWith(
-        'http://localhost:5002/api/v1/weather/city/New%20York?country=US',
+        'http://localhost:5002/api/v1/weather?city=New+York&country=US',
         expect.any(Object)
       );
     });

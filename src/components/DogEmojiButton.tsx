@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
 const DogGallery = lazy(() => 
-  import('./dog/DogGalleryRefactored').then(module => ({ 
+  import('./dog/DogGallery').then(module => ({ 
     default: module.DogGallery 
   }))
 );

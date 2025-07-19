@@ -164,9 +164,19 @@ describe('LocationContext', () => {
   it('handles geolocation permission denied', async () => {
     Object.defineProperty(global.navigator, 'permissions', {
       value: {
-        query: jest.fn().mockResolvedValue({ state: 'denied' })
+        query: jest.fn().mockResolvedValue({ 
+          state: 'denied',
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn()
+        })
       },
       writable: true
+    });
+    
+    // Mock getQuickLocation to return IP location
+    mockLocationService.getQuickLocation.mockResolvedValue({
+      ipLocation: mockIPLocation,
+      timestamp: Date.now()
     });
     
     // Mock getFullLocationData to return only IP location (simulating GPS denied)
@@ -181,17 +191,17 @@ describe('LocationContext', () => {
     
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
+      expect(result.current.permissionStatus).toBe('denied');
     }, { timeout: 3000 });
     
     expect(result.current.coordinates).toBeNull();
     expect(result.current.address).toBeNull();
     expect(result.current.ipLocation).toEqual(mockIPLocation);
-    expect(result.current.permissionStatus).toBe('denied');
   });
 
   it('handles geolocation timeout', async () => {
-    // Mock getFullLocationData to throw timeout error
-    mockLocationService.getFullLocationData.mockRejectedValue(
+    // Mock getQuickLocation to throw timeout error
+    mockLocationService.getQuickLocation.mockRejectedValue(
       new Error('Location request timed out')
     );
     
@@ -238,8 +248,8 @@ describe('LocationContext', () => {
   });
 
   it('clears error when clearError is called', async () => {
-    // Mock getFullLocationData to throw an error
-    mockLocationService.getFullLocationData.mockRejectedValue(
+    // Mock getQuickLocation to throw an error
+    mockLocationService.getQuickLocation.mockRejectedValue(
       new Error('Position unavailable')
     );
     
@@ -280,6 +290,10 @@ describe('LocationContext', () => {
 
   it('calculates hasLocation correctly', async () => {
     // Start with no location data
+    mockLocationService.getQuickLocation.mockResolvedValue({
+      ipLocation: undefined,
+      timestamp: Date.now()
+    });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: undefined,
       address: undefined,
@@ -296,11 +310,15 @@ describe('LocationContext', () => {
     // Initially false
     expect(result.current.hasLocation).toBe(false);
     
-    // Update mock to return coordinates
+    // Update mocks to return coordinates
+    mockLocationService.getQuickLocation.mockResolvedValue({
+      ipLocation: mockIPLocation,
+      timestamp: Date.now()
+    });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
-      address: undefined,
-      ipLocation: undefined,
+      address: mockAddress,
+      ipLocation: mockIPLocation,
       timestamp: Date.now()
     });
     
@@ -337,6 +355,12 @@ describe('LocationContext', () => {
     Object.defineProperty(global.navigator, 'geolocation', {
       value: undefined,
       writable: true
+    });
+    
+    // Mock getQuickLocation to return IP location only
+    mockLocationService.getQuickLocation.mockResolvedValue({
+      ipLocation: mockIPLocation,
+      timestamp: Date.now()
     });
     
     // Mock getFullLocationData to return only IP location (no GPS available)

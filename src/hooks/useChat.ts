@@ -40,6 +40,13 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
     return `msg-${Date.now()}-${++messageIdCounter.current}`;
   }, []);
 
+  // Validate message content
+  const validateContent = (content: string): void => {
+    if (!content?.trim()) {
+      throw new Error('Message content cannot be empty');
+    }
+  };
+
   // Add a message to the conversation
   const addMessage = useCallback((role: 'user' | 'assistant' | 'system', content: string): ChatMessage => {
     const message = {
@@ -55,9 +62,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
 
   // Send a message and get response
   const sendMessage = useCallback(async (content: string, options: Partial<LLMRequest> = {}): Promise<ChatMessage | null> => {
-    if (!content?.trim()) {
-      throw new Error('Message content cannot be empty');
-    }
+    validateContent(content);
 
     clearError();
 
@@ -90,9 +95,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
 
   // Send message with streaming response
   const sendMessageStream = useCallback(async (content: string, options: Partial<LLMRequest> = {}): Promise<ChatMessage> => {
-    if (!content?.trim()) {
-      throw new Error('Message content cannot be empty');
-    }
+    validateContent(content);
 
     clearError();
 

@@ -86,6 +86,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
       const quickLocation = await locationService.getQuickLocation()
       if (quickLocation.ipLocation) {
         dispatch({ type: 'SET_LOCATION_DATA', payload: quickLocation })
+      } else {
+        // If no quick location, still set loading to false
+        dispatch({ type: 'SET_LOADING', payload: false })
       }
       
       // Then enhance with GPS data in the background (non-blocking)

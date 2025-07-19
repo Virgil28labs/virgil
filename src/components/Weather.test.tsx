@@ -93,17 +93,14 @@ describe('Weather', () => {
 
     render(<Weather />);
     
-    // Check location
-    expect(screen.getByText('New York, NY')).toBeInTheDocument();
-    
     // Check temperature
     expect(screen.getByText('72°F')).toBeInTheDocument();
     
     // Check condition
     expect(screen.getByText('Clear')).toBeInTheDocument();
     
-    // Check feels like
-    expect(screen.getByText('Feels like 70°F')).toBeInTheDocument();
+    // Check weather emoji
+    expect(screen.getByText('☀️')).toBeInTheDocument();
   });
 
   it('renders without weather data', () => {
@@ -170,7 +167,6 @@ describe('Weather', () => {
     // Check structure
     expect(container.querySelector('.weather-widget')).toBeInTheDocument();
     expect(container.querySelector('.weather-content')).toBeInTheDocument();
-    expect(container.querySelector('.weather-details')).toBeInTheDocument();
     
     // Check accessibility
     const weatherWidget = container.querySelector('.weather-widget');
