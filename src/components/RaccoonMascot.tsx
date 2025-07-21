@@ -218,6 +218,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       ".weather-widget", // Weather display widget
       ".power-button", // Power button
       ".virgil-chatbot-bubble", // Chatbot floating button
+      ".emoji-button-interactive", // All emoji buttons (camera, pomodoro, notes, etc.)
     ],
     [],
   );

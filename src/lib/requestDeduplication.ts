@@ -32,6 +32,7 @@ class RequestDeduplicator {
   /**
    * Deduplicates fetch requests by caching promises
    * Optimized with periodic cleanup and size limits
+   * Returns cloned responses to handle multiple readers
    */
   async dedupeFetch(url: string, options?: RequestInit): Promise<Response> {
     const key = this.createHash(url, options);
@@ -46,7 +47,9 @@ class RequestDeduplicator {
     // Check if we have a pending request for this key
     const pending = this.pendingRequests.get(key);
     if (pending) {
-      return pending.promise;
+      // Wait for the pending request and return a clone
+      const response = await pending.promise;
+      return response.clone();
     }
 
     // Enforce cache size limit
@@ -55,7 +58,10 @@ class RequestDeduplicator {
     }
 
     // Create new request
-    const promise = fetch(url, options).finally(() => {
+    const promise = fetch(url, options).then(response => {
+      // Store the response for future cloning
+      return response;
+    }).finally(() => {
       // Remove from pending requests when done
       this.pendingRequests.delete(key);
     });
@@ -66,6 +72,7 @@ class RequestDeduplicator {
       timestamp: now
     });
 
+    // Return the original response for the first caller
     return promise;
   }
 

@@ -98,6 +98,7 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
+          'emoji-button-interactive',
           'touch-manipulation select-none',
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
           className
