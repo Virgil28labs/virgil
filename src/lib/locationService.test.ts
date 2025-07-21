@@ -269,13 +269,16 @@ describe('locationService', () => {
   describe('getIPLocation', () => {
     it('returns IP location data on success', async () => {
       const mockResponse = {
+        success: true,
         ip: '192.168.1.1',
-        country_name: 'United States',
+        country: 'United States',
         region: 'New York',
         city: 'New York City',
         latitude: 40.7128,
         longitude: -74.0060,
-        timezone: 'America/New_York'
+        timezone: {
+          id: 'America/New_York'
+        }
       };
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -295,13 +298,13 @@ describe('locationService', () => {
         timezone: 'America/New_York'
       });
 
-      expect(global.fetch).toHaveBeenCalledWith('https://ipapi.co/192.168.1.1/json/');
+      expect(global.fetch).toHaveBeenCalledWith('https://ipwho.is/192.168.1.1');
     });
 
     it('handles API error responses', async () => {
       const mockResponse = {
-        error: true,
-        reason: 'Invalid IP address'
+        success: false,
+        message: 'Invalid IP address'
       };
 
       // Mock for all retry attempts
@@ -314,9 +317,9 @@ describe('locationService', () => {
         .rejects.toThrow('Invalid IP address');
     });
 
-    it('handles API errors without reason', async () => {
+    it('handles API errors without message', async () => {
       const mockResponse = {
-        error: true
+        success: false
       };
 
       // Mock for all retry attempts
@@ -348,13 +351,16 @@ describe('locationService', () => {
 
       // Mock IP location fetch
       const mockIPLocation = {
+        success: true,
         ip: '192.168.1.1',
-        country_name: 'United States',
+        country: 'United States',
         region: 'New York',
         city: 'New York City',
         latitude: 40.7128,
         longitude: -74.0060,
-        timezone: 'America/New_York'
+        timezone: {
+          id: 'America/New_York'
+        }
       };
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -503,13 +509,16 @@ describe('locationService', () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
+          success: true,
           ip: '192.168.1.1',
-          country_name: 'United States',
+          country: 'United States',
           region: 'New York',
           city: 'New York City',
           latitude: 40.7128,
           longitude: -74.0060,
-          timezone: 'America/New_York'
+          timezone: {
+            id: 'America/New_York'
+          }
         })
       });
 

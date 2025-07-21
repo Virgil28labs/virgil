@@ -7,6 +7,21 @@ import type {
 } from '../types/location.types'
 import { retryWithBackoff } from './retryUtils'
 
+// ipwho.is API response type
+interface IPWhoResponse {
+  success: boolean;
+  message?: string;
+  ip: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: {
+    id: string;
+  } | string;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
 export const locationService = {
@@ -60,8 +75,8 @@ export const locationService = {
         throw new Error('Failed to fetch address');
       }
       
-      const data: any = await response.json();
-      const address: any = data.address || {};
+      const data = await response.json();
+      const address = data.address || {};
       
       // Handle various street name fields from OpenStreetMap
       const streetName = address.road || 
@@ -88,8 +103,6 @@ export const locationService = {
     }
   },
 
-
-
   async getIPAddress(): Promise<string> {
     return retryWithBackoff(
       async () => {
@@ -113,24 +126,24 @@ export const locationService = {
   async getIPLocation(ip: string): Promise<IPLocation> {
     return retryWithBackoff(
       async () => {
-        const response = await fetch(`https://ipapi.co/${ip}/json/`);
+        const response = await fetch(`https://ipwho.is/${ip}`);
         if (!response.ok) {
           throw new Error('Failed to fetch IP location');
         }
-        const data: any = await response.json();
+        const data: IPWhoResponse = await response.json();
         
-        if (data.error) {
-          throw new Error(data.reason || 'Failed to get location from IP');
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to get location from IP');
         }
         
         return {
           ip: data.ip,
-          country: data.country_name,
+          country: data.country,
           region: data.region,
           city: data.city,
           lat: data.latitude,
           lon: data.longitude,
-          timezone: data.timezone
+          timezone: typeof data.timezone === 'object' ? data.timezone.id : data.timezone
         };
       },
       {
