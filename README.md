@@ -2,6 +2,8 @@
 
 A modern React/TypeScript application featuring an interactive physics-based raccoon mascot, weather integration, location services, and LLM chat capabilities.
 
+[![Deployment Status](https://img.shields.io/badge/deployment-active-brightgreen)](https://virgil-app.vercel.app)
+
 ## ✨ Features
 
 - **Interactive Raccoon Mascot**: Physics-based character with collision detection, triple jump, wall sticking, and text interaction
