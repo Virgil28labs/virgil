@@ -8,15 +8,15 @@
   --rhythm-spacing-lg: 1.25rem;
   --rhythm-spacing-xl: 1.5rem;
   --rhythm-spacing-2xl: 2rem;
-  
+
   --rhythm-radius-sm: 0.75rem;
   --rhythm-radius-md: 1.25rem;
   --rhythm-radius-lg: 1.5rem;
   --rhythm-radius-xl: 2rem;
   --rhythm-radius-full: 50%;
-  
+
   --rhythm-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* NASA APOD colors */
   --rhythm-bg-primary: rgba(57, 41, 62, 0.8);
   --rhythm-bg-secondary: rgba(45, 34, 51, 0.4);
@@ -27,7 +27,7 @@
   --rhythm-text-primary: #f5f5f5;
   --rhythm-text-secondary: #b2a5c1;
   --rhythm-text-muted: rgba(178, 165, 193, 0.7);
-  
+
   /* Pink accent for active steps (matching Virgil brand) */
   --rhythm-pink: #ff6b9d;
   --rhythm-pink-light: #ff8fb3;
@@ -61,7 +61,7 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -85,7 +85,6 @@
   margin: 0;
   letter-spacing: -0.3px;
 }
-
 
 .rhythm-machine-close {
   background: rgba(178, 165, 193, 0.1);
@@ -122,7 +121,6 @@
   flex-direction: column;
   gap: var(--rhythm-spacing-lg);
 }
-
 
 .rhythm-machine-content::-webkit-scrollbar {
   width: 8px;
@@ -224,39 +222,44 @@
 }
 
 @keyframes generatePulse {
-  0%, 100% { 
+  0%,
+  100% {
     box-shadow: 0 4px 15px rgba(108, 59, 170, 0.3);
   }
-  50% { 
-    box-shadow: 0 4px 25px rgba(108, 59, 170, 0.5), 0 0 20px rgba(108, 59, 170, 0.2);
+  50% {
+    box-shadow:
+      0 4px 25px rgba(108, 59, 170, 0.5),
+      0 0 20px rgba(108, 59, 170, 0.2);
   }
 }
 
 @keyframes generateBreathe {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1);
   }
-  50% { 
+  50% {
     transform: scale(1.02);
   }
 }
 
 @keyframes sparkle {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 1;
     transform: scale(1.1);
   }
 }
 
 @keyframes generateSpin {
-  0% { 
+  0% {
     transform: rotate(0deg);
   }
-  100% { 
+  100% {
     transform: rotate(360deg);
   }
 }
@@ -489,7 +492,9 @@
 
 .rhythm-machine-step {
   min-width: 30px;
-  width: calc((100% - (var(--rhythm-spacing-xs) * 31)) / 32); /* Dynamic width based on max steps */
+  width: calc(
+    (100% - (var(--rhythm-spacing-xs) * 31)) / 32
+  ); /* Dynamic width based on max steps */
   height: 50px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--rhythm-border);
@@ -524,13 +529,17 @@
 }
 
 .rhythm-machine-step::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--rhythm-pink), var(--rhythm-pink-light));
+  background: linear-gradient(
+    135deg,
+    var(--rhythm-pink),
+    var(--rhythm-pink-light)
+  );
   opacity: 0;
   transition: var(--rhythm-transition);
   border-radius: var(--rhythm-radius-sm);
@@ -563,7 +572,11 @@
 
 /* Ghost notes - subtle, dimmed appearance */
 .rhythm-machine-step.ghost::before {
-  background: linear-gradient(135deg, rgba(255, 107, 157, 0.4), rgba(255, 143, 179, 0.4));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 157, 0.4),
+    rgba(255, 143, 179, 0.4)
+  );
   opacity: 0.5;
 }
 
@@ -574,7 +587,11 @@
 
 /* Accent + Ghost combination */
 .rhythm-machine-step.accent.ghost::before {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 107, 157, 0.6));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.6),
+    rgba(255, 107, 157, 0.6)
+  );
   opacity: 0.7;
 }
 
@@ -660,14 +677,22 @@
 
 .rhythm-machine-save-slot.occupied {
   border-color: rgba(157, 128, 189, 0.5);
-  background: linear-gradient(135deg, rgba(157, 128, 189, 0.15), rgba(128, 162, 189, 0.15));
+  background: linear-gradient(
+    135deg,
+    rgba(157, 128, 189, 0.15),
+    rgba(128, 162, 189, 0.15)
+  );
   color: var(--rhythm-text-primary);
   box-shadow: 0 2px 8px rgba(157, 128, 189, 0.1);
 }
 
 .rhythm-machine-save-slot.occupied:hover {
   border-color: rgba(157, 128, 189, 0.8);
-  background: linear-gradient(135deg, rgba(157, 128, 189, 0.25), rgba(128, 162, 189, 0.25));
+  background: linear-gradient(
+    135deg,
+    rgba(157, 128, 189, 0.25),
+    rgba(128, 162, 189, 0.25)
+  );
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(157, 128, 189, 0.2);
 }
@@ -755,7 +780,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -770,97 +796,97 @@
     max-height: 95vh;
     padding: var(--rhythm-spacing-md);
   }
-  
+
   .rhythm-machine-content {
     padding: var(--rhythm-spacing-sm);
   }
-  
+
   .rhythm-machine-genre-section {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .rhythm-machine-genre-tags {
     justify-content: center;
   }
-  
+
   .rhythm-machine-transport {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .rhythm-machine-tempo {
     flex-direction: column;
     align-items: stretch;
     gap: var(--rhythm-spacing-sm);
   }
-  
+
   .rhythm-machine-bar-length {
     flex-direction: column;
     align-items: stretch;
     gap: var(--rhythm-spacing-sm);
   }
-  
+
   .rhythm-machine-bar-buttons {
     justify-content: center;
   }
-  
+
   .rhythm-machine-drum-row {
     flex-direction: column;
     gap: var(--rhythm-spacing-xs);
   }
-  
+
   .rhythm-machine-drum-label {
     width: 100%;
   }
-  
+
   .rhythm-machine-steps {
     justify-content: center;
   }
-  
+
   /* Mobile responsive step sizing */
   .rhythm-machine-steps[data-steps="4"] .rhythm-machine-step {
     width: 70px;
     height: 45px;
   }
-  
+
   .rhythm-machine-steps[data-steps="8"] .rhythm-machine-step {
     width: 40px;
     height: 45px;
   }
-  
+
   .rhythm-machine-steps[data-steps="16"] .rhythm-machine-step {
     width: 35px;
     height: 40px;
   }
-  
+
   .rhythm-machine-steps[data-steps="32"] .rhythm-machine-step {
     width: 25px;
     height: 35px;
     min-width: 20px;
   }
-  
+
   .rhythm-machine-save-slots {
     padding: var(--rhythm-spacing-sm);
   }
-  
+
   .rhythm-machine-save-buttons {
     gap: var(--rhythm-spacing-sm);
   }
-  
+
   .rhythm-machine-save-slot {
     width: 45px;
     height: 45px;
   }
-  
+
   .slot-number {
     font-size: 0.7rem;
   }
-  
+
   .slot-abbreviation {
     font-size: 0.85rem;
   }
-  
+
   .slot-action {
     width: 20px;
     height: 20px;

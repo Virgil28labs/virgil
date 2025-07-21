@@ -30,6 +30,7 @@ The Notes app is designed around the principle of "capture first, organize later
 ## Features
 
 ### Core Features
+
 - ✅ Single input field with rotating placeholders
 - ✅ AI-powered auto-tagging (work, personal, journal, task, idea, health, etc.)
 - ✅ Automatic task extraction from natural language
@@ -43,6 +44,7 @@ The Notes app is designed around the principle of "capture first, organize later
 - ✅ Responsive design
 
 ### AI Features
+
 - Automatic tag generation based on content
 - Task extraction from natural language
 - Mood detection (positive, neutral, negative)
@@ -82,10 +84,13 @@ NotesEmojiButton
 ## Components
 
 ### NotesEmojiButton
+
 Entry point component that renders the emoji button. Uses React.lazy for code splitting.
 
 ### NotesApp
+
 Main container component that:
+
 - Manages modal state
 - Coordinates between input, filter, and list
 - Handles keyboard shortcuts
@@ -93,21 +98,27 @@ Main container component that:
 - Manages settings
 
 ### NotesInput
+
 Smart input component with:
+
 - Auto-resizing textarea
 - Rotating placeholder text for inspiration
 - Keyboard shortcut support (⌘+Enter)
 - Character limit (5000)
 
 ### NotesFilter
+
 Filter bar with:
+
 - Tag-based filtering buttons
 - Search functionality
 - Keyboard navigation support
 - ARIA labels for accessibility
 
 ### NotesEntry
+
 Individual note display with:
+
 - Relative time display ("2 hours ago")
 - Tag pills
 - Checkbox rendering
@@ -117,7 +128,9 @@ Individual note display with:
 - React.memo optimization
 
 ### useNotesStore
+
 Central state management hook providing:
+
 - Entry CRUD operations
 - AI processing coordination
 - Error handling
@@ -127,6 +140,7 @@ Central state management hook providing:
 ## Data Flow
 
 ### Creating a Note
+
 1. User types in NotesInput
 2. Submits with ⌘+Enter
 3. useNotesStore creates entry with optimistic update
@@ -135,6 +149,7 @@ Central state management hook providing:
 6. UI updates when AI completes
 
 ### Editing a Note
+
 1. User clicks edit button
 2. NotesEntry switches to edit mode
 3. User modifies content
@@ -143,6 +158,7 @@ Central state management hook providing:
 6. IndexedDB updated
 
 ### AI Processing Flow
+
 1. New entry created
 2. shouldProcessContent validates content
 3. processEntryWithAI called asynchronously
@@ -177,6 +193,7 @@ Task {
 ```
 
 ### Storage Operations
+
 - `getAllEntries()`: Retrieve all notes
 - `addEntry()`: Create new note
 - `updateEntry()`: Modify existing note
@@ -188,20 +205,25 @@ Task {
 ## AI Integration
 
 ### OpenAI Configuration
+
 - Model: GPT-4o-mini
 - Temperature: 0.3 (consistent output)
 - Max tokens: 200
 - Retry logic with exponential backoff
 
 ### Prompt Engineering
+
 The AI is instructed to:
+
 1. Extract clear action items
 2. Generate 2-3 relevant tags
 3. Detect mood if expressed
 4. Use specific tags for health, work, etc.
 
 ### Fallback System
+
 When AI is unavailable:
+
 - Keyword-based tag generation
 - Pattern matching for task extraction
 - Maintains core functionality offline
@@ -209,22 +231,26 @@ When AI is unavailable:
 ## Performance Optimizations
 
 ### React Optimizations
+
 - React.memo on NotesEntry component
 - useMemo for expensive computations
 - useCallback for event handlers
 - Lazy loading of main app
 
 ### State Management
+
 - Optimistic updates for instant feedback
 - Batch state updates
 - Minimal re-renders
 
 ### Storage Optimizations
+
 - Singleton IndexedDB instance
 - Cached database connection
 - Efficient queries with indexes
 
 ### AI Processing
+
 - Asynchronous processing
 - Non-blocking UI updates
 - Retry logic for transient failures
@@ -233,18 +259,21 @@ When AI is unavailable:
 ## Accessibility
 
 ### Keyboard Navigation
+
 - Full keyboard support
 - Tab navigation
 - Escape to close modals
 - Shortcuts documented in UI
 
 ### Screen Reader Support
+
 - Semantic HTML
 - ARIA labels and descriptions
 - Role attributes
 - Live regions for updates
 
 ### Visual Design
+
 - High contrast colors
 - Clear focus indicators
 - Readable font sizes
@@ -253,11 +282,13 @@ When AI is unavailable:
 ## Error Handling
 
 ### User-Friendly Messages
+
 - Storage errors: "Failed to save your note"
 - Network errors: "AI processing unavailable"
 - Clear recovery actions
 
 ### Error Recovery
+
 - Optimistic update rollback
 - Graceful degradation
 - Retry mechanisms
@@ -266,6 +297,7 @@ When AI is unavailable:
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Export functionality**: Download notes as markdown/JSON
 2. **Bulk operations**: Select and delete/tag multiple notes
 3. **Advanced search**: Search within date ranges, by mood
@@ -276,12 +308,14 @@ When AI is unavailable:
 8. **Analytics**: Personal insights dashboard
 
 ### Performance Improvements
+
 1. **Virtual scrolling**: For large note collections
 2. **Web Workers**: Offload AI processing
 3. **Service Worker**: Offline support
 4. **Compression**: Reduce storage usage
 
 ### AI Enhancements
+
 1. **Smart suggestions**: Context-aware prompts
 2. **Summarization**: Daily/weekly summaries
 3. **Sentiment tracking**: Mood trends over time
@@ -290,18 +324,21 @@ When AI is unavailable:
 ## Testing Strategy
 
 ### Unit Tests Needed
+
 - Storage operations
 - AI service with mocks
 - Tag/task extraction logic
 - Date formatting utilities
 
 ### Integration Tests
+
 - Full CRUD workflows
 - AI processing pipeline
 - Error recovery scenarios
 - Keyboard shortcuts
 
 ### E2E Tests
+
 - Note creation flow
 - Search and filter
 - Edit/delete operations
@@ -310,18 +347,21 @@ When AI is unavailable:
 ## Code Quality
 
 ### TypeScript
+
 - Strict mode enabled
 - Comprehensive type definitions
 - No any types
 - Error types for better handling
 
 ### Documentation
+
 - JSDoc comments on all public APIs
 - Inline comments for complex logic
 - README for architecture
 - Component documentation
 
 ### Patterns
+
 - Composition over inheritance
 - Custom hooks for logic reuse
 - Optimistic updates
@@ -330,6 +370,7 @@ When AI is unavailable:
 ## Contributing
 
 When adding features:
+
 1. Follow existing patterns
 2. Add TypeScript types
 3. Include error handling
@@ -340,6 +381,7 @@ When adding features:
 ## Performance Metrics
 
 Target metrics:
+
 - Initial load: <3s on 3G
 - Bundle size: <200KB
 - Time to interactive: <1s

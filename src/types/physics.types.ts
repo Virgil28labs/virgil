@@ -73,13 +73,13 @@ export interface KeyState {
 
 export interface CollisionResult {
   collided: boolean;
-  side?: 'top' | 'bottom' | 'left' | 'right';
+  side?: "top" | "bottom" | "left" | "right";
   element?: UIElement;
 }
 
-export type WallSide = 'left' | 'right' | null;
+export type WallSide = "left" | "right" | null;
 
-export type MascotEmoji = '🦝' | '🐾' | '🍃' | '🌰' | '🗑️' | '🌙' | '🐻' | '🍯';
+export type MascotEmoji = "🦝" | "🐾" | "🍃" | "🌰" | "🗑️" | "🌙" | "🐻" | "🍯";
 
 export interface RaccoonMascotProps {
   // Props if any are added in the future

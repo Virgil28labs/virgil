@@ -51,7 +51,7 @@ export interface WeatherState {
   loading: boolean;
   error: string | null;
   lastUpdated: number | null;
-  unit: 'celsius' | 'fahrenheit';
+  unit: "celsius" | "fahrenheit";
 }
 
 export interface WeatherContextType extends WeatherState {
@@ -61,21 +61,21 @@ export interface WeatherContextType extends WeatherState {
   hasWeather: boolean;
 }
 
-export type WeatherActionType = 
-  | 'SET_LOADING'
-  | 'SET_WEATHER_DATA'
-  | 'SET_FORECAST_DATA'
-  | 'SET_ERROR'
-  | 'TOGGLE_UNIT'
-  | 'CLEAR_ERROR';
+export type WeatherActionType =
+  | "SET_LOADING"
+  | "SET_WEATHER_DATA"
+  | "SET_FORECAST_DATA"
+  | "SET_ERROR"
+  | "TOGGLE_UNIT"
+  | "CLEAR_ERROR";
 
 export type WeatherAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_WEATHER_DATA'; payload: WeatherData }
-  | { type: 'SET_FORECAST_DATA'; payload: ForecastData }
-  | { type: 'SET_ERROR'; payload: string }
-  | { type: 'TOGGLE_UNIT' }
-  | { type: 'CLEAR_ERROR' };
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_WEATHER_DATA"; payload: WeatherData }
+  | { type: "SET_FORECAST_DATA"; payload: ForecastData }
+  | { type: "SET_ERROR"; payload: string }
+  | { type: "TOGGLE_UNIT" }
+  | { type: "CLEAR_ERROR" };
 
 // OpenWeatherMap API Response Types
 export interface OpenWeatherResponse {

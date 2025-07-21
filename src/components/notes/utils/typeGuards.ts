@@ -3,43 +3,50 @@
  * Provides runtime type checking for safer code
  */
 
-import { Entry, Task, TagType, ActionType, NotesError, ErrorType } from '../types'
+import {
+  Entry,
+  Task,
+  TagType,
+  ActionType,
+  NotesError,
+  ErrorType,
+} from "../types";
 
 /**
  * Checks if a value is a valid Entry
  */
 export function isEntry(value: unknown): value is Entry {
-  if (!value || typeof value !== 'object') return false
-  
-  const entry = value as Record<string, unknown>
-  
+  if (!value || typeof value !== "object") return false;
+
+  const entry = value as Record<string, unknown>;
+
   return (
-    typeof entry.id === 'string' &&
+    typeof entry.id === "string" &&
     entry.timestamp instanceof Date &&
-    typeof entry.content === 'string' &&
+    typeof entry.content === "string" &&
     Array.isArray(entry.tags) &&
     entry.tags.every(isTagType) &&
     Array.isArray(entry.tasks) &&
     entry.tasks.every(isTask) &&
-    typeof entry.aiProcessed === 'boolean' &&
-    typeof entry.isEdited === 'boolean' &&
+    typeof entry.aiProcessed === "boolean" &&
+    typeof entry.isEdited === "boolean" &&
     (entry.actionType === undefined || isActionType(entry.actionType))
-  )
+  );
 }
 
 /**
  * Checks if a value is a valid Task
  */
 export function isTask(value: unknown): value is Task {
-  if (!value || typeof value !== 'object') return false
-  
-  const task = value as Record<string, unknown>
-  
+  if (!value || typeof value !== "object") return false;
+
+  const task = value as Record<string, unknown>;
+
   return (
-    typeof task.text === 'string' &&
-    typeof task.completed === 'boolean' &&
-    typeof task.extracted === 'boolean'
-  )
+    typeof task.text === "string" &&
+    typeof task.completed === "boolean" &&
+    typeof task.extracted === "boolean"
+  );
 }
 
 /**
@@ -47,9 +54,9 @@ export function isTask(value: unknown): value is Task {
  */
 export function isTagType(value: unknown): value is TagType {
   return (
-    typeof value === 'string' &&
-    ['work', 'health', 'money', 'people', 'growth', 'life'].includes(value)
-  )
+    typeof value === "string" &&
+    ["work", "health", "money", "people", "growth", "life"].includes(value)
+  );
 }
 
 /**
@@ -57,9 +64,9 @@ export function isTagType(value: unknown): value is TagType {
  */
 export function isActionType(value: unknown): value is ActionType {
   return (
-    typeof value === 'string' &&
-    ['task', 'note', 'idea', 'goal', 'reflect'].includes(value)
-  )
+    typeof value === "string" &&
+    ["task", "note", "idea", "goal", "reflect"].includes(value)
+  );
 }
 
 /**
@@ -68,8 +75,10 @@ export function isActionType(value: unknown): value is ActionType {
 export function isNotesError(value: unknown): value is NotesError {
   return (
     value instanceof NotesError ||
-    (value instanceof Error && 'type' in value && isErrorType((value as any).type))
-  )
+    (value instanceof Error &&
+      "type" in value &&
+      isErrorType((value as any).type))
+  );
 }
 
 /**
@@ -77,9 +86,9 @@ export function isNotesError(value: unknown): value is NotesError {
  */
 export function isErrorType(value: unknown): value is ErrorType {
   return (
-    typeof value === 'string' &&
+    typeof value === "string" &&
     Object.values(ErrorType).includes(value as ErrorType)
-  )
+  );
 }
 
 /**
@@ -87,13 +96,13 @@ export function isErrorType(value: unknown): value is ErrorType {
  */
 export function safeJSONParse<T>(
   json: string,
-  validator: (value: unknown) => value is T
+  validator: (value: unknown) => value is T,
 ): T | null {
   try {
-    const parsed = JSON.parse(json)
-    return validator(parsed) ? parsed : null
+    const parsed = JSON.parse(json);
+    return validator(parsed) ? parsed : null;
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -102,10 +111,10 @@ export function safeJSONParse<T>(
  */
 export function toValidatedArray<T>(
   value: unknown,
-  validator: (item: unknown) => item is T
+  validator: (item: unknown) => item is T,
 ): T[] {
-  if (!Array.isArray(value)) return []
-  return value.filter(validator)
+  if (!Array.isArray(value)) return [];
+  return value.filter(validator);
 }
 
 /**
@@ -113,15 +122,15 @@ export function toValidatedArray<T>(
  */
 export function toValidDate(value: unknown): Date | null {
   if (value instanceof Date && !isNaN(value.getTime())) {
-    return value
+    return value;
   }
-  
-  if (typeof value === 'string' || typeof value === 'number') {
-    const date = new Date(value)
-    return !isNaN(date.getTime()) ? date : null
+
+  if (typeof value === "string" || typeof value === "number") {
+    const date = new Date(value);
+    return !isNaN(date.getTime()) ? date : null;
   }
-  
-  return null
+
+  return null;
 }
 
 /**
@@ -129,45 +138,45 @@ export function toValidDate(value: unknown): Date | null {
  */
 export function hasProperty<K extends PropertyKey>(
   obj: unknown,
-  key: K
+  key: K,
 ): obj is Record<K, unknown> {
-  return obj != null && typeof obj === 'object' && key in obj
+  return obj != null && typeof obj === "object" && key in obj;
 }
 
 /**
  * Validates and sanitizes entry data
  */
 export function sanitizeEntry(data: unknown): Partial<Entry> | null {
-  if (!data || typeof data !== 'object') return null
-  
-  const obj = data as Record<string, unknown>
-  const sanitized: Partial<Entry> = {}
-  
-  if (typeof obj.id === 'string') sanitized.id = obj.id
-  if (typeof obj.content === 'string') sanitized.content = obj.content
-  
-  const timestamp = toValidDate(obj.timestamp)
-  if (timestamp) sanitized.timestamp = timestamp
-  
+  if (!data || typeof data !== "object") return null;
+
+  const obj = data as Record<string, unknown>;
+  const sanitized: Partial<Entry> = {};
+
+  if (typeof obj.id === "string") sanitized.id = obj.id;
+  if (typeof obj.content === "string") sanitized.content = obj.content;
+
+  const timestamp = toValidDate(obj.timestamp);
+  if (timestamp) sanitized.timestamp = timestamp;
+
   if (Array.isArray(obj.tags)) {
-    sanitized.tags = obj.tags.filter(isTagType)
+    sanitized.tags = obj.tags.filter(isTagType);
   }
-  
+
   if (Array.isArray(obj.tasks)) {
-    sanitized.tasks = obj.tasks.filter(isTask)
+    sanitized.tasks = obj.tasks.filter(isTask);
   }
-  
-  if (typeof obj.aiProcessed === 'boolean') {
-    sanitized.aiProcessed = obj.aiProcessed
+
+  if (typeof obj.aiProcessed === "boolean") {
+    sanitized.aiProcessed = obj.aiProcessed;
   }
-  
-  if (typeof obj.isEdited === 'boolean') {
-    sanitized.isEdited = obj.isEdited
+
+  if (typeof obj.isEdited === "boolean") {
+    sanitized.isEdited = obj.isEdited;
   }
-  
+
   if (isActionType(obj.actionType)) {
-    sanitized.actionType = obj.actionType
+    sanitized.actionType = obj.actionType;
   }
-  
-  return sanitized
+
+  return sanitized;
 }

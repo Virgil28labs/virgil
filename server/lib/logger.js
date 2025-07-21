@@ -1,6 +1,6 @@
 // Simple logger utility for server
 /* eslint-disable no-console */
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === "development";
 
 class Logger {
   log(message, ...args) {

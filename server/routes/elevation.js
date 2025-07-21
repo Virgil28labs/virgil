@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const fetch = require('node-fetch');
-const rateLimit = require('express-rate-limit');
+const fetch = require("node-fetch");
+const rateLimit = require("express-rate-limit");
 
 // Rate limiting for elevation API
 const elevationLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 30, // Limit each IP to 30 requests per minute
-  message: 'Too many elevation requests, please try again later.',
+  message: "Too many elevation requests, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -20,27 +20,27 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const roundCoordinate = (coord) => Math.round(coord * 1000) / 1000;
 
 // Get elevation by coordinates
-router.get('/coordinates/:lat/:lon', elevationLimiter, async (req, res) => {
+router.get("/coordinates/:lat/:lon", elevationLimiter, async (req, res) => {
   try {
     const lat = parseFloat(req.params.lat);
     const lon = parseFloat(req.params.lon);
 
     if (isNaN(lat) || isNaN(lon)) {
       return res.status(400).json({
-        error: 'Invalid coordinates provided'
+        error: "Invalid coordinates provided",
       });
     }
 
     // Check if coordinates are within valid range
     if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
       return res.status(400).json({
-        error: 'Coordinates out of valid range'
+        error: "Coordinates out of valid range",
       });
     }
 
     // Round coordinates for caching
     const cacheKey = `${roundCoordinate(lat)},${roundCoordinate(lon)}`;
-    
+
     // Check cache first
     const cached = elevationCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
@@ -50,23 +50,23 @@ router.get('/coordinates/:lat/:lon', elevationLimiter, async (req, res) => {
     // Fetch elevation from Open-Elevation API
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
-    
+
     try {
       const response = await fetch(
         `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`,
-        { signal: controller.signal }
+        { signal: controller.signal },
       );
       clearTimeout(timeout);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
 
       if (!data || !data.results || data.results.length === 0) {
         return res.status(404).json({
-          error: 'No elevation data found for these coordinates'
+          error: "No elevation data found for these coordinates",
         });
       }
 
@@ -77,19 +77,19 @@ router.get('/coordinates/:lat/:lon', elevationLimiter, async (req, res) => {
       const result = {
         elevation: elevationMeters,
         elevationFeet: elevationFeet,
-        unit: 'meters',
+        unit: "meters",
         coordinates: {
           latitude: elevationData.latitude,
-          longitude: elevationData.longitude
+          longitude: elevationData.longitude,
         },
-        source: 'Open-Elevation',
-        cached: false
+        source: "Open-Elevation",
+        cached: false,
       };
 
       // Cache the result
       elevationCache.set(cacheKey, {
         data: { ...result, cached: true },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // Clean old cache entries periodically
@@ -108,27 +108,27 @@ router.get('/coordinates/:lat/:lon', elevationLimiter, async (req, res) => {
       throw fetchError;
     }
   } catch (error) {
-    console.error('Elevation API error:', error.message);
-    
-    if (error.name === 'AbortError') {
+    console.error("Elevation API error:", error.message);
+
+    if (error.name === "AbortError") {
       return res.status(504).json({
-        error: 'Elevation service timeout'
+        error: "Elevation service timeout",
       });
     }
-    
+
     res.status(500).json({
-      error: 'Failed to fetch elevation data',
-      message: error.message
+      error: "Failed to fetch elevation data",
+      message: error.message,
     });
   }
 });
 
 // Health check endpoint
-router.get('/health', (req, res) => {
+router.get("/health", (req, res) => {
   res.json({
-    status: 'ok',
+    status: "ok",
     cacheSize: elevationCache.size,
-    service: 'elevation'
+    service: "elevation",
   });
 });
 

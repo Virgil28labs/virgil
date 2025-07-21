@@ -16,12 +16,16 @@
   justify-content: center;
   z-index: 1001;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .virgil-chatbot-bubble:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .chat-icon {
@@ -110,7 +114,7 @@
 }
 
 .assistant-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   font-size: 1.2rem;
   color: var(--brand-accent-purple);
@@ -139,7 +143,7 @@
 }
 
 .tooltip::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -6px;
   left: 20px;
@@ -173,7 +177,7 @@
   border: 1px solid #e9ecef;
   border-radius: 20px;
   padding: 0.5rem 1rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.9rem;
   color: var(--brand-medium-gray);
   cursor: pointer;
@@ -244,7 +248,7 @@
 }
 
 .model-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--brand-dark-purple);
@@ -321,7 +325,7 @@
   padding: 0.5rem 0.75rem;
   border-radius: 20px;
   border-bottom-left-radius: 4px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.8rem;
   max-width: 85%;
   animation: fadeIn 0.3s ease-out;
@@ -366,7 +370,7 @@
 .chatbot-avatar-v {
   color: #6c3baa !important;
   font-weight: 900 !important;
-  font-family: 'Montserrat', sans-serif !important;
+  font-family: "Montserrat", sans-serif !important;
   font-size: 1.6rem !important;
   text-transform: uppercase !important;
 }
@@ -377,7 +381,7 @@
   padding: 0.5rem 0.75rem;
   border-radius: 16px;
   line-height: 1.3;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.8rem;
   border: 1px solid rgba(108, 59, 170, 0.1);
 }
@@ -420,11 +424,17 @@
   animation: bounce 1.4s ease-in-out infinite both;
 }
 
-.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+.typing-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0.8);
     opacity: 0.5;
   }
@@ -445,7 +455,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.9rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .error-msg button {
@@ -478,7 +488,7 @@
   font-size: 0.9rem;
   color: var(--brand-medium-gray);
   margin-bottom: 0.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .quick-btn {
@@ -491,7 +501,7 @@
   font-size: 0.9rem;
   text-align: left;
   transition: all 0.2s;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .quick-btn:hover {
@@ -528,7 +538,7 @@
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
   outline: none;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: var(--brand-dark-purple);
 }
 
@@ -548,7 +558,7 @@
   cursor: pointer;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s;
@@ -587,7 +597,7 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .profile-dropdown-btn:hover {
@@ -659,7 +669,7 @@
 }
 
 .profile-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   font-size: 1rem;
   color: var(--brand-dark-purple);
@@ -668,7 +678,7 @@
 }
 
 .profile-email {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.85rem;
   color: var(--brand-medium-gray);
   margin: 0;
@@ -677,7 +687,7 @@
 }
 
 .section-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--brand-dark-purple);
@@ -707,7 +717,7 @@
 }
 
 .item-text {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.85rem;
   color: var(--brand-medium-gray);
   line-height: 1.3;
@@ -726,7 +736,7 @@
   width: 100%;
   margin-bottom: 0.5rem;
   transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.85rem;
   color: var(--brand-medium-gray);
 }
@@ -758,7 +768,7 @@
   color: var(--brand-dark-purple);
   padding: 10px;
   font-size: 12px;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
   line-height: 1.3;
   resize: vertical;
   min-height: 100px;
@@ -837,35 +847,35 @@
     bottom: 1rem;
     height: 400px;
   }
-  
+
   .virgil-chatbot-bubble {
     right: 1rem;
     bottom: 1rem;
   }
-  
+
   .message {
     max-width: 90%;
   }
-  
+
   .profile-dropdown {
     right: -1rem;
     left: -1rem;
     min-width: auto;
     margin-top: 0.25rem;
   }
-  
+
   .profile-section {
     padding: 0.75rem;
   }
-  
+
   .section-title {
     font-size: 0.8rem;
   }
-  
+
   .item-text {
     font-size: 0.8rem;
   }
-  
+
   .profile-action {
     padding: 0.6rem;
     font-size: 0.8rem;

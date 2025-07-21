@@ -16,14 +16,14 @@ class RequestDeduplicator {
    * Creates a numeric hash for better performance than string keys
    */
   private createHash(url: string, options?: RequestInit): number {
-    const method = options?.method || 'GET';
-    const body = options?.body || '';
+    const method = options?.method || "GET";
+    const body = options?.body || "";
     const str = `${method}:${url}:${body}`;
-    
+
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash;
@@ -69,7 +69,7 @@ class RequestDeduplicator {
     // Store the pending request
     this.pendingRequests.set(key, {
       promise,
-      timestamp: now
+      timestamp: now,
     });
 
     // Return the original response for the first caller
@@ -91,15 +91,15 @@ class RequestDeduplicator {
    */
   private cleanup(now: number): void {
     const keysToDelete: number[] = [];
-    
+
     for (const [key, request] of this.pendingRequests.entries()) {
       if (now - request.timestamp > this.maxAge) {
         keysToDelete.push(key);
       }
     }
-    
+
     // Batch delete for better performance
-    keysToDelete.forEach(key => this.pendingRequests.delete(key));
+    keysToDelete.forEach((key) => this.pendingRequests.delete(key));
   }
 
   /**
@@ -121,7 +121,10 @@ class RequestDeduplicator {
 export const requestDeduplicator = new RequestDeduplicator();
 
 // Convenience function for deduped fetch
-export const dedupeFetch = (url: string, options?: RequestInit): Promise<Response> => {
+export const dedupeFetch = (
+  url: string,
+  options?: RequestInit,
+): Promise<Response> => {
   return requestDeduplicator.dedupeFetch(url, options);
 };
 
@@ -130,6 +133,6 @@ export function useRequestDeduplication() {
   return {
     dedupeFetch,
     getPendingCount: () => requestDeduplicator.getPendingCount(),
-    clear: () => requestDeduplicator.clear()
+    clear: () => requestDeduplicator.clear(),
   };
 }

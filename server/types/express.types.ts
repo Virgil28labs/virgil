@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
 // Extended Express types for our application
 export interface AuthenticatedRequest extends Request {
@@ -26,14 +26,14 @@ export interface ApiResponse extends Response {
 export type MiddlewareFunction = (
   req: ApiRequest,
   res: ApiResponse,
-  next: NextFunction
+  next: NextFunction,
 ) => void | Promise<void>;
 
 export type ErrorHandler = (
   err: Error,
   req: ApiRequest,
   res: ApiResponse,
-  next: NextFunction
+  next: NextFunction,
 ) => void;
 
 export interface ServerConfig {
@@ -49,5 +49,5 @@ export interface ServerConfig {
     max: number;
     message: string;
   };
-  environment: 'development' | 'production' | 'test';
+  environment: "development" | "production" | "test";
 }

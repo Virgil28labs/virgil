@@ -9,7 +9,7 @@ The Notes app is now ready for testing! Here's what's implemented:
 3. **Single Input Box** - With rotating placeholders that inspire capture
 4. **Entry Display** - Reverse chronological feed with beautiful cards
 5. **Checkbox Support** - Lines with [ ] or - [ ] render as interactive checkboxes
-6. **IndexedDB Storage** - All notes persist locally 
+6. **IndexedDB Storage** - All notes persist locally
 7. **Filter Bar** - Filter by tags (All, Journal, Tasks, Work, Personal)
 8. **Search** - Hidden by default, toggle with search icon
 9. **AI Integration** (Mock) - Currently returns mock tags and extracts mock tasks

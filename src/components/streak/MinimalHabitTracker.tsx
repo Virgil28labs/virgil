@@ -1,17 +1,17 @@
-import { memo, useState, useCallback } from 'react'
-import { useHabits } from '../../hooks/useHabits'
-import { HabitCard } from './HabitCard'
-import { AddHabitForm } from './AddHabitForm'
-import './MinimalHabitTracker.css'
+import { memo, useState, useCallback } from "react";
+import { useHabits } from "../../hooks/useHabits";
+import { HabitCard } from "./HabitCard";
+import { AddHabitForm } from "./AddHabitForm";
+import "./MinimalHabitTracker.css";
 
 interface MinimalHabitTrackerProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export const MinimalHabitTracker = memo(function MinimalHabitTracker({
   isOpen,
-  onClose
+  onClose,
 }: MinimalHabitTrackerProps) {
   const {
     habits,
@@ -21,30 +21,30 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
     updateHabit,
     deleteHabit,
     undoCheckIn,
-    canCheckInToday
-  } = useHabits()
+    canCheckInToday,
+  } = useHabits();
 
-  const [isAddingHabit, setIsAddingHabit] = useState(false)
+  const [isAddingHabit, setIsAddingHabit] = useState(false);
 
-  const handleAddHabit = useCallback((name: string, emoji: string) => {
-    addHabit(name, emoji)
-    setIsAddingHabit(false)
-  }, [addHabit])
+  const handleAddHabit = useCallback(
+    (name: string, emoji: string) => {
+      addHabit(name, emoji);
+      setIsAddingHabit(false);
+    },
+    [addHabit],
+  );
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
-    <div 
-      className="habit-tracker-backdrop" 
+    <div
+      className="habit-tracker-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Habit Tracker"
     >
-      <div 
-        className="habit-tracker-panel" 
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="habit-tracker-panel" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="habit-tracker-header">
           <h2>
@@ -55,8 +55,12 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             <button
               className="reset-button"
               onClick={() => {
-                if (window.confirm('Reset all habits and start fresh? This cannot be undone.')) {
-                  localStorage.removeItem('virgil_habits');
+                if (
+                  window.confirm(
+                    "Reset all habits and start fresh? This cannot be undone.",
+                  )
+                ) {
+                  localStorage.removeItem("virgil_habits");
                   window.location.reload();
                 }
               }}
@@ -85,15 +89,17 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             <span className="stat-value">{stats.totalCheckIns}</span>
             <span className="stat-label">Check-ins</span>
           </div>
-          <div 
+          <div
             className="stat best-streak-stat"
             data-start-date={
-              stats.bestStreakStartDate 
-                ? `Started ${new Date(stats.bestStreakStartDate).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
+              stats.bestStreakStartDate
+                ? `Started ${new Date(
+                    stats.bestStreakStartDate,
+                  ).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
                   })}`
-                : ''
+                : ""
             }
           >
             <span className="stat-value">{stats.currentStreak}</span>
@@ -113,7 +119,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
 
         {/* Habits Grid */}
         <div className="habits-grid">
-          {habits.map(habit => (
+          {habits.map((habit) => (
             <HabitCard
               key={habit.id}
               habit={habit}
@@ -124,7 +130,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
               onUndo={undoCheckIn}
             />
           ))}
-          
+
           {/* Add new habit */}
           {habits.length < 10 && !isAddingHabit && (
             <button
@@ -139,5 +145,5 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
         </div>
       </div>
     </div>
-  )
-})
+  );
+});

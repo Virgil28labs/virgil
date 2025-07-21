@@ -3,11 +3,12 @@
    Imports design system variables and animations
    ======================================== */
 
-@import './styles/variables.css';
-@import './styles/animations.css';
+@import "./styles/variables.css";
+@import "./styles/animations.css";
 
 /* Global Reset */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -15,7 +16,9 @@ html, body {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -50,7 +53,7 @@ html, body {
 }
 
 .loading-screen p {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 20px;
   color: var(--brand-light-gray);
   opacity: 0.6;
@@ -65,7 +68,6 @@ html, body {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-
 
 /* Auth Page */
 .auth-page {
@@ -94,7 +96,7 @@ html, body {
 }
 
 .auth-page header h1 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(2rem, 8vw, 3rem);
   font-weight: 400;
   color: var(--brand-light-gray);
@@ -125,7 +127,7 @@ html, body {
   opacity: 0.7; /* Improved from 0.4 for better accessibility */
   border: none;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1.2rem, 4vw, 1.5rem);
   font-weight: 400;
   transition: opacity 0.3s ease;
@@ -140,7 +142,7 @@ html, body {
 .auth-switch {
   text-align: center;
   margin-top: clamp(1rem, 3vh, 1.5rem);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: var(--brand-light-gray);
   opacity: 0.6;
   font-size: clamp(0.9rem, 3vw, 1rem);
@@ -152,7 +154,7 @@ html, body {
   color: var(--brand-light-gray);
   cursor: pointer;
   text-decoration: underline;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: inherit;
   opacity: 0.8;
 }
@@ -162,7 +164,8 @@ html, body {
 }
 
 /* Forms */
-.signup-form, .login-form {
+.signup-form,
+.login-form {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -171,7 +174,8 @@ html, body {
   justify-content: center;
 }
 
-.signup-form h2, .login-form h2 {
+.signup-form h2,
+.login-form h2 {
   display: none;
 }
 
@@ -199,12 +203,14 @@ html, body {
   border-bottom: 1px solid var(--brand-accent-purple);
   background: transparent;
   color: var(--brand-light-gray);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1rem, 4vw, 1.25rem);
   font-weight: 400;
   text-align: left;
   opacity: 0.8;
-  transition: border-color 0.3s ease, opacity 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    opacity 0.3s ease;
   box-sizing: border-box;
 }
 
@@ -217,7 +223,7 @@ html, body {
 .form-group input::placeholder {
   color: var(--brand-light-gray);
   opacity: 0.4;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .form-group input:disabled {
@@ -233,17 +239,18 @@ html, body {
 .form-group small {
   color: var(--brand-light-gray);
   opacity: 0.6;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
 }
 
-.signup-form button, .login-form button {
+.signup-form button,
+.login-form button {
   width: clamp(160px, 50vw, 220px);
   padding: 0;
   background: none;
   color: var(--brand-accent-purple);
   border: 1px solid var(--brand-accent-purple);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1rem, 3.5vw, 1.25rem);
   font-weight: 400;
   cursor: pointer;
@@ -256,14 +263,14 @@ html, body {
   display: block;
 }
 
-.signup-form button:hover:not(:disabled), 
+.signup-form button:hover:not(:disabled),
 .login-form button:hover:not(:disabled) {
   opacity: 1;
   background: var(--brand-accent-purple);
   color: white;
 }
 
-.signup-form button:disabled, 
+.signup-form button:disabled,
 .login-form button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -273,7 +280,7 @@ html, body {
   margin-top: 2rem;
   padding: 0;
   text-align: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 16px;
   font-weight: 400;
 }
@@ -306,7 +313,6 @@ html, body {
   overflow: hidden;
 }
 
-
 .user-info {
   margin: 0 0 0.15rem 0;
   text-align: center;
@@ -314,7 +320,7 @@ html, body {
 
 .user-info p {
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
   line-height: 1.2;
@@ -338,9 +344,12 @@ html, body {
   opacity: 0.8;
 }
 
-.user-ip, .ip-address, .ip-loading, .ip-error {
+.user-ip,
+.ip-address,
+.ip-loading,
+.ip-error {
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
   line-height: 1.2;
@@ -367,9 +376,12 @@ html, body {
   margin-bottom: 0.15rem;
 }
 
-.coordinates, .street-address, .address-loading, .elevation {
+.coordinates,
+.street-address,
+.address-loading,
+.elevation {
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--brand-light-gray);
   line-height: 1.2;
@@ -403,7 +415,7 @@ html, body {
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   cursor: pointer;
   transition: opacity 0.3s ease;
 }
@@ -442,7 +454,7 @@ html, body {
   transition: all 0.3s ease;
   padding: 0.15rem;
   z-index: 1000;
-  box-shadow: 
+  box-shadow:
     0 0 15px rgba(59, 130, 246, 0.8),
     0 0 25px rgba(99, 102, 241, 0.6),
     0 0 35px rgba(139, 92, 246, 0.4),
@@ -453,11 +465,16 @@ html, body {
 
 .sign-out-fixed:hover {
   opacity: 1;
-  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
+  background: linear-gradient(
+    135deg,
+    var(--brand-accent-pink),
+    #f472b6,
+    #ec4899
+  );
   color: white;
   transform: scale(1.15);
   border: 2px solid var(--brand-accent-pink);
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(239, 176, 194, 1),
     0 0 30px rgba(244, 114, 182, 0.8),
     0 0 45px rgba(236, 72, 153, 0.6),
@@ -467,7 +484,7 @@ html, body {
 
 @keyframes powerButtonGlow {
   0% {
-    box-shadow: 
+    box-shadow:
       0 0 8px rgba(59, 130, 246, 0.5),
       0 0 15px rgba(99, 102, 241, 0.3),
       0 0 20px rgba(139, 92, 246, 0.2),
@@ -475,7 +492,7 @@ html, body {
       inset 0 -1px 2px rgba(99, 102, 241, 0.3);
   }
   100% {
-    box-shadow: 
+    box-shadow:
       0 0 12px rgba(59, 130, 246, 0.7),
       0 0 20px rgba(99, 102, 241, 0.5),
       0 0 25px rgba(139, 92, 246, 0.3),
@@ -504,7 +521,7 @@ html, body {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  box-shadow: 
+  box-shadow:
     0 0 8px rgba(59, 130, 246, 0.5),
     0 0 15px rgba(99, 102, 241, 0.3),
     0 0 20px rgba(139, 92, 246, 0.2),
@@ -515,9 +532,14 @@ html, body {
 
 .power-button:hover {
   transform: scale(1.15);
-  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
+  background: linear-gradient(
+    135deg,
+    var(--brand-accent-pink),
+    #f472b6,
+    #ec4899
+  );
   border: 2px solid var(--brand-accent-pink);
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(239, 176, 194, 1),
     0 0 30px rgba(244, 114, 182, 0.8),
     0 0 45px rgba(236, 72, 153, 0.6),
@@ -534,7 +556,7 @@ html, body {
 }
 
 .power-icon::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -1px;
   left: 50%;
@@ -544,7 +566,6 @@ html, body {
   background: white;
 }
 
-
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
   /* Auth Page Mobile */
@@ -552,44 +573,45 @@ html, body {
     gap: 2rem;
     padding: 1rem;
   }
-  
+
   .auth-page header h1 {
     font-size: 36px;
   }
-  
+
   .auth-toggle {
     gap: 2rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .auth-toggle button {
     font-size: 20px;
     padding: 0.5rem;
   }
-  
+
   .auth-switch {
     margin-top: 1.5rem;
     font-size: 14px;
   }
-  
+
   /* Form Mobile */
   .form-group {
     margin-bottom: 1.5rem;
     max-width: 95vw;
   }
-  
-  .signup-form button, .login-form button {
+
+  .signup-form button,
+  .login-form button {
     width: 180px;
     height: 45px;
     font-size: 18px;
     margin-top: 1.5rem;
   }
-  
+
   .message {
     margin-top: 1.5rem;
     font-size: 14px;
   }
-  
+
   /* Dashboard Mobile */
   .dashboard {
     padding: 1rem;
@@ -601,33 +623,31 @@ html, body {
   .auth-page header h1 {
     font-size: 28px;
   }
-  
-  
+
   .auth-toggle {
     gap: 1.5rem;
   }
-  
+
   .auth-toggle button {
     font-size: 18px;
   }
-  
+
   .form-group input {
     font-size: 16px;
     min-width: 250px;
   }
-  
-  .signup-form button, .login-form button {
+
+  .signup-form button,
+  .login-form button {
     width: 160px;
     height: 40px;
     font-size: 16px;
   }
-  
 }
-
 
 /* Virgil Logo */
 .virgil-logo {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 400;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   text-align: left;
@@ -652,7 +672,9 @@ html, body {
   padding: 0;
   margin: 0;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .virgil-logo-button:hover {
@@ -684,7 +706,7 @@ html, body {
   transform: translateX(-50%);
   z-index: 1000;
   text-align: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: var(--brand-light-gray);
   user-select: none;
   line-height: 1.2;
@@ -722,19 +744,19 @@ html, body {
   .datetime-display {
     top: 1.5rem;
   }
-  
+
   .datetime-display .time {
     font-size: clamp(1rem, 2.5vw, 1.4rem);
   }
-  
+
   .datetime-display .time-seconds {
     font-size: 30%;
   }
-  
+
   .datetime-display .date {
     font-size: clamp(0.7rem, 1.8vw, 0.9rem);
   }
-  
+
   .datetime-display .day {
     font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   }
@@ -826,13 +848,13 @@ a:focus-visible,
     min-width: 44px;
     min-height: 44px;
   }
-  
+
   .auth-toggle button {
     min-width: 44px;
     min-height: 44px;
     padding: 12px 16px;
   }
-  
+
   /* Prevent zoom on form inputs for iOS */
   input[type="email"],
   input[type="password"],
@@ -964,7 +986,11 @@ a:focus-visible,
   height: 80vh;
   max-width: 1200px;
   max-height: 900px;
-  background: linear-gradient(135deg, rgba(57, 41, 62, 0.98) 0%, rgba(108, 59, 170, 0.08) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(57, 41, 62, 0.98) 0%,
+    rgba(108, 59, 170, 0.08) 100%
+  );
   border: 1px solid rgba(139, 123, 161, 0.4);
   border-radius: var(--radius-large);
   overflow: hidden;
@@ -1038,7 +1064,7 @@ a:focus-visible,
   color: var(--brand-light-gray);
   opacity: 0.7;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 16px;
   font-weight: 400;
   padding: 8px 16px;
@@ -1063,7 +1089,7 @@ a:focus-visible,
 }
 
 .profile-tabs button.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -8px;
   left: 0;
@@ -1356,7 +1382,7 @@ a:focus-visible,
   color: var(--brand-light-gray);
   padding: 12px;
   font-size: 13px;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
   line-height: 1.4;
   resize: vertical;
   min-height: 120px;
@@ -1529,17 +1555,39 @@ a:focus-visible,
   opacity: 0;
 }
 
-.data-point:nth-child(1) { animation-delay: 0ms; }
-.data-point:nth-child(2) { animation-delay: 20ms; }
-.data-point:nth-child(3) { animation-delay: 40ms; }
-.data-point:nth-child(4) { animation-delay: 60ms; }
-.data-point:nth-child(5) { animation-delay: 80ms; }
-.data-point:nth-child(6) { animation-delay: 100ms; }
-.data-point:nth-child(7) { animation-delay: 120ms; }
-.data-point:nth-child(8) { animation-delay: 140ms; }
-.data-point:nth-child(9) { animation-delay: 160ms; }
-.data-point:nth-child(10) { animation-delay: 180ms; }
-.data-point:nth-child(n+11) { animation-delay: 200ms; }
+.data-point:nth-child(1) {
+  animation-delay: 0ms;
+}
+.data-point:nth-child(2) {
+  animation-delay: 20ms;
+}
+.data-point:nth-child(3) {
+  animation-delay: 40ms;
+}
+.data-point:nth-child(4) {
+  animation-delay: 60ms;
+}
+.data-point:nth-child(5) {
+  animation-delay: 80ms;
+}
+.data-point:nth-child(6) {
+  animation-delay: 100ms;
+}
+.data-point:nth-child(7) {
+  animation-delay: 120ms;
+}
+.data-point:nth-child(8) {
+  animation-delay: 140ms;
+}
+.data-point:nth-child(9) {
+  animation-delay: 160ms;
+}
+.data-point:nth-child(10) {
+  animation-delay: 180ms;
+}
+.data-point:nth-child(n + 11) {
+  animation-delay: 200ms;
+}
 
 @keyframes fadeInUp {
   from {
@@ -1563,7 +1611,7 @@ a:focus-visible,
 }
 
 .data-point.live::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 8px;
   right: 8px;
@@ -1575,11 +1623,12 @@ a:focus-visible,
 }
 
 @keyframes gentle-pulse {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 1;
     transform: scale(1.2);
   }
@@ -1593,9 +1642,15 @@ a:focus-visible,
 }
 
 @keyframes iconBounce {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .data-label {
@@ -1611,7 +1666,7 @@ a:focus-visible,
 .data-value {
   font-size: 12px;
   color: var(--brand-light-gray);
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
   margin-left: auto;
   text-align: right;
   overflow: hidden;
@@ -1642,11 +1697,21 @@ a:focus-visible,
   animation-fill-mode: both;
 }
 
-.permission-btn:nth-child(1) { animation-delay: 220ms; }
-.permission-btn:nth-child(2) { animation-delay: 240ms; }
-.permission-btn:nth-child(3) { animation-delay: 260ms; }
-.permission-btn:nth-child(4) { animation-delay: 280ms; }
-.permission-btn:nth-child(5) { animation-delay: 300ms; }
+.permission-btn:nth-child(1) {
+  animation-delay: 220ms;
+}
+.permission-btn:nth-child(2) {
+  animation-delay: 240ms;
+}
+.permission-btn:nth-child(3) {
+  animation-delay: 260ms;
+}
+.permission-btn:nth-child(4) {
+  animation-delay: 280ms;
+}
+.permission-btn:nth-child(5) {
+  animation-delay: 300ms;
+}
 
 .permission-btn:not(:disabled):hover {
   background: rgba(139, 123, 161, 0.1);
@@ -1660,9 +1725,16 @@ a:focus-visible,
 }
 
 @keyframes subtle-wiggle {
-  0%, 100% { transform: rotate(0deg) translateY(-2px); }
-  25% { transform: rotate(-2deg) translateY(-2px); }
-  75% { transform: rotate(2deg) translateY(-2px); }
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(-2px);
+  }
+  25% {
+    transform: rotate(-2deg) translateY(-2px);
+  }
+  75% {
+    transform: rotate(2deg) translateY(-2px);
+  }
 }
 
 .permission-btn.prompt,
@@ -1715,91 +1787,90 @@ a:focus-visible,
     max-width: none;
     max-height: none;
   }
-  
+
   .profile-viewer-header {
     padding: 16px 20px;
   }
-  
+
   .profile-viewer-content {
     padding: 20px;
   }
-  
+
   .tab-content {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .profile-tabs {
     padding: 16px 20px;
     gap: 1.5rem;
   }
-  
+
   .profile-tabs button {
     font-size: 14px;
     padding: 6px 12px;
   }
-  
+
   .profile-info-section {
     padding: 16px;
   }
-  
+
   .profile-info-section h4 {
     font-size: 12px;
     margin-bottom: 12px;
   }
-  
+
   .profile-user-name {
     font-size: 16px;
   }
-  
+
   .profile-user-email {
     font-size: 13px;
   }
-  
-  
+
   .info-text {
     font-size: 13px;
   }
-  
+
   .profile-action-btn {
     padding: 10px 14px;
     font-size: 12px;
   }
-  
+
   .virgil-data-grid {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
   .data-point {
     padding: 8px 10px;
   }
-  
+
   .data-icon {
     font-size: 16px;
   }
-  
+
   .data-label {
     font-size: 10px;
   }
-  
+
   .data-value {
     font-size: 11px;
   }
-  
+
   .permission-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  
+
   .permission-btn {
     padding: 12px 8px;
   }
-  
+
   .perm-icon {
     font-size: 20px;
   }
-  
+
   .perm-name {
     font-size: 11px;
   }
@@ -1811,13 +1882,12 @@ a:focus-visible,
     width: 85vw;
     height: 85vh;
   }
-  
+
   .profile-viewer-content {
     padding: 24px;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
-
 
 /* Loading animations */
 
@@ -1846,7 +1916,9 @@ a:focus-visible,
   border-radius: 12px;
   padding: 12px 20px;
   cursor: pointer;
-  transition: all 0.3s ease, opacity 0.15s ease;
+  transition:
+    all 0.3s ease,
+    opacity 0.15s ease;
   z-index: 1000;
   backdrop-filter: blur(10px);
   min-width: 150px;
@@ -1874,7 +1946,9 @@ a:focus-visible,
 .weather-widget.raccoon-interaction {
   background: rgba(108, 59, 170, 0.15) !important;
   border-color: rgba(108, 59, 170, 0.6) !important;
-  box-shadow: 0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6) !important;
+  box-shadow:
+    0 0 25px rgba(108, 59, 170, 0.8),
+    0 0 35px rgba(139, 123, 161, 0.6) !important;
   transform: scale(1.1) translateY(-3px) !important;
   /* Ensure position stays fixed */
   position: fixed !important;
@@ -1887,7 +1961,7 @@ a:focus-visible,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: var(--brand-light-gray);
   transition: opacity 0.2s ease;
 }
@@ -1909,7 +1983,6 @@ a:focus-visible,
   margin-left: 4px;
 }
 
-
 /* Mobile responsiveness for weather widget */
 @media (max-width: 768px) {
   .weather-widget {
@@ -1918,15 +1991,15 @@ a:focus-visible,
     padding: 8px 16px;
     min-width: 120px;
   }
-  
+
   .weather-temp {
     font-size: 18px;
   }
-  
+
   .weather-emoji {
     font-size: 20px;
   }
-  
+
   .weather-condition {
     display: none;
   }
@@ -1940,11 +2013,11 @@ a:focus-visible,
     min-width: 100px;
     padding: 6px 12px;
   }
-  
+
   .weather-temp {
     font-size: 16px;
   }
-  
+
   .weather-emoji {
     font-size: 18px;
   }
@@ -1967,7 +2040,7 @@ a:focus-visible,
   border-radius: 12px;
   padding: 16px;
   min-width: 320px;
-  box-shadow: 
+  box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   animation: fadeInSlideDown 0.3s ease-out;
@@ -1986,7 +2059,7 @@ a:focus-visible,
 
 .weather-forecast {
   color: var(--brand-light-gray);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .forecast-header {
@@ -2077,15 +2150,15 @@ a:focus-visible,
     min-width: 280px;
     padding: 12px;
   }
-  
+
   .forecast-days {
     gap: 8px;
   }
-  
+
   .forecast-day {
     padding: 6px 2px;
   }
-  
+
   .forecast-icon {
     font-size: 20px;
   }
@@ -2098,23 +2171,24 @@ a:focus-visible,
     transform: translateX(-50%);
     min-width: 260px;
   }
-  
+
   .forecast-day-name {
     font-size: 10px;
   }
-  
+
   .forecast-temps {
     font-size: 12px;
   }
 }
-
 
 /* ========================================
    VIRGIL DESIGN SYSTEM UTILITIES
    ======================================== */
 
 /* Opacity Utilities - Only keeping used ones */
-.opacity-80 { opacity: 0.8; }
+.opacity-80 {
+  opacity: 0.8;
+}
 
 /* Interactive States */
 .interactive {
@@ -2248,7 +2322,6 @@ a:focus-visible,
   line-height: 1.2;
 }
 
-
 /* Timezone Hover Panel */
 .timezone-hover-panel {
   display: flex;
@@ -2257,7 +2330,7 @@ a:focus-visible,
   border: 1px solid rgba(178, 165, 193, 0.3);
   border-radius: var(--radius-small);
   padding: 0.75rem 1rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   animation: fadeInPanel 0.2s ease-out;
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -2291,8 +2364,6 @@ a:focus-visible,
   }
 }
 
-
-
 /* Timezone Modal */
 .timezone-modal-overlay {
   position: fixed;
@@ -2311,8 +2382,12 @@ a:focus-visible,
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .timezone-modal {
@@ -2326,7 +2401,7 @@ a:focus-visible,
   display: flex;
   flex-direction: column;
   box-shadow: var(--elevation-3);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   animation: slideInModal 0.3s ease-out;
 }
 
@@ -2488,7 +2563,7 @@ a:focus-visible,
   border-radius: var(--radius-medium);
   color: var(--off-white);
   padding: 0.75rem 2.5rem 0.75rem 2.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.875rem;
   transition: all var(--transition-fast);
 }
@@ -2612,9 +2687,6 @@ a:focus-visible,
   font-size: 0.875rem;
 }
 
-
-
-
 /* Timezone List */
 .timezone-list {
   list-style: none;
@@ -2672,7 +2744,7 @@ a:focus-visible,
   border-radius: var(--radius-small);
   color: var(--off-white);
   padding: 0.25rem 0.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -2692,8 +2764,6 @@ a:focus-visible,
 .timezone-list .timezone-time {
   font-size: 1rem;
 }
-
-
 
 .remove-btn {
   position: absolute;
@@ -2718,13 +2788,10 @@ a:focus-visible,
   opacity: 0.7;
 }
 
-
 .remove-btn:hover {
   color: #e74c3c;
   opacity: 1;
 }
-
-
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
@@ -2732,50 +2799,47 @@ a:focus-visible,
     margin: 0.5rem;
     max-height: 90vh;
   }
-  
+
   .modal-header,
   .modal-content,
   .modal-footer {
     padding: 1rem;
   }
-  
+
   .modal-content {
     gap: 1.5rem;
   }
-  
+
   .timezone-hover-panel {
     min-width: 250px;
     padding: 0.75rem;
   }
-  
+
   .timezone-item {
     padding: 0.75rem;
   }
-  
+
   .timezone-details {
     gap: 0.5rem;
   }
-  
-  
+
   .suggestions-list {
     max-height: 200px;
   }
-  
 }
 
 @media (max-width: 480px) {
   .timezone-modal-overlay {
     padding: 0.5rem;
   }
-  
+
   .timezone-list {
     grid-template-columns: 1fr;
   }
-  
+
   .search-input {
     padding: 0.5rem 2rem 0.5rem 2rem;
   }
-  
 }
 
 /* Editable Profile Fields */
@@ -2941,7 +3005,6 @@ a:focus-visible,
   font-size: 20px;
 }
 
-
 /* Unique ID Field */
 .data-point.unique-id {
   background: rgba(108, 59, 170, 0.08);
@@ -2949,7 +3012,7 @@ a:focus-visible,
 }
 
 .data-point.unique-id .data-value {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-weight: 600;
   color: var(--brand-accent-purple);
 }
@@ -3029,7 +3092,7 @@ a:focus-visible,
   border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 /* Profile Cards Container */
@@ -3143,7 +3206,7 @@ a:focus-visible,
 
 /* Contact Card */
 .contact-card .phone-field .data-value {
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: "Monaco", "Courier New", monospace;
   letter-spacing: 0.5px;
 }
 
@@ -3326,13 +3389,21 @@ a:focus-visible,
 }
 
 @keyframes progressFill {
-  from { width: 0; }
-  to { width: 80%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 80%;
+  }
 }
 
 @keyframes progressComplete {
-  from { width: 80%; }
-  to { width: 100%; }
+  from {
+    width: 80%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 .save-status {
@@ -3347,53 +3418,52 @@ a:focus-visible,
     padding: 4px;
     gap: 12px;
   }
-  
+
   .profile-card {
     border-radius: 8px;
   }
-  
+
   .card-header {
     padding: 10px 12px;
   }
-  
+
   .card-header h4 {
     font-size: 13px;
   }
-  
+
   .card-content {
     padding: 12px;
   }
-  
+
   .details-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .address-row {
     grid-template-columns: 1fr;
   }
-  
+
   .data-point {
     padding: 10px;
   }
-  
+
   .data-icon {
     font-size: 14px;
   }
-  
+
   .data-label {
     font-size: 9px;
   }
-  
+
   .data-value {
     font-size: 13px;
   }
-  
+
   .save-progress-container {
     padding: 10px 12px;
   }
-  
+
   .edit-icon {
     font-size: 10px;
   }
 }
-

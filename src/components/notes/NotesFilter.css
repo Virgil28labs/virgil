@@ -34,7 +34,7 @@
 }
 
 .notes-filter-button.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -159,11 +159,11 @@
   .notes-filter-bar {
     gap: 0.75rem;
   }
-  
+
   .notes-filter-button {
     font-size: 0.8rem;
   }
-  
+
   .notes-search-toggle {
     padding: 0.25rem;
   }

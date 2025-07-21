@@ -35,7 +35,7 @@ export interface GiphyImages {
   preview: GiphyImageRendition;
   preview_gif: GiphyImageRendition;
   preview_webp: GiphyImageRendition;
-  '480w_still': GiphyImageRendition;
+  "480w_still": GiphyImageRendition;
 }
 
 // Giphy User object
@@ -54,7 +54,7 @@ export interface GiphyUser {
 
 // Core Giphy GIF object
 export interface GiphyGif {
-  type: 'gif';
+  type: "gif";
   id: string;
   url: string;
   slug: string;
@@ -64,7 +64,7 @@ export interface GiphyGif {
   username: string;
   source: string;
   title: string;
-  rating: 'g' | 'pg' | 'pg-13' | 'r';
+  rating: "g" | "pg" | "pg-13" | "r";
   content_url: string;
   source_tld: string;
   source_post_url: string;
@@ -90,7 +90,7 @@ export interface GiphyImage {
   previewUrl: string; // Still image for loading
   originalUrl: string; // Full quality version
   title: string;
-  rating: 'g' | 'pg' | 'pg-13' | 'r';
+  rating: "g" | "pg" | "pg-13" | "r";
   width: number;
   height: number;
   username?: string;
@@ -128,9 +128,9 @@ export interface GiphySearchParams {
   q: string; // Search query
   limit?: number; // Number of results (default 25, max 50)
   offset?: number; // Starting position
-  rating?: 'g' | 'pg' | 'pg-13' | 'r'; // Content rating
+  rating?: "g" | "pg" | "pg-13" | "r"; // Content rating
   lang?: string; // Language code
-  fmt?: 'json' | 'html'; // Response format
+  fmt?: "json" | "html"; // Response format
   random_id?: string; // User session identifier
 }
 
@@ -138,14 +138,13 @@ export interface GiphySearchParams {
 export interface GiphyTrendingParams {
   limit?: number;
   offset?: number;
-  rating?: 'g' | 'pg' | 'pg-13' | 'r';
-  fmt?: 'json' | 'html';
+  rating?: "g" | "pg" | "pg-13" | "r";
+  fmt?: "json" | "html";
   random_id?: string;
 }
 
-
 // Loading states
-export type GiphyLoadingState = 'idle' | 'loading' | 'error' | 'success';
+export type GiphyLoadingState = "idle" | "loading" | "error" | "success";
 
 // Component prop types
 export interface GiphyCardProps {
@@ -167,10 +166,10 @@ export interface GiphyModalProps {
 
 export interface GiphySearchControlsProps {
   searchQuery: string;
-  rating: 'g' | 'pg' | 'pg-13' | 'r';
+  rating: "g" | "pg" | "pg-13" | "r";
   isLoading: boolean;
   onSearchChange: (query: string) => void;
-  onRatingChange: (rating: 'g' | 'pg' | 'pg-13' | 'r') => void;
+  onRatingChange: (rating: "g" | "pg" | "pg-13" | "r") => void;
   onSearch: () => void;
 }
 
@@ -190,12 +189,12 @@ export interface GiphyContextType {
   trendingGifs: GiphyImage[];
   favorites: GiphyImage[];
   searchQuery: string;
-  currentTab: 'search' | 'trending' | 'favorites';
-  rating: 'g' | 'pg' | 'pg-13' | 'r';
+  currentTab: "search" | "trending" | "favorites";
+  rating: "g" | "pg" | "pg-13" | "r";
   loading: GiphyLoadingState;
   error: string | null;
   hasMore: boolean;
-  
+
   // Actions
   search: (query: string) => Promise<void>;
   loadTrending: () => Promise<void>;
@@ -203,25 +202,25 @@ export interface GiphyContextType {
   toggleFavorite: (gif: GiphyImage) => void;
   isFavorited: (url: string) => boolean;
   setSearchQuery: (query: string) => void;
-  setCurrentTab: (tab: 'search' | 'trending' | 'favorites') => void;
-  setRating: (rating: 'g' | 'pg' | 'pg-13' | 'r') => void;
+  setCurrentTab: (tab: "search" | "trending" | "favorites") => void;
+  setRating: (rating: "g" | "pg" | "pg-13" | "r") => void;
   clearError: () => void;
 }
 
 // Gallery action types for reducer
 export type GiphyAction =
-  | { type: 'SET_LOADING'; payload: GiphyLoadingState }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_SEARCH_RESULTS'; payload: GiphyImage[] }
-  | { type: 'APPEND_SEARCH_RESULTS'; payload: GiphyImage[] }
-  | { type: 'SET_TRENDING_GIFS'; payload: GiphyImage[] }
-  | { type: 'SET_SEARCH_QUERY'; payload: string }
-  | { type: 'SET_CURRENT_TAB'; payload: 'search' | 'trending' | 'favorites' }
-  | { type: 'SET_RATING'; payload: 'g' | 'pg' | 'pg-13' | 'r' }
-  | { type: 'SET_HAS_MORE'; payload: boolean }
-  | { type: 'TOGGLE_FAVORITE'; payload: GiphyImage }
-  | { type: 'SET_FAVORITES'; payload: GiphyImage[] }
-  | { type: 'CLEAR_ERROR' };
+  | { type: "SET_LOADING"; payload: GiphyLoadingState }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_SEARCH_RESULTS"; payload: GiphyImage[] }
+  | { type: "APPEND_SEARCH_RESULTS"; payload: GiphyImage[] }
+  | { type: "SET_TRENDING_GIFS"; payload: GiphyImage[] }
+  | { type: "SET_SEARCH_QUERY"; payload: string }
+  | { type: "SET_CURRENT_TAB"; payload: "search" | "trending" | "favorites" }
+  | { type: "SET_RATING"; payload: "g" | "pg" | "pg-13" | "r" }
+  | { type: "SET_HAS_MORE"; payload: boolean }
+  | { type: "TOGGLE_FAVORITE"; payload: GiphyImage }
+  | { type: "SET_FAVORITES"; payload: GiphyImage[] }
+  | { type: "CLEAR_ERROR" };
 
 // Gallery state
 export interface GiphyState {
@@ -229,14 +228,13 @@ export interface GiphyState {
   trendingGifs: GiphyImage[];
   favorites: GiphyImage[];
   searchQuery: string;
-  currentTab: 'search' | 'trending' | 'favorites';
-  rating: 'g' | 'pg' | 'pg-13' | 'r';
+  currentTab: "search" | "trending" | "favorites";
+  rating: "g" | "pg" | "pg-13" | "r";
   loading: GiphyLoadingState;
   error: string | null;
   hasMore: boolean;
   offset: number;
 }
-
 
 // Service response types
 export interface GiphyServiceError {
@@ -244,4 +242,3 @@ export interface GiphyServiceError {
   status?: number;
   code?: string;
 }
-

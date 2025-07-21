@@ -8,15 +8,15 @@
   --circle-spacing-lg: 1.25rem;
   --circle-spacing-xl: 1.5rem;
   --circle-spacing-2xl: 2rem;
-  
+
   --circle-radius-sm: 0.75rem;
   --circle-radius-md: 1.25rem;
   --circle-radius-lg: 1.5rem;
   --circle-radius-xl: 2rem;
   --circle-radius-full: 50%;
-  
+
   --circle-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Refined NASA APOD colors */
   --circle-bg-primary: rgba(57, 41, 62, 0.85);
   --circle-bg-secondary: rgba(45, 34, 51, 0.6);
@@ -27,12 +27,12 @@
   --circle-text-primary: #f8f8f8;
   --circle-text-secondary: #c0b5d1;
   --circle-text-muted: rgba(178, 165, 193, 0.8);
-  
+
   /* Pink accent for interactive elements only */
   --circle-pink: #ff6b9d;
   --circle-pink-light: #ff8fb3;
   --circle-pink-dark: #ee5a6f;
-  
+
   /* Gray color for drawing */
   --circle-gray: #b3b3b3;
   --circle-gray-light: #c8c8c8;
@@ -65,7 +65,7 @@
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
   animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -116,9 +116,13 @@
 .circle-game-canvas-container {
   flex: 1;
   position: relative;
-  background: linear-gradient(135deg, var(--circle-bg-tertiary), rgba(45, 34, 51, 0.2));
+  background: linear-gradient(
+    135deg,
+    var(--circle-bg-tertiary),
+    rgba(45, 34, 51, 0.2)
+  );
   margin-bottom: var(--circle-spacing-md);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -128,7 +132,10 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" fill="%23b3b3b3"/><circle cx="12" cy="12" r="8" fill="none" stroke="%23b3b3b3" stroke-width="0.5" opacity="0.6"/></svg>') 12 12, crosshair;
+  cursor:
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1" fill="%23b3b3b3"/><circle cx="12" cy="12" r="8" fill="none" stroke="%23b3b3b3" stroke-width="0.5" opacity="0.6"/></svg>')
+      12 12,
+    crosshair;
   touch-action: none;
 }
 
@@ -204,7 +211,11 @@
 }
 
 .circle-game-try-again {
-  background: linear-gradient(135deg, var(--circle-pink), var(--circle-pink-light));
+  background: linear-gradient(
+    135deg,
+    var(--circle-pink),
+    var(--circle-pink-light)
+  );
   border: 1px solid var(--circle-pink);
   color: white;
   padding: var(--circle-spacing-sm) var(--circle-spacing-xl);
@@ -219,7 +230,11 @@
 }
 
 .circle-game-try-again:hover {
-  background: linear-gradient(135deg, var(--circle-pink-light), var(--circle-pink));
+  background: linear-gradient(
+    135deg,
+    var(--circle-pink-light),
+    var(--circle-pink)
+  );
   transform: translateY(-1px);
   box-shadow: 0 5px 20px rgba(255, 107, 157, 0.35);
 }
@@ -297,7 +312,8 @@
 }
 
 @keyframes subtleGlow {
-  0%, 100% {
+  0%,
+  100% {
     text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
   }
   50% {
@@ -306,7 +322,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -321,39 +338,39 @@
     max-height: 95vh;
     padding: var(--circle-spacing-md);
   }
-  
+
   .circle-game-instructions h3 {
     font-size: 1.8rem;
   }
-  
+
   .circle-game-instructions p {
     font-size: 0.9rem;
   }
-  
+
   .circle-game-score {
     font-size: 2.8rem;
   }
-  
+
   .circle-game-message {
     font-size: 1rem;
   }
-  
+
   .circle-game-controls {
     flex-wrap: wrap;
     justify-content: center;
     gap: var(--circle-spacing-xs);
   }
-  
+
   .circle-game-control-button {
     font-size: 0.8rem;
     padding: var(--circle-spacing-xs) var(--circle-spacing-sm);
   }
-  
+
   .circle-game-try-again {
     font-size: 0.9rem;
     padding: var(--circle-spacing-xs) var(--circle-spacing-lg);
   }
-  
+
   .circle-game-result {
     padding: var(--circle-spacing-lg);
     max-width: 95%;

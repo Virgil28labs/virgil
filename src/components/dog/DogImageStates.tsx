@@ -1,12 +1,12 @@
-import { memo } from 'react'
-import type { TabType } from '../../types'
+import { memo } from "react";
+import type { TabType } from "../../types";
 
 interface DogImageStatesProps {
-  loading: boolean
-  error: string | null
-  dogsCount: number
-  activeTab: TabType
-  onSwitchToFetch?: () => void
+  loading: boolean;
+  error: string | null;
+  dogsCount: number;
+  activeTab: TabType;
+  onSwitchToFetch?: () => void;
 }
 
 export const DogImageStates = memo(function DogImageStates({
@@ -14,7 +14,7 @@ export const DogImageStates = memo(function DogImageStates({
   error,
   dogsCount,
   activeTab,
-  onSwitchToFetch
+  onSwitchToFetch,
 }: DogImageStatesProps) {
   // Loading State
   if (loading) {
@@ -23,7 +23,7 @@ export const DogImageStates = memo(function DogImageStates({
         <div className="doggo-loading-spinner"></div>
         <p className="doggo-loading-text">Fetching adorable doggos...</p>
       </div>
-    )
+    );
   }
 
   // Error State
@@ -33,7 +33,7 @@ export const DogImageStates = memo(function DogImageStates({
         <div className="doggo-error-icon">😢</div>
         <p className="doggo-error-message">{error}</p>
       </div>
-    )
+    );
   }
 
   // Empty State
@@ -42,18 +42,18 @@ export const DogImageStates = memo(function DogImageStates({
       <div className="doggo-empty">
         <div className="doggo-empty-icon">🏠</div>
         <h3 className="doggo-empty-title">
-          {activeTab === 'fetch' 
+          {activeTab === "fetch"
             ? "Ready to meet some doggos?"
             : "Your Doggo Sanctuary is empty!"}
         </h3>
         <p className="doggo-empty-message">
-          {activeTab === 'fetch' 
+          {activeTab === "fetch"
             ? "Choose your preferences and click 'Fetch'"
             : "Start by fetching some adorable friends"}
         </p>
-        {activeTab === 'gallery' && onSwitchToFetch && (
-          <button 
-            className="doggo-empty-button" 
+        {activeTab === "gallery" && onSwitchToFetch && (
+          <button
+            className="doggo-empty-button"
             onClick={onSwitchToFetch}
             aria-label="Switch to fetch tab to get dogs"
           >
@@ -61,17 +61,17 @@ export const DogImageStates = memo(function DogImageStates({
           </button>
         )}
       </div>
-    )
+    );
   }
 
   // Return null if there are dogs to display
-  return null
-})
+  return null;
+});
 
 // Specialized loading component for individual images
 export const DogImageSkeleton = memo(function DogImageSkeleton() {
-  return <div className="doggo-image-skeleton" />
-})
+  return <div className="doggo-image-skeleton" />;
+});
 
 // Specialized error component for individual images
 export const DogImageError = memo(function DogImageError() {
@@ -79,5 +79,5 @@ export const DogImageError = memo(function DogImageError() {
     <div className="doggo-image-error" aria-label="Image failed to load">
       🐕‍🦺
     </div>
-  )
-})
+  );
+});

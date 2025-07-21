@@ -1,7 +1,11 @@
 // Central export for all utility functions
 
-export * from './format';
-export * from './validation';
+export * from "./format";
+export * from "./validation";
 
-// Re-export the cn utility from the existing utils file
-export { cn } from '../utils';
+// cn utility for combining class names with Tailwind CSS
+import { clsx, type ClassValue } from "clsx";
+
+export function cn(...inputs: ClassValue[]) {
+  return clsx(inputs);
+}

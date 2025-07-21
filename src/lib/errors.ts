@@ -5,46 +5,51 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode?: number,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = "AppError";
     Object.setPrototypeOf(this, AppError.prototype);
   }
 }
 
 export class ValidationError extends AppError {
   constructor(message: string, details?: unknown) {
-    super(message, 'VALIDATION_ERROR', 400, details);
-    this.name = 'ValidationError';
+    super(message, "VALIDATION_ERROR", 400, details);
+    this.name = "ValidationError";
+    Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
 
 export class NetworkError extends AppError {
   constructor(message: string, details?: unknown) {
-    super(message, 'NETWORK_ERROR', 503, details);
-    this.name = 'NetworkError';
+    super(message, "NETWORK_ERROR", 503, details);
+    this.name = "NetworkError";
+    Object.setPrototypeOf(this, NetworkError.prototype);
   }
 }
 
 export class AuthError extends AppError {
   constructor(message: string, details?: unknown) {
-    super(message, 'AUTH_ERROR', 401, details);
-    this.name = 'AuthError';
+    super(message, "AUTH_ERROR", 401, details);
+    this.name = "AuthError";
+    Object.setPrototypeOf(this, AuthError.prototype);
   }
 }
 
 export class NotFoundError extends AppError {
   constructor(message: string, details?: unknown) {
-    super(message, 'NOT_FOUND', 404, details);
-    this.name = 'NotFoundError';
+    super(message, "NOT_FOUND", 404, details);
+    this.name = "NotFoundError";
+    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
 
 export class RateLimitError extends AppError {
   constructor(message: string, details?: unknown) {
-    super(message, 'RATE_LIMIT', 429, details);
-    this.name = 'RateLimitError';
+    super(message, "RATE_LIMIT", 429, details);
+    this.name = "RateLimitError";
+    Object.setPrototypeOf(this, RateLimitError.prototype);
   }
 }
 
@@ -56,23 +61,23 @@ export function handleError(error: unknown): AppError {
 
   if (error instanceof Error) {
     // Handle specific error types
-    if (error.name === 'AbortError') {
-      return new AppError('Request was cancelled', 'ABORT_ERROR');
+    if (error.name === "AbortError") {
+      return new AppError("Request was cancelled", "ABORT_ERROR");
     }
-    
-    if (error.message.includes('fetch')) {
+
+    if (error.message.includes("fetch")) {
       return new NetworkError(error.message);
     }
 
-    return new AppError(error.message, 'UNKNOWN_ERROR');
+    return new AppError(error.message, "UNKNOWN_ERROR");
   }
 
   // Handle non-Error objects
   return new AppError(
-    'An unexpected error occurred',
-    'UNKNOWN_ERROR',
+    "An unexpected error occurred",
+    "UNKNOWN_ERROR",
     500,
-    error
+    error,
   );
 }
 
@@ -86,25 +91,25 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  
-  if (typeof error === 'string') {
+
+  if (typeof error === "string") {
     return error;
   }
-  
-  return 'An unexpected error occurred';
+
+  return "An unexpected error occurred";
 }
 
 // Error logging utility
 export function logError(error: unknown, context?: string): void {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     const errorObj = handleError(error);
-    const contextPrefix = context ? `[${context}] ` : '';
-    
+    const contextPrefix = context ? `[${context}] ` : "";
+
     // In development, we can use console.error for debugging
     console.error(`${contextPrefix}${errorObj.name}: ${errorObj.message}`, {
       code: errorObj.code,
       details: errorObj.details,
-      stack: errorObj.stack
+      stack: errorObj.stack,
     });
   }
 }

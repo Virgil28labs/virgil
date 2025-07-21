@@ -1,7 +1,7 @@
 // Virgil Brand Assets
-export { 
-  brandColors, 
-  cssVariables, 
+export {
+  brandColors,
+  cssVariables,
   colors,
   semanticColors,
   tokens,
@@ -9,5 +9,5 @@ export {
   getColorForBackground,
   type ColorPalette,
   type SemanticColors,
-  type DesignTokens
-} from './colors'
+  type DesignTokens,
+} from "./colors";

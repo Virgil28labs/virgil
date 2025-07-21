@@ -42,7 +42,7 @@ export class ResponseCache {
 
   async get<T>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.misses++;
       return null;
@@ -69,10 +69,10 @@ export class ResponseCache {
 
     this.cache.set(key, {
       value,
-      expiresAt: Date.now() + (ttl * 1000),
-      createdAt: Date.now()
+      expiresAt: Date.now() + ttl * 1000,
+      createdAt: Date.now(),
     });
-    
+
     this.accessOrder.set(key, Date.now());
   }
 
@@ -103,9 +103,10 @@ export class ResponseCache {
   }
 
   getStats(): CacheStats {
-    const hitRate = this.hits + this.misses > 0 
-      ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
-      : 0;
+    const hitRate =
+      this.hits + this.misses > 0
+        ? ((this.hits / (this.hits + this.misses)) * 100).toFixed(2)
+        : 0;
 
     return {
       size: this.cache.size,
@@ -113,7 +114,7 @@ export class ResponseCache {
       hits: this.hits,
       misses: this.misses,
       hitRate: `${hitRate}%`,
-      ttl: this.ttl
+      ttl: this.ttl,
     };
   }
 

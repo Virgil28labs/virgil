@@ -1,8 +1,8 @@
-import { memo } from 'react'
-import { FetchControls } from './FetchControls'
-import { DogGrid } from './DogGrid'
-import { DogImageStates } from './DogImageStates'
-import { useDogGallery } from './DogGalleryProvider'
+import { memo } from "react";
+import { FetchControls } from "./FetchControls";
+import { DogGrid } from "./DogGrid";
+import { DogImageStates } from "./DogImageStates";
+import { useDogGallery } from "./DogGalleryProvider";
 
 export const DogGalleryContent = memo(function DogGalleryContent() {
   const {
@@ -18,28 +18,28 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
     setSelectedImageIndex,
     fetchDogs,
     isFavorited,
-    toggleFavorite
-  } = useDogGallery()
+    toggleFavorite,
+  } = useDogGallery();
 
-  const displayDogs = state.activeTab === 'fetch' ? dogs : favorites
+  const displayDogs = state.activeTab === "fetch" ? dogs : favorites;
 
   const handleImageClick = (url: string) => {
-    const index = displayDogs.findIndex(dog => dog.url === url)
-    if (index !== -1) setSelectedImageIndex(index)
-  }
+    const index = displayDogs.findIndex((dog) => dog.url === url);
+    if (index !== -1) setSelectedImageIndex(index);
+  };
 
   const handleFetch = () => {
-    fetchDogs()
-  }
+    fetchDogs();
+  };
 
   const handleSwitchToFetch = () => {
-    setActiveTab('fetch')
-  }
+    setActiveTab("fetch");
+  };
 
   return (
     <div className="doggo-sanctuary-content">
       {/* Fetch Controls - Only show in fetch tab */}
-      {state.activeTab === 'fetch' && (
+      {state.activeTab === "fetch" && (
         <FetchControls
           selectedBreed={state.selectedBreed}
           fetchCount={state.fetchCount}
@@ -57,7 +57,9 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
         error={error}
         dogsCount={displayDogs.length}
         activeTab={state.activeTab}
-        onSwitchToFetch={state.activeTab === 'gallery' ? handleSwitchToFetch : undefined}
+        onSwitchToFetch={
+          state.activeTab === "gallery" ? handleSwitchToFetch : undefined
+        }
       />
 
       {/* Dog Grid - Only show when there are dogs and no loading/error states */}
@@ -70,5 +72,5 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
         />
       )}
     </div>
-  )
-})
+  );
+});

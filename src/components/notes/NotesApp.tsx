@@ -1,116 +1,126 @@
-import { useState, useCallback, useMemo } from 'react'
-import { Modal } from '../common/Modal'
-import { NotesInput } from './NotesInput'
-import { NotesList } from './NotesList'
-import { NotesFilter } from './NotesFilter'
-import { useNotesStore } from './useNotesStore'
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
-import { NotesErrorBoundary } from './NotesErrorBoundary'
-import { FilterType, ActionFilterType, TagType } from './types'
-import './NotesApp.css'
+import { useState, useCallback, useMemo } from "react";
+import { Modal } from "../common/Modal";
+import { NotesInput } from "./NotesInput";
+import { NotesList } from "./NotesList";
+import { NotesFilter } from "./NotesFilter";
+import { useNotesStore } from "./useNotesStore";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { NotesErrorBoundary } from "./NotesErrorBoundary";
+import { FilterType, ActionFilterType, TagType } from "./types";
+import "./NotesApp.css";
 
 interface NotesAppProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all')
-  const [activeActionFilter, setActiveActionFilter] = useState<ActionFilterType>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showSettings, setShowSettings] = useState(false)
-  const { 
-    entries, 
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeActionFilter, setActiveActionFilter] =
+    useState<ActionFilterType>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  const {
+    entries,
     isLoading,
     error,
     processingIds,
-    addEntry, 
-    toggleTask, 
-    updateEntry, 
-    deleteEntry, 
-    aiEnabled, 
+    addEntry,
+    toggleTask,
+    updateEntry,
+    deleteEntry,
+    aiEnabled,
     toggleAI,
-    clearError
-  } = useNotesStore()
+    clearError,
+  } = useNotesStore();
 
   // Filter entries based on active filter and search
   const filteredEntries = useMemo(() => {
-    let filtered = entries
+    let filtered = entries;
 
     // Apply tag filter
-    if (activeFilter !== 'all') {
-      filtered = filtered.filter(entry => 
-        entry.tags.includes(activeFilter as TagType)
-      )
+    if (activeFilter !== "all") {
+      filtered = filtered.filter((entry) =>
+        entry.tags.includes(activeFilter as TagType),
+      );
     }
 
     // Apply action type filter
-    if (activeActionFilter !== 'all') {
-      filtered = filtered.filter(entry => 
-        entry.actionType === activeActionFilter
-      )
+    if (activeActionFilter !== "all") {
+      filtered = filtered.filter(
+        (entry) => entry.actionType === activeActionFilter,
+      );
     }
 
     // Apply search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(entry =>
-        entry.content.toLowerCase().includes(query)
-      )
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((entry) =>
+        entry.content.toLowerCase().includes(query),
+      );
     }
 
     // Sort by timestamp (newest first)
-    return filtered.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-  }, [entries, activeFilter, activeActionFilter, searchQuery])
+    return filtered.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
+  }, [entries, activeFilter, activeActionFilter, searchQuery]);
 
-  const handleAddEntry = useCallback((content: string) => {
-    addEntry(content)
-  }, [addEntry])
+  const handleAddEntry = useCallback(
+    (content: string) => {
+      addEntry(content);
+    },
+    [addEntry],
+  );
 
   // Keyboard shortcuts
   const toggleSearch = useCallback(() => {
-    const searchButton = document.querySelector('.notes-search-toggle') as HTMLButtonElement
-    searchButton?.click()
-  }, [])
+    const searchButton = document.querySelector(
+      ".notes-search-toggle",
+    ) as HTMLButtonElement;
+    searchButton?.click();
+  }, []);
 
   const toggleSettings = useCallback(() => {
-    setShowSettings(prev => !prev)
-  }, [])
+    setShowSettings((prev) => !prev);
+  }, []);
 
-  useKeyboardShortcuts([
-    {
-      key: 'k',
-      modifiers: ['cmd', 'ctrl'],
-      handler: toggleSearch,
-      preventDefault: true,
-      description: 'Toggle search'
-    },
-    {
-      key: ',',
-      modifiers: ['cmd', 'ctrl'],
-      handler: toggleSettings,
-      preventDefault: true,
-      description: 'Toggle settings'
-    }
-  ], { enabled: isOpen })
+  useKeyboardShortcuts(
+    [
+      {
+        key: "k",
+        modifiers: ["cmd", "ctrl"],
+        handler: toggleSearch,
+        preventDefault: true,
+        description: "Toggle search",
+      },
+      {
+        key: ",",
+        modifiers: ["cmd", "ctrl"],
+        handler: toggleSettings,
+        preventDefault: true,
+        description: "Toggle settings",
+      },
+    ],
+    { enabled: isOpen },
+  );
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <span>Notes</span>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              cursor: 'pointer',
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
               opacity: 0.6,
-              fontSize: '1.1rem'
+              fontSize: "1.1rem",
             }}
             aria-label="Settings"
           >
@@ -124,36 +134,59 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
       <div className="notes-container">
         <div className="notes-header">
           {showSettings ? (
-            <div style={{ 
-              padding: '1rem', 
-              background: 'rgba(245, 245, 245, 0.05)', 
-              borderRadius: '8px',
-              marginBottom: '1rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem' }}>Settings</h3>
-                <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>⌘,</span>
+            <div
+              style={{
+                padding: "1rem",
+                background: "rgba(245, 245, 245, 0.05)",
+                borderRadius: "8px",
+                marginBottom: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                <h3 style={{ margin: 0, fontSize: "1rem" }}>Settings</h3>
+                <span style={{ fontSize: "0.75rem", opacity: 0.5 }}>⌘,</span>
               </div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  cursor: "pointer",
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={aiEnabled}
                   onChange={toggleAI}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 />
                 <span>Enable AI processing (tags & task extraction)</span>
               </label>
-              <p style={{ margin: '0.5rem 0 0 1.5rem', fontSize: '0.75rem', opacity: 0.7 }}>
-                When enabled, OpenAI will analyze your entries to suggest tags and extract tasks
+              <p
+                style={{
+                  margin: "0.5rem 0 0 1.5rem",
+                  fontSize: "0.75rem",
+                  opacity: 0.7,
+                }}
+              >
+                When enabled, OpenAI will analyze your entries to suggest tags
+                and extract tasks
               </p>
-              <div className="notes-shortcuts" style={{ marginTop: '1.5rem' }}>
+              <div className="notes-shortcuts" style={{ marginTop: "1.5rem" }}>
                 <div className="notes-shortcut">
-                  <kbd>{navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}</kbd>
+                  <kbd>{navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}</kbd>
                   <kbd>Enter</kbd>
                   <span>Submit</span>
                 </div>
                 <div className="notes-shortcut">
-                  <kbd>{navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}</kbd>
+                  <kbd>{navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}</kbd>
                   <kbd>K</kbd>
                   <span>Search</span>
                 </div>
@@ -177,7 +210,7 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
             </>
           )}
         </div>
-        
+
         <div className="notes-content">
           {isLoading ? (
             <div className="notes-loading">
@@ -187,8 +220,8 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
           ) : error ? (
             <div className="notes-error">
               <p className="notes-error-message">{error.message}</p>
-              <button 
-                onClick={clearError} 
+              <button
+                onClick={clearError}
                 className="notes-error-retry"
                 aria-label="Dismiss error"
               >
@@ -207,8 +240,8 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
         </div>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
 /**
  * Notes application with error boundary wrapper
@@ -218,5 +251,5 @@ export const NotesApp = (props: NotesAppProps) => {
     <NotesErrorBoundary>
       <NotesAppContent {...props} />
     </NotesErrorBoundary>
-  )
-}
+  );
+};

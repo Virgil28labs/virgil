@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo } from "react";
 
 interface SkeletonLoaderProps {
   width?: string;
@@ -8,10 +8,10 @@ interface SkeletonLoaderProps {
 }
 
 export const SkeletonLoader = memo(function SkeletonLoader({
-  width = '100%',
-  height = '20px',
-  borderRadius = '4px',
-  className = ''
+  width = "100%",
+  height = "20px",
+  borderRadius = "4px",
+  className = "",
 }: SkeletonLoaderProps) {
   return (
     <div
@@ -22,11 +22,11 @@ export const SkeletonLoader = memo(function SkeletonLoader({
         width,
         height,
         borderRadius,
-        background: 'linear-gradient(90deg, var(--brand-dark-purple) 25%, var(--brand-light-purple) 50%, var(--brand-dark-purple) 75%)',
-        backgroundSize: '200% 100%',
-        animation: 'skeleton-loading 1.5s infinite'
+        background:
+          "linear-gradient(90deg, var(--brand-dark-purple) 25%, var(--brand-light-purple) 50%, var(--brand-dark-purple) 75%)",
+        backgroundSize: "200% 100%",
+        animation: "skeleton-loading 1.5s infinite",
       }}
     />
   );
 });
-

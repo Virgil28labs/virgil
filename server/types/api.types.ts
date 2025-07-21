@@ -8,7 +8,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface HealthCheckResponse {
-  status: 'healthy' | 'unhealthy';
+  status: "healthy" | "unhealthy";
   service: string;
   configured: boolean;
   timestamp: string;
@@ -16,10 +16,9 @@ export interface HealthCheckResponse {
   version?: string;
 }
 
-
 export interface LLMApiRequest {
   messages: Array<{
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant" | "system";
     content: string;
   }>;
   model: string;
@@ -49,5 +48,3 @@ export interface ModelsApiResponse {
   success: boolean;
   data: Record<string, string[]>;
 }
-
-

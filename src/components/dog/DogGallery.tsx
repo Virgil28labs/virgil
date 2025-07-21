@@ -1,14 +1,17 @@
-import { memo } from 'react'
-import { DogGalleryProvider, useDogGallery } from './DogGalleryProvider'
-import { DogGalleryTabs } from './DogGalleryTabs'
-import { DogGalleryContent } from './DogGalleryContent'
-import { ImageModal } from './ImageModal'
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
-import type { DogGalleryProps } from '../../types'
-import './DogGallery.css'
+import { memo } from "react";
+import { DogGalleryProvider, useDogGallery } from "./DogGalleryProvider";
+import { DogGalleryTabs } from "./DogGalleryTabs";
+import { DogGalleryContent } from "./DogGalleryContent";
+import { ImageModal } from "./ImageModal";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import type { DogGalleryProps } from "../../types";
+import "./DogGallery.css";
 
 // Inner component that has access to the context
-const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGalleryProps) {
+const DogGalleryInner = memo(function DogGalleryInner({
+  isOpen,
+  onClose,
+}: DogGalleryProps) {
   const {
     state,
     dogs,
@@ -16,23 +19,39 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
     setActiveTab,
     setSelectedImageIndex,
     isFavorited,
-    toggleFavorite
-  } = useDogGallery()
+    toggleFavorite,
+  } = useDogGallery();
 
-  const displayDogs = state.activeTab === 'fetch' ? dogs : favorites
+  const displayDogs = state.activeTab === "fetch" ? dogs : favorites;
 
   // Keyboard shortcuts
-  useKeyboardShortcuts({
-    'Escape': state.selectedImageIndex !== null ? () => setSelectedImageIndex(null) : onClose,
-    'f': () => setActiveTab('fetch'),
-    'g': () => setActiveTab('gallery')
-  }, isOpen)
+  useKeyboardShortcuts(
+    {
+      Escape:
+        state.selectedImageIndex !== null
+          ? () => setSelectedImageIndex(null)
+          : onClose,
+      f: () => setActiveTab("fetch"),
+      g: () => setActiveTab("gallery"),
+    },
+    isOpen,
+  );
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
-    <div className="doggo-sanctuary-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Doggo Sanctuary">
-      <div className="doggo-sanctuary-panel" onClick={(e) => e.stopPropagation()} role="document">
+    <div
+      className="doggo-sanctuary-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Doggo Sanctuary"
+    >
+      <div
+        className="doggo-sanctuary-panel"
+        onClick={(e) => e.stopPropagation()}
+        role="document"
+      >
         {/* Header */}
         <div className="doggo-sanctuary-header">
           <div>
@@ -41,8 +60,8 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
               Doggo Sanctuary
             </h2>
           </div>
-          <button 
-            className="doggo-sanctuary-close" 
+          <button
+            className="doggo-sanctuary-close"
             onClick={onClose}
             aria-label="Close sanctuary"
           >
@@ -62,7 +81,7 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
       </div>
 
       {/* Image Modal */}
-      <ImageModal 
+      <ImageModal
         dogs={displayDogs}
         currentIndex={state.selectedImageIndex}
         isFavorited={isFavorited}
@@ -71,8 +90,8 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
         onFavoriteToggle={toggleFavorite}
       />
     </div>
-  )
-})
+  );
+});
 
 // Main component with provider
 export const DogGallery = memo(function DogGallery(props: DogGalleryProps) {
@@ -80,5 +99,5 @@ export const DogGallery = memo(function DogGallery(props: DogGalleryProps) {
     <DogGalleryProvider isOpen={props.isOpen}>
       <DogGalleryInner {...props} />
     </DogGalleryProvider>
-  )
-})
+  );
+});

@@ -1,20 +1,22 @@
-import { memo } from 'react'
+import { memo } from "react";
 
 interface VirgilTextLogoProps {
-  onClick?: () => void
+  onClick?: () => void;
 }
 
 /**
  * VirgilTextLogo Component
- * 
+ *
  * Displays the "Virgil" brand name with styled first letter
  * Can be clickable to trigger actions (e.g., open profile)
  * Memoized for performance
  */
-export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTextLogoProps) {
+export const VirgilTextLogo = memo(function VirgilTextLogo({
+  onClick,
+}: VirgilTextLogoProps) {
   if (onClick) {
     return (
-      <button 
+      <button
         className="virgil-logo virgil-logo-button"
         onClick={onClick}
         aria-label="Virgil - Open user profile"
@@ -23,12 +25,8 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
       >
         Virgil
       </button>
-    )
+    );
   }
-  
-  return (
-    <div className="virgil-logo">
-      Virgil
-    </div>
-  )
-})
+
+  return <div className="virgil-logo">Virgil</div>;
+});

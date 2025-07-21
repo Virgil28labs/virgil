@@ -46,7 +46,14 @@
     },
 
     /* Type definitions */
-    "types": ["vite/client", "node", "react", "react-dom", "jest", "@testing-library/jest-dom"],
+    "types": [
+      "vite/client",
+      "node",
+      "react",
+      "react-dom",
+      "jest",
+      "@testing-library/jest-dom"
+    ],
     "jsxImportSource": "react"
   },
   "include": [
@@ -56,9 +63,5 @@
     "src/**/*.tsx",
     "jest.setup.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "server"
-  ]
+  "exclude": ["node_modules", "dist", "server"]
 }

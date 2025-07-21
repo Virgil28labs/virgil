@@ -20,10 +20,10 @@ interface ImportMeta {
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NODE_ENV: 'development' | 'production' | 'test';
+      NODE_ENV: "development" | "production" | "test";
     }
   }
-  
+
   interface Window {
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
@@ -32,37 +32,37 @@ declare global {
   // DOM API types
   type ResizeObserverCallback = (entries: ResizeObserverEntry[]) => void;
   type FrameRequestCallback = (time: number) => void;
-  type PermissionState = 'granted' | 'denied' | 'prompt';
-  type PermissionStatus = 'granted' | 'denied' | 'unknown' | 'unavailable';
+  type PermissionState = "granted" | "denied" | "prompt";
+  type PermissionStatus = "granted" | "denied" | "unknown" | "unavailable";
 }
 
 // Asset type declarations
-declare module '*.svg' {
+declare module "*.svg" {
   const content: string;
   export default content;
 }
 
-declare module '*.png' {
+declare module "*.png" {
   const content: string;
   export default content;
 }
 
-declare module '*.jpg' {
+declare module "*.jpg" {
   const content: string;
   export default content;
 }
 
-declare module '*.jpeg' {
+declare module "*.jpeg" {
   const content: string;
   export default content;
 }
 
-declare module '*.gif' {
+declare module "*.gif" {
   const content: string;
   export default content;
 }
 
-declare module '*.webp' {
+declare module "*.webp" {
   const content: string;
   export default content;
 }
