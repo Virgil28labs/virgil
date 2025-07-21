@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useUserProfile } from "../../hooks/useUserProfile";
+import { usePomodoroSync } from "../../hooks/usePomodoroSync";
+import { storage, STORAGE_KEYS } from "../../lib/storage";
+import { PomodoroStorageState } from "../../types/pomodoro.types";
 
 interface PomodoroTimerProps {
   isOpen: boolean;
@@ -36,6 +39,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   const [particles, setParticles] = useState<Array<{ id: number; x: number }>>(
     [],
   );
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
 
   // Refs
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -43,6 +47,40 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   const dialRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const hasRestoredRef = useRef(false);
+
+  // Service Worker sync hook
+  const {
+    startTimer: startSWTimer,
+    pauseTimer: pauseSWTimer,
+    stopTimer: stopSWTimer,
+    getTimeRemaining,
+  } = usePomodoroSync({
+    onTimerTick: (time) => {
+      setTimeRemaining(time);
+    },
+    onTimerComplete: () => {
+      handleTimerComplete();
+    },
+    onStateSync: (state) => {
+      if (!hasRestoredRef.current && state) {
+        // Restore state on mount
+        setSelectedMinutes(state.selectedMinutes);
+        setSoundEnabled(state.soundEnabled);
+        setIsRunning(state.isRunning);
+        
+        const remaining = getTimeRemaining();
+        setTimeRemaining(remaining);
+        
+        if (state.completedAt && Date.now() - state.completedAt < 5000) {
+          // Show celebration if timer completed recently
+          handleTimerComplete();
+        }
+        
+        hasRestoredRef.current = true;
+      }
+    },
+  });
 
   // Calculate total duration for current session
   const totalDuration = selectedMinutes * 60;
@@ -286,22 +324,23 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
       setShowCelebration(false);
       setParticles([]);
     }, 2000);
-  }, [playSound]);
 
-  // Timer tick
+    // Reset timer state
+    stopSWTimer();
+  }, [playSound, stopSWTimer]);
+
+  // Timer tick for UI updates and sounds
   useEffect(() => {
     if (isRunning && timeRemaining > 0) {
       let lastMilestone = Math.floor((1 - timeRemaining / totalDuration) * 4);
 
       intervalRef.current = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            handleTimerComplete();
-            return 0;
-          }
+        const currentTime = getTimeRemaining();
+        setTimeRemaining(currentTime);
 
+        if (currentTime > 0) {
           // Check for milestones (25%, 50%, 75%)
-          const currentProgress = (totalDuration - (prev - 1)) / totalDuration;
+          const currentProgress = (totalDuration - currentTime) / totalDuration;
           const currentMilestone = Math.floor(currentProgress * 4);
           if (currentMilestone > lastMilestone && currentMilestone < 4) {
             playSound("milestone");
@@ -310,12 +349,10 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
           }
 
           // Play tick in last 5 seconds
-          if (prev <= 5) {
+          if (currentTime <= 5) {
             playSound("tick");
           }
-
-          return prev - 1;
-        });
+        }
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -329,15 +366,41 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, timeRemaining, totalDuration, handleTimerComplete, playSound]);
+  }, [isRunning, timeRemaining, totalDuration, playSound, getTimeRemaining]);
+
+  // Request notification permission
+  const requestNotificationPermission = async () => {
+    if ("Notification" in window && Notification.permission === "default") {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+    }
+  };
 
   // Control functions
-  const startTimer = () => setIsRunning(true);
-  const pauseTimer = () => setIsRunning(false);
+  const startTimer = () => {
+    setIsRunning(true);
+    startSWTimer(selectedMinutes * 60);
+    
+    // Save sound preference
+    const state = storage.get<PomodoroStorageState>(STORAGE_KEYS.POMODORO_STATE);
+    if (state) {
+      storage.set(STORAGE_KEYS.POMODORO_STATE, { ...state, soundEnabled });
+    }
+    
+    // Request notification permission if needed
+    requestNotificationPermission();
+  };
+  
+  const pauseTimer = () => {
+    setIsRunning(false);
+    pauseSWTimer();
+  };
+  
   const resetTimer = () => {
     setIsRunning(false);
     setTimeRemaining(selectedMinutes * 60);
     setMotivationalMessage("");
+    stopSWTimer();
   };
 
   if (!isOpen) return null;
@@ -589,6 +652,13 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
             {soundEnabled ? "🔊" : "🔇"}
           </button>
         </div>
+
+        {/* Notification permission hint */}
+        {notificationPermission === "denied" && (
+          <div className="notification-hint">
+            💡 Enable notifications in browser settings for timer alerts
+          </div>
+        )}
 
         {/* Celebration particles */}
         {showCelebration && (

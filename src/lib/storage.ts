@@ -147,6 +147,7 @@ export const STORAGE_KEYS = {
   CAMERA_PERMISSION: "cameraPermission",
   LOCATION_PERMISSION: "locationPermission",
   NOTIFICATION_PERMISSION: "notificationPermission",
+  POMODORO_STATE: "pomodoroState",
 } as const;
 
 export type StorageKeyType = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

@@ -648,3 +648,14 @@
     max-width: 90%;
   }
 }
+
+/* Notification hint */
+.notification-hint {
+  font-size: 0.85rem;
+  color: #b2a5c1;
+  text-align: center;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background: rgba(108, 59, 170, 0.1);
+  border-radius: 8px;
+}

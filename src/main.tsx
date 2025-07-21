@@ -17,12 +17,10 @@ createRoot(rootElement).render(
 );
 
 // Register service worker for caching and offline support
-if (import.meta.env.PROD) {
-  registerServiceWorker({
-    onSuccess: () => {},
-    onUpdate: () => {},
-  });
-}
+registerServiceWorker({
+  onSuccess: () => {},
+  onUpdate: () => {},
+});
 
 // Setup network monitoring
 setupNetworkMonitoring({

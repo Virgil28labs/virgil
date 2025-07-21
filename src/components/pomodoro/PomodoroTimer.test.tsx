@@ -14,6 +14,28 @@ jest.mock("../../hooks/useUserProfile", () => ({
   useUserProfile: jest.fn(),
 }));
 
+jest.mock("../../hooks/usePomodoroSync", () => ({
+  usePomodoroSync: jest.fn(() => ({
+    startTimer: jest.fn(),
+    pauseTimer: jest.fn(),
+    resumeTimer: jest.fn(),
+    stopTimer: jest.fn(),
+    getTimeRemaining: jest.fn(() => 1500), // 25 minutes default
+    sendToServiceWorker: jest.fn(),
+  })),
+}));
+
+jest.mock("../../lib/storage", () => ({
+  storage: {
+    get: jest.fn(),
+    set: jest.fn(),
+    remove: jest.fn(),
+  },
+  STORAGE_KEYS: {
+    POMODORO_STATE: "pomodoroState",
+  },
+}));
+
 // Mock Audio
 global.AudioContext = jest.fn().mockImplementation(() => ({
   createOscillator: jest.fn(() => ({
@@ -44,7 +66,6 @@ describe("PomodoroTimer", () => {
     jest.useFakeTimers();
     mockUseUserProfile.mockReturnValue({
       profile: {
-        id: "1",
         nickname: "TestUser",
         fullName: "Test User",
         email: "test@example.com",
