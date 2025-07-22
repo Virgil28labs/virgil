@@ -16,12 +16,14 @@ import { NotesEmojiButton } from './notes/NotesEmojiButton'
 import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
+import { GoogleMapsModal } from './maps/GoogleMapsModal'
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth()
   const { address, ipLocation, coordinates, loading: locationLoading } = useLocation()
   const [showProfileViewer, setShowProfileViewer] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [showMapsModal, setShowMapsModal] = useState(false)
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
     try {
       const saved = localStorage.getItem('elevationUnit')
@@ -99,16 +101,34 @@ export const Dashboard = memo(function Dashboard() {
           <div className="address-info">
             {address ? (
               address.street ? (
-                <p className="street-address">{address.street}</p>
+                <p 
+                  className="street-address clickable"
+                  onClick={() => setShowMapsModal(true)}
+                  title="Click to view on map"
+                >
+                  {address.street}
+                </p>
               ) : address.formatted ? (
-                <p className="street-address">{address.formatted.split(',')[0]}</p>
+                <p 
+                  className="street-address clickable"
+                  onClick={() => setShowMapsModal(true)}
+                  title="Click to view on map"
+                >
+                  {address.formatted.split(',')[0]}
+                </p>
               ) : (
                 <SkeletonLoader width="200px" height="16px" />
               )
             ) : locationLoading ? (
               <SkeletonLoader width="200px" height="16px" />
             ) : ipLocation?.city ? (
-              <p className="street-address">{ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}</p>
+              <p 
+                className="street-address clickable"
+                onClick={() => setShowMapsModal(true)}
+                title="Click to view on map"
+              >
+                {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}
+              </p>
             ) : (
               <p className="address-error">Location unavailable</p>
             )}
@@ -180,6 +200,14 @@ export const Dashboard = memo(function Dashboard() {
           onClose={() => setShowProfileViewer(false)}
         />
       </Suspense>
+
+      {/* Google Maps Modal */}
+      <GoogleMapsModal
+        isOpen={showMapsModal}
+        onClose={() => setShowMapsModal(false)}
+        coordinates={coordinates}
+        address={address}
+      />
     </div>
   )
 })

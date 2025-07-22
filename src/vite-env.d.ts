@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="node" />
+/// <reference types="@types/google.maps" />
 
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;
@@ -27,6 +28,7 @@ declare global {
   interface Window {
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
+    google?: typeof google;
   }
 
   // DOM API types

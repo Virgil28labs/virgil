@@ -376,6 +376,17 @@ html, body {
   font-weight: 400;
 }
 
+.street-address.clickable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.street-address.clickable:hover {
+  color: var(--brand-accent-purple);
+  transform: translateY(-1px);
+}
+
 .address-loading {
   opacity: 0.6;
 }
