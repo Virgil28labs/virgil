@@ -3,10 +3,9 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
 import { useWeather } from '../contexts/WeatherContext';
-import type { ChatMessage, ModelOption, SearchResponse } from '../types/chat.types';
+import type { ChatMessage, ModelOption } from '../types/chat.types';
 import { SkeletonLoader } from './SkeletonLoader';
 import { dedupeFetch } from '../lib/requestDeduplication';
-import { searchService } from '../lib/searchService';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import './VirgilChatbot.css';
@@ -16,9 +15,8 @@ const VirgilChatbot = memo(function VirgilChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string>('gpt-4o-mini');
+  const [selectedModel, setSelectedModel] = useState<string>('gpt-4.1-mini');
   const [showModelDropdown, setShowModelDropdown] = useState<boolean>(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -64,9 +62,9 @@ const VirgilChatbot = memo(function VirgilChatbot() {
 
   // Available models - memoized to prevent recreation on every render
   const models = useMemo<ModelOption[]>(() => [
-    { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: 'Fast and efficient' },
-    { id: 'gpt-4o', name: 'GPT-4o', description: 'Most capable model' },
-    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Balanced performance' }
+    { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', description: 'Fast and efficient' },
+    { id: 'gpt-4.1', name: 'GPT-4.1', description: 'Most capable model' },
+    { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' }
   ], []);
 
   // Load saved model from localStorage
@@ -86,7 +84,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isTyping, isSearching]);
+  }, [messages, isTyping]);
 
   // Focus input when opened
   useEffect(() => {
@@ -234,46 +232,13 @@ RESPONSE RULES:
     setError(null);
 
     try {
-      let searchResults: SearchResponse | null = null;
-      
-      // Check if message needs web search
-      if (searchService.detectSearchIntent(messageText)) {
-        setIsSearching(true);
-        try {
-          const searchQuery = searchService.extractSearchQuery(messageText);
-          searchResults = await searchService.search({
-            query: searchQuery,
-            max_results: 3
-          });
-        } catch (searchError) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Search failed, continuing with regular chat:', searchError);
-          }
-        } finally {
-          setIsSearching(false);
-        }
-      }
-      
       setIsTyping(true);
 
       // Use our secure backend API instead of calling OpenAI directly
       const chatApiUrl = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
       
-      // Prepare messages with search context if available
-      let systemPrompt = createSystemPrompt();
-      if (searchResults) {
-        systemPrompt += `\n\nWEB SEARCH RESULTS for "${searchResults.query}":`;
-        if (searchResults.answer) {
-          systemPrompt += `\nSummary: ${searchResults.answer}`;
-        }
-        if (searchResults.results.length > 0) {
-          systemPrompt += `\nSources:`;
-          searchResults.results.forEach((result, index) => {
-            systemPrompt += `\n${index + 1}. ${result.title} (${result.url}): ${result.content.substring(0, 200)}...`;
-          });
-        }
-        systemPrompt += `\n\nUse this search information to provide a comprehensive answer. Include relevant links when appropriate.`;
-      }
+      // Prepare messages
+      const systemPrompt = createSystemPrompt();
 
       const response = await dedupeFetch(`${chatApiUrl}/chat`, {
         method: 'POST',
@@ -287,7 +252,7 @@ RESPONSE RULES:
             ...messages.map(msg => ({ role: msg.role, content: msg.content })),
             { role: 'user', content: messageText }
           ],
-          max_tokens: searchResults ? 400 : 200,
+          max_tokens: 200,
           temperature: 0.7
         })
       });
@@ -328,23 +293,22 @@ RESPONSE RULES:
       setMessages(prev => [...prev, fallbackMessage]);
     } finally {
       setIsTyping(false);
-      setIsSearching(false);
     }
   }, [selectedModel, createSystemPrompt, messages]);
 
   const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (input.trim() && !isTyping && !isSearching) {
+    if (input.trim() && !isTyping) {
       sendMessage(input);
     }
-  }, [input, sendMessage, isTyping, isSearching]);
+  }, [input, sendMessage, isTyping]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isTyping && !isSearching && input.trim()) {
+    if (e.key === 'Enter' && !e.shiftKey && !isTyping && input.trim()) {
       e.preventDefault();
       sendMessage(input);
     }
-  }, [input, sendMessage, isTyping, isSearching]);
+  }, [input, sendMessage, isTyping]);
 
   const handleQuickAction = useCallback((action: string) => {
     sendMessage(action);
@@ -353,7 +317,6 @@ RESPONSE RULES:
   const quickActions = useMemo(() => [
     "Tell me about Virgil",
     "How do I use this app?",
-    "Search for latest news",
     "What can you do?"
   ], []);
 
@@ -574,6 +537,9 @@ RESPONSE RULES:
       >
         {messages.length === 0 && (
           <div className="welcome-msg">
+            <div className="msg-avatar" aria-hidden="true">
+              <span className="chatbot-avatar-v">V</span>
+            </div>
             <div className="welcome-message-bubble" role="status">
               Good afternoon, {user?.user_metadata?.name || 'there'}!
             </div>
@@ -595,32 +561,20 @@ RESPONSE RULES:
             <div className="msg-content" role="text">
               {message.content}
             </div>
-            <div className="msg-time" aria-label={`Sent at ${new Date(message.timestamp).toLocaleTimeString()}`}>
-              {new Date(message.timestamp).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </div>
           </div>
         ))}
 
-        {(isSearching || isTyping) && (
-          <div className="message assistant-msg" role="status" aria-label={isSearching ? "Virgil is searching" : "Virgil is typing"}>
+        {isTyping && (
+          <div className="message assistant-msg" role="status" aria-label="Virgil is typing">
             <div className="msg-avatar" aria-hidden="true">
               <span className="chatbot-avatar-v">V</span>
             </div>
             <div className="msg-content">
               <SkeletonLoader width="80%" height="16px" />
               <div className="typing-status">
-                {isSearching ? (
-                  <span className="search-indicator">🔍 Searching the web...</span>
-                ) : (
-                  <span className="typing-indicator">💭 Thinking...</span>
-                )}
+                <span className="typing-indicator">💭 Thinking...</span>
               </div>
-              <span className="sr-only">
-                {isSearching ? "Virgil is searching the web" : "Virgil is typing a response"}
-              </span>
+              <span className="sr-only">Virgil is typing a response</span>
             </div>
           </div>
         )}
@@ -665,7 +619,7 @@ RESPONSE RULES:
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            disabled={isTyping || isSearching}
+            disabled={isTyping}
             className="msg-input"
             aria-label="Type your message to Virgil"
             aria-describedby={error ? "chat-error" : undefined}
@@ -673,12 +627,12 @@ RESPONSE RULES:
           />
           <button
             type="submit"
-            disabled={!input.trim() || isTyping || isSearching}
+            disabled={!input.trim() || isTyping}
             className="send-btn"
             title="Send message"
-            aria-label={isSearching ? "Searching..." : isTyping ? "Sending message" : "Send message"}
+            aria-label={isTyping ? "Sending message" : "Send message"}
           >
-            {isSearching ? '🔍' : isTyping ? '...' : 'Send'}
+            {isTyping ? '•••' : '➤'}
           </button>
         </div>
       </form>
