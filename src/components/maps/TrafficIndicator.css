@@ -1,0 +1,180 @@
+/* TrafficIndicator.css - Live traffic status button */
+
+.traffic-indicator {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid transparent;
+  border-radius: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all var(--transition-medium), color var(--transition-slow);
+  z-index: 30; /* Well below route info bar */
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--traffic-color, #999);
+  min-width: 140px;
+  height: 48px;
+}
+
+.traffic-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.traffic-indicator:active {
+  transform: translateY(0);
+}
+
+.traffic-indicator.enabled {
+  border-color: var(--traffic-color);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.traffic-indicator.animating {
+  animation: pulse 0.3s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.traffic-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.traffic-icon-wrapper svg {
+  width: 20px;
+  height: 20px;
+  transition: all var(--transition-fast);
+}
+
+/* Pulsing animation for traffic icon when enabled */
+.traffic-indicator.enabled .traffic-pulse {
+  animation: trafficPulse 2s infinite;
+}
+
+@keyframes trafficPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.traffic-status-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--traffic-color);
+  border: 2px solid white;
+  border-radius: 50%;
+  animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--traffic-color-rgb), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(var(--traffic-color-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--traffic-color-rgb), 0);
+  }
+}
+
+.traffic-label {
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* Traffic level colors */
+.traffic-indicator[style*="#4CAF50"] {
+  --traffic-color-rgb: 76, 175, 80;
+}
+
+.traffic-indicator[style*="#FFA726"] {
+  --traffic-color-rgb: 255, 167, 38;
+}
+
+.traffic-indicator[style*="#F44336"] {
+  --traffic-color-rgb: 244, 67, 54;
+}
+
+/* When route info bar is present, move up */
+.has-route-info .traffic-indicator {
+  bottom: 6rem;
+  transition: bottom var(--transition-normal);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .traffic-indicator {
+    bottom: 0.5rem;
+    left: 0.5rem;
+    padding: 0.625rem 1rem;
+    min-width: 120px;
+    height: 40px;
+    font-size: 0.8125rem;
+  }
+  
+  .traffic-icon-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .traffic-icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .has-route-info .traffic-indicator {
+    bottom: 5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .traffic-indicator {
+    background: rgba(30, 30, 30, 0.95);
+    color: var(--traffic-color, #aaa);
+  }
+  
+  .traffic-indicator.enabled {
+    background: rgba(30, 30, 30, 0.98);
+  }
+  
+  .traffic-status-dot {
+    border-color: #1e1e1e;
+  }
+}

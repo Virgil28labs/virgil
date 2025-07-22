@@ -7,7 +7,7 @@ interface ModalProps {
   title: string | React.ReactNode
   children: React.ReactNode
   className?: string
-  size?: 'small' | 'medium' | 'large'
+  size?: 'small' | 'medium' | 'large' | 'extra-large'
 }
 
 export const Modal: React.FC<ModalProps> = ({ 

@@ -17,72 +17,16 @@ export interface GoogleMapsModalProps {
   } | null;
 }
 
-export interface MapConfig {
-  center: google.maps.LatLngLiteral;
-  zoom: number;
-  mapTypeId: google.maps.MapTypeId;
-  styles: google.maps.MapTypeStyle[];
-  disableDefaultUI?: boolean;
-  zoomControl?: boolean;
-  mapTypeControl?: boolean;
-  streetViewControl?: boolean;
-  fullscreenControl?: boolean;
-}
 
-export interface StreetViewConfig {
-  position: google.maps.LatLngLiteral;
-  pov: {
-    heading: number;
-    pitch: number;
-  };
-  zoom: number;
-  addressControl?: boolean;
-  linksControl?: boolean;
-  panControl?: boolean;
-  enableCloseButton?: boolean;
-}
-
-export type ViewMode = 'map' | 'streetview';
-
-export type SearchType = 'coffee' | 'food' | 'gas' | 'grocery' | 'pharmacy' | 'atm' | 'restaurant' | 'bar' | 'entertainment' | 'convenience' | '24hour';
-
-export interface Place {
-  id: string;
-  name: string;
-  address: string;
-  location: google.maps.LatLngLiteral;
-  rating?: number;
-  priceLevel?: number;
-  openNow?: boolean;
-  distance?: number;
-  placeId: string;
-  types?: string[];
-  icon?: string;
-}
+// Simplified types for traffic checking use case
 
 export interface SavedPlace {
-  id: string;
-  name: string;
-  location: google.maps.LatLngLiteral;
-  address?: string;
-  type: 'home' | 'work' | 'custom';
-  icon?: string;
-}
-
-export interface GoogleMapsState {
-  map: google.maps.Map | null;
-  streetView: google.maps.StreetViewPanorama | null;
-  marker: google.maps.Marker | null;
-  currentView: ViewMode;
-  isLoading: boolean;
-  error: string | null;
-  // New state for features
-  searchResults: Place[];
-  selectedPlace: Place | null;
-  savedPlaces: SavedPlace[];
-  showTraffic: boolean;
-  activeSearch: SearchType | null;
-  searchMarkers: google.maps.Marker[];
+  id: string
+  name: string
+  address: string
+  placeId?: string
+  isHome?: boolean
+  timestamp: number
 }
 
 // Custom map styles for Virgil theme

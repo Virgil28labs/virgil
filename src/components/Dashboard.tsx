@@ -125,9 +125,9 @@ export const Dashboard = memo(function Dashboard() {
               <p 
                 className="street-address clickable"
                 onClick={() => setShowMapsModal(true)}
-                title="Click to view on map"
+                title="Click to view on map (IP-based location)"
               >
-                {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}
+                📍 {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}{ipLocation.country ? `, ${ipLocation.country}` : ''}
               </p>
             ) : (
               <p className="address-error">Location unavailable</p>
@@ -144,8 +144,8 @@ export const Dashboard = memo(function Dashboard() {
             )}
           </div>
           
-          {coordinates?.elevation !== undefined && (
-            <div className="elevation-info">
+          <div className="elevation-info">
+            {coordinates?.elevation !== undefined ? (
               <p 
                 className="elevation" 
                 onClick={toggleElevationUnit}
@@ -157,8 +157,14 @@ export const Dashboard = memo(function Dashboard() {
                   : `${Math.round(coordinates.elevation * 3.28084)}ft`
                 }
               </p>
-            </div>
-          )}
+            ) : coordinates && !locationLoading ? (
+              <p className="elevation" style={{ opacity: 0.6 }}>
+                Elevation: unavailable
+              </p>
+            ) : locationLoading ? (
+              <SkeletonLoader width="120px" height="16px" />
+            ) : null}
+          </div>
         </div>
       </div>
 

@@ -1,0 +1,385 @@
+/* RouteInputBar.css - Streamlined routing interface */
+
+.route-input-bar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 50; /* Highest priority for input and dropdown */
+  padding: 1rem;
+}
+
+.route-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.route-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.input-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.location-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.location-dot.origin {
+  background: #4285F4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+}
+
+.location-dot.destination {
+  background: #EA4335;
+  box-shadow: 0 0 0 3px rgba(234, 67, 53, 0.2);
+}
+
+.route-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #333;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.route-input:focus {
+  border-color: var(--brand-accent-purple);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(108, 59, 170, 0.1);
+}
+
+.route-input.current-location {
+  color: #4285F4;
+  font-style: italic;
+}
+
+.route-input::placeholder {
+  color: #999;
+  font-weight: 400;
+}
+
+/* Current Location Button */
+.current-location-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #4285F4;
+  transition: all var(--transition-fast);
+  border-radius: 8px;
+}
+
+.current-location-btn:hover {
+  background: rgba(66, 133, 244, 0.1);
+  transform: scale(1.05);
+}
+
+.current-location-btn:active {
+  transform: scale(0.95);
+}
+
+/* Swap Locations Button */
+.swap-locations-btn {
+  position: absolute;
+  right: -2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  transition: all var(--transition-fast);
+  z-index: 2;
+}
+
+.swap-locations-btn:hover:not(:disabled) {
+  border-color: var(--brand-accent-purple);
+  color: var(--brand-accent-purple);
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.swap-locations-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Connection Line */
+.route-connection-line {
+  position: absolute;
+  left: 23px;
+  top: 44px;
+  bottom: 44px;
+  width: 2px;
+  background: linear-gradient(180deg, #4285F4 0%, #EA4335 100%);
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* Save Destination Button */
+.save-destination-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #666;
+  transition: all var(--transition-fast);
+  border-radius: 8px;
+}
+
+.save-destination-btn:hover {
+  background: rgba(108, 59, 170, 0.1);
+  color: var(--brand-accent-purple);
+  transform: scale(1.05);
+}
+
+.save-destination-btn.saved {
+  color: var(--brand-accent-purple);
+}
+
+.save-destination-btn:active {
+  transform: scale(0.95);
+}
+
+/* Clear Route Button */
+.clear-route-btn {
+  position: absolute;
+  right: 2.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #EA4335;
+  transition: all var(--transition-fast);
+  border-radius: 8px;
+}
+
+.clear-route-btn:hover {
+  background: rgba(234, 67, 53, 0.1);
+  transform: scale(1.05);
+}
+
+.clear-route-btn:active {
+  transform: scale(0.95);
+}
+
+/* Star animation when saving */
+.save-destination-btn svg {
+  transition: all var(--transition-fast);
+}
+
+.save-destination-btn.saved svg {
+  animation: starPulse 0.4s ease-out;
+}
+
+@keyframes starPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.3) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Shine effect on save */
+.save-destination-btn.saved::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(108, 59, 170, 0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: shine 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+}
+
+/* Saved Places Dropdown */
+.saved-places-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: fadeIn var(--transition-fast);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.saved-place-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.saved-place-item:last-child {
+  border-bottom: none;
+}
+
+.saved-place-item:hover {
+  background: rgba(108, 59, 170, 0.05);
+  transform: translateX(4px);
+}
+
+.saved-place-item:active {
+  transform: translateX(2px);
+}
+
+.place-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.place-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.place-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.place-address {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .route-input-bar {
+    left: 0.5rem;
+    right: 0.5rem;
+    padding: 0.75rem;
+  }
+  
+  .route-input {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .swap-locations-btn {
+    right: -2rem;
+    width: 28px;
+    height: 28px;
+  }
+  
+  .route-input-group {
+    gap: 0.5rem;
+  }
+}
+
+/* Landscape Mode */
+@media (max-height: 500px) {
+  .route-input-bar {
+    top: 0.5rem;
+  }
+  
+  .route-inputs {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .route-connection-line {
+    display: none;
+  }
+  
+  .swap-locations-btn {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin: 0 0.25rem;
+  }
+}

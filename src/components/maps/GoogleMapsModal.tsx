@@ -3,20 +3,16 @@ import { Modal } from '../common/Modal'
 import { 
   loadGoogleMaps, 
   createLocationMarker, 
-  createInfoWindow,
-  checkStreetViewAvailability,
   getGoogleMapsApiKey 
 } from '../../utils/googleMaps'
 import { 
   GoogleMapsModalProps, 
-  ViewMode,
   VIRGIL_MAP_STYLES,
-  Place 
+  SavedPlace
 } from '../../types/maps.types'
-import { SearchBar } from './SearchBar'
-import { InfoPanel } from './InfoPanel'
-import { MapToolbar } from './MapToolbar'
-import { DistanceOverlay } from './DistanceOverlay'
+import { RouteInputBar } from './RouteInputBar'
+import { RouteInfoBar } from './RouteInfoBar'
+import { TrafficIndicator } from './TrafficIndicator'
 import './GoogleMapsModal.css'
 
 export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
@@ -27,72 +23,46 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
 }) => {
   // DOM refs
   const mapRef = useRef<HTMLDivElement>(null)
-  const streetViewRef = useRef<HTMLDivElement>(null)
   
-  // Map instance refs (to avoid stale closures)
+  // Map instance refs
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
-  const streetViewInstanceRef = useRef<google.maps.StreetViewPanorama | null>(null)
   const markerInstanceRef = useRef<google.maps.Marker | null>(null)
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null)
-  const searchMarkersRef = useRef<google.maps.Marker[]>([])
-  const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null)
   const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null)
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null)
-  
-  // Distance measurement refs
-  const measurePolylineRef = useRef<google.maps.Polyline | null>(null)
-  const measureMarkersRef = useRef<google.maps.Marker[]>([])
+  const alternativeRenderersRef = useRef<google.maps.DirectionsRenderer[]>([])
+  const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null)
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null)
+  const autoCollapseTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   // State
-  const [currentView, setCurrentView] = useState<ViewMode>('map')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [streetViewAvailable, setStreetViewAvailable] = useState(true)
   const [mapsLoaded, setMapsLoaded] = useState(false)
+  const [currentAddress, setCurrentAddress] = useState<string>('')
   
-  // Search state
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
-  const [showTraffic, setShowTraffic] = useState(false)
-  const [currentMapLayer, setCurrentMapLayer] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('roadmap')
+  // Route state
+  const [currentRoute, setCurrentRoute] = useState<google.maps.DirectionsRoute | null>(null)
+  const [alternativeRoutes, setAlternativeRoutes] = useState<google.maps.DirectionsRoute[]>([])
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0)
   
-  // Distance measurement state
-  const [measureMode, setMeasureMode] = useState(false)
-  const [measurePoints, setMeasurePoints] = useState<google.maps.LatLng[]>([])
-  const [distanceInfo, setDistanceInfo] = useState<{
-    distance: number
-    walkingTime?: number
-    drivingTime?: number
-    transitTime?: number
-  } | null>(null)
+  // Saved places state
+  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([])
+  const [currentDestinationPlace, setCurrentDestinationPlace] = useState<google.maps.places.PlaceResult | null>(null)
+  
+  // Traffic state
+  const [showTraffic, setShowTraffic] = useState(true)
+  const [hasActiveRoute, setHasActiveRoute] = useState(false)
+  const [showRouteOptions, setShowRouteOptions] = useState(false)
+  const [routeInfoVisible, setRouteInfoVisible] = useState(true)
+  const [departureTime, setDepartureTime] = useState<Date | 'now'>('now')
 
   // Cleanup function
   const cleanupMaps = useCallback(() => {
     console.log('Cleaning up map instances...')
     
-    // Clear search markers
-    searchMarkersRef.current.forEach(marker => {
-      marker.setMap(null)
-    })
-    searchMarkersRef.current = []
-    
     if (markerInstanceRef.current) {
       markerInstanceRef.current.setMap(null)
       markerInstanceRef.current = null
-    }
-    
-    if (mapInstanceRef.current) {
-      google.maps.event.clearInstanceListeners(mapInstanceRef.current)
-      mapInstanceRef.current = null
-    }
-    
-    if (streetViewInstanceRef.current) {
-      google.maps.event.clearInstanceListeners(streetViewInstanceRef.current)
-      streetViewInstanceRef.current = null
-    }
-    
-    if (trafficLayerRef.current) {
-      trafficLayerRef.current.setMap(null)
-      trafficLayerRef.current = null
     }
     
     if (directionsRendererRef.current) {
@@ -100,601 +70,553 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       directionsRendererRef.current = null
     }
     
-    // Clear distance measurement
-    if (measurePolylineRef.current) {
-      measurePolylineRef.current.setMap(null)
-      measurePolylineRef.current = null
+    // Clean up alternative renderers
+    alternativeRenderersRef.current.forEach(renderer => {
+      renderer.setMap(null)
+    })
+    alternativeRenderersRef.current = []
+    
+    if (trafficLayerRef.current) {
+      trafficLayerRef.current.setMap(null)
+      trafficLayerRef.current = null
     }
     
-    measureMarkersRef.current.forEach(marker => {
-      marker.setMap(null)
-    })
-    measureMarkersRef.current = []
+    if (mapInstanceRef.current) {
+      google.maps.event.clearInstanceListeners(mapInstanceRef.current)
+      mapInstanceRef.current = null
+    }
     
-    placesServiceRef.current = null
     directionsServiceRef.current = null
+    geocoderRef.current = null
+    
+    // Clear auto-collapse timer
+    if (autoCollapseTimerRef.current) {
+      clearTimeout(autoCollapseTimerRef.current)
+      autoCollapseTimerRef.current = null
+    }
   }, [])
 
-  // Trigger resize on map instances
-  const triggerResize = useCallback(() => {
-    if (mapInstanceRef.current && currentView === 'map') {
-      console.log('Triggering map resize')
-      google.maps.event.trigger(mapInstanceRef.current, 'resize')
-      
-      // Re-center the map
-      if (coordinates) {
-        mapInstanceRef.current.setCenter({
-          lat: coordinates.latitude,
-          lng: coordinates.longitude
+  // Get address for current location
+  const geocodeLocation = useCallback(async (latLng: google.maps.LatLngLiteral) => {
+    if (!geocoderRef.current) return ''
+    
+    try {
+      const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
+        geocoderRef.current!.geocode({ location: latLng }, (results, status) => {
+          if (status === 'OK' && results) {
+            resolve(results)
+          } else {
+            reject(new Error(status))
+          }
         })
+      })
+      
+      return result[0]?.formatted_address || ''
+    } catch (error) {
+      console.error('Geocoding error:', error)
+      return ''
+    }
+  }, [])
+
+  // Handle route request
+  const handleRouteRequest = useCallback(async (origin: string, destination: string, customDepartureTime?: Date | 'now') => {
+    if (!directionsServiceRef.current || !directionsRendererRef.current) return
+    
+    // Use custom departure time if provided, otherwise use state
+    const depTime = customDepartureTime !== undefined ? customDepartureTime : departureTime
+    
+    const request: google.maps.DirectionsRequest = {
+      origin,
+      destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      provideRouteAlternatives: true,
+      drivingOptions: {
+        departureTime: depTime === 'now' ? new Date() : depTime,
+        trafficModel: google.maps.TrafficModel.BEST_GUESS
       }
     }
     
-    if (streetViewInstanceRef.current && currentView === 'streetview') {
-      console.log('Triggering street view resize')
-      google.maps.event.trigger(streetViewInstanceRef.current, 'resize')
+    try {
+      const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
+        directionsServiceRef.current!.route(request, (result, status) => {
+          if (status === 'OK' && result) {
+            resolve(result)
+          } else {
+            reject(new Error(status))
+          }
+        })
+      })
+      
+      if (result.routes.length > 0) {
+        setCurrentRoute(result.routes[0])
+        setAlternativeRoutes(result.routes.slice(1))
+        setSelectedRouteIndex(0)
+        setHasActiveRoute(true)
+        setShowRouteOptions(true)
+        setRouteInfoVisible(true)
+        
+        // Clear previous alternative renderers
+        alternativeRenderersRef.current.forEach(renderer => {
+          renderer.setMap(null)
+        })
+        alternativeRenderersRef.current = []
+        
+        // Display main route
+        directionsRendererRef.current.setDirections(result)
+        directionsRendererRef.current.setRouteIndex(0)
+        directionsRendererRef.current.setOptions({
+          polylineOptions: {
+            strokeColor: '#4285F4',
+            strokeOpacity: 0.8,
+            strokeWeight: 6,
+            zIndex: 1000
+          }
+        })
+        
+        // Display alternative routes with different styling
+        result.routes.slice(1).forEach((route, index) => {
+          const renderer = new google.maps.DirectionsRenderer({
+            map: mapInstanceRef.current,
+            directions: result,
+            routeIndex: index + 1,
+            suppressMarkers: true,
+            suppressInfoWindows: true,
+            preserveViewport: true,
+            hideRouteList: true,
+            polylineOptions: {
+              strokeColor: '#808080',
+              strokeOpacity: 0.6,
+              strokeWeight: 5,
+              zIndex: 100
+            }
+          })
+          alternativeRenderersRef.current.push(renderer)
+        })
+        
+        // Fit map to route bounds
+        const bounds = result.routes[0].bounds
+        if (bounds && mapInstanceRef.current) {
+          mapInstanceRef.current.fitBounds(bounds, {
+            top: 100,
+            right: 50,
+            bottom: 150,
+            left: 50
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Directions error:', error)
+      setError('Unable to calculate route. Please try again.')
     }
-  }, [currentView, coordinates])
+  }, [departureTime])
 
+  // Handle route selection
+  const handleRouteSelect = useCallback((index: number) => {
+    if (!directionsRendererRef.current || !currentRoute) return
+    
+    setSelectedRouteIndex(index)
+    
+    // Clear any existing timer
+    if (autoCollapseTimerRef.current) {
+      clearTimeout(autoCollapseTimerRef.current)
+    }
+    
+    // Auto-collapse after 800ms
+    autoCollapseTimerRef.current = setTimeout(() => {
+      setShowRouteOptions(false)
+    }, 800)
+    
+    // Update main route to show selected route
+    directionsRendererRef.current.setRouteIndex(index)
+    directionsRendererRef.current.setOptions({
+      polylineOptions: {
+        strokeColor: '#4285F4',
+        strokeOpacity: 0.8,
+        strokeWeight: 6,
+        zIndex: 1000
+      }
+    })
+    
+    // Update alternative routes styling
+    alternativeRenderersRef.current.forEach((renderer, i) => {
+      const routeIndex = i + 1
+      if (routeIndex === index) {
+        // This is now the selected route, hide it as it's shown by main renderer
+        renderer.setMap(null)
+      } else {
+        // Show as alternative
+        renderer.setMap(mapInstanceRef.current)
+        renderer.setOptions({
+          polylineOptions: {
+            strokeColor: '#808080',
+            strokeOpacity: 0.6,
+            strokeWeight: 5,
+            zIndex: 100
+          }
+        })
+      }
+    })
+    
+    // If selecting an alternative route, we need to update the display
+    if (index > 0) {
+      // Show the previously selected route as an alternative
+      const prevRenderer = new google.maps.DirectionsRenderer({
+        map: mapInstanceRef.current,
+        directions: directionsRendererRef.current.getDirections(),
+        routeIndex: 0,
+        suppressMarkers: true,
+        suppressInfoWindows: true,
+        preserveViewport: true,
+        hideRouteList: true,
+        polylineOptions: {
+          strokeColor: '#808080',
+          strokeOpacity: 0.6,
+          strokeWeight: 5,
+          zIndex: 100
+        }
+      })
+      // Store it temporarily
+      alternativeRenderersRef.current[index - 1] = prevRenderer
+    }
+    
+    // Get all routes and select the correct one
+    const allRoutes = [currentRoute, ...alternativeRoutes]
+    if (index < allRoutes.length) {
+      const selectedRoute = allRoutes[index]
+      
+      // Fit map to the selected route bounds with smooth animation
+      const bounds = selectedRoute.bounds
+      if (bounds && mapInstanceRef.current) {
+        const padding = {
+          top: 100, 
+          right: 50, 
+          bottom: 150, 
+          left: 50
+        }
+        mapInstanceRef.current.panToBounds(bounds, padding)
+        
+        setTimeout(() => {
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.fitBounds(bounds, padding)
+          }
+        }, 300)
+      }
+    }
+  }, [currentRoute, alternativeRoutes])
 
-  // Handle get directions
-  const handleGetDirections = useCallback((place: Place) => {
-    if (!coordinates) return
+  // Handle clear route
+  const handleClearRoute = useCallback(() => {
+    // Clear route displays
+    if (directionsRendererRef.current) {
+      directionsRendererRef.current.setMap(null)
+      directionsRendererRef.current.setMap(mapInstanceRef.current)
+      directionsRendererRef.current.setDirections({ routes: [] } as any)
+    }
     
-    const origin = `${coordinates.latitude},${coordinates.longitude}`
-    const destination = `${place.location.lat},${place.location.lng}`
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=walking`
+    // Clear alternative renderers
+    alternativeRenderersRef.current.forEach(renderer => {
+      renderer.setMap(null)
+    })
+    alternativeRenderersRef.current = []
     
-    window.open(url, '_blank')
+    // Clear state
+    setCurrentRoute(null)
+    setAlternativeRoutes([])
+    setSelectedRouteIndex(0)
+    setHasActiveRoute(false)
+    setShowRouteOptions(false)
+    setRouteInfoVisible(true)
+    
+    // Clear any auto-collapse timer
+    if (autoCollapseTimerRef.current) {
+      clearTimeout(autoCollapseTimerRef.current)
+      autoCollapseTimerRef.current = null
+    }
+    
+    // Reset map view to current location
+    if (mapInstanceRef.current && coordinates) {
+      mapInstanceRef.current.setCenter({
+        lat: coordinates.latitude,
+        lng: coordinates.longitude
+      })
+      mapInstanceRef.current.setZoom(14)
+    }
   }, [coordinates])
 
+  // Handle toggle expand/collapse
+  const handleToggleExpand = useCallback(() => {
+    setShowRouteOptions(prev => !prev)
+    
+    // Clear auto-collapse timer if user manually toggles
+    if (autoCollapseTimerRef.current) {
+      clearTimeout(autoCollapseTimerRef.current)
+      autoCollapseTimerRef.current = null
+    }
+  }, [])
 
-  // Close place details
-  const handleClosePlaceDetails = useCallback(() => {
-    setSelectedPlace(null)
+  // Handle close route info
+  const handleCloseRouteInfo = useCallback(() => {
+    setRouteInfoVisible(false)
+    
+    // Clear auto-collapse timer
+    if (autoCollapseTimerRef.current) {
+      clearTimeout(autoCollapseTimerRef.current)
+      autoCollapseTimerRef.current = null
+    }
   }, [])
 
   // Handle traffic toggle
-  const handleToggleTraffic = useCallback((show: boolean) => {
-    if (!mapInstanceRef.current) return
-
-    if (show) {
-      if (!trafficLayerRef.current) {
-        trafficLayerRef.current = new google.maps.TrafficLayer()
-      }
-      trafficLayerRef.current.setMap(mapInstanceRef.current)
-    } else {
+  const handleToggleTraffic = useCallback(() => {
+    setShowTraffic(prev => {
+      const newState = !prev
       if (trafficLayerRef.current) {
-        trafficLayerRef.current.setMap(null)
+        trafficLayerRef.current.setMap(newState ? mapInstanceRef.current : null)
       }
-    }
-    
-    setShowTraffic(show)
-  }, [])
-
-  // Handle layer change
-  const handleLayerChange = useCallback((layer: 'roadmap' | 'satellite' | 'hybrid' | 'terrain') => {
-    if (!mapInstanceRef.current) return
-    
-    mapInstanceRef.current.setMapTypeId(layer)
-    setCurrentMapLayer(layer)
-  }, [])
-
-  // Handle measure toggle
-  const handleToggleMeasure = useCallback((active: boolean) => {
-    setMeasureMode(active)
-    
-    if (!active) {
-      // Clear measurement
-      if (measurePolylineRef.current) {
-        measurePolylineRef.current.setMap(null)
-        measurePolylineRef.current = null
-      }
-      
-      measureMarkersRef.current.forEach(marker => {
-        marker.setMap(null)
-      })
-      measureMarkersRef.current = []
-      
-      setMeasurePoints([])
-      setDistanceInfo(null)
-    }
-  }, [])
-
-  // Calculate travel times using Directions API
-  const calculateTravelTimes = useCallback(async (origin: google.maps.LatLng, destination: google.maps.LatLng) => {
-    if (!directionsServiceRef.current) return
-
-    const modes: google.maps.TravelMode[] = [
-      google.maps.TravelMode.WALKING,
-      google.maps.TravelMode.DRIVING,
-      google.maps.TravelMode.TRANSIT
-    ]
-
-    const times: { walking?: number; driving?: number; transit?: number } = {}
-
-    for (const mode of modes) {
-      try {
-        const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
-          directionsServiceRef.current!.route({
-            origin,
-            destination,
-            travelMode: mode,
-            unitSystem: google.maps.UnitSystem.METRIC
-          }, (result, status) => {
-            if (status === 'OK' && result) {
-              resolve(result)
-            } else {
-              reject(new Error(status))
-            }
-          })
-        })
-
-        const duration = result.routes[0]?.legs[0]?.duration?.value
-        if (duration) {
-          const minutes = Math.round(duration / 60)
-          if (mode === google.maps.TravelMode.WALKING) times.walking = minutes
-          if (mode === google.maps.TravelMode.DRIVING) times.driving = minutes
-          if (mode === google.maps.TravelMode.TRANSIT) times.transit = minutes
-        }
-      } catch (error) {
-        // Some modes might not be available
-        console.log(`${mode} directions not available`)
-      }
-    }
-
-    return times
-  }, [])
-
-  // Handle map click for distance measurement
-  const handleMapClick = useCallback(async (event: google.maps.MapMouseEvent) => {
-    if (!measureMode || !event.latLng || !mapInstanceRef.current) return
-
-    const newPoint = event.latLng
-    const newPoints = [...measurePoints, newPoint]
-    setMeasurePoints(newPoints)
-
-    // Add marker
-    const marker = new google.maps.Marker({
-      position: newPoint,
-      map: mapInstanceRef.current,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 6,
-        fillColor: '#6c3baa',
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 2
-      }
-    })
-    measureMarkersRef.current.push(marker)
-
-    // Update polyline
-    if (measurePolylineRef.current) {
-      measurePolylineRef.current.setPath(newPoints)
-    } else {
-      measurePolylineRef.current = new google.maps.Polyline({
-        path: newPoints,
-        geodesic: true,
-        strokeColor: '#6c3baa',
-        strokeOpacity: 1.0,
-        strokeWeight: 3,
-        map: mapInstanceRef.current
-      })
-    }
-
-    // Calculate distance and times if we have 2 points
-    if (newPoints.length === 2) {
-      const distance = google.maps.geometry.spherical.computeDistanceBetween(
-        newPoints[0],
-        newPoints[1]
-      )
-
-      const times = await calculateTravelTimes(newPoints[0], newPoints[1])
-      
-      setDistanceInfo({
-        distance,
-        ...times
-      })
-    } else if (newPoints.length > 2) {
-      // Reset for new measurement
-      setMeasurePoints([newPoint])
-      
-      // Clear old markers except the last one
-      measureMarkersRef.current.slice(0, -1).forEach(marker => {
-        marker.setMap(null)
-      })
-      measureMarkersRef.current = [measureMarkersRef.current[measureMarkersRef.current.length - 1]]
-      
-      if (measurePolylineRef.current) {
-        measurePolylineRef.current.setPath([newPoint])
-      }
-      
-      setDistanceInfo(null)
-    }
-  }, [measureMode, measurePoints, calculateTravelTimes])
-
-  // Handle search from SearchBar
-  const handleSearch = useCallback((query: string) => {
-    if (!mapInstanceRef.current || !placesServiceRef.current) return
-
-    const request: google.maps.places.TextSearchRequest = {
-      query,
-      location: mapInstanceRef.current.getCenter(),
-      radius: 5000
-    }
-
-    placesServiceRef.current.textSearch(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        // Clear existing search markers
-        searchMarkersRef.current.forEach(marker => {
-          marker.setMap(null)
-        })
-        searchMarkersRef.current = []
-
-        const bounds = new google.maps.LatLngBounds()
-        
-        results.slice(0, 10).forEach(place => {
-          if (!place.geometry?.location) return
-
-          const marker = new google.maps.Marker({
-            position: place.geometry.location,
-            map: mapInstanceRef.current!,
-            title: place.name,
-            icon: {
-              url: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
-              scaledSize: new google.maps.Size(32, 32)
-            }
-          })
-
-          marker.addListener('click', () => {
-            const placeData: Place = {
-              id: place.place_id || '',
-              placeId: place.place_id || '',
-              name: place.name || '',
-              address: place.formatted_address || '',
-              location: {
-                lat: place.geometry!.location!.lat(),
-                lng: place.geometry!.location!.lng()
-              },
-              rating: place.rating,
-              priceLevel: place.price_level,
-              types: place.types
-            }
-            setSelectedPlace(placeData)
-          })
-
-          searchMarkersRef.current.push(marker)
-          bounds.extend(place.geometry.location)
-        })
-
-        if (results.length > 0) {
-          mapInstanceRef.current!.fitBounds(bounds)
-        }
-      }
+      return newState
     })
   }, [])
 
-  // Handle place selection from SearchBar autocomplete
-  const handlePlaceSelect = useCallback((place: google.maps.places.PlaceResult) => {
-    if (!place.geometry?.location || !mapInstanceRef.current) return
-
-    mapInstanceRef.current.setCenter(place.geometry.location)
-    mapInstanceRef.current.setZoom(17)
-
-    const placeData: Place = {
-      id: place.place_id || '',
-      placeId: place.place_id || '',
-      name: place.name || '',
-      address: place.formatted_address || '',
-      location: {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      },
-      types: place.types
-    }
+  // Handle departure time change
+  const handleDepartureTimeChange = useCallback((newTime: Date | 'now') => {
+    setDepartureTime(newTime)
     
-    setSelectedPlace(placeData)
-  }, [])
+    // If we have a route, recalculate with new departure time
+    if (hasActiveRoute && currentDestinationPlace) {
+      const origin = currentAddress || 'Current Location'
+      const destination = currentDestinationPlace.formatted_address || currentDestinationPlace.name || ''
+      handleRouteRequest(origin, destination, newTime)
+    }
+  }, [hasActiveRoute, currentDestinationPlace, currentAddress, handleRouteRequest])
 
-  // Initialize Google Maps
+  // Initialize map
   useEffect(() => {
-    if (!isOpen || !coordinates) {
-      console.log('Modal not open or no coordinates, skipping initialization')
+    if (!isOpen || !mapRef.current || !coordinates) return
+    
+    const apiKey = getGoogleMapsApiKey()
+    if (!apiKey) {
+      setError('Google Maps API key is not configured')
+      setIsLoading(false)
       return
     }
-
+    
     let mounted = true
-    let initTimer: NodeJS.Timeout
-
-    const initializeMaps = async () => {
+    
+    const initializeMap = async () => {
       try {
-        console.log('Starting Google Maps initialization...')
-        setIsLoading(true)
-        setError(null)
-        
-        const apiKey = getGoogleMapsApiKey()
-        if (!apiKey) {
-          throw new Error('Google Maps API key not found. Please check your .env file.')
-        }
-
         // Load Google Maps if not already loaded
         if (!window.google?.maps) {
-          console.log('Loading Google Maps script...')
-          await loadGoogleMaps({ 
-            apiKey,
-            libraries: ['places', 'geometry', 'visualization']
-          })
-          console.log('Google Maps script loaded successfully')
+          await loadGoogleMaps({ apiKey })
         }
-
-        if (!mounted) return
-
-        // Wait for container to have dimensions
-        const mapContainer = mapRef.current
-        if (!mapContainer) {
-          throw new Error('Map container not found')
-        }
-
-        // Check if container has dimensions
-        const rect = mapContainer.getBoundingClientRect()
-        console.log('Map container dimensions:', rect.width, 'x', rect.height)
         
-        if (rect.width === 0 || rect.height === 0) {
-          console.log('Container has no dimensions, waiting...')
-          // Retry after a delay
-          initTimer = setTimeout(() => {
-            if (mounted) initializeMaps()
-          }, 300)
-          return
-        }
-
-        const position = {
+        if (!mounted || !mapRef.current) return
+        
+        // Create map instance
+        const map = new google.maps.Map(mapRef.current, {
+          center: {
+            lat: coordinates.latitude,
+            lng: coordinates.longitude
+          },
+          zoom: 14,
+          styles: VIRGIL_MAP_STYLES,
+          disableDefaultUI: true,
+          zoomControl: true,
+          zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_CENTER
+          },
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+          rotateControl: false,
+          scaleControl: false,
+          clickableIcons: false
+        })
+        
+        mapInstanceRef.current = map
+        
+        // Initialize services
+        directionsServiceRef.current = new google.maps.DirectionsService()
+        directionsRendererRef.current = new google.maps.DirectionsRenderer({
+          map,
+          suppressMarkers: false,
+          suppressInfoWindows: true,
+          preserveViewport: true,
+          hideRouteList: true, // Hide the default route list
+          polylineOptions: {
+            strokeColor: '#4285F4',
+            strokeOpacity: 0.8,
+            strokeWeight: 6
+          }
+        })
+        geocoderRef.current = new google.maps.Geocoder()
+        
+        // Add traffic layer (ON by default)
+        trafficLayerRef.current = new google.maps.TrafficLayer()
+        trafficLayerRef.current.setMap(map)
+        
+        // Add current location marker
+        markerInstanceRef.current = createLocationMarker({
           lat: coordinates.latitude,
           lng: coordinates.longitude
-        }
-        console.log('Initializing map at position:', position)
-
-        // Check Street View availability
-        const hasStreetView = await checkStreetViewAvailability(position)
-        setStreetViewAvailable(hasStreetView)
-        console.log('Street View available:', hasStreetView)
-
-        // Initialize Map
-        if (mapContainer && mounted) {
-          console.log('Creating map instance...')
-          const map = new google.maps.Map(mapContainer, {
-            center: position,
-            zoom: 16,
-            styles: VIRGIL_MAP_STYLES,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            disableDefaultUI: false,
-            zoomControl: true,
-            mapTypeControl: false, // Using our custom layer control
-            streetViewControl: true,
-            fullscreenControl: true,
-            zoomControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_BOTTOM
-            },
-            fullscreenControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_BOTTOM
-            }
-          })
-
-          mapInstanceRef.current = map
-          console.log('Map instance created successfully')
-
-          // Initialize PlacesService
-          placesServiceRef.current = new google.maps.places.PlacesService(map)
-          console.log('PlacesService created successfully')
-          
-          // Initialize DirectionsService
-          directionsServiceRef.current = new google.maps.DirectionsService()
-          console.log('DirectionsService created successfully')
-          
-          // Add click listener for distance measurement
-          map.addListener('click', handleMapClick)
-
-          // Trigger resize after a brief delay to ensure proper rendering
-          setTimeout(() => {
-            if (mounted && mapInstanceRef.current) {
-              google.maps.event.trigger(mapInstanceRef.current, 'resize')
-              mapInstanceRef.current.setCenter(position)
-              console.log('Initial resize triggered')
-            }
-          }, 100)
-
-          // Create marker
-          const marker = createLocationMarker(position, map)
-          markerInstanceRef.current = marker
-          
-          // Create info window
-          const addressText = address?.street || address?.formatted || 'Your Location'
-          const infoContent = `
-            <div class="map-info-window">
-              <h3>${addressText}</h3>
-              <p>Lat: ${coordinates.latitude.toFixed(6)}</p>
-              <p>Lng: ${coordinates.longitude.toFixed(6)}</p>
-            </div>
-          `
-          createInfoWindow(infoContent, marker, map)
-          console.log('Marker and info window created')
-        }
-
-        // Initialize Street View
-        if (streetViewRef.current && hasStreetView && mounted) {
-          console.log('Creating Street View instance...')
-          const streetView = new google.maps.StreetViewPanorama(streetViewRef.current, {
-            position,
-            pov: {
-              heading: 0,
-              pitch: 0
-            },
-            zoom: 1,
-            addressControl: true,
-            linksControl: true,
-            panControl: true,
-            enableCloseButton: false,
-            fullscreenControl: true,
-            fullscreenControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_TOP
-            }
-          })
-
-          streetViewInstanceRef.current = streetView
-          console.log('Street View instance created successfully')
-        }
-
+        }, map)
+        
+        // Get address for current location
+        const addr = await geocodeLocation({
+          lat: coordinates.latitude,
+          lng: coordinates.longitude
+        })
+        setCurrentAddress(addr)
+        
+        setMapsLoaded(true)
+        setIsLoading(false)
+        setError(null)
+        
+      } catch (err) {
+        console.error('Error initializing map:', err)
         if (mounted) {
-          setMapsLoaded(true)
+          setError('Failed to load Google Maps. Please try again.')
           setIsLoading(false)
-          console.log('Maps initialization completed')
-        }
-      } catch (error) {
-        console.error('Failed to initialize Google Maps:', error)
-        if (mounted) {
-          setIsLoading(false)
-          setError(error instanceof Error ? error.message : 'Failed to load maps. Please check your internet connection and try again.')
         }
       }
     }
-
-    // Initialize with delay to ensure modal is fully rendered
-    initTimer = setTimeout(() => {
-      initializeMaps()
-    }, 500) // Increased delay to ensure container dimensions
-
-    // Cleanup
+    
+    initializeMap()
+    
     return () => {
       mounted = false
-      clearTimeout(initTimer)
       cleanupMaps()
     }
-  }, [isOpen, coordinates, address, cleanupMaps, handleMapClick])
+  }, [isOpen, coordinates, cleanupMaps, geocodeLocation])
 
-  // Trigger resize when view changes
+  // Load saved places from localStorage
   useEffect(() => {
-    if (!mapsLoaded) return
-    
-    // Small delay to ensure CSS transitions complete
-    const timer = setTimeout(() => {
-      triggerResize()
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [currentView, mapsLoaded, triggerResize])
+    const stored = localStorage.getItem('virgil_saved_places')
+    if (stored) {
+      try {
+        const places = JSON.parse(stored) as SavedPlace[]
+        setSavedPlaces(places)
+      } catch (error) {
+        console.error('Error loading saved places:', error)
+      }
+    }
+  }, [])
 
-  // Toggle between Map and Street View
-  const toggleView = useCallback(() => {
-    const newView = currentView === 'map' ? 'streetview' : 'map'
-    console.log('Toggling view to:', newView)
-    setCurrentView(newView)
-  }, [currentView])
+  // Save place handler
+  const handleSavePlace = useCallback((place: google.maps.places.PlaceResult, isHome?: boolean) => {
+    if (!place.name && !place.formatted_address) return
+    
+    const newPlace: SavedPlace = {
+      id: Date.now().toString(),
+      name: place.name || place.formatted_address || 'Saved Place',
+      address: place.formatted_address || '',
+      placeId: place.place_id,
+      isHome,
+      timestamp: Date.now()
+    }
+    
+    setSavedPlaces(prev => {
+      // Remove existing home if setting new home
+      let updated = isHome ? prev.filter(p => !p.isHome) : prev
+      
+      // Check if place already exists
+      const existingIndex = updated.findIndex(p => p.placeId === place.place_id)
+      if (existingIndex >= 0) {
+        updated = updated.filter((_, i) => i !== existingIndex)
+      }
+      
+      // Add new place
+      updated = [newPlace, ...updated]
+      
+      // Limit to 10 saved places (excluding home)
+      const nonHomePlaces = updated.filter(p => !p.isHome)
+      const homePlaces = updated.filter(p => p.isHome)
+      if (nonHomePlaces.length > 10) {
+        updated = [...homePlaces, ...nonHomePlaces.slice(0, 10)]
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('virgil_saved_places', JSON.stringify(updated))
+      
+      return updated
+    })
+  }, [])
 
-  // Get display address
-  const displayAddress = address?.street || 
-    (address?.formatted ? address.formatted.split(',')[0] : '') ||
-    'Current Location'
+  // Remove saved place handler
+  const handleRemoveSavedPlace = useCallback((placeId?: string) => {
+    if (!placeId) return
+    
+    setSavedPlaces(prev => {
+      const updated = prev.filter(p => p.placeId !== placeId)
+      localStorage.setItem('virgil_saved_places', JSON.stringify(updated))
+      return updated
+    })
+  }, [])
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={
-        <div className="maps-modal-header">
-          <span className="maps-modal-title">{displayAddress}</span>
-          {streetViewAvailable && mapsLoaded && !isLoading && (
-            <button 
-              className="view-toggle-btn"
-              onClick={toggleView}
-              title={`Switch to ${currentView === 'map' ? 'Street View' : 'Map'}`}
-            >
-              {currentView === 'map' ? '🚶 Street View' : '🗺️ Map View'}
-            </button>
-          )}
-        </div>
-      }
+      title="Check Traffic"
       className="google-maps-modal"
-      size="large"
+      size="extra-large"
     >
-      <div className="maps-container">
+      <div className={`maps-container ${routeInfoVisible && currentRoute ? 'has-route-info' : ''}`}>
         {isLoading && (
           <div className="maps-loading">
             <div className="maps-spinner"></div>
-            <p>Loading maps...</p>
+            <p>Loading map...</p>
           </div>
         )}
         
         {error && (
           <div className="maps-error">
-            <p>⚠️ {error}</p>
-            <button 
-              className="retry-btn"
-              onClick={() => window.location.reload()}
-            >
-              Retry
-            </button>
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()}>Reload</button>
           </div>
         )}
-
+        
         <div 
-          ref={mapRef}
-          className={`map-view ${currentView === 'map' && mapsLoaded ? 'active' : ''}`}
+          ref={mapRef} 
+          className={`map-view ${!isLoading && mapsLoaded ? 'active' : ''}`}
         />
         
-        {streetViewAvailable && (
-          <div 
-            ref={streetViewRef}
-            className={`street-view ${currentView === 'streetview' && mapsLoaded ? 'active' : ''}`}
-          />
-        )}
-
-        {!streetViewAvailable && currentView === 'streetview' && mapsLoaded && (
-          <div className="street-view-unavailable">
-            <p>Street View is not available for this location</p>
-            <button onClick={() => setCurrentView('map')}>
-              Back to Map
-            </button>
-          </div>
-        )}
-
-        {/* Search and controls - only show in map view when loaded */}
-        {currentView === 'map' && mapsLoaded && !isLoading && (
+        {/* Map controls */}
+        {mapsLoaded && !isLoading && (
           <>
-            <SearchBar 
-              onSearch={handleSearch}
-              onPlaceSelect={handlePlaceSelect}
-              placeholder="Search places..."
+            <RouteInputBar
+              currentLocation={coordinates ? {
+                lat: coordinates.latitude,
+                lng: coordinates.longitude
+              } : null}
+              currentAddress={currentAddress || address?.formatted || 'Current Location'}
+              onRouteRequest={handleRouteRequest}
+              onDestinationSelect={setCurrentDestinationPlace}
+              savedPlaces={savedPlaces}
+              currentDestinationPlace={currentDestinationPlace}
+              onSavePlace={handleSavePlace}
+              onRemoveSavedPlace={handleRemoveSavedPlace}
+              hasRoute={hasActiveRoute}
+              onClearRoute={handleClearRoute}
             />
             
-            <MapToolbar 
+            <TrafficIndicator
+              map={mapInstanceRef.current}
+              isTrafficEnabled={showTraffic}
               onToggleTraffic={handleToggleTraffic}
-              onToggleMeasure={handleToggleMeasure}
-              onLayerChange={handleLayerChange}
-              initialTrafficState={showTraffic}
-              measureActive={measureMode}
-              currentLayer={currentMapLayer}
             />
             
-            {distanceInfo && (
-              <DistanceOverlay 
-                distance={distanceInfo.distance}
-                walkingTime={distanceInfo.walkingTime}
-                drivingTime={distanceInfo.drivingTime}
-                transitTime={distanceInfo.transitTime}
-                onClose={() => setDistanceInfo(null)}
+            {routeInfoVisible && currentRoute && (
+              <RouteInfoBar
+                route={currentRoute}
+                alternativeRoutes={alternativeRoutes}
+                onRouteSelect={handleRouteSelect}
+                selectedRouteIndex={selectedRouteIndex}
+                isExpanded={showRouteOptions}
+                onToggleExpand={handleToggleExpand}
+                onClose={handleCloseRouteInfo}
+                departureTime={departureTime}
+                onDepartureTimeChange={handleDepartureTimeChange}
               />
             )}
-            
-            <InfoPanel 
-              place={selectedPlace}
-              onClose={handleClosePlaceDetails}
-              onGetDirections={handleGetDirections}
-              userLocation={coordinates ? { 
-                lat: coordinates.latitude, 
-                lng: coordinates.longitude 
-              } : null}
-            />
           </>
         )}
       </div>
