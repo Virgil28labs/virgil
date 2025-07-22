@@ -44,6 +44,16 @@ const VirgilChatbot = memo(function VirgilChatbot() {
   const [dashboardContext, setDashboardContext] = useState<DashboardContext | null>(null);
   const [contextualSuggestions, setContextualSuggestions] = useState<ContextualSuggestion[]>([]);
   
+  // Window control state
+  const [windowSize, setWindowSize] = useState<'normal' | 'large' | 'fullscreen'>(() => {
+    try {
+      const saved = localStorage.getItem('virgil-window-size') as 'normal' | 'large' | 'fullscreen';
+      return saved || 'normal';
+    } catch {
+      return 'normal';
+    }
+  });
+  
   const { user } = useAuth();
   const { address, ipLocation, hasGPSLocation, coordinates } = useLocation();
   const { data: weatherData, unit: weatherUnit } = useWeather();
@@ -200,14 +210,13 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     }
   }, [isOpen]);
 
-  // Save conversation when chat is closed
+  // Save conversation when chat is closed (but keep messages for persistence)
   useEffect(() => {
     if (!isOpen && messages.length > 0) {
       const saveConversation = async () => {
         try {
           await memoryService.saveConversation(messages);
-          // Clear messages after saving
-          setMessages([]);
+          // Keep messages in state for persistence - don't clear them
         } catch (error) {
           console.error('Failed to save conversation:', error);
         }
@@ -216,6 +225,54 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       saveConversation();
     }
   }, [isOpen, messages]);
+
+  // Persist active conversation to localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        localStorage.setItem('virgil-active-conversation', JSON.stringify(messages));
+      } catch (error) {
+        console.error('Failed to save active conversation:', error);
+      }
+    } else {
+      // Clear localStorage when no messages
+      localStorage.removeItem('virgil-active-conversation');
+    }
+  }, [messages]);
+
+  // Load persisted conversation on mount
+  useEffect(() => {
+    const loadPersistedConversation = async () => {
+      try {
+        // Priority: localStorage active session > memory service > empty
+        const savedMessages = localStorage.getItem('virgil-active-conversation');
+        if (savedMessages) {
+          const parsedMessages = JSON.parse(savedMessages);
+          if (parsedMessages.length > 0) {
+            setMessages(parsedMessages);
+            return;
+          }
+        }
+        
+        // Fallback to memory service if no active session
+        const lastConv = await memoryService.getLastConversation();
+        if (lastConv && lastConv.messages && lastConv.messages.length > 0) {
+          // Only load if conversation is recent (within 24 hours)
+          const isRecent = lastConv.timestamp && (Date.now() - lastConv.timestamp) < 24 * 60 * 60 * 1000;
+          if (isRecent) {
+            setMessages(lastConv.messages);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load persisted conversation:', error);
+      }
+    };
+
+    // Only load on initial mount
+    if (messages.length === 0) {
+      loadPersistedConversation();
+    }
+  }, []); // Empty dependency array for mount-only execution
 
   // System prompt is now managed directly in this component
 
@@ -344,6 +401,38 @@ RESPONSE RULES:
     return models.find(m => m.id === selectedModel) || models[0];
   }, [selectedModel]);
 
+  // Window control handlers
+  const handleMinimize = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  const handleSizeToggle = useCallback(() => {
+    const sizes: ('normal' | 'large' | 'fullscreen')[] = ['normal', 'large', 'fullscreen'];
+    const currentIndex = sizes.indexOf(windowSize);
+    const nextSize = sizes[(currentIndex + 1) % sizes.length];
+    setWindowSize(nextSize);
+    try {
+      localStorage.setItem('virgil-window-size', nextSize);
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, [windowSize]);
+
+  const handleNewChat = useCallback(async () => {
+    if (messages.length > 0) {
+      try {
+        // Save current conversation to memory before clearing
+        await memoryService.saveConversation(messages);
+      } catch (error) {
+        console.error('Failed to save conversation before starting new chat:', error);
+      }
+    }
+    
+    // Clear current conversation
+    setMessages([]);
+    localStorage.removeItem('virgil-active-conversation');
+  }, [messages]);
+
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
 
@@ -357,6 +446,9 @@ RESPONSE RULES:
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setError(null);
+    
+    // Refocus the input field after sending message
+    setTimeout(() => inputRef.current?.focus(), 0);
 
     try {
       setIsTyping(true);
@@ -373,6 +465,8 @@ RESPONSE RULES:
         };
         setMessages(prev => [...prev, appMessage]);
         setIsTyping(false);
+        // Refocus input after app response
+        setTimeout(() => inputRef.current?.focus(), 0);
         return;
       }
 
@@ -435,6 +529,8 @@ RESPONSE RULES:
       setMessages(prev => [...prev, fallbackMessage]);
     } finally {
       setIsTyping(false);
+      // Refocus input after response is complete
+      setTimeout(() => inputRef.current?.focus(), 0);
     }
   }, [selectedModel, createSystemPrompt, messages]);
 
@@ -540,7 +636,7 @@ RESPONSE RULES:
         if (chatContainerRef) chatContainerRef.current = el;
         if (keyboardNavRef) keyboardNavRef.current = el;
       }}
-      className="virgil-chatbot-container"
+      className={`virgil-chatbot-container ${windowSize}`}
       role="dialog"
       aria-label="Virgil AI Assistant"
       aria-modal="true"
@@ -585,29 +681,33 @@ RESPONSE RULES:
               </div>
             )}
           </div>
-          {showMemoryIndicator && (
-            <button 
-              className="memory-indicator clickable"
-              onClick={() => setShowMemoryModal(true)}
-              title="View memories and conversations"
-            >
-              🧠 Memory Active
-            </button>
-          )}
-          {dashboardContext && (
-            <div 
-              className="context-indicator"
-              title={`Smart context active: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`}
-            >
-              🎯 Context Aware
+          {(showMemoryIndicator || dashboardContext || messages.length > 0) && (
+            <div className="status-cluster">
+              {showMemoryIndicator && (
+                <button 
+                  className="status-pill memory-pill"
+                  onClick={() => setShowMemoryModal(true)}
+                  title="Memory Active - View conversations"
+                >
+                  🧠 MEM
+                </button>
+              )}
+              {dashboardContext && (
+                <div 
+                  className="status-pill context-pill"
+                  title={`Context Aware: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`}
+                >
+                  🎯 CTX
+                </div>
+              )}
             </div>
           )}
           <div className="model-selector">
             <button 
-              className="model-dropdown-btn"
+              className="model-dropdown-btn compact"
               onClick={() => setShowModelDropdown(!showModelDropdown)}
             >
-              {getCurrentModel().name}
+              {getCurrentModel().name.replace('GPT-', '').replace(' Mini', '')}
               <span className="dropdown-arrow">▼</span>
             </button>
             {showModelDropdown && (
@@ -635,18 +735,13 @@ RESPONSE RULES:
               </div>
             )}
           </div>
-        </div>
-        <div className="header-right">
           <div className="profile-selector">
             <button 
-              className="profile-dropdown-btn"
+              className="status-pill edit-pill"
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               title="System Prompt Editor"
             >
-              <div className="user-avatar">
-                📝
-              </div>
-              <span className="dropdown-arrow">▼</span>
+              ⚙️ EDIT
             </button>
             {showProfileDropdown && (
               <div className="profile-dropdown">
@@ -736,12 +831,32 @@ RESPONSE RULES:
             )}
           </div>
           <button
-            className="close-btn"
-            onClick={() => setIsOpen(false)}
-            title="Close chat"
+            className="status-pill new-chat-pill"
+            onClick={handleNewChat}
+            title={messages.length > 0 ? "Start a new conversation (current one will be saved to memory)" : "Start a new conversation"}
           >
-            ✕
+            ✨ NEW
           </button>
+        </div>
+        <div className="header-right">
+          <div className="window-controls">
+            <button
+              className="minimize-btn"
+              onClick={handleMinimize}
+              title="Close to floating bubble"
+              aria-label="Close to floating bubble"
+            >
+              —
+            </button>
+            <button
+              className="size-toggle-btn"
+              onClick={handleSizeToggle}
+              title={`Current: ${windowSize} - Click to toggle`}
+              aria-label={`Toggle window size (current: ${windowSize})`}
+            >
+              ⧉
+            </button>
+          </div>
         </div>
       </div>
 
@@ -911,7 +1026,7 @@ RESPONSE RULES:
                         .filter(memory => 
                           !searchQuery || 
                           memory.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          memory.context.toLowerCase().includes(searchQuery.toLowerCase())
+                          memory.context.toLowerCase().includes(searchQuery.toLowerCase()),
                         )
                         .map(memory => (
                           <div key={memory.id} className="memory-item">
@@ -954,7 +1069,7 @@ RESPONSE RULES:
                         .filter(conv => 
                           !searchQuery || 
                           conv.firstMessage.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+                          conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
                         )
                         .map(conv => (
                           <div key={conv.id} className="conversation-item">
