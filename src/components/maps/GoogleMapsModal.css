@@ -60,7 +60,7 @@
   min-height: 350px;
   overflow: hidden;
   border-radius: var(--radius-medium);
-  background: var(--deep-plum);
+  background: #f5f5f5;
 }
 
 /* Map and Street View */

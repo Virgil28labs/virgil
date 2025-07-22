@@ -11,12 +11,12 @@ import {
   GoogleMapsModalProps, 
   ViewMode,
   VIRGIL_MAP_STYLES,
-  SearchType,
   Place 
 } from '../../types/maps.types'
-import { QuickSearchPill } from './QuickSearchPill'
-import { PlaceDetailsCard } from './PlaceDetailsCard'
-import { MapControls } from './MapControls'
+import { SearchBar } from './SearchBar'
+import { InfoPanel } from './InfoPanel'
+import { MapToolbar } from './MapToolbar'
+import { DistanceOverlay } from './DistanceOverlay'
 import './GoogleMapsModal.css'
 
 export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
@@ -36,6 +36,12 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null)
   const searchMarkersRef = useRef<google.maps.Marker[]>([])
   const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null)
+  const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null)
+  const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null)
+  
+  // Distance measurement refs
+  const measurePolylineRef = useRef<google.maps.Polyline | null>(null)
+  const measureMarkersRef = useRef<google.maps.Marker[]>([])
   
   // State
   const [currentView, setCurrentView] = useState<ViewMode>('map')
@@ -45,11 +51,19 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   const [mapsLoaded, setMapsLoaded] = useState(false)
   
   // Search state
-  const [isSearching, setIsSearching] = useState(false)
-  const [searchResults, setSearchResults] = useState<Place[]>([])
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
-  const [activeSearchType, setActiveSearchType] = useState<SearchType | null>(null)
   const [showTraffic, setShowTraffic] = useState(false)
+  const [currentMapLayer, setCurrentMapLayer] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('roadmap')
+  
+  // Distance measurement state
+  const [measureMode, setMeasureMode] = useState(false)
+  const [measurePoints, setMeasurePoints] = useState<google.maps.LatLng[]>([])
+  const [distanceInfo, setDistanceInfo] = useState<{
+    distance: number
+    walkingTime?: number
+    drivingTime?: number
+    transitTime?: number
+  } | null>(null)
 
   // Cleanup function
   const cleanupMaps = useCallback(() => {
@@ -81,7 +95,24 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       trafficLayerRef.current = null
     }
     
+    if (directionsRendererRef.current) {
+      directionsRendererRef.current.setMap(null)
+      directionsRendererRef.current = null
+    }
+    
+    // Clear distance measurement
+    if (measurePolylineRef.current) {
+      measurePolylineRef.current.setMap(null)
+      measurePolylineRef.current = null
+    }
+    
+    measureMarkersRef.current.forEach(marker => {
+      marker.setMap(null)
+    })
+    measureMarkersRef.current = []
+    
     placesServiceRef.current = null
+    directionsServiceRef.current = null
   }, [])
 
   // Trigger resize on map instances
@@ -105,125 +136,6 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     }
   }, [currentView, coordinates])
 
-  // Get search type configuration
-  const getSearchTypeConfig = (type: SearchType): { keyword: string; types: string[] } => {
-    const configs: Record<SearchType, { keyword: string; types: string[] }> = {
-      coffee: { keyword: 'coffee', types: ['cafe', 'coffee_shop'] },
-      food: { keyword: 'food', types: ['restaurant', 'meal_delivery', 'meal_takeaway'] },
-      gas: { keyword: 'gas station', types: ['gas_station'] },
-      grocery: { keyword: 'grocery', types: ['supermarket', 'grocery_or_supermarket'] },
-      pharmacy: { keyword: 'pharmacy', types: ['pharmacy', 'drugstore'] },
-      atm: { keyword: 'atm', types: ['atm'] },
-      restaurant: { keyword: 'restaurant', types: ['restaurant'] },
-      bar: { keyword: 'bar', types: ['bar', 'night_club'] },
-      entertainment: { keyword: 'entertainment', types: ['movie_theater', 'amusement_park', 'bowling_alley'] },
-      convenience: { keyword: '24 hour', types: ['convenience_store'] },
-      '24hour': { keyword: '24 hour', types: ['convenience_store'] }
-    }
-    return configs[type] || { keyword: type, types: [] }
-  }
-
-  // Handle nearby search
-  const handleNearbySearch = useCallback(async (type: SearchType) => {
-    if (!mapInstanceRef.current || !placesServiceRef.current || !coordinates) {
-      console.error('Map or PlacesService not initialized')
-      return
-    }
-
-    setIsSearching(true)
-    setActiveSearchType(type)
-    setSelectedPlace(null)
-
-    // Clear existing search markers
-    searchMarkersRef.current.forEach(marker => {
-      marker.setMap(null)
-    })
-    searchMarkersRef.current = []
-
-    const { keyword, types } = getSearchTypeConfig(type)
-    const userLocation = new google.maps.LatLng(coordinates.latitude, coordinates.longitude)
-
-    const request: google.maps.places.PlaceSearchRequest = {
-      location: userLocation,
-      radius: 1500, // 1.5km radius
-      keyword,
-      type: types[0] as any, // Google Maps expects a single type
-      rankBy: google.maps.places.RankBy.PROMINENCE
-    }
-
-    placesServiceRef.current.nearbySearch(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        const places: Place[] = results.slice(0, 10).map(place => {
-          const placeLocation = place.geometry?.location
-          
-          // Calculate distance
-          let distance = 0
-          if (placeLocation && userLocation) {
-            distance = google.maps.geometry.spherical.computeDistanceBetween(
-              userLocation,
-              placeLocation
-            )
-          }
-
-          return {
-            id: place.place_id || '',
-            placeId: place.place_id || '',
-            name: place.name || '',
-            address: place.vicinity || '',
-            location: {
-              lat: placeLocation?.lat() || 0,
-              lng: placeLocation?.lng() || 0
-            },
-            rating: place.rating,
-            priceLevel: place.price_level,
-            openNow: place.opening_hours?.open_now,
-            distance,
-            types: place.types,
-            icon: place.icon
-          }
-        })
-
-        // Sort by distance
-        places.sort((a, b) => (a.distance || 0) - (b.distance || 0))
-        
-        setSearchResults(places)
-        
-        // Create markers for each place
-        places.forEach(place => {
-          const marker = new google.maps.Marker({
-            position: place.location,
-            map: mapInstanceRef.current!,
-            title: place.name,
-            icon: {
-              url: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
-              scaledSize: new google.maps.Size(32, 32)
-            }
-          })
-
-          marker.addListener('click', () => {
-            setSelectedPlace(place)
-          })
-
-          searchMarkersRef.current.push(marker)
-        })
-
-        // Adjust map bounds to show all results
-        if (places.length > 0) {
-          const bounds = new google.maps.LatLngBounds()
-          bounds.extend(userLocation)
-          places.forEach(place => {
-            bounds.extend(new google.maps.LatLng(place.location.lat, place.location.lng))
-          })
-          mapInstanceRef.current!.fitBounds(bounds)
-        }
-      } else {
-        console.error('Places search failed:', status)
-        setSearchResults([])
-      }
-      
-      setIsSearching(false)
-    })
-  }, [coordinates])
 
   // Handle get directions
   const handleGetDirections = useCallback((place: Place) => {
@@ -236,11 +148,6 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     window.open(url, '_blank')
   }, [coordinates])
 
-  // Handle save place (placeholder for now)
-  const handleSavePlace = useCallback((place: Place) => {
-    console.log('Save place:', place)
-    // TODO: Implement save functionality with local storage or database
-  }, [])
 
   // Close place details
   const handleClosePlaceDetails = useCallback(() => {
@@ -263,6 +170,231 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     }
     
     setShowTraffic(show)
+  }, [])
+
+  // Handle layer change
+  const handleLayerChange = useCallback((layer: 'roadmap' | 'satellite' | 'hybrid' | 'terrain') => {
+    if (!mapInstanceRef.current) return
+    
+    mapInstanceRef.current.setMapTypeId(layer)
+    setCurrentMapLayer(layer)
+  }, [])
+
+  // Handle measure toggle
+  const handleToggleMeasure = useCallback((active: boolean) => {
+    setMeasureMode(active)
+    
+    if (!active) {
+      // Clear measurement
+      if (measurePolylineRef.current) {
+        measurePolylineRef.current.setMap(null)
+        measurePolylineRef.current = null
+      }
+      
+      measureMarkersRef.current.forEach(marker => {
+        marker.setMap(null)
+      })
+      measureMarkersRef.current = []
+      
+      setMeasurePoints([])
+      setDistanceInfo(null)
+    }
+  }, [])
+
+  // Calculate travel times using Directions API
+  const calculateTravelTimes = useCallback(async (origin: google.maps.LatLng, destination: google.maps.LatLng) => {
+    if (!directionsServiceRef.current) return
+
+    const modes: google.maps.TravelMode[] = [
+      google.maps.TravelMode.WALKING,
+      google.maps.TravelMode.DRIVING,
+      google.maps.TravelMode.TRANSIT
+    ]
+
+    const times: { walking?: number; driving?: number; transit?: number } = {}
+
+    for (const mode of modes) {
+      try {
+        const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
+          directionsServiceRef.current!.route({
+            origin,
+            destination,
+            travelMode: mode,
+            unitSystem: google.maps.UnitSystem.METRIC
+          }, (result, status) => {
+            if (status === 'OK' && result) {
+              resolve(result)
+            } else {
+              reject(new Error(status))
+            }
+          })
+        })
+
+        const duration = result.routes[0]?.legs[0]?.duration?.value
+        if (duration) {
+          const minutes = Math.round(duration / 60)
+          if (mode === google.maps.TravelMode.WALKING) times.walking = minutes
+          if (mode === google.maps.TravelMode.DRIVING) times.driving = minutes
+          if (mode === google.maps.TravelMode.TRANSIT) times.transit = minutes
+        }
+      } catch (error) {
+        // Some modes might not be available
+        console.log(`${mode} directions not available`)
+      }
+    }
+
+    return times
+  }, [])
+
+  // Handle map click for distance measurement
+  const handleMapClick = useCallback(async (event: google.maps.MapMouseEvent) => {
+    if (!measureMode || !event.latLng || !mapInstanceRef.current) return
+
+    const newPoint = event.latLng
+    const newPoints = [...measurePoints, newPoint]
+    setMeasurePoints(newPoints)
+
+    // Add marker
+    const marker = new google.maps.Marker({
+      position: newPoint,
+      map: mapInstanceRef.current,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 6,
+        fillColor: '#6c3baa',
+        fillOpacity: 1,
+        strokeColor: '#fff',
+        strokeWeight: 2
+      }
+    })
+    measureMarkersRef.current.push(marker)
+
+    // Update polyline
+    if (measurePolylineRef.current) {
+      measurePolylineRef.current.setPath(newPoints)
+    } else {
+      measurePolylineRef.current = new google.maps.Polyline({
+        path: newPoints,
+        geodesic: true,
+        strokeColor: '#6c3baa',
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        map: mapInstanceRef.current
+      })
+    }
+
+    // Calculate distance and times if we have 2 points
+    if (newPoints.length === 2) {
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(
+        newPoints[0],
+        newPoints[1]
+      )
+
+      const times = await calculateTravelTimes(newPoints[0], newPoints[1])
+      
+      setDistanceInfo({
+        distance,
+        ...times
+      })
+    } else if (newPoints.length > 2) {
+      // Reset for new measurement
+      setMeasurePoints([newPoint])
+      
+      // Clear old markers except the last one
+      measureMarkersRef.current.slice(0, -1).forEach(marker => {
+        marker.setMap(null)
+      })
+      measureMarkersRef.current = [measureMarkersRef.current[measureMarkersRef.current.length - 1]]
+      
+      if (measurePolylineRef.current) {
+        measurePolylineRef.current.setPath([newPoint])
+      }
+      
+      setDistanceInfo(null)
+    }
+  }, [measureMode, measurePoints, calculateTravelTimes])
+
+  // Handle search from SearchBar
+  const handleSearch = useCallback((query: string) => {
+    if (!mapInstanceRef.current || !placesServiceRef.current) return
+
+    const request: google.maps.places.TextSearchRequest = {
+      query,
+      location: mapInstanceRef.current.getCenter(),
+      radius: 5000
+    }
+
+    placesServiceRef.current.textSearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        // Clear existing search markers
+        searchMarkersRef.current.forEach(marker => {
+          marker.setMap(null)
+        })
+        searchMarkersRef.current = []
+
+        const bounds = new google.maps.LatLngBounds()
+        
+        results.slice(0, 10).forEach(place => {
+          if (!place.geometry?.location) return
+
+          const marker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: mapInstanceRef.current!,
+            title: place.name,
+            icon: {
+              url: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
+              scaledSize: new google.maps.Size(32, 32)
+            }
+          })
+
+          marker.addListener('click', () => {
+            const placeData: Place = {
+              id: place.place_id || '',
+              placeId: place.place_id || '',
+              name: place.name || '',
+              address: place.formatted_address || '',
+              location: {
+                lat: place.geometry!.location!.lat(),
+                lng: place.geometry!.location!.lng()
+              },
+              rating: place.rating,
+              priceLevel: place.price_level,
+              types: place.types
+            }
+            setSelectedPlace(placeData)
+          })
+
+          searchMarkersRef.current.push(marker)
+          bounds.extend(place.geometry.location)
+        })
+
+        if (results.length > 0) {
+          mapInstanceRef.current!.fitBounds(bounds)
+        }
+      }
+    })
+  }, [])
+
+  // Handle place selection from SearchBar autocomplete
+  const handlePlaceSelect = useCallback((place: google.maps.places.PlaceResult) => {
+    if (!place.geometry?.location || !mapInstanceRef.current) return
+
+    mapInstanceRef.current.setCenter(place.geometry.location)
+    mapInstanceRef.current.setZoom(17)
+
+    const placeData: Place = {
+      id: place.place_id || '',
+      placeId: place.place_id || '',
+      name: place.name || '',
+      address: place.formatted_address || '',
+      location: {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      },
+      types: place.types
+    }
+    
+    setSelectedPlace(placeData)
   }, [])
 
   // Initialize Google Maps
@@ -338,19 +470,14 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             disableDefaultUI: false,
             zoomControl: true,
-            mapTypeControl: true,
+            mapTypeControl: false, // Using our custom layer control
             streetViewControl: true,
             fullscreenControl: true,
-            mapTypeControlOptions: {
-              mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain'],
-              style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-              position: google.maps.ControlPosition.TOP_RIGHT
-            },
             zoomControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_CENTER
+              position: google.maps.ControlPosition.RIGHT_BOTTOM
             },
             fullscreenControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_TOP
+              position: google.maps.ControlPosition.RIGHT_BOTTOM
             }
           })
 
@@ -360,6 +487,13 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           // Initialize PlacesService
           placesServiceRef.current = new google.maps.places.PlacesService(map)
           console.log('PlacesService created successfully')
+          
+          // Initialize DirectionsService
+          directionsServiceRef.current = new google.maps.DirectionsService()
+          console.log('DirectionsService created successfully')
+          
+          // Add click listener for distance measurement
+          map.addListener('click', handleMapClick)
 
           // Trigger resize after a brief delay to ensure proper rendering
           setTimeout(() => {
@@ -436,7 +570,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       clearTimeout(initTimer)
       cleanupMaps()
     }
-  }, [isOpen, coordinates, address, cleanupMaps])
+  }, [isOpen, coordinates, address, cleanupMaps, handleMapClick])
 
   // Trigger resize when view changes
   useEffect(() => {
@@ -524,24 +658,38 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           </div>
         )}
 
-        {/* Search components - only show in map view when loaded */}
+        {/* Search and controls - only show in map view when loaded */}
         {currentView === 'map' && mapsLoaded && !isLoading && (
           <>
-            <MapControls 
+            <SearchBar 
+              onSearch={handleSearch}
+              onPlaceSelect={handlePlaceSelect}
+              placeholder="Search places..."
+            />
+            
+            <MapToolbar 
               onToggleTraffic={handleToggleTraffic}
+              onToggleMeasure={handleToggleMeasure}
+              onLayerChange={handleLayerChange}
               initialTrafficState={showTraffic}
+              measureActive={measureMode}
+              currentLayer={currentMapLayer}
             />
             
-            <QuickSearchPill 
-              onSearch={handleNearbySearch}
-              isSearching={isSearching}
-            />
+            {distanceInfo && (
+              <DistanceOverlay 
+                distance={distanceInfo.distance}
+                walkingTime={distanceInfo.walkingTime}
+                drivingTime={distanceInfo.drivingTime}
+                transitTime={distanceInfo.transitTime}
+                onClose={() => setDistanceInfo(null)}
+              />
+            )}
             
-            <PlaceDetailsCard 
+            <InfoPanel 
               place={selectedPlace}
               onClose={handleClosePlaceDetails}
               onGetDirections={handleGetDirections}
-              onSave={handleSavePlace}
               userLocation={coordinates ? { 
                 lat: coordinates.latitude, 
                 lng: coordinates.longitude 
