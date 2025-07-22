@@ -477,6 +477,18 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     [handleUserInteraction, createDrumSound]
   )
 
+  // Handler for generate button
+  const handleGenerateClick = useCallback(async () => {
+    await handleUserInteraction()
+    generateAIPattern()
+  }, [handleUserInteraction, generateAIPattern])
+
+  // Handler for play/stop button
+  const handlePlaybackClick = useCallback(async () => {
+    await handleUserInteraction()
+    togglePlayback()
+  }, [handleUserInteraction, togglePlayback])
+
   return (
     <div 
       className="rhythm-machine-backdrop" 
@@ -526,10 +538,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
             />
             <button 
               className={`rhythm-machine-generate ${audioInitialized ? 'ready' : 'pending'} ${isGenerating ? 'generating' : ''}`}
-              onClick={async () => {
-                await handleUserInteraction()
-                generateAIPattern()
-              }}
+              onClick={handleGenerateClick}
               disabled={isGenerating}
             >
               <span className="rhythm-machine-generate-icon">
@@ -557,10 +566,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           <div className="rhythm-machine-transport">
             <button 
               className={`rhythm-machine-play ${isPlaying ? 'playing' : ''}`}
-              onClick={async () => {
-                await handleUserInteraction()
-                togglePlayback()
-              }}
+              onClick={handlePlaybackClick}
               aria-label={isPlaying ? 'Stop playback' : 'Start playback'}
             >
               <span>{isPlaying ? '⏸️' : '▶️'}</span>

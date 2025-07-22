@@ -98,7 +98,10 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
         // Save to localStorage
         try {
           localStorage.setItem('virgil_last_destination', destinationText)
-        } catch {}
+        } catch (error) {
+          // localStorage might be full or disabled
+          console.warn('Failed to save destination to localStorage:', error)
+        }
         
         if (onDestinationSelect) {
           onDestinationSelect(place)
@@ -189,7 +192,10 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     // Save to localStorage
     try {
       localStorage.setItem('virgil_last_destination', place.name)
-    } catch {}
+    } catch (error) {
+      // localStorage might be full or disabled
+      console.warn('Failed to save destination to localStorage:', error)
+    }
     
     // Create a PlaceResult-like object for routing
     if (place.placeId) {

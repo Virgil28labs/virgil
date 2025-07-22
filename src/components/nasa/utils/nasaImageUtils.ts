@@ -1,4 +1,5 @@
 import type { ApodImage } from '../../../types/nasa.types'
+import { downloadImage } from '../../../utils/downloadUtils'
 
 // Common event handler for stopping propagation
 export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
@@ -6,54 +7,30 @@ export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
   e.stopPropagation()
 }
 
-// Generate filename for APOD download
-const generateFilename = (apod: ApodImage, quality: 'standard' | 'hd') => {
-  const sanitizedTitle = apod.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .substring(0, 50) // Limit length
-  
-  const dateStr = apod.date
-  const qualityStr = quality === 'hd' ? '-hd' : ''
-  
-  return `nasa-apod-${dateStr}-${sanitizedTitle}${qualityStr}.jpg`
-}
-
 // Download APOD image utility
 export const downloadApodImage = async (
   apod: ApodImage, 
   quality: 'standard' | 'hd' = 'standard'
 ): Promise<void> => {
+  // Choose URL based on quality preference and availability
+  const imageUrl = quality === 'hd' && apod.hdImageUrl 
+    ? apod.hdImageUrl 
+    : apod.imageUrl
+
+  // For videos, we can't download directly - open in new tab
+  if (apod.mediaType === 'video') {
+    window.open(imageUrl, '_blank')
+    return
+  }
+
   try {
-    // Choose URL based on quality preference and availability
-    const imageUrl = quality === 'hd' && apod.hdImageUrl 
-      ? apod.hdImageUrl 
-      : apod.imageUrl
-
-    // For videos, we can't download directly - open in new tab
-    if (apod.mediaType === 'video') {
-      window.open(imageUrl, '_blank')
-      return
-    }
-
-    const response = await fetch(imageUrl)
-    const blob = await response.blob()
-    const objectUrl = URL.createObjectURL(blob)
-    
-    const a = document.createElement('a')
-    a.href = objectUrl
-    a.download = generateFilename(apod, quality)
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(objectUrl)
+    await downloadImage({
+      url: imageUrl,
+      title: apod.title,
+      date: apod.date
+    }, 'nasa-apod')
   } catch (error) {
-    console.error('Failed to download APOD:', error)
-    // If CORS fails, open image in new tab as fallback
-    const imageUrl = quality === 'hd' && apod.hdImageUrl 
-      ? apod.hdImageUrl 
-      : apod.imageUrl
+    // If download fails, open image in new tab as fallback
     window.open(imageUrl, '_blank')
   }
 }

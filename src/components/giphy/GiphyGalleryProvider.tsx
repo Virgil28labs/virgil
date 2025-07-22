@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useReducer, useCallback, useEffect, ReactNode, memo } from 'react'
 import { giphyService } from '../../lib/giphyService'
 import type { 
   GiphyContextType, 
@@ -123,7 +123,7 @@ interface GiphyGalleryProviderProps {
 }
 
 // Provider component
-export function GiphyGalleryProvider({ children, isOpen = false }: GiphyGalleryProviderProps) {
+export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ children, isOpen = false }: GiphyGalleryProviderProps) {
   const [state, dispatch] = useReducer(giphyGalleryReducer, {
     ...initialState,
     favorites: loadFavoritesFromStorage()
@@ -274,7 +274,7 @@ export function GiphyGalleryProvider({ children, isOpen = false }: GiphyGalleryP
       {children}
     </GiphyGalleryContext.Provider>
   )
-}
+})
 
 // Custom hook to use the context
 export function useGiphyGallery(): GiphyContextType {

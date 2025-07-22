@@ -57,7 +57,9 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
         };
       };
     })
-    .catch(() => {});
+    .catch((error) => {
+      console.error('Service worker registration failed:', error);
+    });
 }
 
 function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
@@ -79,7 +81,9 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {});
+    .catch((error) => {
+      console.error('Service worker fetch failed:', error);
+    });
 }
 
 export function unregisterServiceWorker() {
@@ -88,7 +92,9 @@ export function unregisterServiceWorker() {
       .then((registration) => {
         registration.unregister();
       })
-      .catch(() => {});
+      .catch((error) => {
+        console.error('Service worker unregistration failed:', error);
+      });
   }
 }
 

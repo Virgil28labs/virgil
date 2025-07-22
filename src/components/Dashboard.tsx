@@ -17,6 +17,7 @@ import { LoadingFallback } from './LoadingFallback'
 import { SkeletonLoader } from './SkeletonLoader'
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
 import { GoogleMapsModal } from './maps/GoogleMapsModal'
+import { SectionErrorBoundary } from './common/SectionErrorBoundary'
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth()
@@ -73,9 +74,11 @@ export const Dashboard = memo(function Dashboard() {
       {/* Fixed positioned elements */}
       <VirgilTextLogo onClick={() => setShowProfileViewer(true)} />
       <DateTime />
-      <Suspense fallback={null}>
-        <LazyWeather />
-      </Suspense>
+      <SectionErrorBoundary sectionName="Weather" fallback={null}>
+        <Suspense fallback={null}>
+          <LazyWeather />
+        </Suspense>
+      </SectionErrorBoundary>
 
       {/* Power button */}
       <button 
@@ -169,9 +172,11 @@ export const Dashboard = memo(function Dashboard() {
       </div>
 
       {/* Raccoon Mascot */}
-      <Suspense fallback={<LoadingFallback message="Loading mascot..." size="small" />}>
-        <LazyRaccoonMascot />
-      </Suspense>
+      <SectionErrorBoundary sectionName="Mascot" fallback={null}>
+        <Suspense fallback={<LoadingFallback message="Loading mascot..." size="small" />}>
+          <LazyRaccoonMascot />
+        </Suspense>
+      </SectionErrorBoundary>
       {/* Dog Emoji Button */}
       <DogEmojiButton />
       
@@ -208,12 +213,14 @@ export const Dashboard = memo(function Dashboard() {
       </Suspense>
 
       {/* Google Maps Modal */}
-      <GoogleMapsModal
-        isOpen={showMapsModal}
-        onClose={() => setShowMapsModal(false)}
-        coordinates={coordinates}
-        address={address}
-      />
+      <SectionErrorBoundary sectionName="Maps">
+        <GoogleMapsModal
+          isOpen={showMapsModal}
+          onClose={() => setShowMapsModal(false)}
+          coordinates={coordinates}
+          address={address}
+        />
+      </SectionErrorBoundary>
     </div>
   )
 })
