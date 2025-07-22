@@ -44,6 +44,31 @@ export interface StreetViewConfig {
 
 export type ViewMode = 'map' | 'streetview';
 
+export type SearchType = 'coffee' | 'food' | 'gas' | 'grocery' | 'pharmacy' | 'atm' | 'restaurant' | 'bar' | 'entertainment' | 'convenience' | '24hour';
+
+export interface Place {
+  id: string;
+  name: string;
+  address: string;
+  location: google.maps.LatLngLiteral;
+  rating?: number;
+  priceLevel?: number;
+  openNow?: boolean;
+  distance?: number;
+  placeId: string;
+  types?: string[];
+  icon?: string;
+}
+
+export interface SavedPlace {
+  id: string;
+  name: string;
+  location: google.maps.LatLngLiteral;
+  address?: string;
+  type: 'home' | 'work' | 'custom';
+  icon?: string;
+}
+
 export interface GoogleMapsState {
   map: google.maps.Map | null;
   streetView: google.maps.StreetViewPanorama | null;
@@ -51,6 +76,13 @@ export interface GoogleMapsState {
   currentView: ViewMode;
   isLoading: boolean;
   error: string | null;
+  // New state for features
+  searchResults: Place[];
+  selectedPlace: Place | null;
+  savedPlaces: SavedPlace[];
+  showTraffic: boolean;
+  activeSearch: SearchType | null;
+  searchMarkers: google.maps.Marker[];
 }
 
 // Custom map styles for Virgil theme
