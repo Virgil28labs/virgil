@@ -2,6 +2,4 @@
 
 export * from './format';
 export * from './validation';
-
-// Re-export the cn utility from the existing utils file
-export { cn } from '../utils';
+export * from './cn';
