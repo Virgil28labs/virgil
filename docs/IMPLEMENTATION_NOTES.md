@@ -17,7 +17,19 @@
 - **How**: DashboardContextService collects data, DynamicContextBuilder enhances prompts
 - **Visual**: 🎯 Context Aware badge shows when active
 
-#### 3. App Data Access (Complete)
+#### 3. Professional UI Design System (Complete)
+- **Pill-Based Interface**: Consistent 54×20px pills for all controls
+- **Color-Coded System**:
+  - 🧠 **MEM** (Purple): Memory/conversation access
+  - 🎯 **CTX** (Green): Context awareness indicator  
+  - ⚙️ **EDIT** (Blue): System prompt editor
+  - ✨ **NEW** (Orange): Start new conversation
+  - **4.1** (Gray): Model selector with compact dropdown
+- **Window Controls**: Minimize to bubble, size toggle (normal/large/fullscreen)
+- **Conversation Persistence**: Messages retained across window sessions
+- **Smart Spacing**: 6px gaps throughout for visual consistency
+
+#### 4. App Data Access (Complete)
 - **Working Apps**: All 9 dashboard apps
   - Notes, Pomodoro, Habit Tracker
   - Camera, Dog Gallery, NASA APOD
@@ -125,11 +137,45 @@ interface ChatMessage {
 }
 ```
 
+### UI Design Patterns
+
+#### Pill System Implementation
+```css
+.status-pill {
+  width: 54px;
+  height: 20px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+```
+
+#### Window Size Controls
+- **Normal**: 450×600px (default)
+- **Large**: 600×700px  
+- **Fullscreen**: 90vw×85vh (max 1200×800px)
+- **Persistence**: Saved to localStorage `'virgil-window-size'`
+
+#### Conversation Persistence
+- **Active Session**: `localStorage['virgil-active-conversation']`
+- **Memory Archive**: IndexedDB via MemoryService
+- **Smart Loading**: localStorage → memoryService → empty state
+- **Automatic Save**: On window close (keeps messages in state)
+
 ### Testing
 
 1. **Memory System**: Create conversations, mark messages, close/reopen chat
 2. **Context**: Check time/weather queries, verify context badges
 3. **App Data**: Open apps, add data, ask Virgil about it
+4. **UI Consistency**: Verify all pills are 54×20px with 6px spacing
+5. **Window Controls**: Test minimize, size toggle, conversation persistence
 
 ### Common Issues & Solutions
 
