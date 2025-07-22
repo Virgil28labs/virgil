@@ -290,10 +290,8 @@ export class PhotoStorage {
       
       if (photosToKeep.length < photos.length) {
         await this.savePhotos(photosToKeep)
-        console.log(`Cleaned up ${photos.length - photosToKeep.length} old photos`)
       }
     } catch (error) {
-      console.error('Error during cleanup:', error)
     }
   }
 
@@ -307,9 +305,7 @@ export class PhotoStorage {
       
       // Perform migrations here if needed
       localStorage.setItem(this.VERSION_KEY, this.CURRENT_VERSION)
-      console.log('Photo storage migrated to version', this.CURRENT_VERSION)
     } catch (error) {
-      console.error('Error migrating photo storage:', error)
     }
   }
 }

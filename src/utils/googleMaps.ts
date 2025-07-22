@@ -48,7 +48,6 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
 
       // Create global callback
       (window as any).__googleMapsCallback = () => {
-        console.log('Google Maps callback triggered');
         delete (window as any).__googleMapsCallback;
       };
 
@@ -59,19 +58,16 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
         // Add extra time for Google Maps to initialize
         setTimeout(() => {
           if (typeof google !== 'undefined' && google.maps) {
-            console.log('Google Maps API loaded successfully');
             resolve(google);
           } else {
-            console.error('Google Maps object not found after script load');
             reject(new Error('Google Maps failed to initialize properly'));
           }
         }, 100);
       };
 
       // Handle load error
-      script.onerror = (error) => {
+      script.onerror = (_error) => {
         googleMapsPromise = null;
-        console.error('Google Maps script failed to load:', error);
         reject(new Error('Failed to load Google Maps script. Please check your internet connection and API key.'));
       };
 

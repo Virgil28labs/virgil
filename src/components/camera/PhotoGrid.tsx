@@ -132,9 +132,8 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 }) => {
   const gridRef = useRef<HTMLDivElement>(null)
 
-  const handleFavoriteToggle = useCallback((photoId: string) => {
+  const handleFavoriteToggle = useCallback((_photoId: string) => {
     // This would be handled by the parent component
-    console.log('Toggle favorite for photo:', photoId)
   }, [])
 
   if (loading) {

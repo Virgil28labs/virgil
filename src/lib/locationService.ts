@@ -33,11 +33,6 @@ export const locationService = {
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('GPS location obtained successfully:', {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          });
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -47,22 +42,21 @@ export const locationService = {
         },
         (error: GeolocationPositionError) => {
           let errorMessage = 'Unable to retrieve your location';
-          let errorDetails = '';
+          let _errorDetails = '';
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = 'Location access denied by user';
-              errorDetails = 'Please enable location permissions in your browser settings';
+              _errorDetails = 'Please enable location permissions in your browser settings';
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = 'Location information is unavailable';
-              errorDetails = 'GPS signal unavailable. Using IP-based location instead';
+              _errorDetails = 'GPS signal unavailable. Using IP-based location instead';
               break;
             case error.TIMEOUT:
               errorMessage = 'Location request timed out';
-              errorDetails = 'GPS took too long to respond. Using IP-based location instead';
+              _errorDetails = 'GPS took too long to respond. Using IP-based location instead';
               break;
           }
-          console.warn(`GPS location failed: ${errorMessage} (${errorDetails})`);
           reject(new Error(errorMessage));
         },
         {
@@ -167,7 +161,6 @@ export const locationService = {
 
   async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
     try {
-      console.log(`Fetching elevation for coordinates: ${latitude}, ${longitude}`);
       return await retryWithBackoff(
         async () => {
           const response = await fetch(
@@ -178,7 +171,6 @@ export const locationService = {
           );
           
           if (!response.ok) {
-            console.warn(`Elevation API error: ${response.status} ${response.statusText}`);
             if (response.status === 404) {
               throw new Error('Elevation data not available for this location');
             }
@@ -189,11 +181,9 @@ export const locationService = {
           
           // Validate response data
           if (typeof data.elevation !== 'number' || typeof data.elevationFeet !== 'number') {
-            console.warn('Invalid elevation data received:', data);
             throw new Error('Invalid elevation data format');
           }
           
-          console.log('Elevation data received:', data);
           return {
             elevation: data.elevation,
             elevationFeet: data.elevationFeet
@@ -202,13 +192,11 @@ export const locationService = {
         {
           maxRetries: 3, // Increased retries
           initialDelay: 1000, // Increased initial delay
-          onRetry: (attempt, error) => {
-            console.warn(`Retrying elevation fetch (attempt ${attempt}):`, error.message);
+          onRetry: (_attempt, _error) => {
           }
         }
       );
     } catch (error) {
-      console.error('Failed to fetch elevation after all retries:', error);
       // Return null instead of throwing to allow graceful degradation
       return null as any;
     }
@@ -303,9 +291,7 @@ export const locationService = {
       
       if (addressResult.status === 'fulfilled') {
         result.address = addressResult.value;
-        console.log('Address fetched successfully:', result.address.street || result.address.city);
       } else {
-        console.warn('Address fetch failed:', addressResult.reason);
       }
       
       if (elevationResult.status === 'fulfilled' && elevationResult.value) {
@@ -314,16 +300,13 @@ export const locationService = {
           elevation: elevationResult.value.elevation,
           elevationUnit: 'meters'
         };
-        console.log('Elevation added to coordinates:', elevationResult.value.elevation);
       } else {
-        console.warn('Elevation fetch failed or returned null:', elevationResult.status === 'rejected' ? elevationResult.reason : 'null response');
         // Still return coordinates without elevation
         result.coordinates = coords;
       }
       
       return result;
     } catch (error) {
-      console.error('GPS location fetch failed:', error);
       return {};
     }
   },

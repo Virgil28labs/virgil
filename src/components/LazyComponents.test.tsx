@@ -42,13 +42,6 @@ jest.mock('../lib/weatherService', () => ({
   }
 }));
 
-jest.mock('../lib/searchService', () => ({
-  searchService: {
-    search: jest.fn(),
-    formatResults: jest.fn()
-  }
-}));
-
 jest.mock('../lib/locationService', () => ({
   locationService: {
     getIPLocation: jest.fn(),

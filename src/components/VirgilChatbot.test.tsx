@@ -6,14 +6,6 @@ jest.mock('../lib/requestDeduplication', () => ({
   dedupeFetch: jest.fn()
 }));
 
-jest.mock('../lib/searchService', () => ({
-  searchService: {
-    detectSearchIntent: jest.fn().mockReturnValue(false),
-    extractSearchQuery: jest.fn().mockReturnValue(''),
-    search: jest.fn().mockResolvedValue(null)
-  }
-}));
-
 jest.mock('../hooks/useFocusManagement', () => ({
   useFocusManagement: () => ({ containerRef: { current: null } })
 }));

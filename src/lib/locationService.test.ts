@@ -54,7 +54,7 @@ describe('locationService', () => {
         expect.any(Function),
         {
           enableHighAccuracy: true,
-          timeout: 3000,
+          timeout: 5000,
           maximumAge: 300000
         }
       );

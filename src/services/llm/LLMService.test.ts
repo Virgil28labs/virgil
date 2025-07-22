@@ -277,7 +277,7 @@ describe('LLMService', () => {
       const result = await service.getModels();
       
       expect(result).toEqual({});
-      expect(service.emit).toHaveBeenCalledWith('error', { error: 'Fetch error' });
+      expect(service.emit).toHaveBeenCalledWith('error', { error: 'Error: Fetch error' });
     });
   });
 

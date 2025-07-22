@@ -58,8 +58,6 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
 
   // Cleanup function
   const cleanupMaps = useCallback(() => {
-    console.log('Cleaning up map instances...')
-    
     if (markerInstanceRef.current) {
       markerInstanceRef.current.setMap(null)
       markerInstanceRef.current = null
@@ -174,7 +172,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         })
         
         // Display alternative routes with different styling
-        result.routes.slice(1).forEach((route, index) => {
+        result.routes.slice(1).forEach((_route, index) => {
           const renderer = new google.maps.DirectionsRenderer({
             map: mapInstanceRef.current,
             directions: result,

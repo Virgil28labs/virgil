@@ -1,8 +1,8 @@
 import { EmojiButton } from '../common/EmojiButton'
-import { PomodoroApp } from './PomodoroApp'
+import { PomodoroTimer } from './PomodoroTimer'
 
 const PomodoroAppWrapper = ({ onClose }: { onClose: () => void }) => (
-  <PomodoroApp isOpen={true} onClose={onClose} />
+  <PomodoroTimer isOpen={true} onClose={onClose} />
 )
 
 export const PomodoroEmojiButton = () => (

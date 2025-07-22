@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PomodoroEmojiButton } from './PomodoroEmojiButton'
 import { EmojiButton } from '../common/EmojiButton'
-import { PomodoroApp } from './PomodoroApp'
+import { PomodoroTimer } from './PomodoroTimer'
 
 // Mock the EmojiButton component
 jest.mock('../common/EmojiButton', () => ({
@@ -22,15 +22,14 @@ jest.mock('../common/EmojiButton', () => ({
   ))
 }))
 
-// Mock PomodoroApp
-jest.mock('./PomodoroApp', () => ({
-  PomodoroApp: jest.fn(({ isOpen }) => 
+// Mock PomodoroTimer
+jest.mock('./PomodoroTimer', () => ({
+  PomodoroTimer: jest.fn(({ isOpen }) => 
     isOpen ? <div data-testid="pomodoro-app">Pomodoro App</div> : null
   )
 }))
 
 const mockEmojiButton = EmojiButton as jest.MockedFunction<typeof EmojiButton>
-const mockPomodoroApp = PomodoroApp as jest.MockedFunction<typeof PomodoroApp>
 
 describe('PomodoroEmojiButton', () => {
   beforeEach(() => {
@@ -88,7 +87,7 @@ describe('PomodoroEmojiButton', () => {
     // Test the wrapper component
     render(<GalleryComponent onClose={jest.fn()} />)
     
-    expect(mockPomodoroApp).toHaveBeenCalledWith(
+    expect(PomodoroTimer).toHaveBeenCalledWith(
       expect.objectContaining({
         isOpen: true,
         onClose: expect.any(Function)

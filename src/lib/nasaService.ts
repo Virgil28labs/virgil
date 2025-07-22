@@ -3,7 +3,6 @@ import type {
   ApodImage,
   NasaApodParams
 } from '../types/nasa.types';
-// import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 
 // Environment-configurable API settings
