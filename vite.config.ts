@@ -1,25 +1,25 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   server: {
     port: process.env.VITE_DEV_PORT ? parseInt(process.env.VITE_DEV_PORT) : 3000,
     host: true, // Listen on all addresses including localhost and network
     hmr: {
-      overlay: true
+      overlay: true,
     },
     watch: {
       usePolling: false,
-      interval: 100
-    }
+      interval: 100,
+    },
   },
   build: {
     rollupOptions: {
@@ -56,18 +56,18 @@ export default defineConfig({
           
           // Return undefined for all other cases
           return undefined;
-        }
+        },
       },
       treeshake: {
-        moduleSideEffects: false
-      }
+        moduleSideEffects: false,
+      },
     },
     sourcemap: process.env.NODE_ENV !== 'production',
     minify: 'esbuild',
     target: 'es2020',
-    cssMinify: true
+    cssMinify: true,
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', '@supabase/supabase-js']
-  }
-})
+    include: ['react', 'react-dom', '@supabase/supabase-js'],
+  },
+});

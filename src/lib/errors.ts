@@ -5,7 +5,7 @@ export class AppError extends Error {
     message: string,
     public code: string,
     public statusCode?: number,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = 'AppError';
@@ -72,7 +72,7 @@ export function handleError(error: unknown): AppError {
     'An unexpected error occurred',
     'UNKNOWN_ERROR',
     500,
-    error
+    error,
   );
 }
 
@@ -104,7 +104,7 @@ export function logError(error: unknown, context?: string): void {
     console.error(`${contextPrefix}${errorObj.name}: ${errorObj.message}`, {
       code: errorObj.code,
       details: errorObj.details,
-      stack: errorObj.stack
+      stack: errorObj.stack,
     });
   }
 }

@@ -28,7 +28,7 @@ describe('RequestDeduplicator', () => {
       const promises = [
         dedupeFetch('https://api.example.com/data'),
         dedupeFetch('https://api.example.com/data'),
-        dedupeFetch('https://api.example.com/data')
+        dedupeFetch('https://api.example.com/data'),
       ];
 
       const results = await Promise.all(promises);
@@ -48,7 +48,7 @@ describe('RequestDeduplicator', () => {
       const promises = [
         dedupeFetch('https://api.example.com/data1'),
         dedupeFetch('https://api.example.com/data2'),
-        dedupeFetch('https://api.example.com/data3')
+        dedupeFetch('https://api.example.com/data3'),
       ];
 
       await Promise.all(promises);
@@ -62,7 +62,7 @@ describe('RequestDeduplicator', () => {
       const promises = [
         dedupeFetch('https://api.example.com/data', { method: 'GET' }),
         dedupeFetch('https://api.example.com/data', { method: 'POST' }),
-        dedupeFetch('https://api.example.com/data', { method: 'PUT' })
+        dedupeFetch('https://api.example.com/data', { method: 'PUT' }),
       ];
 
       await Promise.all(promises);
@@ -76,12 +76,12 @@ describe('RequestDeduplicator', () => {
       const promises = [
         dedupeFetch('https://api.example.com/data', { 
           method: 'POST', 
-          body: JSON.stringify({ id: 1 }) 
+          body: JSON.stringify({ id: 1 }), 
         }),
         dedupeFetch('https://api.example.com/data', { 
           method: 'POST', 
-          body: JSON.stringify({ id: 2 }) 
-        })
+          body: JSON.stringify({ id: 2 }), 
+        }),
       ];
 
       await Promise.all(promises);
@@ -96,7 +96,7 @@ describe('RequestDeduplicator', () => {
       // Multiple requests should all fail with the same error
       const promises = [
         dedupeFetch('https://api.example.com/data'),
-        dedupeFetch('https://api.example.com/data')
+        dedupeFetch('https://api.example.com/data'),
       ];
 
       await expect(promises[0]).rejects.toThrow('Network error');
@@ -164,11 +164,11 @@ describe('RequestDeduplicator', () => {
   describe('cache size management', () => {
     it('should evict oldest entry when cache is full', async () => {
       // Mock requests that don't resolve immediately
-      let resolvers: Array<() => void> = [];
+      const resolvers: Array<() => void> = [];
       mockFetch.mockImplementation(() => 
         new Promise(resolve => {
           resolvers.push(() => resolve(new Response('test')));
-        })
+        }),
       );
 
       // Fill cache to max size (50)
@@ -223,7 +223,7 @@ describe('RequestDeduplicator', () => {
       const promises = [
         dedupeFetch('https://api.example.com/a'),
         dedupeFetch('https://api.example.com/b'),
-        dedupeFetch('https://api.example.com/c')
+        dedupeFetch('https://api.example.com/c'),
       ];
 
       await Promise.all(promises);

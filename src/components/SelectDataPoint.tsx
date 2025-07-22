@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react';
 
 interface SelectDataPointProps {
   icon: string
@@ -19,89 +19,89 @@ export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
   options,
   allowCustom = true,
   placeholder = 'Not set',
-  className = ''
+  className = '',
 }) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [showCustomInput, setShowCustomInput] = useState(false)
-  const [customValue, setCustomValue] = useState('')
-  const selectRef = useRef<HTMLSelectElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isEditing, setIsEditing] = useState(false);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  const selectRef = useRef<HTMLSelectElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Check if current value is a custom value (not in options)
-  const isCustomValue = value && !options.some(opt => opt.value === value)
+  const isCustomValue = value && !options.some(opt => opt.value === value);
 
   useEffect(() => {
     if (isCustomValue) {
-      setCustomValue(value)
-      setShowCustomInput(true)
+      setCustomValue(value);
+      setShowCustomInput(true);
     }
-  }, [value, isCustomValue])
+  }, [value, isCustomValue]);
 
   useEffect(() => {
     if (isEditing && selectRef.current && !showCustomInput) {
-      selectRef.current.focus()
+      selectRef.current.focus();
     } else if (showCustomInput && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
+      inputRef.current.focus();
+      inputRef.current.select();
     }
-  }, [isEditing, showCustomInput])
+  }, [isEditing, showCustomInput]);
 
   const handleClick = () => {
     if (!isEditing) {
-      setIsEditing(true)
+      setIsEditing(true);
     }
-  }
+  };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = e.target.value
+    const newValue = e.target.value;
     if (newValue === 'other') {
-      setShowCustomInput(true)
-      setCustomValue('')
+      setShowCustomInput(true);
+      setCustomValue('');
     } else {
-      onChange(newValue)
-      setIsEditing(false)
-      setShowCustomInput(false)
+      onChange(newValue);
+      setIsEditing(false);
+      setShowCustomInput(false);
     }
-  }
+  };
 
   const handleCustomInputBlur = () => {
     if (customValue.trim()) {
-      onChange(customValue.trim())
+      onChange(customValue.trim());
     }
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleCustomInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleCustomInputBlur()
+      handleCustomInputBlur();
     } else if (e.key === 'Escape') {
-      setCustomValue('')
-      setShowCustomInput(false)
-      setIsEditing(false)
+      setCustomValue('');
+      setShowCustomInput(false);
+      setIsEditing(false);
     }
-  }
+  };
 
   const handleBlur = () => {
     if (!showCustomInput) {
-      setIsEditing(false)
+      setIsEditing(false);
     }
-  }
+  };
 
   const displayValue = () => {
-    if (!value) return placeholder
+    if (!value) return placeholder;
     
     // Find the label for the value
-    const option = options.find(opt => opt.value === value)
-    if (option) return option.label
+    const option = options.find(opt => opt.value === value);
+    if (option) return option.label;
     
     // It's a custom value
-    return value
-  }
+    return value;
+  };
 
   const currentSelectValue = () => {
-    if (isCustomValue || showCustomInput) return 'other'
-    return value || ''
-  }
+    if (isCustomValue || showCustomInput) return 'other';
+    return value || '';
+  };
 
   return (
     <div className={`data-point editable selectable ${className}`}>
@@ -148,8 +148,8 @@ export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              handleClick()
+              e.preventDefault();
+              handleClick();
             }
           }}
           aria-label={`${label}: ${displayValue()}, click to edit`}
@@ -159,5 +159,5 @@ export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
         </span>
       )}
     </div>
-  )
-}
+  );
+};

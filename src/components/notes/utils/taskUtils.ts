@@ -3,7 +3,7 @@
  * Centralizes task extraction, merging, and manipulation logic
  */
 
-import { Task } from '../types'
+import type { Task } from '../types';
 
 /**
  * Regular expression patterns for task detection
@@ -14,9 +14,9 @@ const TASK_PATTERNS = {
   needToPatterns: [
     /(?:need to|should|must|have to)\s+(.+)/i,
     /(?:remember to|don't forget to)\s+(.+)/i,
-    /^(?:todo|task):\s*(.+)/i
-  ]
-} as const
+    /^(?:todo|task):\s*(.+)/i,
+  ],
+} as const;
 
 /**
  * Extracts checkbox tasks from content
@@ -24,21 +24,21 @@ const TASK_PATTERNS = {
  * @returns Array of tasks found in the content
  */
 export function extractTasksFromContent(content: string): Task[] {
-  const tasks: Task[] = []
-  const lines = content.split('\n')
+  const tasks: Task[] = [];
+  const lines = content.split('\n');
 
   lines.forEach(line => {
-    const checkboxMatch = line.match(TASK_PATTERNS.checkbox)
+    const checkboxMatch = line.match(TASK_PATTERNS.checkbox);
     if (checkboxMatch) {
       tasks.push({
         text: checkboxMatch[2].trim(),
         completed: checkboxMatch[1].toLowerCase() === 'x',
-        extracted: false
-      })
+        extracted: false,
+      });
     }
-  })
+  });
 
-  return tasks
+  return tasks;
 }
 
 /**
@@ -48,31 +48,31 @@ export function extractTasksFromContent(content: string): Task[] {
  * @returns Array of extracted task strings
  */
 export function extractFallbackTasks(content: string): string[] {
-  const tasks: string[] = []
-  const lines = content.split('\n')
+  const tasks: string[] = [];
+  const lines = content.split('\n');
 
   lines.forEach(line => {
-    const trimmedLine = line.trim()
-    if (!trimmedLine) return
+    const trimmedLine = line.trim();
+    if (!trimmedLine) return;
     
-    const lowerLine = trimmedLine.toLowerCase()
+    const lowerLine = trimmedLine.toLowerCase();
     
     // Check for action words at the beginning of lines
     if (TASK_PATTERNS.actionWords.some(word => lowerLine.startsWith(word))) {
-      tasks.push(trimmedLine)
+      tasks.push(trimmedLine);
     }
     
     // Check for pattern-based tasks
     for (const pattern of TASK_PATTERNS.needToPatterns) {
-      const match = trimmedLine.match(pattern)
+      const match = trimmedLine.match(pattern);
       if (match && match[1]) {
-        tasks.push(match[1].trim())
-        break
+        tasks.push(match[1].trim());
+        break;
       }
     }
-  })
+  });
 
-  return [...new Set(tasks)]
+  return [...new Set(tasks)];
 }
 
 /**
@@ -83,24 +83,24 @@ export function extractFallbackTasks(content: string): string[] {
  * @returns Merged task list without duplicates
  */
 export function mergeTasksWithAI(manualTasks: Task[], aiTasks: string[]): Task[] {
-  const merged = [...manualTasks]
+  const merged = [...manualTasks];
   
   aiTasks.forEach(aiTask => {
     const exists = merged.some(task => 
       task.text.toLowerCase().includes(aiTask.toLowerCase()) ||
-      aiTask.toLowerCase().includes(task.text.toLowerCase())
-    )
+      aiTask.toLowerCase().includes(task.text.toLowerCase()),
+    );
     
     if (!exists) {
       merged.push({
         text: aiTask,
         completed: false,
-        extracted: true
-      })
+        extracted: true,
+      });
     }
-  })
+  });
 
-  return merged
+  return merged;
 }
 
 /**
@@ -109,7 +109,7 @@ export function mergeTasksWithAI(manualTasks: Task[], aiTasks: string[]): Task[]
  * @returns Number of completed tasks
  */
 export function countCompletedTasks(tasks: Task[]): number {
-  return tasks.filter(task => task.completed).length
+  return tasks.filter(task => task.completed).length;
 }
 
 /**
@@ -118,7 +118,7 @@ export function countCompletedTasks(tasks: Task[]): number {
  * @returns True if all tasks are completed
  */
 export function areAllTasksCompleted(tasks: Task[]): boolean {
-  return tasks.length > 0 && tasks.every(task => task.completed)
+  return tasks.length > 0 && tasks.every(task => task.completed);
 }
 
 /**
@@ -128,13 +128,13 @@ export function areAllTasksCompleted(tasks: Task[]): boolean {
  * @returns New array with the task toggled
  */
 export function toggleTaskAtIndex(tasks: Task[], index: number): Task[] {
-  if (index < 0 || index >= tasks.length) return tasks
+  if (index < 0 || index >= tasks.length) return tasks;
   
-  const updatedTasks = [...tasks]
+  const updatedTasks = [...tasks];
   updatedTasks[index] = {
     ...updatedTasks[index],
-    completed: !updatedTasks[index].completed
-  }
+    completed: !updatedTasks[index].completed,
+  };
   
-  return updatedTasks
+  return updatedTasks;
 }

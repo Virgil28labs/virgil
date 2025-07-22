@@ -7,6 +7,7 @@ const mockUseWeather = jest.fn<WeatherContextType, []>();
 // Default mock return value
 mockUseWeather.mockReturnValue({
   data: null,
+  forecast: null,
   loading: false,
   error: null,
   unit: 'fahrenheit',
@@ -14,7 +15,7 @@ mockUseWeather.mockReturnValue({
   hasWeather: false,
   fetchWeather: jest.fn(),
   clearError: jest.fn(),
-  lastUpdated: null
+  lastUpdated: null,
 });
 
 export const useWeather = mockUseWeather;

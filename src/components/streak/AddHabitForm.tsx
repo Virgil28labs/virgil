@@ -1,7 +1,7 @@
-import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { EmojiSuggestions } from './EmojiSuggestions'
-import { EmojiPicker } from './EmojiPicker'
-import { EMOJI_DATABASE } from '../../data/habitEmojis'
+import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { EmojiSuggestions } from './EmojiSuggestions';
+import { EmojiPicker } from './EmojiPicker';
+import { EMOJI_DATABASE } from '../../data/habitEmojis';
 
 interface AddHabitFormProps {
   onAdd: (name: string, emoji: string) => void
@@ -11,60 +11,60 @@ interface AddHabitFormProps {
 
 export const AddHabitForm = memo(function AddHabitForm({
   onAdd,
-  onCancel
+  onCancel,
 }: AddHabitFormProps) {
-  const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState('')
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState('');
+  const [emoji, setEmoji] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    inputRef.current?.focus();
+  }, []);
 
   // Auto-suggest emoji based on habit name
   const suggestedEmoji = useMemo(() => {
-    if (!name.trim()) return '🎯'
+    if (!name.trim()) return '🎯';
     
-    const lowercaseName = name.toLowerCase()
+    const lowercaseName = name.toLowerCase();
     const match = EMOJI_DATABASE.find(({ keywords }) =>
-      keywords.some(keyword => lowercaseName.includes(keyword))
-    )
+      keywords.some(keyword => lowercaseName.includes(keyword)),
+    );
     
-    return match?.emoji || '🎯'
-  }, [name])
+    return match?.emoji || '🎯';
+  }, [name]);
 
   // Use suggested emoji if user hasn't manually selected one
-  const displayEmoji = emoji || suggestedEmoji
+  const displayEmoji = emoji || suggestedEmoji;
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (name.trim()) {
-      onAdd(name.trim(), displayEmoji)
+      onAdd(name.trim(), displayEmoji);
     }
-  }, [name, displayEmoji, onAdd])
+  }, [name, displayEmoji, onAdd]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onCancel()
+      onCancel();
     }
-  }, [onCancel])
+  }, [onCancel]);
 
   const handleEmojiSelect = useCallback((selectedEmoji: string) => {
-    setEmoji(selectedEmoji)
-    setShowSuggestions(false)
-    setShowEmojiPicker(false)
-    inputRef.current?.focus()
-  }, [])
+    setEmoji(selectedEmoji);
+    setShowSuggestions(false);
+    setShowEmojiPicker(false);
+    inputRef.current?.focus();
+  }, []);
 
   const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value)
+    setName(e.target.value);
     // Show suggestions when user starts typing
     if (e.target.value && !showSuggestions && !emoji) {
-      setShowSuggestions(true)
+      setShowSuggestions(true);
     }
-  }, [emoji, showSuggestions])
+  }, [emoji, showSuggestions]);
 
   return (
     <form 
@@ -129,5 +129,5 @@ export const AddHabitForm = memo(function AddHabitForm({
         />
       )}
     </form>
-  )
-})
+  );
+});

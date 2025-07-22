@@ -5,7 +5,7 @@ import type {
   ChatHookOptions,
   ConversationSummary,
   ExportData,
-  ExportFormat
+  ExportFormat,
 } from '../types/chat.types';
 import type { LLMRequest } from '../types/llm.types';
 
@@ -53,7 +53,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       id: generateMessageId(),
       role,
       content,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     setMessages(prev => [...prev, message]);
@@ -75,7 +75,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
         messages: [...messages, userMessage],
         systemPrompt,
         cacheKey: options.enableCache ? `chat-${messages.length + 1}` : undefined,
-        ...options
+        ...options,
       });
 
       if (response?.content) {
@@ -109,7 +109,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       role: 'assistant',
       content: '',
       timestamp: new Date().toISOString(),
-      streaming: true
+      streaming: true,
     };
     
     setMessages(prev => [...prev, assistantMessage]);
@@ -119,7 +119,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       const stream = completeStream({
         messages: [...messages, userMessage],
         systemPrompt,
-        ...options
+        ...options,
       });
 
       let fullContent = '';
@@ -132,7 +132,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
           setMessages(prev => prev.map(msg => 
             msg.id === assistantMessageId 
               ? { ...msg, content: fullContent }
-              : msg
+              : msg,
           ));
         }
       }
@@ -141,7 +141,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       setMessages(prev => prev.map(msg => 
         msg.id === assistantMessageId 
           ? { ...msg, streaming: false }
-          : msg
+          : msg,
       ));
 
       return { ...assistantMessage, streaming: false } as ChatMessage;
@@ -169,7 +169,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
   // Update a message
   const updateMessage = useCallback((messageId: string, updates: Partial<ChatMessage>): void => {
     setMessages(prev => prev.map(msg => 
-      msg.id === messageId ? { ...msg, ...updates } : msg
+      msg.id === messageId ? { ...msg, ...updates } : msg,
     ));
   }, []);
 
@@ -202,7 +202,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       assistantMessages,
       totalMessages,
       lastMessage: messages[messages.length - 1] || null,
-      conversationStarted: messages.length > 0 ? messages[0].timestamp : null
+      conversationStarted: messages.length > 0 ? messages[0].timestamp : null,
     };
   }, [messages]);
 
@@ -212,7 +212,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       systemPrompt,
       messages: messages.filter(msg => msg.role !== 'system'),
       exportedAt: new Date().toISOString(),
-      summary: getConversationSummary()
+      summary: getConversationSummary(),
     };
 
     if (format === 'json') {
@@ -220,7 +220,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
     }
 
     if (format === 'markdown') {
-      let markdown = `# Conversation Export\n\n`;
+      let markdown = '# Conversation Export\n\n';
       if (systemPrompt) {
         markdown += `**System Prompt:** ${systemPrompt}\n\n`;
       }
@@ -267,6 +267,6 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
     isTyping,
     error: error?.message || null,
     clearError,
-    isReady: !loading && !isTyping
+    isReady: !loading && !isTyping,
   };
 }

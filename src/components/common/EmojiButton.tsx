@@ -24,7 +24,7 @@ interface EmojiButtonProps {
 const defaultHoverColor = {
   background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(167, 139, 250, 0.3) 100%)',
   border: 'rgba(139, 92, 246, 0.6)',
-  glow: 'rgba(139, 92, 246, 0.4)'
+  glow: 'rgba(139, 92, 246, 0.4)',
 };
 
 export const EmojiButton: FC<EmojiButtonProps> = ({
@@ -77,7 +77,7 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
     backdropFilter: isHovered ? 'blur(20px)' : 'none',
     boxShadow: isHovered 
       ? `0 0 30px ${hoverColor.glow.replace('0.4', '0.3')}, inset 0 1px 0 rgba(255, 255, 255, 0.2)` 
-      : 'none'
+      : 'none',
   };
 
   const emojiStyles: React.CSSProperties = {
@@ -88,7 +88,7 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
     WebkitTextFillColor: isHovered ? 'transparent' : 'inherit',
     transition: 'all 0.3s ease',
     transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-    display: 'inline-block'
+    display: 'inline-block',
   };
 
   return (
@@ -101,7 +101,7 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
           'emoji-button-interactive',
           'touch-manipulation select-none',
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-          className
+          className,
         )}
         style={buttonStyles}
         aria-label={ariaLabel}
@@ -113,14 +113,15 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
       </button>
 
       {isOpen && (
-        <Suspense fallback={
+        <Suspense fallback={(
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md">
             <div className="flex flex-col items-center gap-4 text-white">
               <div className="h-16 w-16 animate-spin rounded-full border-4 border-white/30 border-t-white" />
               <span>Loading...</span>
             </div>
           </div>
-        }>
+        )}
+        >
           <GalleryComponent onClose={handleClose} />
         </Suspense>
       )}

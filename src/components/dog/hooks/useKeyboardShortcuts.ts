@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
 export interface KeyboardShortcuts {
   'Escape'?: () => void
@@ -10,20 +10,20 @@ export interface KeyboardShortcuts {
 
 export const useKeyboardShortcuts = (
   shortcuts: KeyboardShortcuts,
-  enabled: boolean = true
+  enabled: boolean = true,
 ) => {
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const handler = shortcuts[e.key as keyof KeyboardShortcuts]
+      const handler = shortcuts[e.key as keyof KeyboardShortcuts];
       if (handler) {
-        e.preventDefault()
-        handler()
+        e.preventDefault();
+        handler();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [shortcuts, enabled])
-}
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [shortcuts, enabled]);
+};

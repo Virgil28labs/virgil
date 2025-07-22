@@ -15,14 +15,14 @@ interface RetryOptions {
  */
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
-  options: RetryOptions = {}
+  options: RetryOptions = {},
 ): Promise<T> {
   const {
     maxRetries = 3,
     initialDelay = 1000,
     maxDelay = 10000,
     backoffFactor = 2,
-    onRetry
+    onRetry,
   } = options;
 
   let lastError: any;
@@ -39,7 +39,7 @@ export async function retryWithBackoff<T>(
       
       const delay = Math.min(
         initialDelay * Math.pow(backoffFactor, attempt),
-        maxDelay
+        maxDelay,
       );
       
       if (onRetry) {

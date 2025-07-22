@@ -11,7 +11,7 @@ const validateRhythmRequest = (req, res, next) => {
   // Validate description
   if (!description || typeof description !== 'string') {
     return res.status(400).json({
-      error: 'Description is required and must be a string'
+      error: 'Description is required and must be a string',
     });
   }
 
@@ -19,7 +19,7 @@ const validateRhythmRequest = (req, res, next) => {
   if (barLength !== undefined) {
     if (![4, 8, 16, 32].includes(barLength)) {
       return res.status(400).json({
-        error: 'Bar length must be 4, 8, 16, or 32 steps'
+        error: 'Bar length must be 4, 8, 16, or 32 steps',
       });
     }
   }
@@ -27,7 +27,7 @@ const validateRhythmRequest = (req, res, next) => {
   // Validate style
   if (style !== undefined && typeof style !== 'string') {
     return res.status(400).json({
-      error: 'Style must be a string'
+      error: 'Style must be a string',
     });
   }
 
@@ -35,7 +35,7 @@ const validateRhythmRequest = (req, res, next) => {
   if (temperature !== undefined) {
     if (typeof temperature !== 'number' || temperature < 0 || temperature > 2) {
       return res.status(400).json({
-        error: 'Temperature must be a number between 0 and 2'
+        error: 'Temperature must be a number between 0 and 2',
       });
     }
   }
@@ -69,75 +69,72 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
       description = 'hip hop groove',
       barLength = 8,
       style = '',
-      temperature = 0.7
+      temperature = 0.7,
     } = req.body;
 
-
     // Simple classification prompt - matching original behavior
-    const systemPrompt = `You are a music genre classifier. Classify drum beat descriptions into one of these categories: techno, house, trap, breakbeat, or minimal.`;
+    const systemPrompt = 'You are a music genre classifier. Classify drum beat descriptions into one of these categories: techno, house, trap, breakbeat, or minimal.';
 
     const userPrompt = `Given this drum beat description: "${description}", classify it into one of these categories: techno, house, trap, breakbeat, or minimal. Respond with ONLY the category name in lowercase, nothing else.`;
 
     // Generate pattern using LLM
-    const result = await requestQueue.add(async () => {
-      return llmProxy.complete({
-        messages: [
-          { role: 'user', content: userPrompt }
-        ],
-        model: 'claude-3-haiku-20240307', // Fast and good for structured output
-        temperature,
-        maxTokens: 512,
-        systemPrompt,
-        provider: 'anthropic'
-      });
-    });
+    const result = await requestQueue.add(async () => llmProxy.complete({
+      messages: [
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'claude-3-haiku-20240307', // Fast and good for structured output
+      temperature,
+      maxTokens: 512,
+      systemPrompt,
+      provider: 'anthropic',
+    }));
 
     // Define presets matching original
     const PRESETS = {
       techno: [
-        [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // kick
-        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // snare
-        [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // hihat
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], // openhat
-        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0]  // clap
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], // kick
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], // snare
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0], // hihat
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // openhat
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  // clap
       ],
       house: [
-        [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // kick
-        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // snare
-        [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // hihat
-        [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1], // openhat
-        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0]  // clap
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], // kick
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], // snare
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0], // hihat
+        [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], // openhat
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  // clap
       ],
       trap: [
-        [1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0], // kick
-        [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // snare
-        [1,0,1,0,1,0,1,0,1,1,0,1,0,1,1,1], // hihat
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0], // openhat
-        [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]  // clap
+        [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0], // kick
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], // snare
+        [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1], // hihat
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], // openhat
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  // clap
       ],
       breakbeat: [
-        [1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0], // kick
-        [0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0], // snare
-        [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], // hihat
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0], // openhat
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // clap
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], // kick
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], // snare
+        [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], // hihat
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], // openhat
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  // clap
       ],
       minimal: [
-        [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], // kick
-        [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // snare
-        [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1], // hihat
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // openhat
-        [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]  // clap
-      ]
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], // kick
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], // snare
+        [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1], // hihat
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // openhat
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  // clap
+      ],
     };
 
     let pattern;
     let selectedCategory = 'techno'; // default
-    
+
     try {
       // Get the category from LLM response
       const category = result.content.trim().toLowerCase();
-      
+
       // Validate category
       if (PRESETS[category]) {
         selectedCategory = category;
@@ -145,14 +142,14 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
       } else {
         // Invalid category from LLM - using default
       }
-      
+
     } catch {
       // LLM response parsing failed - using default
     }
-    
+
     // Get the preset pattern for the selected category
     const presetPattern = PRESETS[selectedCategory];
-    
+
     // Adjust pattern length if needed
     if (barLength === 16) {
       // Use preset as-is for 16 steps
@@ -170,7 +167,7 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
         return extended;
       });
     }
-    
+
     // Convert to boolean arrays
     pattern = pattern.map(drum => drum.map(step => Boolean(step)));
 
@@ -182,19 +179,19 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
         barLength,
         style,
         generated: new Date().toISOString(),
-        category: selectedCategory
+        category: selectedCategory,
       },
       usage: result.usage,
-      cached: res.locals.cached || false
+      cached: res.locals.cached || false,
     });
 
   } catch (error) {
     console.error('Rhythm generation error:', error);
-    
+
     // Fallback to algorithmic generation on any error
     try {
       const pattern = generateFallbackPattern(req.body.barLength || 8, req.body.description || 'hip hop groove');
-      
+
       res.json({
         success: true,
         data: {
@@ -203,9 +200,9 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
           barLength: req.body.barLength || 8,
           style: req.body.style || '',
           generated: new Date().toISOString(),
-          fallback: true
+          fallback: true,
         },
-        cached: false
+        cached: false,
       });
     } catch (fallbackError) {
       next(fallbackError);
@@ -220,10 +217,10 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
  */
 function generateFallbackPattern(barLength, description) {
   const pattern = Array(5).fill(null).map(() => Array(barLength).fill(false));
-  
+
   // Generate basic patterns based on description keywords
   const desc = description.toLowerCase();
-  
+
   for (let step = 0; step < barLength; step++) {
     // KICK patterns
     if (desc.includes('hip hop') || desc.includes('trap')) {
@@ -235,7 +232,7 @@ function generateFallbackPattern(barLength, description) {
     } else {
       pattern[0][step] = step % 4 === 0;
     }
-    
+
     // SNARE patterns
     if (desc.includes('hip hop') || desc.includes('trap')) {
       pattern[1][step] = step % 8 === 4 || (step % 16 === 14 && Math.random() > 0.4);
@@ -246,7 +243,7 @@ function generateFallbackPattern(barLength, description) {
     } else {
       pattern[1][step] = step % 8 === 4;
     }
-    
+
     // HIHAT patterns
     if (desc.includes('hip hop') || desc.includes('trap')) {
       pattern[2][step] = step % 2 === 1 && Math.random() > 0.1;
@@ -257,10 +254,10 @@ function generateFallbackPattern(barLength, description) {
     } else {
       pattern[2][step] = step % 2 === 1 && Math.random() > 0.3;
     }
-    
+
     // OPENHAT patterns
     pattern[3][step] = step % 8 === 7 && Math.random() > 0.5;
-    
+
     // CLAP patterns
     if (desc.includes('hip hop') || desc.includes('trap')) {
       pattern[4][step] = step % 16 === 12 && Math.random() > 0.4;
@@ -268,7 +265,7 @@ function generateFallbackPattern(barLength, description) {
       pattern[4][step] = step % 16 === 12 && Math.random() > 0.7;
     }
   }
-  
+
   return pattern;
 }
 

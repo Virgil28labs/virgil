@@ -5,8 +5,9 @@
  * Features city-first search with keyboard navigation and accessibility support.
  */
 
-import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { searchTimezones, getPopularTimezones, TimezoneInfo } from './timezoneData'
+import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import type { TimezoneInfo } from './timezoneData';
+import { searchTimezones, getPopularTimezones } from './timezoneData';
 
 interface TimezoneSearchProps {
   onSelect: (timezone: string) => void
@@ -21,127 +22,127 @@ const TimezoneSearch = memo(function TimezoneSearch({
   excludeTimezones = [],
   className = '',
   placeholder = 'Search cities or countries...',
-  autoFocus = false
+  autoFocus = false,
 }: TimezoneSearchProps) {
-  const [query, setQuery] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([])
+  const [query, setQuery] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
 
   // Search results with popular timezones when empty query
   const searchResults = useMemo(() => {
     const results = query.trim() 
       ? searchTimezones(query, 8)
-      : getPopularTimezones().slice(0, 8)
+      : getPopularTimezones().slice(0, 8);
     
     // Filter out already selected timezones
-    return results.filter(tz => !excludeTimezones.includes(tz.timezone))
-  }, [query, excludeTimezones])
+    return results.filter(tz => !excludeTimezones.includes(tz.timezone));
+  }, [query, excludeTimezones]);
 
   // Auto-focus input on mount
   useEffect(() => {
     if (autoFocus && inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }, [autoFocus])
+  }, [autoFocus]);
 
   // Reset selection when results change
   useEffect(() => {
-    setSelectedIndex(-1)
-  }, [searchResults])
+    setSelectedIndex(-1);
+  }, [searchResults]);
 
   // Handle input change
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setQuery(value)
-    setShowSuggestions(true)
-    setSelectedIndex(-1)
-  }, [])
+    const value = event.target.value;
+    setQuery(value);
+    setShowSuggestions(true);
+    setSelectedIndex(-1);
+  }, []);
 
   // Handle input focus
   const handleInputFocus = useCallback(() => {
-    setShowSuggestions(true)
-  }, [])
+    setShowSuggestions(true);
+  }, []);
 
   // Handle input blur with delay to allow for suggestion clicks
   const handleInputBlur = useCallback(() => {
     setTimeout(() => {
-      setShowSuggestions(false)
-    }, 150)
-  }, [])
+      setShowSuggestions(false);
+    }, 150);
+  }, []);
 
   // Handle timezone selection
   const handleTimezoneSelect = useCallback((timezone: TimezoneInfo) => {
-    onSelect(timezone.timezone)
-    setQuery('')
-    setShowSuggestions(false)
-    setSelectedIndex(-1)
-  }, [onSelect])
+    onSelect(timezone.timezone);
+    setQuery('');
+    setShowSuggestions(false);
+    setSelectedIndex(-1);
+  }, [onSelect]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions || searchResults.length === 0) return
+    if (!showSuggestions || searchResults.length === 0) return;
 
     switch (event.key) {
       case 'ArrowDown':
-        event.preventDefault()
+        event.preventDefault();
         setSelectedIndex(prev => {
-          const next = prev < searchResults.length - 1 ? prev + 1 : 0
+          const next = prev < searchResults.length - 1 ? prev + 1 : 0;
           // Scroll to selected item
           setTimeout(() => {
             suggestionRefs.current[next]?.scrollIntoView({
               block: 'nearest',
-              behavior: 'smooth'
-            })
-          }, 0)
-          return next
-        })
-        break
+              behavior: 'smooth',
+            });
+          }, 0);
+          return next;
+        });
+        break;
 
       case 'ArrowUp':
-        event.preventDefault()
+        event.preventDefault();
         setSelectedIndex(prev => {
-          const next = prev > 0 ? prev - 1 : searchResults.length - 1
+          const next = prev > 0 ? prev - 1 : searchResults.length - 1;
           // Scroll to selected item
           setTimeout(() => {
             suggestionRefs.current[next]?.scrollIntoView({
               block: 'nearest',
-              behavior: 'smooth'
-            })
-          }, 0)
-          return next
-        })
-        break
+              behavior: 'smooth',
+            });
+          }, 0);
+          return next;
+        });
+        break;
 
       case 'Enter':
-        event.preventDefault()
+        event.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
-          handleTimezoneSelect(searchResults[selectedIndex])
+          handleTimezoneSelect(searchResults[selectedIndex]);
         }
-        break
+        break;
 
       case 'Escape':
-        event.preventDefault()
-        setShowSuggestions(false)
-        setSelectedIndex(-1)
-        inputRef.current?.blur()
-        break
+        event.preventDefault();
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        inputRef.current?.blur();
+        break;
 
       case 'Tab':
         // Allow tab to close suggestions
-        setShowSuggestions(false)
-        break
+        setShowSuggestions(false);
+        break;
     }
-  }, [showSuggestions, searchResults, selectedIndex, handleTimezoneSelect])
+  }, [showSuggestions, searchResults, selectedIndex, handleTimezoneSelect]);
 
   // Clear search
   const handleClearSearch = useCallback(() => {
-    setQuery('')
-    setShowSuggestions(true)
-    setSelectedIndex(-1)
-    inputRef.current?.focus()
-  }, [])
+    setQuery('');
+    setShowSuggestions(true);
+    setSelectedIndex(-1);
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <div className={`timezone-search ${className}`}>
@@ -223,8 +224,8 @@ const TimezoneSearch = memo(function TimezoneSearch({
       )}
 
     </div>
-  )
-})
+  );
+});
 
-export { TimezoneSearch }
+export { TimezoneSearch };
 

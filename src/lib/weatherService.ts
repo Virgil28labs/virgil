@@ -32,9 +32,8 @@ class WeatherService {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
             },
-            timeout: 10000
           });
 
           if (!res.ok) {
@@ -55,8 +54,8 @@ class WeatherService {
           initialDelay: 1000,
           onRetry: () => {
             // Retry silently
-          }
-        }
+          },
+        },
       );
 
       const result = await response.json();
@@ -70,7 +69,7 @@ class WeatherService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: weatherData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return weatherData;
@@ -104,8 +103,8 @@ class WeatherService {
       const response = await dedupeFetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -123,7 +122,7 @@ class WeatherService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: weatherData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return weatherData;
@@ -155,9 +154,8 @@ class WeatherService {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
             },
-            timeout: 10000
           });
 
           if (!res.ok) {
@@ -178,8 +176,8 @@ class WeatherService {
           initialDelay: 1000,
           onRetry: () => {
             // Retry silently
-          }
-        }
+          },
+        },
       );
 
       const result = await response.json();
@@ -193,7 +191,7 @@ class WeatherService {
       // Cache the result
       this.forecastCache.set(cacheKey, {
         data: forecastData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return forecastData;
@@ -227,8 +225,8 @@ class WeatherService {
       const response = await dedupeFetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -246,7 +244,7 @@ class WeatherService {
       // Cache the result
       this.forecastCache.set(cacheKey, {
         data: forecastData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return forecastData;

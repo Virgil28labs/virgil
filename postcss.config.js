@@ -6,4 +6,4 @@ export default {
     'postcss-merge-rules': {}, // Merges duplicate CSS rules
     'postcss-combine-media-query': {}, // Combines duplicate media queries
   },
-}
+};

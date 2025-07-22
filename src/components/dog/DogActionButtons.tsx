@@ -1,6 +1,6 @@
-import { memo, useState, useCallback } from 'react'
-import type { DogActionButtonsProps } from '../../types'
-import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils'
+import { memo, useState, useCallback } from 'react';
+import type { DogActionButtonsProps } from '../../types';
+import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 
 export const DogActionButtons = memo(function DogActionButtons({ 
   dog,
@@ -9,48 +9,48 @@ export const DogActionButtons = memo(function DogActionButtons({
   onDownload,
   onCopy,
   showLabels = false,
-  size = 'medium'
+  size = 'medium',
 }: DogActionButtonsProps) {
-  const [showCopied, setShowCopied] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
+  const [showCopied, setShowCopied] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
 
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     try {
       if (onDownload) {
-        onDownload(e)
+        onDownload(e);
       } else {
-        await downloadImage(dog.url, dog.breed)
+        await downloadImage(dog.url, dog.breed);
       }
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download image:', error)
+      console.error('Failed to download image:', error);
     }
-  }, [dog.url, dog.breed, onDownload])
+  }, [dog.url, dog.breed, onDownload]);
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     try {
       if (onCopy) {
-        onCopy(e)
+        onCopy(e);
       } else {
-        await copyImageToClipboard(dog.url)
+        await copyImageToClipboard(dog.url);
       }
-      setShowCopied(true)
-      setTimeout(() => setShowCopied(false), 2000)
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy image:', error)
+      console.error('Failed to copy image:', error);
     }
-  }, [dog.url, onCopy])
+  }, [dog.url, onCopy]);
 
   const sizeClasses = {
     small: 'doggo-action-btn--small',
     medium: 'doggo-action-btn--medium', 
-    large: 'doggo-action-btn--large'
-  }
+    large: 'doggo-action-btn--large',
+  };
 
-  const buttonClass = `doggo-action-btn ${sizeClasses[size]}`
+  const buttonClass = `doggo-action-btn ${sizeClasses[size]}`;
 
   return (
     <div className={`doggo-action-buttons ${showLabels ? 'doggo-action-buttons--labeled' : ''}`}>
@@ -61,9 +61,11 @@ export const DogActionButtons = memo(function DogActionButtons({
         title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
       >
         {isFavorited ? '❤️' : '🤍'}
-        {showLabels && <span className="doggo-action-label">
-          {isFavorited ? 'Favorited' : 'Favorite'}
-        </span>}
+        {showLabels && (
+          <span className="doggo-action-label">
+            {isFavorited ? 'Favorited' : 'Favorite'}
+          </span>
+        )}
       </button>
       
       <button
@@ -73,9 +75,11 @@ export const DogActionButtons = memo(function DogActionButtons({
         title="Download"
       >
         {showDownloaded ? '✓' : '⬇️'}
-        {showLabels && <span className="doggo-action-label">
-          {showDownloaded ? 'Downloaded' : 'Download'}
-        </span>}
+        {showLabels && (
+          <span className="doggo-action-label">
+            {showDownloaded ? 'Downloaded' : 'Download'}
+          </span>
+        )}
       </button>
       
       <button
@@ -85,10 +89,12 @@ export const DogActionButtons = memo(function DogActionButtons({
         title="Copy image"
       >
         {showCopied ? '✓' : '📋'}
-        {showLabels && <span className="doggo-action-label">
-          {showCopied ? 'Copied' : 'Copy'}
-        </span>}
+        {showLabels && (
+          <span className="doggo-action-label">
+            {showCopied ? 'Copied' : 'Copy'}
+          </span>
+        )}
       </button>
     </div>
-  )
-})
+  );
+});

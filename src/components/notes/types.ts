@@ -69,10 +69,10 @@ export class NotesError extends Error {
   constructor(
     public type: ErrorType,
     message: string,
-    public originalError?: unknown
+    public originalError?: unknown,
   ) {
-    super(message)
-    this.name = 'NotesError'
+    super(message);
+    this.name = 'NotesError';
   }
 }
 

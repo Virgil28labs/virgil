@@ -66,7 +66,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('renders when isOpen is true', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Draw Perfect Circle')).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('DrawPerfectCircle', () => {
 
   it('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const closeButton = screen.getByRole('button', { name: /close circle game/i });
     await user.click(closeButton);
@@ -91,7 +91,7 @@ describe('DrawPerfectCircle', () => {
 
   it('calls onClose when backdrop is clicked', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const backdrop = screen.getByRole('dialog');
     await user.click(backdrop);
@@ -101,7 +101,7 @@ describe('DrawPerfectCircle', () => {
 
   it('does not call onClose when panel is clicked', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const panel = screen.getByRole('document');
     await user.click(panel);
@@ -110,7 +110,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('displays initial instructions', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('Draw a perfect circle')).toBeInTheDocument();
     expect(screen.getByText('Click and drag to draw your circle')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('renders canvas element', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const canvas = document.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
@@ -127,7 +127,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('renders control buttons', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /hide grid/i })).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe('DrawPerfectCircle', () => {
 
   it('toggles grid visibility', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const gridButton = screen.getByRole('button', { name: /hide grid/i });
     await user.click(gridButton);
@@ -145,7 +145,7 @@ describe('DrawPerfectCircle', () => {
 
   it('clears canvas when clear button is clicked', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const clearButton = screen.getByRole('button', { name: /clear/i });
     await user.click(clearButton);
@@ -160,7 +160,7 @@ describe('DrawPerfectCircle', () => {
       return null;
     });
 
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText(/Best score: 85/)).toBeInTheDocument();
     expect(screen.getByText(/Attempts: 3/)).toBeInTheDocument();
@@ -168,7 +168,7 @@ describe('DrawPerfectCircle', () => {
 
   it('handles keyboard shortcuts', async () => {
     const user = userEvent.setup();
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     // Test Escape key
     await user.keyboard('{Escape}');
@@ -187,7 +187,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('handles mouse drawing events', async () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const canvas = document.querySelector('canvas')!;
     
@@ -207,18 +207,18 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('handles touch drawing events', async () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const canvas = document.querySelector('canvas')!;
     
     // Simulate touch start
     fireEvent.touchStart(canvas, {
-      touches: [{ clientX: 100, clientY: 100 }]
+      touches: [{ clientX: 100, clientY: 100 }],
     });
     
     // Simulate touch move
     fireEvent.touchMove(canvas, {
-      touches: [{ clientX: 150, clientY: 150 }]
+      touches: [{ clientX: 150, clientY: 150 }],
     });
     
     // Simulate touch end
@@ -231,7 +231,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('has proper accessibility attributes', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
@@ -242,7 +242,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('handles window resize events', async () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     // Simulate window resize
     fireEvent.resize(window);
@@ -254,7 +254,7 @@ describe('DrawPerfectCircle', () => {
   });
 
   it('prevents default on mouse and touch events', () => {
-    render(<DrawPerfectCircle isOpen={true} onClose={mockOnClose} />);
+    render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
     const canvas = document.querySelector('canvas')!;
     
@@ -262,7 +262,7 @@ describe('DrawPerfectCircle', () => {
       bubbles: true, 
       cancelable: true,
       clientX: 100,
-      clientY: 100
+      clientY: 100,
     });
     
     const preventDefault = jest.spyOn(mouseDownEvent, 'preventDefault');

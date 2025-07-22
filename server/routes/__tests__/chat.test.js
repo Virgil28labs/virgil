@@ -6,9 +6,7 @@ jest.mock('node-fetch', () => jest.fn());
 const fetch = require('node-fetch');
 
 // Mock rate limiter to avoid rate limit issues in tests
-jest.mock('express-rate-limit', () => {
-  return jest.fn(() => (req, res, next) => next());
-});
+jest.mock('express-rate-limit', () => jest.fn(() => (req, res, next) => next()));
 
 const chatRouter = require('../chat');
 
@@ -19,11 +17,11 @@ describe('Chat Routes', () => {
     app = express();
     app.use(express.json());
     app.use('/api/v1/chat', chatRouter);
-    
+
     // Reset mocks
     jest.clearAllMocks();
     fetch.mockClear();
-    
+
     // Set up default environment
     process.env.OPENAI_API_KEY = 'test-api-key';
   });
@@ -40,25 +38,25 @@ describe('Chat Routes', () => {
         json: jest.fn().mockResolvedValue({
           choices: [{
             message: {
-              content: 'Hello! How can I help you today?'
-            }
+              content: 'Hello! How can I help you today?',
+            },
           }],
           usage: {
             prompt_tokens: 10,
             completion_tokens: 8,
-            total_tokens: 18
-          }
-        })
+            total_tokens: 18,
+          },
+        }),
       };
-      
+
       fetch.mockResolvedValue(mockOpenAIResponse);
 
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
           messages: [
-            { role: 'user', content: 'Hello' }
-          ]
+            { role: 'user', content: 'Hello' },
+          ],
         })
         .expect('Content-Type', /json/)
         .expect(200);
@@ -67,13 +65,13 @@ describe('Chat Routes', () => {
         success: true,
         message: {
           role: 'assistant',
-          content: 'Hello! How can I help you today?'
+          content: 'Hello! How can I help you today?',
         },
         usage: {
           prompt_tokens: 10,
           completion_tokens: 8,
-          total_tokens: 18
-        }
+          total_tokens: 18,
+        },
       });
 
       expect(fetch).toHaveBeenCalledWith(
@@ -82,9 +80,9 @@ describe('Chat Routes', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer test-api-key'
-          }
-        })
+            'Authorization': 'Bearer test-api-key',
+          },
+        }),
       );
     });
 
@@ -93,10 +91,10 @@ describe('Chat Routes', () => {
         ok: true,
         json: jest.fn().mockResolvedValue({
           choices: [{ message: { content: 'Response' } }],
-          usage: {}
-        })
+          usage: {},
+        }),
       };
-      
+
       fetch.mockResolvedValue(mockOpenAIResponse);
 
       await request(app)
@@ -105,17 +103,17 @@ describe('Chat Routes', () => {
           messages: [{ role: 'user', content: 'Hello' }],
           model: 'gpt-4',
           temperature: 0.5,
-          max_tokens: 500
+          max_tokens: 500,
         })
         .expect(200);
 
       const fetchCall = fetch.mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
-      
+
       expect(requestBody).toMatchObject({
         model: 'gpt-4',
         temperature: 0.5,
-        max_tokens: 500
+        max_tokens: 500,
       });
     });
 
@@ -126,7 +124,7 @@ describe('Chat Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     });
 
@@ -134,12 +132,12 @@ describe('Chat Routes', () => {
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: 'invalid'
+          messages: 'invalid',
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     });
 
@@ -147,12 +145,12 @@ describe('Chat Routes', () => {
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: []
+          messages: [],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     });
 
@@ -162,12 +160,12 @@ describe('Chat Routes', () => {
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'Chat service is not properly configured'
+        error: 'Chat service is not properly configured',
       });
     });
 
@@ -177,23 +175,23 @@ describe('Chat Routes', () => {
         status: 429,
         json: jest.fn().mockResolvedValue({
           error: {
-            message: 'Rate limit exceeded'
-          }
-        })
+            message: 'Rate limit exceeded',
+          },
+        }),
       };
-      
+
       fetch.mockResolvedValue(mockErrorResponse);
 
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(429);
 
       expect(response.body).toEqual({
         error: 'Failed to get response from chat service',
-        status: 429
+        status: 429,
       });
     });
 
@@ -203,13 +201,13 @@ describe('Chat Routes', () => {
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(500);
 
       expect(response.body).toEqual({
         error: 'Internal server error',
-        message: 'Failed to process chat request'
+        message: 'Failed to process chat request',
       });
     });
 
@@ -218,16 +216,16 @@ describe('Chat Routes', () => {
         ok: true,
         json: jest.fn().mockResolvedValue({
           // Missing expected structure
-          invalid: 'response'
-        })
+          invalid: 'response',
+        }),
       };
-      
+
       fetch.mockResolvedValue(mockBadResponse);
 
       const response = await request(app)
         .post('/api/v1/chat')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(500);
 
@@ -246,7 +244,7 @@ describe('Chat Routes', () => {
         status: 'healthy',
         service: 'chat',
         configured: true,
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
     });
 
@@ -261,7 +259,7 @@ describe('Chat Routes', () => {
         status: 'unhealthy',
         service: 'chat',
         configured: false,
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
     });
   });
@@ -275,7 +273,7 @@ describe('Chat Routes', () => {
         max: 30,
         message: 'Too many chat requests, please try again later.',
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
       });
     });
   });

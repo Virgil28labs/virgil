@@ -13,7 +13,6 @@ interface WeatherForecastProps {
  */
 export const WeatherForecast = memo(function WeatherForecast({ 
   forecast, 
-  unit 
 }: WeatherForecastProps) {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);

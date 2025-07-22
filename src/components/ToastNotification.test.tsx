@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { ToastContainer, Toast } from './ToastNotification';
+import type { Toast } from './ToastNotification';
+import { ToastContainer } from './ToastNotification';
 
 // Mock timers for auto-dismiss testing
 jest.useFakeTimers();
@@ -20,7 +21,7 @@ describe('ToastContainer', () => {
 
   it('renders nothing when no toasts', () => {
     const { container } = render(
-      <ToastContainer toasts={[]} onDismiss={mockOnDismiss} />
+      <ToastContainer toasts={[]} onDismiss={mockOnDismiss} />,
     );
     
     expect(container.firstChild).toBeNull();
@@ -30,7 +31,7 @@ describe('ToastContainer', () => {
     const toasts: Toast[] = [
       { id: '1', type: 'success', message: 'Success message' },
       { id: '2', type: 'error', message: 'Error message' },
-      { id: '3', type: 'info', message: 'Info message' }
+      { id: '3', type: 'info', message: 'Info message' },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -46,7 +47,7 @@ describe('ToastContainer', () => {
     
     positions.forEach(position => {
       const { container } = render(
-        <ToastContainer toasts={toasts} onDismiss={mockOnDismiss} position={position} />
+        <ToastContainer toasts={toasts} onDismiss={mockOnDismiss} position={position} />,
       );
       
       const toastContainer = container.querySelector('[aria-label="Notifications"]');
@@ -76,7 +77,7 @@ describe('ToastContainer', () => {
       { id: '1', type: 'success', message: 'Success' },
       { id: '2', type: 'error', message: 'Error' },
       { id: '3', type: 'warning', message: 'Warning' },
-      { id: '4', type: 'info', message: 'Info' }
+      { id: '4', type: 'info', message: 'Info' },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -90,7 +91,7 @@ describe('ToastContainer', () => {
 
   it('calls onDismiss when close button clicked', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'info', message: 'Test message' }
+      { id: '1', type: 'info', message: 'Test message' },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -108,7 +109,7 @@ describe('ToastContainer', () => {
 
   it('auto-dismisses after default duration', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'info', message: 'Auto dismiss test' }
+      { id: '1', type: 'info', message: 'Auto dismiss test' },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -135,7 +136,7 @@ describe('ToastContainer', () => {
 
   it('auto-dismisses after custom duration', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'info', message: 'Custom duration', duration: 3000 }
+      { id: '1', type: 'info', message: 'Custom duration', duration: 3000 },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -152,7 +153,7 @@ describe('ToastContainer', () => {
 
   it('does not auto-dismiss persistent toasts', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'info', message: 'Persistent toast', persistent: true }
+      { id: '1', type: 'info', message: 'Persistent toast', persistent: true },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -174,9 +175,9 @@ describe('ToastContainer', () => {
         message: 'Action toast',
         action: {
           label: 'Retry',
-          onClick: mockAction
-        }
-      }
+          onClick: mockAction,
+        },
+      },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -190,7 +191,7 @@ describe('ToastContainer', () => {
 
   it('has proper accessibility attributes', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'error', message: 'Error notification' }
+      { id: '1', type: 'error', message: 'Error notification' },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -206,7 +207,7 @@ describe('ToastContainer', () => {
     const toasts: Toast[] = [
       { id: '1', type: 'info', message: 'First', duration: 2000 },
       { id: '2', type: 'info', message: 'Second', duration: 4000 },
-      { id: '3', type: 'info', message: 'Third', duration: 6000 }
+      { id: '3', type: 'info', message: 'Third', duration: 6000 },
     ];
 
     render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);
@@ -240,7 +241,7 @@ describe('ToastContainer', () => {
 
   it('cleans up timers when toast is manually dismissed', () => {
     const toasts: Toast[] = [
-      { id: '1', type: 'info', message: 'Manual dismiss' }
+      { id: '1', type: 'info', message: 'Manual dismiss' },
     ];
 
     const { rerender } = render(<ToastContainer toasts={toasts} onDismiss={mockOnDismiss} />);

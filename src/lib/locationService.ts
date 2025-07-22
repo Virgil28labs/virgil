@@ -2,12 +2,12 @@ import type {
   Coordinates,
   Address,
   IPLocation,
-  LocationData
-} from '../types/location.types'
-import { retryWithBackoff } from './retryUtils'
+  LocationData,
+} from '../types/location.types';
+import { retryWithBackoff } from './retryUtils';
 
 // ipwho.is API response type
-interface IPWhoResponse {
+interface IpWhoResponse {
   success: boolean;
   message?: string;
   ip: string;
@@ -37,7 +37,7 @@ export const locationService = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
-            timestamp: position.timestamp
+            timestamp: position.timestamp,
           });
         },
         (error: GeolocationPositionError) => {
@@ -62,8 +62,8 @@ export const locationService = {
         {
           enableHighAccuracy: true,
           timeout: 5000, // Increased to 5s for better reliability
-          maximumAge: 300000
-        }
+          maximumAge: 300000,
+        },
       );
     });
   },
@@ -71,7 +71,7 @@ export const locationService = {
   async getAddressFromCoordinates(latitude: number, longitude: number): Promise<Address> {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
       );
       
       if (!response.ok) {
@@ -99,7 +99,7 @@ export const locationService = {
         city: address.city || address.town || address.village || '',
         postcode: address.postcode || '',
         country: address.country || '',
-        formatted: data.display_name || ''
+        formatted: data.display_name || '',
       };
     } catch (_error) {
       throw new Error('Failed to get address from coordinates');
@@ -121,8 +121,8 @@ export const locationService = {
         initialDelay: 500,
         onRetry: (_attempt, _error) => {
           // Retry silently
-        }
-      }
+        },
+      },
     );
   },
 
@@ -133,7 +133,7 @@ export const locationService = {
         if (!response.ok) {
           throw new Error('Failed to fetch IP location');
         }
-        const data: IPWhoResponse = await response.json();
+        const data: IpWhoResponse = await response.json();
         
         if (!data.success) {
           throw new Error(data.message || 'Failed to get location from IP');
@@ -146,7 +146,7 @@ export const locationService = {
           city: data.city,
           lat: data.latitude,
           lon: data.longitude,
-          timezone: typeof data.timezone === 'object' ? data.timezone.id : data.timezone
+          timezone: typeof data.timezone === 'object' ? data.timezone.id : data.timezone,
         };
       },
       {
@@ -154,8 +154,8 @@ export const locationService = {
         initialDelay: 500,
         onRetry: (_attempt, _error) => {
           // Retry silently
-        }
-      }
+        },
+      },
     );
   },
 
@@ -166,8 +166,8 @@ export const locationService = {
           const response = await fetch(
             `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`,
             {
-              signal: AbortSignal.timeout(8000) // Increased to 8 second timeout
-            }
+              signal: AbortSignal.timeout(8000), // Increased to 8 second timeout
+            },
           );
           
           if (!response.ok) {
@@ -186,15 +186,15 @@ export const locationService = {
           
           return {
             elevation: data.elevation,
-            elevationFeet: data.elevationFeet
+            elevationFeet: data.elevationFeet,
           };
         },
         {
           maxRetries: 3, // Increased retries
           initialDelay: 1000, // Increased initial delay
           onRetry: (_attempt, _error) => {
-          }
-        }
+          },
+        },
       );
     } catch (error) {
       // Return null instead of throwing to allow graceful degradation
@@ -205,7 +205,7 @@ export const locationService = {
   async getQuickLocation(): Promise<LocationData> {
     // Fast IP-only location for immediate weather display
     const locationData: LocationData = {
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     try {
@@ -226,7 +226,7 @@ export const locationService = {
 
   async getFullLocationData(existingIPLocation?: IPLocation): Promise<LocationData> {
     const locationData: LocationData = {
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // If we already have IP location, use it; otherwise fetch it
@@ -286,7 +286,7 @@ export const locationService = {
       // Fetch address and elevation in parallel
       const [addressResult, elevationResult] = await Promise.allSettled([
         this.getAddressFromCoordinates(coords.latitude, coords.longitude),
-        this.getElevation(coords.latitude, coords.longitude)
+        this.getElevation(coords.latitude, coords.longitude),
       ]);
       
       if (addressResult.status === 'fulfilled') {
@@ -298,7 +298,7 @@ export const locationService = {
         result.coordinates = {
           ...coords,
           elevation: elevationResult.value.elevation,
-          elevationUnit: 'meters'
+          elevationUnit: 'meters',
         };
       } else {
         // Still return coordinates without elevation
@@ -318,7 +318,7 @@ export const locationService = {
       city: ipLocation.city || '',
       postcode: '',
       country: ipLocation.country || '',
-      formatted: `${ipLocation.city || ''}, ${ipLocation.region || ''} ${ipLocation.country || ''}`.trim()
+      formatted: `${ipLocation.city || ''}, ${ipLocation.region || ''} ${ipLocation.country || ''}`.trim(),
     };
-  }
+  },
 };

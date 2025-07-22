@@ -22,7 +22,7 @@ export const DEFAULT_PHYSICS_CONFIG: PhysicsConfig = {
   friction: 0.98,
   bounceDamping: 0.6,
   angularDamping: 0.95,
-  groundLevel: 0
+  groundLevel: 0,
 };
 
 export class PhysicsEngine {

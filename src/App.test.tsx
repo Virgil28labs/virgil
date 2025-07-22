@@ -4,16 +4,16 @@ import App from './App';
 
 // Mock the lazy loaded components
 jest.mock('./components/LazyComponents', () => ({
-  LazyVirgilChatbot: () => <div data-testid="chatbot">Chatbot Component</div>
+  LazyVirgilChatbot: () => <div data-testid="chatbot">Chatbot Component</div>,
 }));
 
 // Mock child components to simplify testing
 jest.mock('./components/AuthPage', () => ({
-  AuthPage: () => <div data-testid="auth-page">Auth Page</div>
+  AuthPage: () => <div data-testid="auth-page">Auth Page</div>,
 }));
 
 jest.mock('./components/Dashboard', () => ({
-  Dashboard: () => <div data-testid="dashboard">Dashboard</div>
+  Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 
 // Mock contexts
@@ -21,28 +21,28 @@ jest.mock('./contexts/AuthContext', () => {
   const mockUseAuth = jest.fn(() => ({
     user: null,
     loading: false,
-    signOut: jest.fn()
+    signOut: jest.fn(),
   }));
   
   return {
     AuthProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    useAuth: mockUseAuth
+    useAuth: mockUseAuth,
   };
 });
 
 jest.mock('./contexts/LocationContext', () => ({
-  LocationProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>
+  LocationProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock('./contexts/WeatherContext', () => ({
-  WeatherProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>
+  WeatherProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock('./hooks/useToast', () => ({
   useToast: () => ({
     toasts: [],
-    removeToast: jest.fn()
-  })
+    removeToast: jest.fn(),
+  }),
 }));
 
 describe('App Component', () => {
@@ -73,7 +73,7 @@ describe('App Component', () => {
     useAuthMock.mockReturnValue({
       user: { id: '123', email: 'test@example.com' },
       loading: false,
-      signOut: jest.fn()
+      signOut: jest.fn(),
     });
 
     render(<App />);
@@ -85,7 +85,7 @@ describe('App Component', () => {
     useAuthMock.mockReturnValue({
       user: null,
       loading: true,
-      signOut: jest.fn()
+      signOut: jest.fn(),
     });
 
     render(<App />);
@@ -97,7 +97,7 @@ describe('App Component', () => {
     useAuthMock.mockReturnValue({
       user: { id: '123', email: 'test@example.com' },
       loading: false,
-      signOut: jest.fn()
+      signOut: jest.fn(),
     });
 
     render(<App />);

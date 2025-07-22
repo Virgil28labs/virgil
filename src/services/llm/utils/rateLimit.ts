@@ -67,7 +67,7 @@ export class RateLimiter {
       maxRequests: this.maxRequests,
       remainingRequests: this.getRemainingRequests(),
       resetTime: this.getResetTime(),
-      windowMs: this.windowMs
+      windowMs: this.windowMs,
     };
   }
 

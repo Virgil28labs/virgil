@@ -3,12 +3,12 @@ import { EmojiButton } from './common/EmojiButton';
 
 const DogGallery = lazy(() => 
   import('./dog/DogGallery').then(module => ({ 
-    default: module.DogGallery 
-  }))
+    default: module.DogGallery, 
+  })),
 );
 
 const DogGalleryWrapper = ({ onClose }: { onClose: () => void }) => (
-  <DogGallery isOpen={true} onClose={onClose} />
+  <DogGallery isOpen onClose={onClose} />
 );
 
 export const DogEmojiButton = () => (
@@ -21,7 +21,7 @@ export const DogEmojiButton = () => (
     hoverColor={{
       background: 'linear-gradient(135deg, rgba(108, 59, 170, 0.3) 0%, rgba(178, 165, 193, 0.3) 100%)',
       border: 'rgba(178, 165, 193, 0.6)',
-      glow: 'rgba(108, 59, 170, 0.4)'
+      glow: 'rgba(108, 59, 170, 0.4)',
     }}
     title="Visit the Doggo Sanctuary!"
     className="opacity-80 hover:opacity-100"

@@ -1,4 +1,3 @@
-import type { WeatherData } from '../../types/weather.types';
 
 // Mock weather service
 export const weatherService = {
@@ -26,5 +25,5 @@ export const weatherService = {
     if (conditionId === 803 || conditionId === 804) return '☁️';
     return '🌡️';
   }),
-  clearCache: jest.fn()
+  clearCache: jest.fn(),
 };

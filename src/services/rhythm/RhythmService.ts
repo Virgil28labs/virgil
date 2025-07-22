@@ -1,4 +1,3 @@
-import { LLMService } from '../llm/LLMService';
 
 export interface RhythmPattern {
   pattern: boolean[][]; // 5 drums x N steps
@@ -18,11 +17,9 @@ export interface RhythmGenerationOptions {
 }
 
 export class RhythmService {
-  private _llmService: LLMService;
   private baseUrl: string;
 
   constructor() {
-    this._llmService = new LLMService();
     this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
   }
 
@@ -34,7 +31,7 @@ export class RhythmService {
       description,
       barLength,
       style = '',
-      temperature = 0.7
+      temperature = 0.7,
     } = options;
 
     try {
@@ -47,8 +44,8 @@ export class RhythmService {
           description,
           barLength,
           style,
-          temperature
-        })
+          temperature,
+        }),
       });
 
       if (!response.ok) {
@@ -135,32 +132,8 @@ export class RhythmService {
       barLength,
       style,
       generated: new Date().toISOString(),
-      fallback: true
+      fallback: true,
     };
-  }
-
-  /**
-   * Validate pattern structure
-   */
-  private validatePattern(pattern: boolean[][]): boolean {
-    if (!Array.isArray(pattern) || pattern.length !== 5) {
-      return false;
-    }
-
-    for (const drumPattern of pattern) {
-      if (!Array.isArray(drumPattern)) {
-        return false;
-      }
-      
-      // Check that all values are boolean
-      for (const step of drumPattern) {
-        if (typeof step !== 'boolean') {
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 
   // Removed all advanced pattern conversion methods - using simple classification approach
@@ -184,7 +157,7 @@ export class RhythmService {
       return {
         totalGenerations: 0,
         successRate: 0,
-        averageResponseTime: 0
+        averageResponseTime: 0,
       };
     }
   }

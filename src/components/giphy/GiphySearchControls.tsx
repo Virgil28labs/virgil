@@ -1,5 +1,5 @@
-import { memo, useState, useEffect } from 'react'
-import type { GiphySearchControlsProps } from '../../types/giphy.types'
+import { memo, useState, useEffect } from 'react';
+import type { GiphySearchControlsProps } from '../../types/giphy.types';
 
 export const GiphySearchControls = memo(function GiphySearchControls({
   searchQuery,
@@ -7,33 +7,33 @@ export const GiphySearchControls = memo(function GiphySearchControls({
   isLoading,
   onSearchChange,
   onRatingChange,
-  onSearch
+  onSearch,
 }: GiphySearchControlsProps) {
-  const [inputValue, setInputValue] = useState(searchQuery)
+  const [inputValue, setInputValue] = useState(searchQuery);
 
   // Sync input value with prop changes
   useEffect(() => {
-    setInputValue(searchQuery)
-  }, [searchQuery])
+    setInputValue(searchQuery);
+  }, [searchQuery]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setInputValue(value)
-    onSearchChange(value)
-  }
+    const value = e.target.value;
+    setInputValue(value);
+    onSearchChange(value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (inputValue.trim()) {
-      onSearch()
+      onSearch();
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit(e)
+      handleSubmit(e);
     }
-  }
+  };
 
   return (
     <form className="giphy-search-controls" onSubmit={handleSubmit}>
@@ -79,7 +79,7 @@ export const GiphySearchControls = memo(function GiphySearchControls({
                 border: '2px solid rgba(255,255,255,0.3)', 
                 borderTop: '2px solid white', 
                 borderRadius: '50%', 
-                animation: 'spin 1s linear infinite' 
+                animation: 'spin 1s linear infinite', 
               }}
             />
             Searching...
@@ -89,5 +89,5 @@ export const GiphySearchControls = memo(function GiphySearchControls({
         )}
       </button>
     </form>
-  )
-})
+  );
+});

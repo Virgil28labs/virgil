@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react'
-import { PhotoGalleryTabs } from './PhotoGalleryTabs'
-import { PhotoGrid } from './PhotoGrid'
-import { CameraInterface } from './CameraInterface'
-import { usePhotoGallery } from './hooks/usePhotoGallery'
-import type { SavedPhoto } from '../../types/camera.types'
+import React, { useState, useCallback } from 'react';
+import { PhotoGalleryTabs } from './PhotoGalleryTabs';
+import { PhotoGrid } from './PhotoGrid';
+import { CameraInterface } from './CameraInterface';
+import { usePhotoGallery } from './hooks/usePhotoGallery';
+import type { SavedPhoto } from '../../types/camera.types';
 
 interface PhotoGalleryProps {
   onPhotoSelect: (photo: SavedPhoto) => void
@@ -33,24 +33,24 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
   onBulkDelete,
   onBulkFavorite,
   onSearch,
-  searchQuery
+  searchQuery,
 }) => {
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setLocalSearchQuery(value)
-    onSearch(value)
-  }, [onSearch])
+    const value = e.target.value;
+    setLocalSearchQuery(value);
+    onSearch(value);
+  }, [onSearch]);
 
   const handleSearchClear = useCallback(() => {
-    setLocalSearchQuery('')
-    onSearch('')
-  }, [onSearch])
+    setLocalSearchQuery('');
+    onSearch('');
+  }, [onSearch]);
 
   // Don't show toolbar for camera tab
   if (activeTab === 'camera') {
-    return null
+    return null;
   }
 
   return (
@@ -135,12 +135,12 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   onPhotoSelect,
-  onError
+  onError,
 }) => {
   const {
     galleryState,
@@ -155,82 +155,82 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     handlePhotoCapture,
     handleBulkDelete,
     handleBulkFavorite,
-    getPhotoStats
-  } = usePhotoGallery()
+    getPhotoStats,
+  } = usePhotoGallery();
 
-  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
 
-  const currentPhotos = getCurrentPhotos()
-  const stats = getPhotoStats()
+  const currentPhotos = getCurrentPhotos();
+  const stats = getPhotoStats();
 
   const handleTabChange = useCallback((tab: 'camera' | 'gallery' | 'favorites') => {
-    setActiveTab(tab)
-    setIsSelectionMode(false)
-    clearSelection()
-  }, [setActiveTab, clearSelection])
+    setActiveTab(tab);
+    setIsSelectionMode(false);
+    clearSelection();
+  }, [setActiveTab, clearSelection]);
 
   const handlePhotoClick = useCallback((photo: SavedPhoto) => {
-    onPhotoSelect(photo)
-  }, [onPhotoSelect])
+    onPhotoSelect(photo);
+  }, [onPhotoSelect]);
 
   const handlePhotoSelectToggle = useCallback((photoId: string) => {
-    togglePhotoSelection(photoId)
-  }, [togglePhotoSelection])
+    togglePhotoSelection(photoId);
+  }, [togglePhotoSelection]);
 
   const handleToggleSelectionMode = useCallback(() => {
     setIsSelectionMode(prev => {
       if (prev) {
-        clearSelection()
+        clearSelection();
       }
-      return !prev
-    })
-  }, [clearSelection])
+      return !prev;
+    });
+  }, [clearSelection]);
 
   const handleSelectAll = useCallback(() => {
-    selectAllPhotos()
-  }, [selectAllPhotos])
+    selectAllPhotos();
+  }, [selectAllPhotos]);
 
   const handleClearSelection = useCallback(() => {
-    clearSelection()
-    setIsSelectionMode(false)
-  }, [clearSelection])
+    clearSelection();
+    setIsSelectionMode(false);
+  }, [clearSelection]);
 
   const handleBulkDeleteConfirm = useCallback(async () => {
-    if (galleryState.selectedPhotos.size === 0) return
+    if (galleryState.selectedPhotos.size === 0) return;
     
     const confirmed = window.confirm(
-      `Are you sure you want to delete ${galleryState.selectedPhotos.size} photo${galleryState.selectedPhotos.size > 1 ? 's' : ''}?`
-    )
+      `Are you sure you want to delete ${galleryState.selectedPhotos.size} photo${galleryState.selectedPhotos.size > 1 ? 's' : ''}?`,
+    );
     
     if (confirmed) {
-      const deletedCount = await handleBulkDelete()
+      const deletedCount = await handleBulkDelete();
       if (deletedCount > 0) {
-        setIsSelectionMode(false)
+        setIsSelectionMode(false);
       }
     }
-  }, [galleryState.selectedPhotos.size, handleBulkDelete])
+  }, [galleryState.selectedPhotos.size, handleBulkDelete]);
 
   const handleBulkFavoriteAction = useCallback(async (makeFavorite: boolean) => {
-    if (galleryState.selectedPhotos.size === 0) return
+    if (galleryState.selectedPhotos.size === 0) return;
     
-    await handleBulkFavorite(makeFavorite)
-    setIsSelectionMode(false)
-  }, [galleryState.selectedPhotos.size, handleBulkFavorite])
+    await handleBulkFavorite(makeFavorite);
+    setIsSelectionMode(false);
+  }, [galleryState.selectedPhotos.size, handleBulkFavorite]);
 
   const handleCameraCapture = useCallback(async (dataUrl: string) => {
     try {
-      await handlePhotoCapture(dataUrl)
+      await handlePhotoCapture(dataUrl);
     } catch (err) {
-      onError('Failed to save photo')
+      onError('Failed to save photo');
     }
-  }, [handlePhotoCapture, onError])
+  }, [handlePhotoCapture, onError]);
 
   // Handle errors
   React.useEffect(() => {
     if (error) {
-      onError(error)
+      onError(error);
     }
-  }, [error, onError])
+  }, [error, onError]);
 
   return (
     <div className="photo-gallery">
@@ -276,5 +276,5 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -3,11 +3,12 @@
  * Handles storage, AI processing, and state updates
  */
 
-import { useState, useEffect, useCallback } from 'react'
-import { Entry, NotesError, ErrorType } from './types'
-import { notesStorage } from './storage'
-import { processEntryWithAI, shouldProcessContent } from './aiService'
-import { extractTasksFromContent, mergeTasksWithAI, toggleTaskAtIndex } from './utils/taskUtils'
+import { useState, useEffect, useCallback } from 'react';
+import type { Entry } from './types';
+import { NotesError, ErrorType } from './types';
+import { notesStorage } from './storage';
+import { processEntryWithAI, shouldProcessContent } from './aiService';
+import { extractTasksFromContent, mergeTasksWithAI, toggleTaskAtIndex } from './utils/taskUtils';
 
 /**
  * Main store hook for the notes application
@@ -20,41 +21,41 @@ import { extractTasksFromContent, mergeTasksWithAI, toggleTaskAtIndex } from './
  * - Error handling with user-friendly messages
  */
 export const useNotesStore = () => {
-  const [entries, setEntries] = useState<Entry[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<NotesError | null>(null)
-  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set())
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<NotesError | null>(null);
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   
   const [aiEnabled, setAiEnabled] = useState(() => {
-    const saved = localStorage.getItem('notesAiEnabled')
-    return saved !== null ? saved === 'true' : true
-  })
+    const saved = localStorage.getItem('notesAiEnabled');
+    return saved !== null ? saved === 'true' : true;
+  });
 
   // Load entries from IndexedDB on mount
   useEffect(() => {
     const loadEntries = async () => {
       try {
-        setError(null)
-        const storedEntries = await notesStorage.getAllEntries()
-        setEntries(storedEntries)
+        setError(null);
+        const storedEntries = await notesStorage.getAllEntries();
+        setEntries(storedEntries);
       } catch (error) {
-        console.error('Failed to load entries:', error)
+        console.error('Failed to load entries:', error);
         setError(
           error instanceof NotesError 
             ? error 
             : new NotesError(
-                ErrorType.STORAGE_ERROR,
-                'Failed to load your notes. Please refresh the page.',
-                error
-              )
-        )
+              ErrorType.STORAGE_ERROR,
+              'Failed to load your notes. Please refresh the page.',
+              error,
+            ),
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadEntries()
-  }, [])
+    loadEntries();
+  }, []);
 
   /**
    * Adds a new entry with optimistic updates
@@ -62,7 +63,7 @@ export const useNotesStore = () => {
    */
   const addEntry = useCallback(async (content: string) => {
     // Clear any previous errors
-    setError(null)
+    setError(null);
     
     // Create new entry
     const newEntry: Entry = {
@@ -72,20 +73,20 @@ export const useNotesStore = () => {
       tags: [],
       tasks: extractTasksFromContent(content),
       aiProcessed: false,
-      isEdited: false
-    }
+      isEdited: false,
+    };
 
     // Add to state immediately (optimistic update)
-    setEntries(prev => [newEntry, ...prev])
+    setEntries(prev => [newEntry, ...prev]);
 
     try {
       // Save to IndexedDB
-      await notesStorage.addEntry(newEntry)
+      await notesStorage.addEntry(newEntry);
 
       // Process with AI asynchronously if enabled
       if (aiEnabled && shouldProcessContent(content)) {
         // Mark as processing
-        setProcessingIds(prev => new Set(prev).add(newEntry.id))
+        setProcessingIds(prev => new Set(prev).add(newEntry.id));
         
         processEntryWithAI(newEntry.content).then(async (aiData) => {
           if (aiData) {
@@ -94,52 +95,52 @@ export const useNotesStore = () => {
               tags: aiData.tags,
               actionType: aiData.actionType,
               tasks: mergeTasksWithAI(newEntry.tasks, aiData.tasks),
-              aiProcessed: true
-            }
+              aiProcessed: true,
+            };
 
             // Update state
             setEntries(prev => 
               prev.map(entry => 
-                entry.id === newEntry.id ? updatedEntry : entry
-              )
-            )
+                entry.id === newEntry.id ? updatedEntry : entry,
+              ),
+            );
 
             // Update in IndexedDB
             try {
-              await notesStorage.updateEntry(updatedEntry)
+              await notesStorage.updateEntry(updatedEntry);
             } catch (storageError) {
-              console.error('Failed to save AI updates:', storageError)
+              console.error('Failed to save AI updates:', storageError);
             }
           }
         }).catch(aiError => {
-          console.error('AI processing failed:', aiError)
+          console.error('AI processing failed:', aiError);
         }).finally(() => {
           // Remove from processing set
           setProcessingIds(prev => {
-            const next = new Set(prev)
-            next.delete(newEntry.id)
-            return next
-          })
-        })
+            const next = new Set(prev);
+            next.delete(newEntry.id);
+            return next;
+          });
+        });
       }
     } catch (error) {
-      console.error('Failed to save entry:', error)
+      console.error('Failed to save entry:', error);
       
       // Rollback optimistic update
-      setEntries(prev => prev.filter(e => e.id !== newEntry.id))
+      setEntries(prev => prev.filter(e => e.id !== newEntry.id));
       
       // Set user-friendly error
       setError(
         error instanceof NotesError
           ? error
           : new NotesError(
-              ErrorType.STORAGE_ERROR,
-              'Failed to save your note. Please try again.',
-              error
-            )
-      )
+            ErrorType.STORAGE_ERROR,
+            'Failed to save your note. Please try again.',
+            error,
+          ),
+      );
     }
-  }, [aiEnabled])
+  }, [aiEnabled]);
 
   /**
    * Updates an existing entry
@@ -147,41 +148,41 @@ export const useNotesStore = () => {
    * @param updates Partial entry updates
    */
   const updateEntry = useCallback(async (id: string, updates: Partial<Entry>) => {
-    setError(null)
+    setError(null);
     
     // Optimistic update
     setEntries(prev => 
       prev.map(entry => 
         entry.id === id 
           ? { ...entry, ...updates, isEdited: true }
-          : entry
-      )
-    )
+          : entry,
+      ),
+    );
 
-    const entry = entries.find(e => e.id === id)
+    const entry = entries.find(e => e.id === id);
     if (entry) {
       try {
-        await notesStorage.updateEntry({ ...entry, ...updates, isEdited: true })
+        await notesStorage.updateEntry({ ...entry, ...updates, isEdited: true });
       } catch (error) {
-        console.error('Failed to update entry:', error)
+        console.error('Failed to update entry:', error);
         
         // Rollback optimistic update
         setEntries(prev => 
-          prev.map(e => e.id === id ? entry : e)
-        )
+          prev.map(e => e.id === id ? entry : e),
+        );
         
         setError(
           error instanceof NotesError
             ? error
             : new NotesError(
-                ErrorType.STORAGE_ERROR,
-                'Failed to update the note. Please try again.',
-                error
-              )
-        )
+              ErrorType.STORAGE_ERROR,
+              'Failed to update the note. Please try again.',
+              error,
+            ),
+        );
       }
     }
-  }, [entries])
+  }, [entries]);
 
   /**
    * Toggles a task completion status
@@ -189,67 +190,67 @@ export const useNotesStore = () => {
    * @param taskIndex The index of the task to toggle
    */
   const toggleTask = useCallback(async (entryId: string, taskIndex: number) => {
-    const entry = entries.find(e => e.id === entryId)
-    if (!entry) return
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
 
-    const updatedTasks = toggleTaskAtIndex(entry.tasks, taskIndex)
-    await updateEntry(entryId, { tasks: updatedTasks })
-  }, [entries, updateEntry])
+    const updatedTasks = toggleTaskAtIndex(entry.tasks, taskIndex);
+    await updateEntry(entryId, { tasks: updatedTasks });
+  }, [entries, updateEntry]);
 
   /**
    * Deletes an entry
    * @param id The ID of the entry to delete
    */
   const deleteEntry = useCallback(async (id: string) => {
-    setError(null)
+    setError(null);
     
     // Store entry for potential rollback
-    const entryToDelete = entries.find(e => e.id === id)
+    const entryToDelete = entries.find(e => e.id === id);
     
     // Optimistic update
-    setEntries(prev => prev.filter(e => e.id !== id))
+    setEntries(prev => prev.filter(e => e.id !== id));
 
     try {
-      await notesStorage.deleteEntry(id)
+      await notesStorage.deleteEntry(id);
     } catch (error) {
-      console.error('Failed to delete entry:', error)
+      console.error('Failed to delete entry:', error);
       
       // Rollback if we have the entry
       if (entryToDelete) {
         setEntries(prev => [...prev, entryToDelete].sort((a, b) => 
-          b.timestamp.getTime() - a.timestamp.getTime()
-        ))
+          b.timestamp.getTime() - a.timestamp.getTime(),
+        ));
       }
       
       setError(
         error instanceof NotesError
           ? error
           : new NotesError(
-              ErrorType.STORAGE_ERROR,
-              'Failed to delete the note. Please try again.',
-              error
-            )
-      )
+            ErrorType.STORAGE_ERROR,
+            'Failed to delete the note. Please try again.',
+            error,
+          ),
+      );
     }
-  }, [entries])
+  }, [entries]);
 
   /**
    * Toggles AI processing on/off
    */
   const toggleAI = useCallback(() => {
     setAiEnabled(prev => {
-      const newValue = !prev
-      localStorage.setItem('notesAiEnabled', String(newValue))
-      return newValue
-    })
-  }, [])
+      const newValue = !prev;
+      localStorage.setItem('notesAiEnabled', String(newValue));
+      return newValue;
+    });
+  }, []);
 
   /**
    * Clears the current error
    */
   const clearError = useCallback(() => {
-    setError(null)
-  }, [])
+    setError(null);
+  }, []);
 
   return {
     entries,
@@ -262,7 +263,7 @@ export const useNotesStore = () => {
     deleteEntry,
     aiEnabled,
     toggleAI,
-    clearError
-  }
-}
+    clearError,
+  };
+};
 

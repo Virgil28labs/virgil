@@ -23,9 +23,9 @@ const VirgilChatbot = memo(function VirgilChatbot() {
   const [customSystemPrompt, setCustomSystemPrompt] = useState<string>(() => {
     // Load from localStorage on component mount
     try {
-      return localStorage.getItem('virgil-custom-system-prompt') || ''
+      return localStorage.getItem('virgil-custom-system-prompt') || '';
     } catch {
-      return ''
+      return '';
     }
   });
   
@@ -44,7 +44,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     autoFocus: true,
     restoreFocus: true,
     trapFocus: true,
-    initialFocusSelector: 'input[type="text"]'
+    initialFocusSelector: 'input[type="text"]',
   });
 
   // Keyboard navigation for quick actions and model dropdown
@@ -57,14 +57,14 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       } else if (element.classList.contains('model-option')) {
         element.click();
       }
-    }
+    },
   });
 
   // Available models - memoized to prevent recreation on every render
   const models = useMemo<ModelOption[]>(() => [
     { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', description: 'Fast and efficient' },
     { id: 'gpt-4.1', name: 'GPT-4.1', description: 'Most capable model' },
-    { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' }
+    { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' },
   ], []);
 
   // Load saved model from localStorage
@@ -158,7 +158,7 @@ AVAILABLE ACTIONS:
 
 Provide contextual help based on what the user is currently experiencing.`;
 
-    const basePrompt = customSystemPrompt || "You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.";
+    const basePrompt = customSystemPrompt || 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
     
     return { basePrompt, staticUserContext };
   }, [user, hasGPSLocation, address, ipLocation, coordinates, weatherData, weatherUnit, customSystemPrompt]);
@@ -169,15 +169,15 @@ Provide contextual help based on what the user is currently experiencing.`;
     const currentTime = now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     });
     const currentDate = now.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     });
     const currentDay = now.toLocaleDateString('en-US', {
-      weekday: 'long'
+      weekday: 'long',
     }).toLowerCase();
 
     // Combine static and dynamic parts
@@ -224,7 +224,7 @@ RESPONSE RULES:
       id: Date.now() + '-user',
       role: 'user',
       content: messageText,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -243,18 +243,18 @@ RESPONSE RULES:
       const response = await dedupeFetch(`${chatApiUrl}/chat`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           model: selectedModel,
           messages: [
             { role: 'system', content: systemPrompt },
             ...messages.map(msg => ({ role: msg.role, content: msg.content })),
-            { role: 'user', content: messageText }
+            { role: 'user', content: messageText },
           ],
           max_tokens: 200,
-          temperature: 0.7
-        })
+          temperature: 0.7,
+        }),
       });
 
       if (!response.ok) {
@@ -272,7 +272,7 @@ RESPONSE RULES:
         id: Date.now() + '-assistant',
         role: 'assistant', 
         content: data.message.content,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -287,7 +287,7 @@ RESPONSE RULES:
         id: Date.now() + '-fallback',
         role: 'assistant',
         content: "I'm having trouble connecting right now. Please try again in a moment!",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       
       setMessages(prev => [...prev, fallbackMessage]);
@@ -315,9 +315,9 @@ RESPONSE RULES:
   }, [sendMessage]);
 
   const quickActions = useMemo(() => [
-    "Tell me about Virgil",
-    "How do I use this app?",
-    "What can you do?"
+    'Tell me about Virgil',
+    'How do I use this app?',
+    'What can you do?',
   ], []);
 
   if (!isOpen) {
@@ -331,10 +331,10 @@ RESPONSE RULES:
         role="button"
       >
         <div className="chat-icon" aria-hidden="true">
-          <div className="chat-line"></div>
-          <div className="chat-line"></div>
+          <div className="chat-line" />
+          <div className="chat-line" />
         </div>
-        <div className="pulse-ring" aria-hidden="true"></div>
+        <div className="pulse-ring" aria-hidden="true" />
       </button>
     );
   }
@@ -382,7 +382,7 @@ RESPONSE RULES:
                   <strong>Current System Prompt:</strong>
                   <p>{createSystemPrompt()}</p>
                   {customSystemPrompt && (
-                    <small style={{color: '#ff9f43', marginTop: '8px', display: 'block'}}>
+                    <small style={{ color: '#ff9f43', marginTop: '8px', display: 'block' }}>
                       ✏️ Custom prompt active
                     </small>
                   )}
@@ -465,7 +465,7 @@ RESPONSE RULES:
                     <button 
                       className="chatbot-prompt-btn reset"
                       onClick={() => {
-                        const defaultPrompt = "You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.";
+                        const defaultPrompt = 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
                         setCustomSystemPrompt(defaultPrompt);
                       }}
                     >
@@ -485,31 +485,37 @@ RESPONSE RULES:
 
                 <div className="profile-section">
                   <div className="section-title">Chat Actions</div>
-                  <button className="profile-action" onClick={() => {
-                    if (confirm('Clear all chat messages?')) {
-                      setMessages([]);
-                      setShowProfileDropdown(false);
-                    }
-                  }}>
+                  <button
+                    className="profile-action"
+                    onClick={() => {
+                      if (confirm('Clear all chat messages?')) {
+                        setMessages([]);
+                        setShowProfileDropdown(false);
+                      }
+                    }}
+                  >
                     <span className="action-icon">🗑️</span>
                     Clear Chat History
                   </button>
-                  <button className="profile-action" onClick={() => {
-                    const chatData = {
-                      exportedAt: new Date().toISOString(),
-                      user: user?.user_metadata?.name || 'Unknown',
-                      messages: messages,
-                      totalMessages: messages.length
-                    };
-                    const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `virgil-chat-${new Date().toISOString().split('T')[0]}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    setShowProfileDropdown(false);
-                  }}>
+                  <button
+                    className="profile-action"
+                    onClick={() => {
+                      const chatData = {
+                        exportedAt: new Date().toISOString(),
+                        user: user?.user_metadata?.name || 'Unknown',
+                        messages: messages,
+                        totalMessages: messages.length,
+                      };
+                      const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `virgil-chat-${new Date().toISOString().split('T')[0]}.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      setShowProfileDropdown(false);
+                    }}
+                  >
                     <span className="action-icon">💾</span>
                     Export Chat Messages
                   </button>
@@ -622,7 +628,7 @@ RESPONSE RULES:
             disabled={isTyping}
             className="msg-input"
             aria-label="Type your message to Virgil"
-            aria-describedby={error ? "chat-error" : undefined}
+            aria-describedby={error ? 'chat-error' : undefined}
             autoComplete="off"
           />
           <button
@@ -630,7 +636,7 @@ RESPONSE RULES:
             disabled={!input.trim() || isTyping}
             className="send-btn"
             title="Send message"
-            aria-label={isTyping ? "Sending message" : "Send message"}
+            aria-label={isTyping ? 'Sending message' : 'Send message'}
           >
             {isTyping ? '•••' : '➤'}
           </button>
@@ -638,7 +644,7 @@ RESPONSE RULES:
       </form>
     </div>
   );
-})
+});
 
 export { VirgilChatbot };
 export default VirgilChatbot;

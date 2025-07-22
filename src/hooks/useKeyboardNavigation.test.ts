@@ -172,7 +172,7 @@ describe('useKeyboardNavigation', () => {
       onArrowUp,
       onArrowDown,
       onArrowLeft,
-      onArrowRight
+      onArrowRight,
     }));
     
     // Test each arrow key
@@ -227,7 +227,7 @@ describe('useKeyboardNavigation', () => {
 
   it('uses custom selector when provided', () => {
     const { result } = renderHook(() => 
-      useKeyboardNavigation({ selector: 'button' })
+      useKeyboardNavigation({ selector: 'button' }),
     );
     
     act(() => {
@@ -249,7 +249,7 @@ describe('useKeyboardNavigation', () => {
 
   it('does not navigate when disabled', () => {
     const { result } = renderHook(() => 
-      useKeyboardNavigation({ enabled: false })
+      useKeyboardNavigation({ enabled: false }),
     );
     
     act(() => {

@@ -21,6 +21,7 @@ export interface Address {
   formatted: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface IPLocation {
   ip: string;
   country?: string;
@@ -59,7 +60,7 @@ export interface LocationContextValue extends LocationState {
 }
 
 
-export type PermissionStatus = 'granted' | 'denied' | 'unknown' | 'unavailable';
+export type PermissionStatus = 'granted' | 'denied' | 'prompt' | 'unknown' | 'unavailable';
 
 export type LocationActionType = 
   | 'SET_LOADING'
@@ -69,10 +70,10 @@ export type LocationActionType =
   | 'CLEAR_ERROR';
 
 export type LocationAction =
-  | { type: 'SET_LOCATION'; payload: Coordinates }
+  | { type: 'SET_LOCATION_DATA'; payload: LocationData }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_PERMISSION'; payload: PermissionStatus }
+  | { type: 'SET_PERMISSION_STATUS'; payload: PermissionStatus }
   | { type: 'CLEAR_ERROR' };
 
 export interface GeolocationError {

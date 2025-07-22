@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import './TrafficIndicator.css'
+import React, { useState, useEffect, useCallback } from 'react';
+import './TrafficIndicator.css';
 
 interface TrafficIndicatorProps {
   map: google.maps.Map | null
@@ -12,80 +12,80 @@ type TrafficLevel = 'light' | 'moderate' | 'heavy' | 'unknown'
 export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
   map,
   isTrafficEnabled,
-  onToggleTraffic
+  onToggleTraffic,
 }) => {
-  const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>('unknown')
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>('unknown');
+  const [isAnimating, setIsAnimating] = useState(false);
   
   // Simulate traffic level detection (in a real app, this would use actual traffic data)
   useEffect(() => {
     if (!map || !isTrafficEnabled) {
-      setTrafficLevel('unknown')
-      return
+      setTrafficLevel('unknown');
+      return;
     }
     
     // In a real implementation, you would analyze traffic data from the map
     // For now, we'll simulate it based on time of day
     const updateTrafficLevel = () => {
-      const hour = new Date().getHours()
+      const hour = new Date().getHours();
       
       // Rush hour patterns
       if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {
-        setTrafficLevel('heavy')
+        setTrafficLevel('heavy');
       } else if ((hour >= 6 && hour <= 7) || (hour >= 9 && hour <= 10) || 
                  (hour >= 16 && hour <= 17) || (hour >= 19 && hour <= 20)) {
-        setTrafficLevel('moderate')
+        setTrafficLevel('moderate');
       } else if (hour >= 22 || hour <= 5) {
-        setTrafficLevel('light')
+        setTrafficLevel('light');
       } else {
-        setTrafficLevel('moderate')
+        setTrafficLevel('moderate');
       }
-    }
+    };
     
-    updateTrafficLevel()
-    const interval = setInterval(updateTrafficLevel, 300000) // Update every 5 minutes
+    updateTrafficLevel();
+    const interval = setInterval(updateTrafficLevel, 300000); // Update every 5 minutes
     
-    return () => clearInterval(interval)
-  }, [map, isTrafficEnabled])
+    return () => clearInterval(interval);
+  }, [map, isTrafficEnabled]);
   
   const handleToggle = useCallback(() => {
-    setIsAnimating(true)
-    onToggleTraffic(!isTrafficEnabled)
+    setIsAnimating(true);
+    onToggleTraffic(!isTrafficEnabled);
     
     setTimeout(() => {
-      setIsAnimating(false)
-    }, 300)
-  }, [isTrafficEnabled, onToggleTraffic])
+      setIsAnimating(false);
+    }, 300);
+  }, [isTrafficEnabled, onToggleTraffic]);
   
   const getTrafficColor = () => {
-    if (!isTrafficEnabled) return '#999'
+    if (!isTrafficEnabled) return '#999';
     
     switch (trafficLevel) {
       case 'light':
-        return '#4CAF50'
+        return '#4CAF50';
       case 'moderate':
-        return '#FFA726'
+        return '#FFA726';
       case 'heavy':
-        return '#F44336'
+        return '#F44336';
       default:
-        return '#999'
+        return '#999';
     }
-  }
+  };
   
   const getTrafficLabel = () => {
-    if (!isTrafficEnabled) return 'Traffic Off'
+    if (!isTrafficEnabled) return 'Traffic Off';
     
     switch (trafficLevel) {
       case 'light':
-        return 'Light Traffic'
+        return 'Light Traffic';
       case 'moderate':
-        return 'Moderate Traffic'
+        return 'Moderate Traffic';
       case 'heavy':
-        return 'Heavy Traffic'
+        return 'Heavy Traffic';
       default:
-        return 'Traffic'
+        return 'Traffic';
     }
-  }
+  };
   
   const getTrafficIcon = () => {
     if (isTrafficEnabled) {
@@ -106,7 +106,7 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
             className="traffic-pulse"
           />
         </svg>
-      )
+      );
     } else {
       return (
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -124,9 +124,9 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
             strokeLinecap="round"
           />
         </svg>
-      )
+      );
     }
-  }
+  };
 
   return (
     <button
@@ -143,5 +143,5 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
       </div>
       <span className="traffic-label">{getTrafficLabel()}</span>
     </button>
-  )
-}
+  );
+};

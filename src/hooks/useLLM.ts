@@ -35,7 +35,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
 
       const response = await service.current.complete({
         ...config,
-        ...options
+        ...options,
       });
 
       return response;
@@ -64,7 +64,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
     try {
       const stream = service.current.completeStream({
         ...config,
-        ...options
+        ...options,
       });
 
       for await (const chunk of stream) {
@@ -97,6 +97,6 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
     loading,
     streaming,
     error,
-    isReady: !loading && !streaming
+    isReady: !loading && !streaming,
   };
 }

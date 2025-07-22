@@ -16,7 +16,7 @@ jest.mock('./circle/DrawPerfectCircle', () => ({
         <button>Show grid</button>
       </div>
     );
-  }
+  },
 }));
 
 describe('CircleGameButton', () => {

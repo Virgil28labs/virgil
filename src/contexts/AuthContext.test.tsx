@@ -34,13 +34,13 @@ describe('AuthContext', () => {
   it('provides initial loading state', () => {
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: null },
-      error: null
+      error: null,
     });
 
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     // Initial state is loading
@@ -50,23 +50,23 @@ describe('AuthContext', () => {
   it('loads user session on mount', async () => {
     const mockUser = {
       id: 'test-id',
-      email: 'test@example.com'
+      email: 'test@example.com',
     };
 
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { 
         session: {
           user: mockUser,
-          access_token: 'test-token'
-        }
+          access_token: 'test-token',
+        },
       },
-      error: null
+      error: null,
     });
 
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -83,7 +83,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -103,21 +103,21 @@ describe('AuthContext', () => {
       return {
         data: {
           subscription: {
-            unsubscribe: unsubscribeMock
-          }
-        }
+            unsubscribe: unsubscribeMock,
+          },
+        },
       };
     });
 
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: null },
-      error: null
+      error: null,
     });
 
     const { unmount } = render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -127,13 +127,13 @@ describe('AuthContext', () => {
     // Simulate auth state change
     const newUser = {
       id: 'new-user',
-      email: 'new@example.com'
+      email: 'new@example.com',
     };
 
     act(() => {
       mockCallback('SIGNED_IN', {
         user: newUser,
-        access_token: 'new-token'
+        access_token: 'new-token',
       });
     });
 
@@ -148,17 +148,17 @@ describe('AuthContext', () => {
   it('handles sign out', async () => {
     const mockUser = {
       id: 'test-id',
-      email: 'test@example.com'
+      email: 'test@example.com',
     };
 
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { 
         session: {
           user: mockUser,
-          access_token: 'test-token'
-        }
+          access_token: 'test-token',
+        },
       },
-      error: null
+      error: null,
     });
 
     (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
@@ -166,7 +166,7 @@ describe('AuthContext', () => {
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -187,13 +187,13 @@ describe('AuthContext', () => {
   it('handles null session correctly', async () => {
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: null },
-      error: null
+      error: null,
     });
 
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>
+      </AuthProvider>,
     );
 
     await waitFor(() => {

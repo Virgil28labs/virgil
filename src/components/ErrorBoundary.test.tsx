@@ -29,7 +29,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <div>Test content</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Test content')).toBeInTheDocument();
@@ -39,8 +39,8 @@ describe('ErrorBoundary', () => {
   it('catches errors and displays error UI', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -53,8 +53,8 @@ describe('ErrorBoundary', () => {
 
     render(
       <ErrorBoundary fallback={customFallback}>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Custom error message')).toBeInTheDocument();
@@ -64,8 +64,8 @@ describe('ErrorBoundary', () => {
   it('logs error to console in development', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
 
     expect(console.error).toHaveBeenCalled();
@@ -76,8 +76,8 @@ describe('ErrorBoundary', () => {
   it('allows manual reset via Try Again button', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
 
     // Error should be displayed
@@ -104,7 +104,7 @@ describe('ErrorBoundary', () => {
     const { rerender } = render(
       <ErrorBoundary>
         <FirstError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -113,7 +113,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary>
         <SecondError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Should still show error UI
@@ -123,8 +123,8 @@ describe('ErrorBoundary', () => {
   it('provides proper error structure in fallback', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
 
     // The error boundary doesn't have a specific class, just check the structure
@@ -149,7 +149,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <AsyncError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // The component renders normally
@@ -171,7 +171,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <TestComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();

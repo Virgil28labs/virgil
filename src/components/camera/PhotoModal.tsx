@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import type { PhotoModalProps } from '../../types/camera.types'
-import { PhotoActions } from './PhotoActions'
+import React, { useState, useCallback, useEffect } from 'react';
+import type { PhotoModalProps } from '../../types/camera.types';
+import { PhotoActions } from './PhotoActions';
 
 export const PhotoModal: React.FC<PhotoModalProps> = ({
   photo,
@@ -10,88 +10,88 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   onPrevious,
   onFavoriteToggle,
   onDelete,
-  onShare
+  onShare,
 }) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
-  const [showActions, setShowActions] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
   // Reset image state when photo changes
   useEffect(() => {
-    setImageLoaded(false)
-    setImageError(false)
-  }, [photo?.id])
+    setImageLoaded(false);
+    setImageError(false);
+  }, [photo?.id]);
 
   // Keyboard navigation
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onClose()
-          break
+          onClose();
+          break;
         case 'ArrowLeft':
-          onPrevious?.()
-          break
+          onPrevious?.();
+          break;
         case 'ArrowRight':
-          onNext?.()
-          break
+          onNext?.();
+          break;
         case ' ':
-          e.preventDefault()
-          setShowActions(prev => !prev)
-          break
+          e.preventDefault();
+          setShowActions(prev => !prev);
+          break;
         case 'f':
           if (photo && onFavoriteToggle) {
-            onFavoriteToggle(photo.id)
+            onFavoriteToggle(photo.id);
           }
-          break
+          break;
         case 'Delete':
           if (photo && onDelete) {
-            onDelete(photo.id)
+            onDelete(photo.id);
           }
-          break
+          break;
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [isOpen, photo, onClose, onNext, onPrevious, onFavoriteToggle, onDelete])
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isOpen, photo, onClose, onNext, onPrevious, onFavoriteToggle, onDelete]);
 
   const handleImageLoad = useCallback(() => {
-    setImageLoaded(true)
-  }, [])
+    setImageLoaded(true);
+  }, []);
 
   const handleImageError = useCallback(() => {
-    setImageError(true)
-  }, [])
+    setImageError(true);
+  }, []);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose()
+      onClose();
     }
-  }, [onClose])
+  }, [onClose]);
 
   const handleFavoriteToggle = useCallback(() => {
     if (photo && onFavoriteToggle) {
-      onFavoriteToggle(photo.id)
+      onFavoriteToggle(photo.id);
     }
-  }, [photo, onFavoriteToggle])
+  }, [photo, onFavoriteToggle]);
 
   const handleDelete = useCallback(() => {
     if (photo && onDelete) {
-      onDelete(photo.id)
+      onDelete(photo.id);
     }
-  }, [photo, onDelete])
+  }, [photo, onDelete]);
 
   const handleShare = useCallback(() => {
     if (photo && onShare) {
-      onShare(photo.id)
+      onShare(photo.id);
     }
-  }, [photo, onShare])
+  }, [photo, onShare]);
 
   if (!isOpen || !photo) {
-    return null
+    return null;
   }
 
   return (
@@ -250,5 +250,5 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

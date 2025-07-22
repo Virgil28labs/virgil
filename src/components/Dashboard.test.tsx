@@ -3,7 +3,7 @@ import { Dashboard } from './Dashboard';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
-import { PermissionStatus } from '../types/location.types';
+import type { PermissionStatus } from '../types/location.types';
 
 // Mock contexts
 jest.mock('../contexts/AuthContext');
@@ -14,19 +14,19 @@ jest.mock('../hooks/useKeyboardNavigation');
 jest.mock('./LazyComponents', () => ({
   LazyRaccoonMascot: () => <div data-testid="raccoon-mascot">Raccoon Mascot</div>,
   LazyWeather: () => <div data-testid="weather">Weather</div>,
-  LazyUserProfileViewer: () => <div data-testid="user-profile-viewer">User Profile Viewer</div>
+  LazyUserProfileViewer: () => <div data-testid="user-profile-viewer">User Profile Viewer</div>,
 }));
 jest.mock('./DogEmojiButton', () => ({
-  DogEmojiButton: () => <button data-testid="dog-emoji-button">🐕</button>
+  DogEmojiButton: () => <button data-testid="dog-emoji-button">🐕</button>,
 }));
 jest.mock('./VirgilTextLogo', () => ({
-  VirgilTextLogo: () => <div data-testid="virgil-logo">Virgil Logo</div>
+  VirgilTextLogo: () => <div data-testid="virgil-logo">Virgil Logo</div>,
 }));
 jest.mock('./DateTime', () => ({
-  DateTime: () => <div data-testid="datetime">DateTime</div>
+  DateTime: () => <div data-testid="datetime">DateTime</div>,
 }));
 jest.mock('./LoadingFallback', () => ({
-  LoadingFallback: () => <div data-testid="loading-fallback">Loading...</div>
+  LoadingFallback: () => <div data-testid="loading-fallback">Loading...</div>,
 }));
 
 const mockSignOut = jest.fn();
@@ -40,14 +40,14 @@ const mockUser = {
   app_metadata: {},
   user_metadata: {},
   aud: 'authenticated',
-  created_at: '2024-01-01T00:00:00Z'
+  created_at: '2024-01-01T00:00:00Z',
 };
 
 const mockAuthValue = {
   user: mockUser,
   loading: false,
   signOut: mockSignOut,
-  refreshUser: jest.fn()
+  refreshUser: jest.fn(),
 };
 
 const mockLocationValue = {
@@ -58,14 +58,14 @@ const mockLocationValue = {
     city: 'New York',
     postcode: '10001',
     country: 'USA',
-    formatted: '123 Main St, New York, NY 10001, USA'
+    formatted: '123 Main St, New York, NY 10001, USA',
   },
   ipLocation: {
     ip: '192.168.1.1',
     city: 'New York',
     region: 'NY',
     country: 'US',
-    timezone: 'America/New_York'
+    timezone: 'America/New_York',
   },
   loading: false,
   error: null,
@@ -77,7 +77,7 @@ const mockLocationValue = {
   hasGPSLocation: true,
   hasIPLocation: true,
   initialized: true,
-  clearError: jest.fn()
+  clearError: jest.fn(),
 };
 
 describe('Dashboard', () => {
@@ -89,7 +89,7 @@ describe('Dashboard', () => {
       focusLast: jest.fn(),
       focusNext: jest.fn(),
       focusPrevious: jest.fn(),
-      focusElement: jest.fn()
+      focusElement: jest.fn(),
     });
     mockUseAuth.mockReturnValue(mockAuthValue);
     mockUseLocation.mockReturnValue(mockLocationValue);
@@ -129,7 +129,7 @@ describe('Dashboard', () => {
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
       hasIPLocation: false,
-      initialized: false
+      initialized: false,
     });
     
     render(<Dashboard />);
@@ -171,7 +171,7 @@ describe('Dashboard', () => {
     
     expect(mockUseKeyboardNavigation).toHaveBeenCalledWith({
       enabled: true,
-      onEscape: expect.any(Function)
+      onEscape: expect.any(Function),
     });
   });
 
@@ -197,7 +197,7 @@ describe('Dashboard', () => {
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
       hasIPLocation: true,
-      initialized: true
+      initialized: true,
     });
     
     render(<Dashboard />);
@@ -216,7 +216,7 @@ describe('Dashboard', () => {
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
       hasIPLocation: true,
-      initialized: true
+      initialized: true,
     });
     
     render(<Dashboard />);

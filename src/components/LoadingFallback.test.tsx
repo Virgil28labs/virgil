@@ -67,7 +67,7 @@ describe('LoadingFallback', () => {
         size="large" 
         variant="spinner" 
         message="Loading large content..."
-      />
+      />,
     );
     
     const fallback = container.querySelector('.loading-fallback');
@@ -101,7 +101,7 @@ describe('LoadingFallback', () => {
 
     combinations.forEach(({ size, variant }) => {
       const { container } = render(
-        <LoadingFallback size={size} variant={variant} />
+        <LoadingFallback size={size} variant={variant} />,
       );
       
       const fallback = container.querySelector('.loading-fallback');

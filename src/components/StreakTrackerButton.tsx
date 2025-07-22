@@ -3,12 +3,12 @@ import { EmojiButton } from './common/EmojiButton';
 
 const MinimalHabitTracker = lazy(() => 
   import('./streak/MinimalHabitTracker').then(module => ({ 
-    default: module.MinimalHabitTracker 
-  }))
+    default: module.MinimalHabitTracker, 
+  })),
 );
 
 const HabitTrackerWrapper = ({ onClose }: { onClose: () => void }) => (
-  <MinimalHabitTracker isOpen={true} onClose={onClose} />
+  <MinimalHabitTracker isOpen onClose={onClose} />
 );
 
 export const StreakTrackerButton = () => (
@@ -21,7 +21,7 @@ export const StreakTrackerButton = () => (
     hoverColor={{
       background: 'linear-gradient(135deg, rgba(108, 59, 170, 0.3) 0%, rgba(90, 50, 140, 0.3) 100%)',
       border: 'rgba(108, 59, 170, 0.6)',
-      glow: 'rgba(108, 59, 170, 0.4)'
+      glow: 'rgba(108, 59, 170, 0.4)',
     }}
     title="Habit Streaks - Track up to 10 habits and build fire streaks!"
     className="opacity-80 hover:opacity-100"

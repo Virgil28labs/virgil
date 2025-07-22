@@ -4,7 +4,6 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { WeatherProvider, useWeather } from './WeatherContext';
 import { LocationContext } from './LocationContext';
 import { weatherService } from '../lib/weatherService';
-import type { LocationContextType } from '../types/location.types';
 import type { WeatherData } from '../types/weather.types';
 
 // Mock the weather service completely
@@ -16,8 +15,8 @@ jest.mock('../lib/weatherService', () => ({
     getForecastByCity: jest.fn(),
     convertTemperature: jest.fn((temp: number, toCelsius: boolean) => {
       return toCelsius ? Math.round((temp - 32) * 5/9) : temp;
-    })
-  }
+    }),
+  },
 }));
 
 const mockWeatherService = weatherService as jest.Mocked<typeof weatherService>;
@@ -38,17 +37,17 @@ const mockWeatherData: WeatherData = {
     id: 800,
     main: 'Clear',
     description: 'clear sky',
-    icon: '01d'
+    icon: '01d',
   },
   sunrise: 1643000000,
   sunset: 1643040000,
   timezone: -28800,
   cityName: 'New York',
   country: 'US',
-  timestamp: Date.now()
+  timestamp: Date.now(),
 };
 
-const mockLocationContext: LocationContextType = {
+const mockLocationContext: LocationContextValue = {
   coordinates: { latitude: 40.7128, longitude: -74.0060 },
   address: null,
   ipLocation: { city: 'New York', region: 'NY', country: 'US', timezone: 'America/New_York' },
@@ -58,13 +57,13 @@ const mockLocationContext: LocationContextType = {
   lastUpdated: Date.now(),
   hasLocation: true,
   refresh: jest.fn(),
-  clearError: jest.fn()
+  clearError: jest.fn(),
 };
 
 // Wrapper component for the hook
 const wrapper = ({ children, locationValue = mockLocationContext }: { 
   children: React.ReactNode;
-  locationValue?: LocationContextType;
+  locationValue?: LocationContextValue;
 }) => (
   <LocationContext.Provider value={locationValue}>
     <WeatherProvider>{children}</WeatherProvider>
@@ -97,22 +96,22 @@ describe('WeatherContext', () => {
     };
     
     expect(() => render(<TestComponent />)).toThrow(
-      'useWeather must be used within a WeatherProvider'
+      'useWeather must be used within a WeatherProvider',
     );
     
     consoleSpy.mockRestore();
   });
 
   it('provides initial state', async () => {
-    const noLocationContext: LocationContextType = {
+    const noLocationContext: LocationContextValue = {
       ...mockLocationContext,
       coordinates: null,
       ipLocation: null,
-      hasLocation: false
+      hasLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {
-      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext })
+      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext }),
     });
     
     expect(result.current.data).toBeNull();
@@ -138,15 +137,15 @@ describe('WeatherContext', () => {
   });
 
   it('does not fetch weather when location is not available', async () => {
-    const noLocationContext: LocationContextType = {
+    const noLocationContext: LocationContextValue = {
       ...mockLocationContext,
       coordinates: null,
       ipLocation: null,
-      hasLocation: false
+      hasLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {
-      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext })
+      wrapper: ({ children }) => wrapper({ children, locationValue: noLocationContext }),
     });
     
     // Advance timers to ensure no fetch happens
@@ -161,10 +160,10 @@ describe('WeatherContext', () => {
 
   it('handles weather fetch errors', async () => {
     mockWeatherService.getWeatherByCoordinates.mockRejectedValue(
-      new Error('Weather API error')
+      new Error('Weather API error'),
     );
     mockWeatherService.getForecastByCoordinates.mockRejectedValue(
-      new Error('Forecast API error')
+      new Error('Forecast API error'),
     );
     
     const { result } = renderHook(() => useWeather(), { wrapper });
@@ -198,10 +197,10 @@ describe('WeatherContext', () => {
 
   it('clears error when clearError is called', async () => {
     mockWeatherService.getWeatherByCoordinates.mockRejectedValue(
-      new Error('Weather API error')
+      new Error('Weather API error'),
     );
     mockWeatherService.getForecastByCoordinates.mockRejectedValue(
-      new Error('Forecast API error')
+      new Error('Forecast API error'),
     );
     
     const { result } = renderHook(() => useWeather(), { wrapper });

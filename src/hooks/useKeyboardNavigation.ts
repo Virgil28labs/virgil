@@ -127,10 +127,10 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
     if (!enabled) return;
 
     const container = containerRef.current || document;
-    container.addEventListener('keydown', handleKeyDown);
+    container.addEventListener('keydown', handleKeyDown as EventListener);
 
     return () => {
-      container.removeEventListener('keydown', handleKeyDown);
+      container.removeEventListener('keydown', handleKeyDown as EventListener);
     };
   }, [enabled, handleKeyDown]);
 
@@ -163,6 +163,6 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
     focusLast,
     focusNext,
     focusPrevious,
-    focusElement
+    focusElement,
   };
 }

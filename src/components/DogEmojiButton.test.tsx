@@ -17,7 +17,7 @@ jest.mock('./dog/DogGallery', () => ({
         </div>
       </div>
     );
-  }
+  },
 }));
 
 describe('DogEmojiButton', () => {
@@ -150,7 +150,7 @@ describe('DogEmojiButton', () => {
       position: 'fixed',
       cursor: 'pointer',
       borderRadius: '50%',
-      fontSize: '1.2rem'
+      fontSize: '1.2rem',
     });
   });
 

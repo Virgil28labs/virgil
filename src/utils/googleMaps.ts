@@ -43,7 +43,7 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
         loading: 'async',
         callback: '__googleMapsCallback',
         ...(options.language && { language: options.language }),
-        ...(options.region && { region: options.region })
+        ...(options.region && { region: options.region }),
       });
 
       // Create global callback
@@ -90,7 +90,7 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
  */
 export function createLocationMarker(
   position: google.maps.LatLngLiteral,
-  map: google.maps.Map
+  map: google.maps.Map,
 ): google.maps.Marker {
   return new google.maps.Marker({
     position,
@@ -104,7 +104,7 @@ export function createLocationMarker(
       fillOpacity: 0.9,
       strokeColor: '#b2a5c1',
       strokeWeight: 3,
-    }
+    },
   });
 }
 
@@ -118,11 +118,11 @@ export function createLocationMarker(
 export function createInfoWindow(
   content: string,
   marker: google.maps.Marker,
-  map: google.maps.Map
+  map: google.maps.Map,
 ): google.maps.InfoWindow {
   const infoWindow = new google.maps.InfoWindow({
     content,
-    maxWidth: 300
+    maxWidth: 300,
   });
 
   marker.addListener('click', () => {
@@ -141,7 +141,7 @@ export function createInfoWindow(
 export function animateToPosition(
   map: google.maps.Map,
   position: google.maps.LatLngLiteral,
-  zoom?: number
+  zoom?: number,
 ): void {
   map.panTo(position);
   if (zoom !== undefined) {
@@ -155,7 +155,7 @@ export function animateToPosition(
  * @returns Promise that resolves with availability status
  */
 export async function checkStreetViewAvailability(
-  position: google.maps.LatLngLiteral
+  position: google.maps.LatLngLiteral,
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const streetViewService = new google.maps.StreetViewService();
@@ -167,7 +167,7 @@ export async function checkStreetViewAvailability(
       },
       (_, status) => {
         resolve(status === google.maps.StreetViewStatus.OK);
-      }
+      },
     );
   });
 }

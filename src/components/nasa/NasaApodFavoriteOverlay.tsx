@@ -1,5 +1,5 @@
-import { memo } from 'react'
-import { stopEvent } from './utils/nasaImageUtils'
+import { memo } from 'react';
+import { stopEvent } from './utils/nasaImageUtils';
 
 interface NasaApodFavoriteOverlayProps {
   isFavorited: boolean
@@ -8,12 +8,12 @@ interface NasaApodFavoriteOverlayProps {
 
 export const NasaApodFavoriteOverlay = memo(function NasaApodFavoriteOverlay({
   isFavorited,
-  onFavoriteToggle
+  onFavoriteToggle,
 }: NasaApodFavoriteOverlayProps) {
   const handleClick = (e: React.MouseEvent) => {
-    stopEvent(e)
-    onFavoriteToggle()
-  }
+    stopEvent(e);
+    onFavoriteToggle();
+  };
 
   return (
     <button
@@ -24,5 +24,5 @@ export const NasaApodFavoriteOverlay = memo(function NasaApodFavoriteOverlay({
     >
       {isFavorited ? '❤️' : '🤍'}
     </button>
-  )
-})
+  );
+});

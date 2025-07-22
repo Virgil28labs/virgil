@@ -2,15 +2,16 @@
  * Supabase client configuration for Virgil
  * Handles authentication and database operations
  */
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import type { User } from '../types/auth.types'
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import type { User } from '../types/auth.types';
 
-const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables')
-  throw new Error('Missing Supabase environment variables')
+  console.error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables');
 }
 
 // Create typed Supabase client with auth configuration
@@ -19,9 +20,9 @@ export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKe
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
-  }
-})
+    flowType: 'pkce',
+  },
+});
 
 // Type-safe helpers
 export type SupabaseUser = User

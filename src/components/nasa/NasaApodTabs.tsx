@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo } from 'react';
 
 export type NasaTabType = 'browse' | 'gallery'
 
@@ -11,7 +11,7 @@ interface NasaApodTabsProps {
 export const NasaApodTabs = memo(function NasaApodTabs({
   activeTab,
   favoritesCount,
-  onTabChange
+  onTabChange,
 }: NasaApodTabsProps) {
   return (
     <div className="nasa-apod-tabs" role="tablist">
@@ -40,5 +40,5 @@ export const NasaApodTabs = memo(function NasaApodTabs({
         </span>
       </button>
     </div>
-  )
-})
+  );
+});

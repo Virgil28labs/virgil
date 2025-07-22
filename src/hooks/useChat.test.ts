@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useChat } from './useChat';
 import { useLLM } from './useLLM';
-import type { ChatMessage, ConversationSummary } from '../types/chat.types';
+import type { ChatMessage } from '../types/chat.types';
 import type { LLMResponse } from '../types/llm.types';
 
 // Mock useLLM hook
@@ -13,17 +13,17 @@ const mockLLMResponse: LLMResponse = {
   content: 'Hello! How can I help you today?',
   model: 'gpt-4',
   usage: {
-    promptTokens: 10,
-    completionTokens: 8,
-    totalTokens: 18
-  }
+    prompt_tokens: 10,
+    completion_tokens: 8,
+    total_tokens: 18,
+  },
 };
 
 const mockStreamChunks = [
   { content: 'Hello! ' },
   { content: 'How can ' },
   { content: 'I help ' },
-  { content: 'you today?' }
+  { content: 'you today?' },
 ];
 
 describe('useChat', () => {
@@ -43,7 +43,7 @@ describe('useChat', () => {
       completeStream: mockCompleteStream,
       loading: false,
       error: null,
-      clearError: mockClearError
+      clearError: mockClearError,
     });
   });
 
@@ -95,10 +95,8 @@ describe('useChat', () => {
       // Check that result.current is not null before proceeding
       expect(result.current).not.toBeNull();
       
-      let response: ChatMessage | null;
-      
       await act(async () => {
-        response = await result.current.sendMessage('Hello, AI!');
+        await result.current.sendMessage('Hello, AI!');
       });
       
       expect(result.current.messages).toHaveLength(2);
@@ -111,11 +109,11 @@ describe('useChat', () => {
         messages: expect.arrayContaining([
           expect.objectContaining({
             role: 'user',
-            content: 'Hello, AI!'
-          })
+            content: 'Hello, AI!',
+          }),
         ]),
         systemPrompt: undefined,
-        cacheKey: undefined
+        cacheKey: undefined,
       });
     });
 
@@ -132,8 +130,8 @@ describe('useChat', () => {
       
       expect(mockComplete).toHaveBeenCalledWith(
         expect.objectContaining({
-          systemPrompt
-        })
+          systemPrompt,
+        }),
       );
     });
 
@@ -147,7 +145,7 @@ describe('useChat', () => {
         await result.current.sendMessage('Hello!', {
           model: 'gpt-4',
           temperature: 0.5,
-          enableCache: true
+          enableCache: true,
         });
       });
       
@@ -155,8 +153,8 @@ describe('useChat', () => {
         expect.objectContaining({
           model: 'gpt-4',
           temperature: 0.5,
-          cacheKey: 'chat-1'
-        })
+          cacheKey: 'chat-1',
+        }),
       );
     });
 
@@ -169,7 +167,7 @@ describe('useChat', () => {
       await expect(
         act(async () => {
           await result.current.sendMessage('   ');
-        })
+        }),
       ).rejects.toThrow('Message content cannot be empty');
     });
 
@@ -185,7 +183,7 @@ describe('useChat', () => {
       await expect(
         act(async () => {
           await result.current.sendMessage('Hello!');
-        })
+        }),
       ).rejects.toThrow('API Error');
       
       // Should add error message to conversation
@@ -221,7 +219,7 @@ describe('useChat', () => {
           for (const chunk of mockStreamChunks) {
             yield chunk;
           }
-        }
+        },
       });
     });
 
@@ -293,7 +291,7 @@ describe('useChat', () => {
         [Symbol.asyncIterator]: async function* () {
           yield { content: 'Hello' };
           throw error;
-        }
+        },
       });
       
       const { result } = renderHook(() => useChat());
@@ -343,9 +341,9 @@ describe('useChat', () => {
       // Check that result.current is not null before proceeding
       expect(result.current).not.toBeNull();
       
-      let message1: ChatMessage;
-      let message2: ChatMessage;
-      let message3: ChatMessage;
+      let message1!: ChatMessage;
+      let message2!: ChatMessage;
+      let message3!: ChatMessage;
       
       act(() => {
         message1 = result.current.addMessage('user', 'Message 1');
@@ -365,7 +363,7 @@ describe('useChat', () => {
     it('updates a message', () => {
       const { result } = renderHook(() => useChat());
       
-      let message: ChatMessage;
+      let message!: ChatMessage;
       
       act(() => {
         message = result.current.addMessage('user', 'Original content');
@@ -374,12 +372,10 @@ describe('useChat', () => {
       act(() => {
         result.current.updateMessage(message.id, {
           content: 'Updated content',
-          edited: true
         });
       });
       
       expect(result.current.messages[0].content).toBe('Updated content');
-      expect(result.current.messages[0].edited).toBe(true);
       expect(result.current.messages[0].role).toBe('user'); // Other properties unchanged
     });
   });
@@ -398,7 +394,7 @@ describe('useChat', () => {
       
       mockComplete.mockResolvedValue({
         ...mockLLMResponse,
-        content: 'Regenerated response'
+        content: 'Regenerated response',
       });
       
       await act(async () => {
@@ -410,9 +406,9 @@ describe('useChat', () => {
       expect(mockComplete).toHaveBeenCalledWith(
         expect.objectContaining({
           messages: expect.arrayContaining([
-            expect.objectContaining({ content: 'Second message' })
-          ])
-        })
+            expect.objectContaining({ content: 'Second message' }),
+          ]),
+        }),
       );
     });
 
@@ -426,7 +422,7 @@ describe('useChat', () => {
       await expect(
         act(async () => {
           await result.current.regenerateLastResponse();
-        })
+        }),
       ).rejects.toThrow('No user message found to regenerate from');
     });
 
@@ -531,7 +527,7 @@ describe('useChat', () => {
         result.current.addMessage('user', 'Hello');
       });
       
-      const data = result.current.exportConversation('raw');
+      const data = result.current.exportConversation('json');
       
       expect(typeof data).toBe('object');
       expect(data).toHaveProperty('messages');
@@ -544,8 +540,8 @@ describe('useChat', () => {
       const exportData = {
         messages: [
           { id: '1', role: 'user', content: 'Loaded message', timestamp: new Date().toISOString() },
-          { id: '2', role: 'assistant', content: 'Loaded response', timestamp: new Date().toISOString() }
-        ]
+          { id: '2', role: 'assistant', content: 'Loaded response', timestamp: new Date().toISOString() },
+        ],
       };
       
       const success = result.current.loadConversation(JSON.stringify(exportData));
@@ -561,10 +557,17 @@ describe('useChat', () => {
       
       const exportData = {
         messages: [
-          { id: '1', role: 'user', content: 'Loaded message', timestamp: new Date().toISOString() }
+          { id: '1', role: 'user', content: 'Loaded message', timestamp: new Date().toISOString() },
         ],
         systemPrompt: 'Test prompt',
-        exportedAt: new Date().toISOString()
+        exportedAt: new Date().toISOString(),
+        summary: {
+          userMessages: 1,
+          assistantMessages: 0,
+          totalMessages: 1,
+          lastMessage: { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: new Date().toISOString() },
+          conversationStarted: new Date().toISOString(),
+        },
       };
       
       const success = result.current.loadConversation(exportData);
@@ -594,7 +597,7 @@ describe('useChat', () => {
         completeStream: mockCompleteStream,
         loading: false,
         error: { message: 'Test error' },
-        clearError: mockClearError
+        clearError: mockClearError,
       });
       
       const { result } = renderHook(() => useChat());
@@ -626,7 +629,7 @@ describe('useChat', () => {
         completeStream: mockCompleteStream,
         loading: true,
         error: null,
-        clearError: mockClearError
+        clearError: mockClearError,
       });
       
       const { result } = renderHook(() => useChat());

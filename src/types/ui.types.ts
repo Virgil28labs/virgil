@@ -3,7 +3,7 @@
  * Common UI patterns and component props
  */
 
-import { type ReactNode } from 'react'
+import { type ReactNode } from 'react';
 
 export interface BaseComponentProps {
   className?: string;

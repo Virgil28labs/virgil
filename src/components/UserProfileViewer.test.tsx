@@ -22,34 +22,40 @@ const mockUser = {
   created_at: '2024-01-15T12:00:00Z', // Use mid-month, mid-day to avoid timezone edge cases
   user_metadata: {
     name: 'Test User',
-    avatarUrl: 'https://example.com/avatar.jpg'
-  }
+    avatarUrl: 'https://example.com/avatar.jpg',
+  },
 };
 
 const mockLocationData = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060 },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
   address: {
     street: '123 Main St',
+    house_number: '123',
     city: 'New York',
-    state: 'NY',
+    postcode: '10001',
     country: 'USA',
-    postalCode: '10001',
-    formatted: '123 Main St, New York, NY 10001, USA'
+    formatted: '123 Main St, New York, NY 10001, USA',
   },
   ipLocation: {
+    ip: '192.168.1.1',
     city: 'New York',
     region: 'NY',
     country: 'US',
-    timezone: 'America/New_York'
+    lat: 40.7128,
+    lon: -74.0060,
+    timezone: 'America/New_York',
   },
   loading: false,
   error: null,
-  permissionStatus: 'granted' as PermissionState,
+  permissionStatus: 'granted' as const,
   lastUpdated: Date.now(),
   hasLocation: true,
   hasGPSLocation: true,
-  refresh: jest.fn(),
-  clearError: jest.fn()
+  hasIPLocation: true,
+  initialized: true,
+  fetchLocationData: jest.fn(),
+  requestLocationPermission: jest.fn(),
+  clearError: jest.fn(),
 };
 
 const mockWeatherData = {
@@ -67,14 +73,14 @@ const mockWeatherData = {
     id: 800,
     main: 'Clear',
     description: 'clear sky',
-    icon: '01d'
+    icon: '01d',
   },
   sunrise: 1643000000,
   sunset: 1643040000,
   timezone: -28800,
   cityName: 'New York',
   country: 'US',
-  timestamp: Date.now()
+  timestamp: Date.now(),
 };
 
 const mockSignOut = jest.fn();
@@ -83,8 +89,8 @@ const mockOnClose = jest.fn();
 // Mock clipboard API
 Object.assign(navigator, {
   clipboard: {
-    writeText: jest.fn()
-  }
+    writeText: jest.fn(),
+  },
 });
 
 describe('UserProfileViewer', () => {
@@ -95,13 +101,14 @@ describe('UserProfileViewer', () => {
       user: mockUser,
       loading: false,
       signOut: mockSignOut,
-      refreshUser: jest.fn()
+      refreshUser: jest.fn(),
     });
     
     mockUseLocation.mockReturnValue(mockLocationData);
     
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -109,7 +116,7 @@ describe('UserProfileViewer', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
     
     mockUseKeyboardNavigation.mockReturnValue({
@@ -118,7 +125,7 @@ describe('UserProfileViewer', () => {
       focusLast: jest.fn(),
       focusNext: jest.fn(),
       focusPrevious: jest.fn(),
-      focusElement: jest.fn()
+      focusElement: jest.fn(),
     });
   });
 
@@ -129,7 +136,7 @@ describe('UserProfileViewer', () => {
   });
 
   it('renders user profile when open', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByRole('dialog', { name: /user profile/i })).toBeInTheDocument();
     expect(screen.getByText('Test User')).toBeInTheDocument();
@@ -137,13 +144,13 @@ describe('UserProfileViewer', () => {
   });
 
   it('displays member since date', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('Member since Jan 15, 2024')).toBeInTheDocument();
   });
 
   it('displays avatar when available', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     const avatar = screen.getByAltText('Profile avatar');
     expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
@@ -154,10 +161,10 @@ describe('UserProfileViewer', () => {
       user: { ...mockUser, user_metadata: { ...mockUser.user_metadata, avatarUrl: '' } },
       loading: false,
       signOut: mockSignOut,
-      refreshUser: jest.fn()
+      refreshUser: jest.fn(),
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('T')).toBeInTheDocument();
   });
@@ -167,16 +174,16 @@ describe('UserProfileViewer', () => {
       user: { ...mockUser, user_metadata: {} },
       loading: false,
       signOut: mockSignOut,
-      refreshUser: jest.fn()
+      refreshUser: jest.fn(),
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('👤')).toBeInTheDocument();
   });
 
   it('displays GPS location when available', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('GPS Location Available')).toBeInTheDocument();
   });
@@ -184,10 +191,10 @@ describe('UserProfileViewer', () => {
   it('displays address when no GPS but address available', () => {
     mockUseLocation.mockReturnValue({
       ...mockLocationData,
-      hasGPSLocation: false
+      hasGPSLocation: false,
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('New York, USA')).toBeInTheDocument();
   });
@@ -196,16 +203,16 @@ describe('UserProfileViewer', () => {
     mockUseLocation.mockReturnValue({
       ...mockLocationData,
       hasGPSLocation: false,
-      address: null
+      address: null,
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('New York, US')).toBeInTheDocument();
   });
 
   it('displays weather information when available', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('72°F - clear sky')).toBeInTheDocument();
   });
@@ -213,6 +220,7 @@ describe('UserProfileViewer', () => {
   it('displays weather in celsius when unit is celsius', () => {
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'celsius',
@@ -220,16 +228,16 @@ describe('UserProfileViewer', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('72°C - clear sky')).toBeInTheDocument();
   });
 
   it('handles sign out button click', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     const signOutButton = screen.getByRole('button', { name: /sign out/i });
     fireEvent.click(signOutButton);
@@ -238,7 +246,7 @@ describe('UserProfileViewer', () => {
   });
 
   it('copies profile data to clipboard', async () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     const copyButton = screen.getByRole('button', { name: /copy profile data/i });
     fireEvent.click(copyButton);
@@ -249,13 +257,13 @@ describe('UserProfileViewer', () => {
         email: 'test@example.com',
         memberSince: '2024-01-15T12:00:00Z',
         location: '123 Main St, New York, NY 10001, USA',
-        weather: '72°F'
-      }, null, 2)
+        weather: '72°F',
+      }, null, 2),
     );
   });
 
   it('closes on Escape key', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     fireEvent.keyDown(document, { key: 'Escape' });
     
@@ -265,9 +273,9 @@ describe('UserProfileViewer', () => {
   it('closes when clicking outside', () => {
     render(
       <div>
-        <UserProfileViewer isOpen={true} onClose={mockOnClose} />
+        <UserProfileViewer isOpen onClose={mockOnClose} />
         <button>Outside button</button>
-      </div>
+      </div>,
     );
     
     const outsideButton = screen.getByText('Outside button');
@@ -277,7 +285,7 @@ describe('UserProfileViewer', () => {
   });
 
   it('does not close when clicking inside', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     const dialog = screen.getByRole('dialog');
     fireEvent.mouseDown(dialog);
@@ -288,7 +296,7 @@ describe('UserProfileViewer', () => {
   it('removes event listeners on unmount', () => {
     const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
     
-    const { unmount } = render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    const { unmount } = render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     unmount();
     
@@ -299,7 +307,7 @@ describe('UserProfileViewer', () => {
   });
 
   it('has proper accessibility attributes', () => {
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'false');
@@ -317,10 +325,10 @@ describe('UserProfileViewer', () => {
       user: { ...mockUser, user_metadata: {} },
       loading: false,
       signOut: mockSignOut,
-      refreshUser: jest.fn()
+      refreshUser: jest.fn(),
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('User')).toBeInTheDocument();
   });
@@ -330,10 +338,10 @@ describe('UserProfileViewer', () => {
       ...mockLocationData,
       hasGPSLocation: false,
       address: null,
-      ipLocation: null
+      ipLocation: null,
     });
     
-    render(<UserProfileViewer isOpen={true} onClose={mockOnClose} />);
+    render(<UserProfileViewer isOpen onClose={mockOnClose} />);
     
     expect(screen.getByText('Location unavailable')).toBeInTheDocument();
   });

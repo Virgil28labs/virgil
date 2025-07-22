@@ -6,7 +6,7 @@ import type { LocationContextValue } from '../types/location.types';
 
 // Mock LocationContext
 jest.mock('../contexts/LocationContext', () => ({
-  useLocation: jest.fn()
+  useLocation: jest.fn(),
 }));
 
 // Mock window properties
@@ -16,13 +16,13 @@ const mockInnerHeight = 768;
 Object.defineProperty(window, 'innerWidth', {
   writable: true,
   configurable: true,
-  value: mockInnerWidth
+  value: mockInnerWidth,
 });
 
 Object.defineProperty(window, 'innerHeight', {
   writable: true,
   configurable: true,
-  value: mockInnerHeight
+  value: mockInnerHeight,
 });
 
 // Mock requestAnimationFrame
@@ -36,7 +36,7 @@ global.cancelAnimationFrame = jest.fn();
 // Mock Audio for sound effects
 global.Audio = jest.fn().mockImplementation(() => ({
   play: jest.fn().mockResolvedValue(undefined),
-  volume: 0
+  volume: 0,
 }));
 
 // Test data
@@ -47,17 +47,17 @@ const mockLocationData: Partial<LocationContextValue> = {
     house_number: '123',
     city: 'New York',
     postcode: '10001',
-    country: 'USA'
+    country: 'USA',
   } as any,
   ipLocation: {
     ip: '192.168.1.1',
     city: 'New York',
     region: 'NY',
     country: 'USA',
-    timezone: 'America/New_York'
+    timezone: 'America/New_York',
   } as any,
   hasGPSLocation: true,
-  hasIPLocation: true
+  hasIPLocation: true,
 };
 
 describe('RaccoonMascot', () => {
@@ -70,7 +70,7 @@ describe('RaccoonMascot', () => {
       address: null,
       ipLocation: null,
       hasGPSLocation: false,
-      hasIPLocation: false
+      hasIPLocation: false,
     });
   });
 
@@ -122,7 +122,7 @@ describe('RaccoonMascot', () => {
       const mascotContainer = screen.getByAltText('Racoon Mascot').parentElement;
       expect(mascotContainer).toHaveAttribute(
         'title',
-        'Click to pick up, use ← → to run, space to jump (triple jump available)!'
+        'Click to pick up, use ← → to run, space to jump (triple jump available)!',
       );
     });
   });
@@ -164,7 +164,7 @@ describe('RaccoonMascot', () => {
       const mockPlay = jest.fn().mockResolvedValue(undefined);
       global.Audio = jest.fn().mockImplementation(() => ({
         play: mockPlay,
-        volume: 0
+        volume: 0,
       }));
       
       render(<RaccoonMascot />);
@@ -230,7 +230,7 @@ describe('RaccoonMascot', () => {
       
       await waitFor(() => {
         expect(mascotContainer).not.toHaveStyle({
-          transform: expect.stringContaining('scale(1.2)')
+          transform: expect.stringContaining('scale(1.2)'),
         });
       });
     });
@@ -437,10 +437,10 @@ describe('RaccoonMascot', () => {
         width: 100,
         height: 30,
         x: 100,
-        y: 100
+        y: 100,
       } as DOMRect));
       Object.defineProperty(mockElement, 'offsetParent', {
-        get: () => document.body
+        get: () => document.body,
       });
       document.body.appendChild(mockElement);
     });

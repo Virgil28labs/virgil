@@ -1,6 +1,6 @@
-import { memo, useEffect, useCallback, useState } from 'react'
-import { giphyService } from '../../lib/giphyService'
-import type { GiphyModalProps } from '../../types/giphy.types'
+import { memo, useEffect, useCallback, useState } from 'react';
+import { giphyService } from '../../lib/giphyService';
+import type { GiphyModalProps } from '../../types/giphy.types';
 
 export const GiphyModal = memo(function GiphyModal({ 
   gifs, 
@@ -8,145 +8,145 @@ export const GiphyModal = memo(function GiphyModal({
   isFavorited,
   onClose, 
   onNavigate,
-  onFavoriteToggle
+  onFavoriteToggle,
 }: GiphyModalProps) {
-  const hasPrevious = currentIndex !== null && currentIndex > 0
-  const hasNext = currentIndex !== null && currentIndex < gifs.length - 1
-  const currentGif = currentIndex !== null ? gifs[currentIndex] : null
+  const hasPrevious = currentIndex !== null && currentIndex > 0;
+  const hasNext = currentIndex !== null && currentIndex < gifs.length - 1;
+  const currentGif = currentIndex !== null ? gifs[currentIndex] : null;
 
-  const [showCopied, setShowCopied] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
+  const [showCopied, setShowCopied] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
 
   const handlePrevious = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (hasPrevious && currentIndex !== null) {
-      onNavigate(currentIndex - 1)
+      onNavigate(currentIndex - 1);
     }
-  }, [hasPrevious, currentIndex, onNavigate])
+  }, [hasPrevious, currentIndex, onNavigate]);
 
   const handleNext = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (hasNext && currentIndex !== null) {
-      onNavigate(currentIndex + 1)
+      onNavigate(currentIndex + 1);
     }
-  }, [hasNext, currentIndex, onNavigate])
+  }, [hasNext, currentIndex, onNavigate]);
 
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!currentGif) return
+    e.stopPropagation();
+    if (!currentGif) return;
     
     try {
-      await giphyService.downloadGif(currentGif, `${currentGif.title || 'gif'}-${currentGif.id}.gif`)
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      await giphyService.downloadGif(currentGif, `${currentGif.title || 'gif'}-${currentGif.id}.gif`);
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download GIF:', error)
+      console.error('Failed to download GIF:', error);
     }
-  }, [currentGif])
+  }, [currentGif]);
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!currentGif) return
+    e.stopPropagation();
+    if (!currentGif) return;
     
     try {
-      const success = await giphyService.copyGifUrl(currentGif)
+      const success = await giphyService.copyGifUrl(currentGif);
       if (success) {
-        setShowCopied(true)
-        setTimeout(() => setShowCopied(false), 2000)
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to copy GIF URL:', error)
+      console.error('Failed to copy GIF URL:', error);
     }
-  }, [currentGif])
+  }, [currentGif]);
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!currentGif) return
+    e.stopPropagation();
+    if (!currentGif) return;
     
-    const shareUrl = giphyService.getShareUrl(currentGif)
+    const shareUrl = giphyService.getShareUrl(currentGif);
     
     if (navigator.share) {
       try {
         await navigator.share({
           title: currentGif.title || 'Check out this GIF!',
-          url: shareUrl
-        })
+          url: shareUrl,
+        });
       } catch (error) {
         // User cancelled or error occurred, fallback to copy
-        await navigator.clipboard.writeText(shareUrl)
-        setShowCopied(true)
-        setTimeout(() => setShowCopied(false), 2000)
+        await navigator.clipboard.writeText(shareUrl);
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
       }
     } else {
       // Fallback to copy URL
-      await navigator.clipboard.writeText(shareUrl)
-      setShowCopied(true)
-      setTimeout(() => setShowCopied(false), 2000)
+      await navigator.clipboard.writeText(shareUrl);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     }
-  }, [currentGif])
+  }, [currentGif]);
 
   const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (currentGif) {
-      onFavoriteToggle(currentGif)
+      onFavoriteToggle(currentGif);
     }
-  }, [currentGif, onFavoriteToggle])
+  }, [currentGif, onFavoriteToggle]);
 
   // Handle keyboard navigation
   useEffect(() => {
-    if (currentIndex === null) return
+    if (currentIndex === null) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onClose()
-          break
+          onClose();
+          break;
         case 'ArrowLeft':
           if (hasPrevious && currentIndex !== null) {
-            onNavigate(currentIndex - 1)
+            onNavigate(currentIndex - 1);
           }
-          break
+          break;
         case 'ArrowRight':
           if (hasNext && currentIndex !== null) {
-            onNavigate(currentIndex + 1)
+            onNavigate(currentIndex + 1);
           }
-          break
+          break;
         case 'f':
         case 'F':
           // Toggle favorite with 'f' key
           if (currentGif) {
-            onFavoriteToggle(currentGif)
+            onFavoriteToggle(currentGif);
           }
-          break
+          break;
         case 'c':
         case 'C':
           // Copy URL with 'c' key
           if (currentGif) {
-            handleCopy({ stopPropagation: () => {} } as React.MouseEvent)
+            handleCopy({ stopPropagation: () => {} } as React.MouseEvent);
           }
-          break
+          break;
         case 'd':
         case 'D':
           // Download with 'd' key
           if (currentGif) {
-            handleDownload({ stopPropagation: () => {} } as React.MouseEvent)
+            handleDownload({ stopPropagation: () => {} } as React.MouseEvent);
           }
-          break
+          break;
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext, currentGif, onFavoriteToggle, handleCopy, handleDownload])
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext, currentGif, onFavoriteToggle, handleCopy, handleDownload]);
 
-  if (currentIndex === null || !currentGif) return null
+  if (currentIndex === null || !currentGif) return null;
 
   return (
     <div 
       className="giphy-image-modal" 
       onClick={(e) => {
-        e.stopPropagation()
-        onClose()
+        e.stopPropagation();
+        onClose();
       }}
       style={{
         position: 'fixed',
@@ -158,7 +158,7 @@ export const GiphyModal = memo(function GiphyModal({
         zIndex: 3000,
         cursor: 'zoom-out',
         animation: 'fadeIn 0.2s ease-out',
-        backdropFilter: 'blur(10px)'
+        backdropFilter: 'blur(10px)',
       }}
     >
       <div 
@@ -168,7 +168,7 @@ export const GiphyModal = memo(function GiphyModal({
           alignItems: 'center',
           gap: 'var(--giphy-spacing-lg)',
           maxWidth: '90vw',
-          maxHeight: '90vh'
+          maxHeight: '90vh',
         }}
       >
         {/* Main GIF */}
@@ -182,7 +182,7 @@ export const GiphyModal = memo(function GiphyModal({
             borderRadius: 'var(--giphy-radius-lg)',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
             animation: 'slideUpFade 0.3s ease-out',
-            cursor: 'default'
+            cursor: 'default',
           }}
         />
         
@@ -192,23 +192,25 @@ export const GiphyModal = memo(function GiphyModal({
             style={{
               textAlign: 'center',
               color: 'white',
-              maxWidth: '600px'
+              maxWidth: '600px',
             }}
           >
             <h3 style={{ 
               margin: 0, 
               fontSize: '1.25rem', 
               fontWeight: '600',
-              marginBottom: '0.5rem'
-            }}>
+              marginBottom: '0.5rem',
+            }}
+            >
               {currentGif.title}
             </h3>
             {currentGif.username && (
               <p style={{ 
                 margin: 0, 
                 fontSize: '0.9rem', 
-                opacity: 0.8 
-              }}>
+                opacity: 0.8, 
+              }}
+              >
                 by {currentGif.username}
               </p>
             )}
@@ -224,7 +226,7 @@ export const GiphyModal = memo(function GiphyModal({
             backdropFilter: 'blur(10px)',
             padding: 'var(--giphy-spacing-sm) var(--giphy-spacing-lg)',
             borderRadius: 'var(--giphy-radius-lg)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
+            border: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
           <button
@@ -244,15 +246,15 @@ export const GiphyModal = memo(function GiphyModal({
               fontSize: '1.75rem',
               padding: 0,
               borderRadius: 'var(--giphy-radius-sm)',
-              animation: isFavorited(currentGif.url) ? 'heartPop 0.4s ease' : 'none'
+              animation: isFavorited(currentGif.url) ? 'heartPop 0.4s ease' : 'none',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-              e.currentTarget.style.transform = 'scale(1.15)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
             {isFavorited(currentGif.url) ? '❤️' : '🤍'}
@@ -275,15 +277,15 @@ export const GiphyModal = memo(function GiphyModal({
               fontSize: '1.75rem',
               padding: 0,
               borderRadius: 'var(--giphy-radius-sm)',
-              color: 'white'
+              color: 'white',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-              e.currentTarget.style.transform = 'scale(1.15)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
             {showDownloaded ? '✓' : '⬇️'}
@@ -306,15 +308,15 @@ export const GiphyModal = memo(function GiphyModal({
               fontSize: '1.75rem',
               padding: 0,
               borderRadius: 'var(--giphy-radius-sm)',
-              color: 'white'
+              color: 'white',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-              e.currentTarget.style.transform = 'scale(1.15)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
             {showCopied ? '✓' : '📋'}
@@ -337,15 +339,15 @@ export const GiphyModal = memo(function GiphyModal({
               fontSize: '1.75rem',
               padding: 0,
               borderRadius: 'var(--giphy-radius-sm)',
-              color: 'white'
+              color: 'white',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-              e.currentTarget.style.transform = 'scale(1.15)'
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.transform = 'scale(1.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
             🔗
@@ -373,17 +375,17 @@ export const GiphyModal = memo(function GiphyModal({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          transition: 'all 0.3s ease'
+          transition: 'all 0.3s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'
-          e.currentTarget.style.transform = 'scale(1.1) rotate(90deg)'
-          e.currentTarget.style.borderColor = 'var(--giphy-accent)'
+          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+          e.currentTarget.style.transform = 'scale(1.1) rotate(90deg)';
+          e.currentTarget.style.borderColor = 'var(--giphy-accent)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'
-          e.currentTarget.style.transform = 'scale(1) rotate(0deg)'
-          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+          e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         }}
       >
         ×
@@ -413,17 +415,17 @@ export const GiphyModal = memo(function GiphyModal({
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'all 0.3s ease',
-            zIndex: 2
+            zIndex: 2,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)'
-            e.currentTarget.style.borderColor = 'var(--giphy-accent)'
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)';
+            e.currentTarget.style.borderColor = 'var(--giphy-accent)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
           }}
         >
           ‹
@@ -453,17 +455,17 @@ export const GiphyModal = memo(function GiphyModal({
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'all 0.3s ease',
-            zIndex: 2
+            zIndex: 2,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)'
-            e.currentTarget.style.borderColor = 'var(--giphy-accent)'
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)';
+            e.currentTarget.style.borderColor = 'var(--giphy-accent)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'
-            e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
           }}
         >
           ›
@@ -484,11 +486,11 @@ export const GiphyModal = memo(function GiphyModal({
           padding: 'var(--giphy-spacing-xs) var(--giphy-spacing-md)',
           borderRadius: 'var(--giphy-radius-sm)',
           fontSize: '0.95rem',
-          fontWeight: '500'
+          fontWeight: '500',
         }}
       >
         {currentIndex + 1} / {gifs.length}
       </div>
     </div>
-  )
-})
+  );
+});

@@ -3,12 +3,12 @@ import { EmojiButton } from '../common/EmojiButton';
 
 const CameraApp = lazy(() => 
   import('./CameraApp').then(module => ({ 
-    default: module.CameraApp 
-  }))
+    default: module.CameraApp, 
+  })),
 );
 
 const CameraAppWrapper = ({ onClose }: { onClose: () => void }) => (
-  <CameraApp isOpen={true} onClose={onClose} />
+  <CameraApp isOpen onClose={onClose} />
 );
 
 export const CameraEmojiButton = () => (
@@ -21,7 +21,7 @@ export const CameraEmojiButton = () => (
     hoverColor={{
       background: 'linear-gradient(135deg, rgba(108, 59, 170, 0.3) 0%, rgba(239, 176, 194, 0.3) 100%)',
       border: 'rgba(239, 176, 194, 0.6)',
-      glow: 'rgba(108, 59, 170, 0.4)'
+      glow: 'rgba(108, 59, 170, 0.4)',
     }}
     title="Take selfies with Virgil Camera!"
     className="opacity-80 hover:opacity-100"

@@ -1,6 +1,6 @@
-import { Entry } from './types'
-import { NotesEntry } from './NotesEntry'
-import './NotesList.css'
+import type { Entry } from './types';
+import { NotesEntry } from './NotesEntry';
+import './NotesList.css';
 
 interface NotesListProps {
   entries: Entry[]
@@ -19,7 +19,7 @@ export const NotesList = ({ entries, onToggleTask, onUpdateEntry, onDeleteEntry,
         <p className="notes-empty-text">No notes yet</p>
         <p className="notes-empty-hint">Start typing above to capture your first thought</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -35,5 +35,5 @@ export const NotesList = ({ entries, onToggleTask, onUpdateEntry, onDeleteEntry,
         />
       ))}
     </div>
-  )
-}
+  );
+};

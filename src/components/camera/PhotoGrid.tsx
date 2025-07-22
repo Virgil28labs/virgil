@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useRef } from 'react'
-import type { PhotoGridProps, SavedPhoto } from '../../types/camera.types'
-import { CameraUtils } from './utils/cameraUtils'
+import React, { useState, useCallback, useRef } from 'react';
+import type { PhotoGridProps, SavedPhoto } from '../../types/camera.types';
+import { CameraUtils } from './utils/cameraUtils';
 
 interface PhotoCardProps {
   photo: SavedPhoto
@@ -17,36 +17,36 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
   isSelectionMode,
   onPhotoClick,
   onPhotoSelect,
-  onFavoriteToggle
+  onFavoriteToggle,
 }) => {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleImageLoad = useCallback(() => {
-    setImageLoaded(true)
-  }, [])
+    setImageLoaded(true);
+  }, []);
 
   const handleImageError = useCallback(() => {
-    setImageError(true)
-  }, [])
+    setImageError(true);
+  }, []);
 
   const handleCardClick = useCallback(() => {
     if (isSelectionMode) {
-      onPhotoSelect(photo.id)
+      onPhotoSelect(photo.id);
     } else {
-      onPhotoClick(photo)
+      onPhotoClick(photo);
     }
-  }, [isSelectionMode, onPhotoSelect, onPhotoClick, photo])
+  }, [isSelectionMode, onPhotoSelect, onPhotoClick, photo]);
 
   const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onFavoriteToggle(photo.id)
-  }, [onFavoriteToggle, photo.id])
+    e.stopPropagation();
+    onFavoriteToggle(photo.id);
+  }, [onFavoriteToggle, photo.id]);
 
   const handleSelectClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onPhotoSelect(photo.id)
-  }, [onPhotoSelect, photo.id])
+    e.stopPropagation();
+    onPhotoSelect(photo.id);
+  }, [onPhotoSelect, photo.id]);
 
   return (
     <div 
@@ -119,8 +119,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const PhotoGrid: React.FC<PhotoGridProps> = ({
   photos,
@@ -128,13 +128,13 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
   onPhotoClick,
   onPhotoSelect,
   isSelectionMode = false,
-  loading = false
+  loading = false,
 }) => {
-  const gridRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const handleFavoriteToggle = useCallback((_photoId: string) => {
     // This would be handled by the parent component
-  }, [])
+  }, []);
 
   if (loading) {
     return (
@@ -144,7 +144,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
           <p>Loading photos...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (photos.length === 0) {
@@ -156,7 +156,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
           <p>Start taking photos to build your gallery!</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -188,5 +188,5 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

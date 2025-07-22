@@ -1,69 +1,69 @@
-import { memo, useState, useCallback } from 'react'
-import type { ApodImage } from '../../types/nasa.types'
+import { memo, useState, useCallback } from 'react';
+import type { ApodImage } from '../../types/nasa.types';
 import { 
   stopEvent, 
   downloadApodImage, 
   copyApodToClipboard, 
-  shareApod 
-} from './utils/nasaImageUtils'
+  shareApod, 
+} from './utils/nasaImageUtils';
 
 interface NasaApodActionOverlayProps {
   apod: ApodImage
 }
 
 export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({ 
-  apod 
+  apod, 
 }: NasaApodActionOverlayProps) {
-  const [showCopied, setShowCopied] = useState(false)
-  const [showShared, setShowShared] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
-  const [showDownloadMenu, setShowDownloadMenu] = useState(false)
+  const [showCopied, setShowCopied] = useState(false);
+  const [showShared, setShowShared] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   const handleDownload = useCallback(async (e: React.MouseEvent, quality: 'standard' | 'hd') => {
-    stopEvent(e)
-    setShowDownloadMenu(false)
+    stopEvent(e);
+    setShowDownloadMenu(false);
     try {
-      await downloadApodImage(apod, quality)
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      await downloadApodImage(apod, quality);
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download APOD:', error)
+      console.error('Failed to download APOD:', error);
     }
-  }, [apod])
+  }, [apod]);
 
   const handleDownloadClick = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (apod.hdImageUrl) {
-      setShowDownloadMenu(!showDownloadMenu)
+      setShowDownloadMenu(!showDownloadMenu);
     } else {
-      handleDownload(e, 'standard')
+      handleDownload(e, 'standard');
     }
-  }, [apod.hdImageUrl, showDownloadMenu, handleDownload])
+  }, [apod.hdImageUrl, showDownloadMenu, handleDownload]);
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     try {
-      await copyApodToClipboard(apod)
-      setShowCopied(true)
-      setTimeout(() => setShowCopied(false), 2000)
+      await copyApodToClipboard(apod);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy APOD:', error)
+      console.error('Failed to copy APOD:', error);
     }
-  }, [apod])
+  }, [apod]);
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     try {
-      const sharedNatively = await shareApod(apod)
+      const sharedNatively = await shareApod(apod);
       if (!sharedNatively) {
         // Fallback was used (copied to clipboard)
-        setShowShared(true)
-        setTimeout(() => setShowShared(false), 2000)
+        setShowShared(true);
+        setTimeout(() => setShowShared(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to share APOD:', error)
+      console.error('Failed to share APOD:', error);
     }
-  }, [apod])
+  }, [apod]);
 
   return (
     <div className="nasa-apod-action-overlay">
@@ -113,5 +113,5 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
         {showShared ? '✓' : '🔗'}
       </button>
     </div>
-  )
-})
+  );
+});

@@ -69,7 +69,7 @@ class RequestDeduplicator {
     // Store the pending request
     this.pendingRequests.set(key, {
       promise,
-      timestamp: now
+      timestamp: now,
     });
 
     // Return the original response for the first caller
@@ -130,6 +130,6 @@ export function useRequestDeduplication() {
   return {
     dedupeFetch,
     getPendingCount: () => requestDeduplicator.getPendingCount(),
-    clear: () => requestDeduplicator.clear()
+    clear: () => requestDeduplicator.clear(),
   };
 }

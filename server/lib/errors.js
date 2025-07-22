@@ -64,7 +64,7 @@ function errorHandler(err, req, res) {
       code: error.code,
       statusCode: error.statusCode,
       stack: error.stack,
-      details: error.details
+      details: error.details,
     });
   }
 
@@ -73,8 +73,8 @@ function errorHandler(err, req, res) {
     error: {
       code: error.code,
       message: error.message,
-      ...(process.env.NODE_ENV === 'development' && { details: error.details })
-    }
+      ...(process.env.NODE_ENV === 'development' && { details: error.details }),
+    },
   });
 }
 
@@ -93,5 +93,5 @@ module.exports = {
   NotFoundError,
   RateLimitError,
   errorHandler,
-  asyncHandler
+  asyncHandler,
 };

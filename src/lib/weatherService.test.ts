@@ -10,7 +10,7 @@ const mockDedupeFetch = dedupeFetch as jest.MockedFunction<typeof dedupeFetch>;
 // Mock console methods
 const originalConsole = {
   log: console.log,
-  error: console.error
+  error: console.error,
 };
 
 describe('weatherService', () => {
@@ -29,14 +29,14 @@ describe('weatherService', () => {
       id: 800,
       main: 'Clear',
       description: 'clear sky',
-      icon: '01d'
+      icon: '01d',
     },
     sunrise: 1643000000,
     sunset: 1643040000,
     timezone: -28800,
     cityName: 'New York',
     country: 'US',
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   beforeEach(() => {
@@ -61,8 +61,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       const result = await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
@@ -74,10 +74,10 @@ describe('weatherService', () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
           },
-          timeout: 10000
-        }
+          timeout: 10000,
+        },
       );
     });
 
@@ -88,8 +88,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
@@ -108,8 +108,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
@@ -124,8 +124,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: updatedWeatherData
-        })
+          data: updatedWeatherData,
+        }),
       } as Response);
 
       const result = await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
@@ -140,7 +140,7 @@ describe('weatherService', () => {
       mockDedupeFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: async () => ({ error: 'Invalid API key' })
+        json: async () => ({ error: 'Invalid API key' }),
       } as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
@@ -152,7 +152,7 @@ describe('weatherService', () => {
         ok: false,
         status: 500,
         json: async () => { throw new Error('Not JSON'); },
-        text: async () => 'Internal Server Error'
+        text: async () => 'Internal Server Error',
       } as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
@@ -164,7 +164,7 @@ describe('weatherService', () => {
         ok: false,
         status: 500,
         json: async () => { throw new Error('Not JSON'); },
-        text: async () => { throw new Error('Not text'); }
+        text: async () => { throw new Error('Not text'); },
       } as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
@@ -175,7 +175,7 @@ describe('weatherService', () => {
       mockDedupeFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ success: false })
+        json: async () => ({ success: false }),
       } as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
@@ -197,8 +197,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       const result = await weatherService.getWeatherByCity('New York');
@@ -209,9 +209,9 @@ describe('weatherService', () => {
         {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+            'Content-Type': 'application/json',
+          },
+        },
       );
     });
 
@@ -221,8 +221,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       const result = await weatherService.getWeatherByCity('New York', 'US');
@@ -230,7 +230,7 @@ describe('weatherService', () => {
       expect(result).toEqual(mockWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledWith(
         'http://localhost:5002/api/v1/weather?city=New+York&country=US',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -240,8 +240,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       await weatherService.getWeatherByCity('New York');
@@ -256,7 +256,7 @@ describe('weatherService', () => {
     it('handles city API errors', async () => {
       mockDedupeFetch.mockResolvedValueOnce({
         ok: false,
-        status: 404
+        status: 404,
       } as Response);
 
       await expect(weatherService.getWeatherByCity('Unknown City'))
@@ -337,8 +337,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
@@ -352,8 +352,8 @@ describe('weatherService', () => {
         status: 200,
         json: async () => ({
           success: true,
-          data: mockWeatherData
-        })
+          data: mockWeatherData,
+        }),
       } as Response);
 
       await weatherService.getWeatherByCoordinates(40.7128, -74.0060);

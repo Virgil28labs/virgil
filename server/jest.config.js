@@ -4,10 +4,10 @@ module.exports = {
   roots: ['<rootDir>'],
   testMatch: [
     '**/__tests__/**/*.+(ts|js)',
-    '**/?(*.)+(spec|test).+(ts|js)'
+    '**/?(*.)+(spec|test).+(ts|js)',
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
@@ -22,20 +22,20 @@ module.exports = {
     '!**/*.test.{js,ts}',
     '!**/*.spec.{js,ts}',
     '!jest.config.js',
-    '!jest.setup.js'
+    '!jest.setup.js',
   ],
   coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
   coverageReporters: ['text', 'lcov', 'html'],
   testTimeout: 10000,
   // Handle TypeScript paths
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
-  }
+    '^@/(.*)$': '<rootDir>/$1',
+  },
 };

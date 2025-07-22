@@ -5,12 +5,12 @@ global.fetch = jest.fn();
 
 // Mock navigator.geolocation
 const mockGeolocation = {
-  getCurrentPosition: jest.fn()
+  getCurrentPosition: jest.fn(),
 };
 
 Object.defineProperty(global.navigator, 'geolocation', {
   value: mockGeolocation,
-  configurable: true
+  configurable: true,
 });
 
 describe('locationService', () => {
@@ -31,9 +31,9 @@ describe('locationService', () => {
         coords: {
           latitude: 40.7128,
           longitude: -74.0060,
-          accuracy: 10
+          accuracy: 10,
         },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
@@ -46,7 +46,7 @@ describe('locationService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         accuracy: 10,
-        timestamp: mockPosition.timestamp
+        timestamp: mockPosition.timestamp,
       });
 
       expect(mockGeolocation.getCurrentPosition).toHaveBeenCalledWith(
@@ -55,8 +55,8 @@ describe('locationService', () => {
         {
           enableHighAccuracy: true,
           timeout: 5000,
-          maximumAge: 300000
-        }
+          maximumAge: 300000,
+        },
       );
     });
 
@@ -64,17 +64,17 @@ describe('locationService', () => {
       // Temporarily remove geolocation
       Object.defineProperty(global.navigator, 'geolocation', {
         value: undefined,
-        configurable: true
+        configurable: true,
       });
 
       await expect(locationService.getCurrentPosition()).rejects.toThrow(
-        'Geolocation is not supported by this browser.'
+        'Geolocation is not supported by this browser.',
       );
 
       // Restore geolocation
       Object.defineProperty(global.navigator, 'geolocation', {
         value: mockGeolocation,
-        configurable: true
+        configurable: true,
       });
     });
 
@@ -83,7 +83,7 @@ describe('locationService', () => {
         code: 1, // PERMISSION_DENIED
         PERMISSION_DENIED: 1,
         POSITION_UNAVAILABLE: 2,
-        TIMEOUT: 3
+        TIMEOUT: 3,
       };
 
       mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
@@ -91,7 +91,7 @@ describe('locationService', () => {
       });
 
       await expect(locationService.getCurrentPosition()).rejects.toThrow(
-        'Location access denied by user'
+        'Location access denied by user',
       );
     });
 
@@ -100,7 +100,7 @@ describe('locationService', () => {
         code: 2, // POSITION_UNAVAILABLE
         PERMISSION_DENIED: 1,
         POSITION_UNAVAILABLE: 2,
-        TIMEOUT: 3
+        TIMEOUT: 3,
       };
 
       mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
@@ -108,7 +108,7 @@ describe('locationService', () => {
       });
 
       await expect(locationService.getCurrentPosition()).rejects.toThrow(
-        'Location information is unavailable'
+        'Location information is unavailable',
       );
     });
 
@@ -117,7 +117,7 @@ describe('locationService', () => {
         code: 3, // TIMEOUT
         PERMISSION_DENIED: 1,
         POSITION_UNAVAILABLE: 2,
-        TIMEOUT: 3
+        TIMEOUT: 3,
       };
 
       mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
@@ -125,7 +125,7 @@ describe('locationService', () => {
       });
 
       await expect(locationService.getCurrentPosition()).rejects.toThrow(
-        'Location request timed out'
+        'Location request timed out',
       );
     });
   });
@@ -139,13 +139,13 @@ describe('locationService', () => {
           house_number: '123',
           city: 'New York',
           postcode: '10001',
-          country: 'USA'
-        }
+          country: 'USA',
+        },
       };
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await locationService.getAddressFromCoordinates(40.7128, -74.0060);
@@ -156,11 +156,11 @@ describe('locationService', () => {
         city: 'New York',
         postcode: '10001',
         country: 'USA',
-        formatted: '123 Main St, New York, NY 10001, USA'
+        formatted: '123 Main St, New York, NY 10001, USA',
       });
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=40.7128&lon=-74.006&zoom=18&addressdetails=1'
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=40.7128&lon=-74.006&zoom=18&addressdetails=1',
       );
     });
 
@@ -173,7 +173,7 @@ describe('locationService', () => {
         { field: 'residential', value: 'Residential Street' },
         { field: 'avenue', value: '5th Avenue' },
         { field: 'street', value: 'Wall Street' },
-        { field: 'way', value: 'Queens Way' }
+        { field: 'way', value: 'Queens Way' },
       ];
 
       for (const testCase of testCases) {
@@ -181,13 +181,13 @@ describe('locationService', () => {
           display_name: 'Test Address',
           address: {
             [testCase.field]: testCase.value,
-            city: 'New York'
-          }
+            city: 'New York',
+          },
         };
 
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => mockResponse
+          json: async () => mockResponse,
         });
 
         const result = await locationService.getAddressFromCoordinates(40.7128, -74.0060);
@@ -199,12 +199,12 @@ describe('locationService', () => {
     it('handles missing address fields gracefully', async () => {
       const mockResponse = {
         display_name: 'Unknown Location',
-        address: {}
+        address: {},
       };
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await locationService.getAddressFromCoordinates(40.7128, -74.0060);
@@ -215,13 +215,13 @@ describe('locationService', () => {
         city: '',
         postcode: '',
         country: '',
-        formatted: 'Unknown Location'
+        formatted: 'Unknown Location',
       });
     });
 
     it('handles API errors', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false
+        ok: false,
       });
 
       await expect(locationService.getAddressFromCoordinates(40.7128, -74.0060))
@@ -240,7 +240,7 @@ describe('locationService', () => {
     it('returns IP address on success', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ip: '192.168.1.1' })
+        json: async () => ({ ip: '192.168.1.1' }),
       });
 
       const result = await locationService.getIPAddress();
@@ -252,7 +252,7 @@ describe('locationService', () => {
     it('handles API errors', async () => {
       // Mock for all retry attempts (initial + 2 retries = 3 total)
       (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false
+        ok: false,
       });
 
       await expect(locationService.getIPAddress()).rejects.toThrow('Failed to fetch IP address');
@@ -277,13 +277,13 @@ describe('locationService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         timezone: {
-          id: 'America/New_York'
-        }
+          id: 'America/New_York',
+        },
       };
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       const result = await locationService.getIPLocation('192.168.1.1');
@@ -295,7 +295,7 @@ describe('locationService', () => {
         city: 'New York City',
         lat: 40.7128,
         lon: -74.0060,
-        timezone: 'America/New_York'
+        timezone: 'America/New_York',
       });
 
       expect(global.fetch).toHaveBeenCalledWith('https://ipwho.is/192.168.1.1');
@@ -304,13 +304,13 @@ describe('locationService', () => {
     it('handles API error responses', async () => {
       const mockResponse = {
         success: false,
-        message: 'Invalid IP address'
+        message: 'Invalid IP address',
       };
 
       // Mock for all retry attempts
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       await expect(locationService.getIPLocation('invalid'))
@@ -319,13 +319,13 @@ describe('locationService', () => {
 
     it('handles API errors without message', async () => {
       const mockResponse = {
-        success: false
+        success: false,
       };
 
       // Mock for all retry attempts
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
+        json: async () => mockResponse,
       });
 
       await expect(locationService.getIPLocation('invalid'))
@@ -346,7 +346,7 @@ describe('locationService', () => {
       // Mock IP address fetch
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ip: '192.168.1.1' })
+        json: async () => ({ ip: '192.168.1.1' }),
       });
 
       // Mock IP location fetch
@@ -359,12 +359,12 @@ describe('locationService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         timezone: {
-          id: 'America/New_York'
-        }
+          id: 'America/New_York',
+        },
       };
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockIPLocation
+        json: async () => mockIPLocation,
       });
 
       // Mock GPS position
@@ -372,9 +372,9 @@ describe('locationService', () => {
         coords: {
           latitude: 40.7128,
           longitude: -74.0060,
-          accuracy: 10
+          accuracy: 10,
         },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success(mockPosition);
@@ -388,12 +388,12 @@ describe('locationService', () => {
           house_number: '123',
           city: 'New York',
           postcode: '10001',
-          country: 'USA'
-        }
+          country: 'USA',
+        },
       };
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockAddress
+        json: async () => mockAddress,
       });
 
       const result = await locationService.getFullLocationData();
@@ -407,13 +407,13 @@ describe('locationService', () => {
           city: 'New York City',
           lat: 40.7128,
           lon: -74.0060,
-          timezone: 'America/New_York'
+          timezone: 'America/New_York',
         },
         coordinates: {
           latitude: 40.7128,
           longitude: -74.0060,
           accuracy: 10,
-          timestamp: mockPosition.timestamp
+          timestamp: mockPosition.timestamp,
         },
         address: {
           street: 'Main Street',
@@ -421,8 +421,8 @@ describe('locationService', () => {
           city: 'New York',
           postcode: '10001',
           country: 'USA',
-          formatted: '123 Main St, New York, NY 10001, USA'
-        }
+          formatted: '123 Main St, New York, NY 10001, USA',
+        },
       });
     });
 
@@ -432,7 +432,7 @@ describe('locationService', () => {
         // 1. getIPAddress - success
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ ip: '192.168.1.1' })
+          json: async () => ({ ip: '192.168.1.1' }),
         })
         // 2-4. getIPLocation - fails (3 retry attempts)
         .mockRejectedValueOnce(new Error('IP location failed'))
@@ -441,22 +441,22 @@ describe('locationService', () => {
         // 5. getIPAddress again (in catch block) - success
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ ip: '192.168.1.1' })
+          json: async () => ({ ip: '192.168.1.1' }),
         })
         // 6. getAddressFromCoordinates - success
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             display_name: 'Test Address',
-            address: { city: 'New York' }
-          })
+            address: { city: 'New York' },
+          }),
         });
 
       // Mock GPS success
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success({
           coords: { latitude: 40.7128, longitude: -74.0060, accuracy: 10 },
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       });
 
@@ -475,7 +475,7 @@ describe('locationService', () => {
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success({
           coords: { latitude: 40.7128, longitude: -74.0060, accuracy: 10 },
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       });
 
@@ -488,8 +488,8 @@ describe('locationService', () => {
           ok: true,
           json: async () => ({
             display_name: 'Test Address',
-            address: { city: 'New York' }
-          })
+            address: { city: 'New York' },
+          }),
         });
 
       const result = await locationService.getFullLocationData();
@@ -503,7 +503,7 @@ describe('locationService', () => {
       // Mock IP success
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ip: '192.168.1.1' })
+        json: async () => ({ ip: '192.168.1.1' }),
       });
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -517,9 +517,9 @@ describe('locationService', () => {
           latitude: 40.7128,
           longitude: -74.0060,
           timezone: {
-            id: 'America/New_York'
-          }
-        })
+            id: 'America/New_York',
+          },
+        }),
       });
 
       // Mock GPS failure
@@ -528,7 +528,7 @@ describe('locationService', () => {
           code: 1,
           PERMISSION_DENIED: 1,
           POSITION_UNAVAILABLE: 2,
-          TIMEOUT: 3
+          TIMEOUT: 3,
         });
       });
 

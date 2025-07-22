@@ -13,7 +13,7 @@ export class LLMService extends EventEmitter {
       cacheTTL: 3600,
       maxRetries: 3,
       retryDelay: 1000,
-      ...config
+      ...config,
     };
     this.activeRequests = new Map();
   }
@@ -25,7 +25,7 @@ export class LLMService extends EventEmitter {
   getStats = jest.fn(() => ({
     activeRequests: this.activeRequests.size,
     cacheStats: { hits: 0, misses: 0 },
-    rateLimitStats: { requests: 0, remaining: 20 }
+    rateLimitStats: { requests: 0, remaining: 20 },
   }));
   clearCache = jest.fn();
   destroy = jest.fn();

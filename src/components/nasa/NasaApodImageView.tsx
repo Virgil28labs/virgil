@@ -1,7 +1,7 @@
-import { memo, useState, useCallback } from 'react'
-import type { ApodImage } from '../../types/nasa.types'
-import { NasaApodFavoriteOverlay } from './NasaApodFavoriteOverlay'
-import { NasaApodActionOverlay } from './NasaApodActionOverlay'
+import { memo, useState, useCallback } from 'react';
+import type { ApodImage } from '../../types/nasa.types';
+import { NasaApodFavoriteOverlay } from './NasaApodFavoriteOverlay';
+import { NasaApodActionOverlay } from './NasaApodActionOverlay';
 
 interface NasaApodImageViewProps {
   apod: ApodImage
@@ -18,15 +18,15 @@ export const NasaApodImageView = memo(function NasaApodImageView({
   onFavoriteToggle,
   imageLoading,
   onImageLoad,
-  onImageError
+  onImageError,
 }: NasaApodImageViewProps) {
-  const [isZoomed, setIsZoomed] = useState(false)
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const handleImageClick = useCallback(() => {
     if (apod.mediaType === 'image') {
-      setIsZoomed(!isZoomed)
+      setIsZoomed(!isZoomed);
     }
-  }, [apod.mediaType, isZoomed])
+  }, [apod.mediaType, isZoomed]);
 
   return (
     <div className={`nasa-apod-image-wrapper ${isZoomed ? 'zoomed' : ''}`}>
@@ -72,5 +72,5 @@ export const NasaApodImageView = memo(function NasaApodImageView({
         </div>
       )}
     </div>
-  )
-})
+  );
+});

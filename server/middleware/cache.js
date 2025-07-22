@@ -7,7 +7,7 @@ class ResponseCache {
     this.cache = new Map();
     this.hits = 0;
     this.misses = 0;
-    
+
     // Cleanup expired entries every 5 minutes
     this.cleanupInterval = setInterval(() => this.cleanup(), 5 * 60 * 1000);
   }
@@ -20,7 +20,7 @@ class ResponseCache {
 
   async get(key) {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.misses++;
       return null;
@@ -47,7 +47,7 @@ class ResponseCache {
       value,
       expiresAt: Date.now() + (ttl * 1000),
       createdAt: Date.now(),
-      lastAccessed: Date.now()
+      lastAccessed: Date.now(),
     });
   }
 
@@ -84,7 +84,7 @@ class ResponseCache {
   }
 
   clear() {
-    const size = this.cache.size;
+    const { size } = this.cache;
     this.cache.clear();
     this.hits = 0;
     this.misses = 0;
@@ -92,7 +92,7 @@ class ResponseCache {
   }
 
   getStats() {
-    const hitRate = this.hits + this.misses > 0 
+    const hitRate = this.hits + this.misses > 0
       ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
       : 0;
 
@@ -102,7 +102,7 @@ class ResponseCache {
       hits: this.hits,
       misses: this.misses,
       hitRate: `${hitRate}%`,
-      ttl: this.ttl
+      ttl: this.ttl,
     };
   }
 
@@ -120,7 +120,7 @@ const cache = new ResponseCache();
 // Middleware function
 const cacheMiddleware = async (req, res, next) => {
   // Only cache GET requests and specific POST endpoints
-  const isCacheable = req.method === 'GET' || 
+  const isCacheable = req.method === 'GET' ||
     (req.method === 'POST' && req.path.includes('/complete'));
 
   if (!isCacheable || process.env.VITE_ENABLE_CACHE !== 'true') {
@@ -132,7 +132,7 @@ const cacheMiddleware = async (req, res, next) => {
     method: req.method,
     path: req.path,
     query: req.query,
-    body: req.body
+    body: req.body,
   });
 
   // Check cache
@@ -146,7 +146,7 @@ const cacheMiddleware = async (req, res, next) => {
   const originalJson = res.json;
 
   // Override json method to cache successful responses
-  res.json = function(data) {
+  res.json = function (data) {
     // Only cache successful responses
     if (res.statusCode >= 200 && res.statusCode < 300) {
       // Don't cache streaming responses or large responses
@@ -171,7 +171,7 @@ const cacheRoutes = require('express').Router();
 cacheRoutes.get('/stats', (req, res) => {
   res.json({
     success: true,
-    data: cache.getStats()
+    data: cache.getStats(),
   });
 });
 
@@ -179,7 +179,7 @@ cacheRoutes.delete('/clear', (req, res) => {
   const cleared = cache.clear();
   res.json({
     success: true,
-    message: `Cleared ${cleared} cache entries`
+    message: `Cleared ${cleared} cache entries`,
   });
 });
 
@@ -187,5 +187,5 @@ module.exports = {
   cache,
   cacheMiddleware,
   cacheRoutes,
-  ResponseCache
+  ResponseCache,
 };

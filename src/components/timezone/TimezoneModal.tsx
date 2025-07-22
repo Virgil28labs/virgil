@@ -5,9 +5,9 @@
  * reordering, and editing with full accessibility support.
  */
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { TimezoneSearch } from './TimezoneSearch'
-import { useTimezones, useTimezoneFormatters } from './useTimezones'
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { TimezoneSearch } from './TimezoneSearch';
+import { useTimezones, useTimezoneFormatters } from './useTimezones';
 
 interface TimezoneModalProps {
   isOpen: boolean
@@ -18,12 +18,12 @@ interface TimezoneModalProps {
 const TimezoneModal = memo(function TimezoneModal({
   isOpen,
   onClose,
-  className = ''
+  className = '',
 }: TimezoneModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null)
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingLabel, setEditingLabel] = useState('')
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState('');
 
   const {
     selectedTimezones,
@@ -32,108 +32,108 @@ const TimezoneModal = memo(function TimezoneModal({
     removeTimezone,
     updateTimezoneLabel,
     clearAllTimezones,
-    canAddMoreTimezones
-  } = useTimezones()
+    canAddMoreTimezones,
+  } = useTimezones();
 
-  const { formatTime } = useTimezoneFormatters()
+  const { formatTime } = useTimezoneFormatters();
 
   // Focus management
   useEffect(() => {
     if (isOpen && closeButtonRef.current) {
-      closeButtonRef.current.focus()
+      closeButtonRef.current.focus();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Trap focus within modal
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
-        return
+        onClose();
+        return;
       }
 
       if (event.key === 'Tab') {
-        const modal = modalRef.current
-        if (!modal) return
+        const modal = modalRef.current;
+        if (!modal) return;
 
         const focusableElements = modal.querySelectorAll(
-          'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-        const firstElement = focusableElements[0] as HTMLElement
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+          'button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
-            event.preventDefault()
-            lastElement?.focus()
+            event.preventDefault();
+            lastElement?.focus();
           }
         } else {
           if (document.activeElement === lastElement) {
-            event.preventDefault()
-            firstElement?.focus()
+            event.preventDefault();
+            firstElement?.focus();
           }
         }
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Handle backdrop click
   const handleBackdropClick = useCallback((event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {
-      onClose()
+      onClose();
     }
-  }, [onClose])
+  }, [onClose]);
 
   // Handle timezone selection from search
   const handleTimezoneSelect = useCallback((timezone: string) => {
-    const success = addTimezone(timezone)
+    const success = addTimezone(timezone);
     if (!success) {
       // Could show error message here
-      console.warn('Failed to add timezone:', timezone)
+      console.warn('Failed to add timezone:', timezone);
     }
-  }, [addTimezone])
+  }, [addTimezone]);
 
   // Handle timezone removal
   const handleRemoveTimezone = useCallback((id: string) => {
-    removeTimezone(id)
-  }, [removeTimezone])
+    removeTimezone(id);
+  }, [removeTimezone]);
 
   // Handle label editing
   const handleStartEditing = useCallback((id: string, currentLabel: string) => {
-    setEditingId(id)
-    setEditingLabel(currentLabel)
-  }, [])
+    setEditingId(id);
+    setEditingLabel(currentLabel);
+  }, []);
 
   const handleSaveLabel = useCallback(() => {
     if (editingId && editingLabel.trim()) {
-      updateTimezoneLabel(editingId, editingLabel.trim())
+      updateTimezoneLabel(editingId, editingLabel.trim());
     }
-    setEditingId(null)
-    setEditingLabel('')
-  }, [editingId, editingLabel, updateTimezoneLabel])
+    setEditingId(null);
+    setEditingLabel('');
+  }, [editingId, editingLabel, updateTimezoneLabel]);
 
   const handleCancelEditing = useCallback(() => {
-    setEditingId(null)
-    setEditingLabel('')
-  }, [])
+    setEditingId(null);
+    setEditingLabel('');
+  }, []);
 
   const handleLabelKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      event.preventDefault()
-      handleSaveLabel()
+      event.preventDefault();
+      handleSaveLabel();
     } else if (event.key === 'Escape') {
-      event.preventDefault()
-      handleCancelEditing()
+      event.preventDefault();
+      handleCancelEditing();
     }
-  }, [handleSaveLabel, handleCancelEditing])
+  }, [handleSaveLabel, handleCancelEditing]);
 
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div 
@@ -169,7 +169,7 @@ const TimezoneModal = memo(function TimezoneModal({
             <TimezoneSearch
               onSelect={handleTimezoneSelect}
               excludeTimezones={selectedTimezones.map(tz => tz.timezone)}
-              autoFocus={true}
+              autoFocus
               className="modal-search"
             />
           )}
@@ -198,7 +198,7 @@ const TimezoneModal = memo(function TimezoneModal({
             ) : (
               <ul className="timezone-list" role="list">
                 {timezonesWithTime.map((timezone) => {
-                  const isEditing = editingId === timezone.id
+                  const isEditing = editingId === timezone.id;
 
                   return (
                     <li 
@@ -249,7 +249,7 @@ const TimezoneModal = memo(function TimezoneModal({
                         ×
                       </button>
                     </li>
-                  )
+                  );
                 })}
               </ul>
             )}
@@ -271,7 +271,7 @@ const TimezoneModal = memo(function TimezoneModal({
         </div>
       </div>
     </div>
-  )
-})
+  );
+});
 
-export { TimezoneModal }
+export { TimezoneModal };

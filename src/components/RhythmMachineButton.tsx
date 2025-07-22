@@ -3,12 +3,12 @@ import { EmojiButton } from './common/EmojiButton';
 
 const RhythmMachineViewer = lazy(() => 
   import('./rhythm/RhythmMachineViewer').then(module => ({ 
-    default: module.RhythmMachineViewer 
-  }))
+    default: module.RhythmMachineViewer, 
+  })),
 );
 
 const RhythmMachineWrapper = ({ onClose }: { onClose: () => void }) => (
-  <RhythmMachineViewer isOpen={true} onClose={onClose} />
+  <RhythmMachineViewer isOpen onClose={onClose} />
 );
 
 export const RhythmMachineButton = () => (
@@ -21,7 +21,7 @@ export const RhythmMachineButton = () => (
     hoverColor={{
       background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.3) 0%, rgba(255, 143, 179, 0.3) 100%)',
       border: 'rgba(255, 107, 157, 0.6)',
-      glow: 'rgba(255, 107, 157, 0.4)'
+      glow: 'rgba(255, 107, 157, 0.4)',
     }}
     title="AI Rhythm Machine - Create beats with AI-powered drum sequencer!"
     className="opacity-80 hover:opacity-100"

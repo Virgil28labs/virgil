@@ -97,7 +97,7 @@ export function validatePassword(password: string): PasswordStrength {
   return {
     isValid: score >= 4,
     score,
-    feedback
+    feedback,
   };
 }
 

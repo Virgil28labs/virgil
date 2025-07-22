@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo } from 'react';
 
 interface VirgilTextLogoProps {
   onClick?: () => void
@@ -23,12 +23,12 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
       >
         Virgil
       </button>
-    )
+    );
   }
   
   return (
     <div className="virgil-logo">
       Virgil
     </div>
-  )
-})
+  );
+});

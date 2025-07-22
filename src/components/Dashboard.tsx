@@ -1,62 +1,62 @@
-import React, { memo, useCallback, useState, Suspense } from 'react'
-import { useAuth } from '../contexts/AuthContext'
-import { useLocation } from '../contexts/LocationContext'
-import { VirgilTextLogo } from './VirgilTextLogo'
-import { DateTime } from './DateTime'
-import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents'
-import { DogEmojiButton } from './DogEmojiButton'
-import { GiphyEmojiButton } from './GiphyEmojiButton'
-import { NasaApodButton } from './NasaApodButton'
-import { RhythmMachineButton } from './RhythmMachineButton'
-import { CircleGameButton } from './CircleGameButton'
-import { StreakTrackerButton } from './StreakTrackerButton'
-import { CameraEmojiButton } from './camera/CameraEmojiButton'
-import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton'
-import { NotesEmojiButton } from './notes/NotesEmojiButton'
-import { LoadingFallback } from './LoadingFallback'
-import { SkeletonLoader } from './SkeletonLoader'
-import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation'
-import { GoogleMapsModal } from './maps/GoogleMapsModal'
-import { SectionErrorBoundary } from './common/SectionErrorBoundary'
+import React, { memo, useCallback, useState, Suspense } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from '../contexts/LocationContext';
+import { VirgilTextLogo } from './VirgilTextLogo';
+import { DateTime } from './DateTime';
+import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents';
+import { DogEmojiButton } from './DogEmojiButton';
+import { GiphyEmojiButton } from './GiphyEmojiButton';
+import { NasaApodButton } from './NasaApodButton';
+import { RhythmMachineButton } from './RhythmMachineButton';
+import { CircleGameButton } from './CircleGameButton';
+import { StreakTrackerButton } from './StreakTrackerButton';
+import { CameraEmojiButton } from './camera/CameraEmojiButton';
+import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton';
+import { NotesEmojiButton } from './notes/NotesEmojiButton';
+import { LoadingFallback } from './LoadingFallback';
+import { SkeletonLoader } from './SkeletonLoader';
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { GoogleMapsModal } from './maps/GoogleMapsModal';
+import { SectionErrorBoundary } from './common/SectionErrorBoundary';
 
 export const Dashboard = memo(function Dashboard() {
-  const { user, signOut } = useAuth()
-  const { address, ipLocation, coordinates, loading: locationLoading } = useLocation()
-  const [showProfileViewer, setShowProfileViewer] = useState(false)
-  const [isSigningOut, setIsSigningOut] = useState(false)
-  const [showMapsModal, setShowMapsModal] = useState(false)
+  const { user, signOut } = useAuth();
+  const { address, ipLocation, coordinates, loading: locationLoading } = useLocation();
+  const [showProfileViewer, setShowProfileViewer] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showMapsModal, setShowMapsModal] = useState(false);
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
     try {
-      const saved = localStorage.getItem('elevationUnit')
-      return (saved === 'feet' || saved === 'meters') ? saved : 'meters'
+      const saved = localStorage.getItem('elevationUnit');
+      return (saved === 'feet' || saved === 'meters') ? saved : 'meters';
     } catch {
-      return 'meters'
+      return 'meters';
     }
-  })
+  });
 
 
   const toggleElevationUnit = useCallback(() => {
     setElevationUnit(prev => {
-      const newUnit = prev === 'meters' ? 'feet' : 'meters'
+      const newUnit = prev === 'meters' ? 'feet' : 'meters';
       try {
-        localStorage.setItem('elevationUnit', newUnit)
+        localStorage.setItem('elevationUnit', newUnit);
       } catch (e) {
-        console.warn('Failed to save elevation unit preference:', e)
+        console.warn('Failed to save elevation unit preference:', e);
       }
-      return newUnit
-    })
-  }, [])
+      return newUnit;
+    });
+  }, []);
 
   const handleSignOut = useCallback(async () => {
-    if (isSigningOut) return // Prevent multiple clicks
+    if (isSigningOut) return; // Prevent multiple clicks
     
-    setIsSigningOut(true)
-    const { error } = await signOut()
+    setIsSigningOut(true);
+    const { error } = await signOut();
     if (error) {
-      console.error('Sign out error:', error)
+      console.error('Sign out error:', error);
     }
-    setIsSigningOut(false)
-  }, [signOut, isSigningOut])
+    setIsSigningOut(false);
+  }, [signOut, isSigningOut]);
 
   // Removed system prompt functionality - moved to VirgilChatbot
 
@@ -66,7 +66,7 @@ export const Dashboard = memo(function Dashboard() {
     onEscape: () => {
       // Optional: Clear any selection or blur active element
       (document.activeElement as HTMLElement)?.blur();
-    }
+    },
   });
 
   return (
@@ -84,13 +84,13 @@ export const Dashboard = memo(function Dashboard() {
       <button 
         className={`power-button ${isSigningOut ? 'signing-out' : ''}`}
         onClick={handleSignOut} 
-        title={isSigningOut ? "Signing out..." : "Sign Out"}
-        aria-label={isSigningOut ? "Signing out..." : "Sign out of your account"}
+        title={isSigningOut ? 'Signing out...' : 'Sign Out'}
+        aria-label={isSigningOut ? 'Signing out...' : 'Sign out of your account'}
         data-keyboard-nav
         disabled={isSigningOut}
       >
-        <div className="power-icon" aria-hidden="true"></div>
-        <span className="sr-only">{isSigningOut ? "Signing out..." : "Sign Out"}</span>
+        <div className="power-icon" aria-hidden="true" />
+        <span className="sr-only">{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
       </button>
 
       {/* Main content */}
@@ -157,8 +157,7 @@ export const Dashboard = memo(function Dashboard() {
               >
                 Elevation: {elevationUnit === 'meters' 
                   ? `${Math.round(coordinates.elevation)}m`
-                  : `${Math.round(coordinates.elevation * 3.28084)}ft`
-                }
+                  : `${Math.round(coordinates.elevation * 3.28084)}ft`}
               </p>
             ) : coordinates && !locationLoading ? (
               <p className="elevation" style={{ opacity: 0.6 }}>
@@ -222,5 +221,5 @@ export const Dashboard = memo(function Dashboard() {
         />
       </SectionErrorBoundary>
     </div>
-  )
-})
+  );
+});

@@ -18,7 +18,7 @@ describe('useToast', () => {
     expect(result.current.toasts).toHaveLength(1);
     expect(result.current.toasts[0]).toMatchObject({
       type: 'info',
-      message: 'Test message'
+      message: 'Test message',
     });
     expect(result.current.toasts[0].id).toBeDefined();
   });
@@ -30,7 +30,7 @@ describe('useToast', () => {
       result.current.addToast({
         type: 'success',
         message: 'Success message',
-        duration: 3000
+        duration: 3000,
       });
     });
     
@@ -38,7 +38,7 @@ describe('useToast', () => {
     expect(result.current.toasts[0]).toMatchObject({
       type: 'success',
       message: 'Success message',
-      duration: 3000
+      duration: 3000,
     });
   });
 
@@ -125,7 +125,7 @@ describe('useToast', () => {
     
     expect(result.current.toasts[0]).toMatchObject({
       type: 'success',
-      message: 'Success!'
+      message: 'Success!',
     });
   });
 
@@ -139,7 +139,7 @@ describe('useToast', () => {
     expect(result.current.toasts[0]).toMatchObject({
       type: 'error',
       message: 'Error occurred',
-      duration: 7000 // Errors have longer duration by default
+      duration: 7000, // Errors have longer duration by default
     });
   });
 
@@ -152,7 +152,7 @@ describe('useToast', () => {
     
     expect(result.current.toasts[0]).toMatchObject({
       type: 'warning',
-      message: 'Warning message'
+      message: 'Warning message',
     });
   });
 
@@ -165,7 +165,7 @@ describe('useToast', () => {
     
     expect(result.current.toasts[0]).toMatchObject({
       type: 'info',
-      message: 'Info message'
+      message: 'Info message',
     });
   });
 
@@ -178,8 +178,8 @@ describe('useToast', () => {
         persistent: true,
         action: {
           label: 'Undo',
-          onClick: jest.fn()
-        }
+          onClick: jest.fn(),
+        },
       });
     });
     
@@ -190,19 +190,19 @@ describe('useToast', () => {
       persistent: true,
       action: {
         label: 'Undo',
-        onClick: expect.any(Function)
-      }
+        onClick: expect.any(Function),
+      },
     });
   });
 
   it('returns toast ID from all methods', () => {
     const { result } = renderHook(() => useToast());
     
-    let id1: string;
-    let id2: string;
-    let id3: string;
-    let id4: string;
-    let id5: string;
+    let id1!: string;
+    let id2!: string;
+    let id3!: string;
+    let id4!: string;
+    let id5!: string;
     
     act(() => {
       id1 = result.current.addToast('Test');

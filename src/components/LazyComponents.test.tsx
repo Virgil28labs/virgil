@@ -6,8 +6,7 @@ import {
   LazyWeather,
   LazyUserProfileViewer,
   lazyWeatherService,
-  lazySearchService,
-  lazyLocationService
+  lazyLocationService,
 } from './LazyComponents';
 
 // Mock React.lazy to return resolved promises with proper component structure
@@ -31,22 +30,22 @@ jest.mock('react', () => ({
     
     MockComponent.displayName = 'MockLazyComponent';
     return MockComponent;
-  }
+  },
 }));
 
 // Mock the service imports
 jest.mock('../lib/weatherService', () => ({
   weatherService: {
     getWeatherByCoordinates: jest.fn(),
-    formatTemperature: jest.fn()
-  }
+    formatTemperature: jest.fn(),
+  },
 }));
 
 jest.mock('../lib/locationService', () => ({
   locationService: {
     getIPLocation: jest.fn(),
-    getAddressFromCoordinates: jest.fn()
-  }
+    getAddressFromCoordinates: jest.fn(),
+  },
 }));
 
 // Helper component for testing lazy loaded components
@@ -62,7 +61,7 @@ describe('LazyComponents', () => {
       render(
         <TestWrapper>
           <LazyRaccoonMascot />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       // In test environment with mocked lazy, component loads immediately
@@ -76,7 +75,7 @@ describe('LazyComponents', () => {
       render(
         <TestWrapper>
           <LazyVirgilChatbot />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('virgil-chatbot')).toBeInTheDocument();
@@ -89,7 +88,7 @@ describe('LazyComponents', () => {
       render(
         <TestWrapper>
           <LazyWeather />
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('weather')).toBeInTheDocument();
@@ -101,8 +100,8 @@ describe('LazyComponents', () => {
     it('renders the UserProfileViewer component', async () => {
       render(
         <TestWrapper>
-          <LazyUserProfileViewer isOpen={true} onClose={() => {}} />
-        </TestWrapper>
+          <LazyUserProfileViewer isOpen onClose={() => {}} />
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('user-profile-viewer')).toBeInTheDocument();
@@ -119,13 +118,6 @@ describe('LazyComponents', () => {
       expect(weatherService.convertTemperature).toBeDefined();
     });
 
-    it('lazy loads the search service', async () => {
-      const searchService = await lazySearchService();
-      
-      expect(searchService).toBeDefined();
-      expect(searchService.search).toBeDefined();
-      expect(searchService.formatSearchResults).toBeDefined();
-    });
 
     it('lazy loads the location service', async () => {
       const locationService = await lazyLocationService();
@@ -158,7 +150,7 @@ describe('LazyComponents', () => {
             <LazyWeather />
             <LazyRaccoonMascot />
           </div>
-        </TestWrapper>
+        </TestWrapper>,
       );
 
       expect(screen.getByTestId('weather')).toBeInTheDocument();

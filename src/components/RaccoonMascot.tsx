@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, memo, useMemo, useCallback } from "react";
-import type { MouseEvent as ReactMouseEvent } from "react";
-import { useLocation } from "../contexts/LocationContext";
+import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
+import { useLocation } from '../contexts/LocationContext';
 
 // Type definitions for the component
 interface Position {
@@ -29,7 +29,7 @@ interface UIElement {
   textBaseline?: number;
 }
 
-type WallSide = "left" | "right" | null;
+type WallSide = 'left' | 'right' | null;
 
 /**
  * 🦝 Interactive Raccoon Mascot Component for Virgil
@@ -61,8 +61,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   };
 
   // Emoji Arrays
-  const raccoonEmojis = ["🦝", "🐾", "🍃", "🌰", "🗑️", "🌙", "🐻", "🍯"];
-  const weatherEmojis = ["⛅", "🌤️", "🌧️", "🌦️", "☀️", "🌩️", "❄️", "🌪️", "🌈"];
+  const raccoonEmojis = ['🦝', '🐾', '🍃', '🌰', '🗑️', '🌙', '🐻', '🍯'];
+  const weatherEmojis = ['⛅', '🌤️', '🌧️', '🌦️', '☀️', '🌩️', '❄️', '🌪️', '🌈'];
 
   /**
    * Returns a random raccoon-related emoji for text bubble display
@@ -182,8 +182,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
 
   // Running Animation State
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [facingDirection, setFacingDirection] = useState<"left" | "right">(
-    "right",
+  const [facingDirection, setFacingDirection] = useState<'left' | 'right'>(
+    'right',
   );
 
   // UI Element Interaction State
@@ -192,7 +192,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   const [currentUIElement, setCurrentUIElement] = useState<UIElement | null>(
     null,
   );
-  const [currentRaccoonEmoji, setCurrentRaccoonEmoji] = useState<string>("🦝");
+  const [currentRaccoonEmoji, setCurrentRaccoonEmoji] = useState<string>('🦝');
 
   // Refs
   const mascotRef = useRef<HTMLDivElement>(null);
@@ -206,19 +206,19 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   // Essential UI selectors for collision detection
   const UI_SELECTORS = useMemo(
     () => [
-      ".virgil-logo", // Virgil "V" logo text
-      ".datetime-display .time", // Time display
-      ".datetime-display .date", // Date display
-      ".datetime-display .day", // Day display
-      ".user-name", // User name text
-      ".user-email", // Email text
-      ".street-address", // Street address
-      ".ip-address", // IP address text
-      ".elevation", // Elevation text
-      ".weather-widget", // Weather display widget
-      ".power-button", // Power button
-      ".virgil-chatbot-bubble", // Chatbot floating button
-      ".emoji-button-interactive", // All emoji buttons (camera, pomodoro, notes, etc.)
+      '.virgil-logo', // Virgil "V" logo text
+      '.datetime-display .time', // Time display
+      '.datetime-display .date', // Date display
+      '.datetime-display .day', // Day display
+      '.user-name', // User name text
+      '.user-email', // Email text
+      '.street-address', // Street address
+      '.ip-address', // IP address text
+      '.elevation', // Elevation text
+      '.weather-widget', // Weather display widget
+      '.power-button', // Power button
+      '.virgil-chatbot-bubble', // Chatbot floating button
+      '.emoji-button-interactive', // All emoji buttons (camera, pomodoro, notes, etc.)
     ],
     [],
   );
@@ -228,21 +228,21 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     elements: UIElement[];
     lastUpdate: number;
     lastHash: string;
-  }>({ elements: [], lastUpdate: 0, lastHash: "" });
+  }>({ elements: [], lastUpdate: 0, lastHash: '' });
 
   /**
    * Creates a hash of current DOM state to detect changes
    */
   const createDOMHash = useCallback((): string => {
     const relevantData = [
-      address?.formatted || "",
-      ipLocation?.ip || "",
+      address?.formatted || '',
+      ipLocation?.ip || '',
       hasGPSLocation.toString(),
       hasIPLocation.toString(),
       window.innerWidth,
       window.innerHeight,
     ];
-    return relevantData.join("|");
+    return relevantData.join('|');
   }, [address, ipLocation, hasGPSLocation, hasIPLocation]);
 
   /**
@@ -264,15 +264,15 @@ const RaccoonMascot = memo(function RaccoonMascot() {
 
     // Define text element selectors once
     const textSelectors = new Set([
-      ".virgil-logo",
-      ".datetime-display .time",
-      ".datetime-display .date",
-      ".datetime-display .day",
-      ".user-name",
-      ".user-email",
-      ".street-address",
-      ".ip-address",
-      ".elevation",
+      '.virgil-logo',
+      '.datetime-display .time',
+      '.datetime-display .date',
+      '.datetime-display .day',
+      '.user-name',
+      '.user-email',
+      '.street-address',
+      '.ip-address',
+      '.elevation',
     ]);
 
     UI_SELECTORS.forEach((selector) => {
@@ -295,13 +295,13 @@ const RaccoonMascot = memo(function RaccoonMascot() {
             const fontSize = parseFloat(computedStyle.fontSize);
 
             // Simple width estimation for collision (good enough for most text)
-            const textContent = (element.textContent || "").trim();
+            const textContent = (element.textContent || '').trim();
             const estimatedWidth = textContent.length * fontSize * 0.6; // Rough approximation
 
             // Calculate text position based on alignment (simplified)
-            if (textAlign === "center") {
+            if (textAlign === 'center') {
               adjustedX = rect.left + (rect.width - estimatedWidth) / 2;
-            } else if (textAlign === "right") {
+            } else if (textAlign === 'right') {
               adjustedX = rect.right - estimatedWidth;
             } else {
               adjustedX = rect.left; // Default to left
@@ -314,7 +314,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           }
 
           elements.push({
-            id: `${selector.replace(/[.\s]/g, "")}_${index}`,
+            id: `${selector.replace(/[.\s]/g, '')}_${index}`,
             type: selector,
             x: adjustedX,
             y: adjustedY,
@@ -325,8 +325,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
             element: element as HTMLElement,
             textBaseline: textBaseline,
             isText: textSelectors.has(selector),
-            isPowerButton: selector === ".power-button",
-            isWeatherWidget: selector === ".weather-widget",
+            isPowerButton: selector === '.power-button',
+            isWeatherWidget: selector === '.weather-widget',
           });
         }
       });
@@ -355,13 +355,13 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       setVisualState((prev) => ({ 
         ...prev, 
         bounceCount: prev.bounceCount + 1,
-        showSparkles: true 
+        showSparkles: true, 
       }));
 
       // Play a cute sound effect (if supported)
       try {
         const audio = new Audio(
-          "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT",
+          'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT',
         );
         audio.volume = 0.3;
         audio.play().catch(() => {}); // Ignore errors if audio fails
@@ -429,12 +429,12 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   // Add global mouse event listeners for dragging
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
 
       return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
       };
     }
     return undefined;
@@ -452,17 +452,17 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     // Update on resize (more responsive than before)
     const handleResize = () => {
       // Clear cache on resize to force recomputation
-      uiElementsCache.current.lastHash = "";
+      uiElementsCache.current.lastHash = '';
       updateUIElements();
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     // Reduced frequency since we now have smart caching (5 seconds instead of 2)
     const interval = setInterval(updateUIElements, 5000);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
       clearInterval(interval);
     };
   }, [detectUIElements]);
@@ -490,11 +490,11 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         // Horizontal movement
         if (keys.current.left) {
           vx = -PHYSICS.MOVE_SPEED;
-          setFacingDirection("left");
+          setFacingDirection('left');
         }
         if (keys.current.right) {
           vx = PHYSICS.MOVE_SPEED;
-          setFacingDirection("right");
+          setFacingDirection('right');
         }
         x += vx;
 
@@ -513,7 +513,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           if (vy > 0 && keys.current.jump) {
             // Falling and holding space
             setIsOnWall(true);
-            setWallSide("left");
+            setWallSide('left');
             vy = Math.min(vy, PHYSICS.WALL_STICK_FORCE); // Slow fall
           } else {
             setIsOnWall(false);
@@ -524,7 +524,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           if (vy > 0 && keys.current.jump) {
             // Falling and holding space
             setIsOnWall(true);
-            setWallSide("right");
+            setWallSide('right');
             vy = Math.min(vy, PHYSICS.WALL_STICK_FORCE); // Slow fall
           } else {
             setIsOnWall(false);
@@ -595,7 +595,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
               // Only set new random emoji if just landed (state transition)
               if (!wasOnUIElement.current) {
                 if (uiElement.isPowerButton) {
-                  setCurrentRaccoonEmoji("⚡");
+                  setCurrentRaccoonEmoji('⚡');
                 } else if (uiElement.isWeatherWidget) {
                   setCurrentRaccoonEmoji(getRandomWeatherEmoji());
                 } else {
@@ -610,28 +610,28 @@ const RaccoonMascot = memo(function RaccoonMascot() {
                 if (uiElement.isPowerButton) {
                   // Special power button interaction
                   uiElement.element.style.boxShadow =
-                    "0 0 25px rgba(239, 176, 194, 1), 0 0 35px rgba(244, 114, 182, 0.8)";
-                  uiElement.element.style.transform = "scale(1.2)";
-                  uiElement.element.style.transition = "all 0.3s ease";
+                    '0 0 25px rgba(239, 176, 194, 1), 0 0 35px rgba(244, 114, 182, 0.8)';
+                  uiElement.element.style.transform = 'scale(1.2)';
+                  uiElement.element.style.transition = 'all 0.3s ease';
                 } else if (uiElement.isWeatherWidget) {
                   // Special weather widget interaction with brand purple glow (consistent with other UI elements)
                   uiElement.element.style.boxShadow =
-                    "0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6)";
+                    '0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6)';
                   uiElement.element.style.transform =
-                    "scale(1.1) translateY(-3px)";
-                  uiElement.element.style.transition = "all 0.3s ease";
+                    'scale(1.1) translateY(-3px)';
+                  uiElement.element.style.transition = 'all 0.3s ease';
                   uiElement.element.style.background =
-                    "rgba(108, 59, 170, 0.15)";
+                    'rgba(108, 59, 170, 0.15)';
                   uiElement.element.style.borderColor =
-                    "rgba(108, 59, 170, 0.6)";
+                    'rgba(108, 59, 170, 0.6)';
                 } else if (uiElement.isText) {
                   uiElement.element.style.textShadow =
-                    "0 0 15px rgba(108, 59, 170, 0.8)";
-                  uiElement.element.style.transition = "text-shadow 0.3s ease";
+                    '0 0 15px rgba(108, 59, 170, 0.8)';
+                  uiElement.element.style.transition = 'text-shadow 0.3s ease';
                 } else {
                   uiElement.element.style.boxShadow =
-                    "0 0 20px rgba(108, 59, 170, 0.6)";
-                  uiElement.element.style.transition = "box-shadow 0.3s ease";
+                    '0 0 20px rgba(108, 59, 170, 0.6)';
+                  uiElement.element.style.transition = 'box-shadow 0.3s ease';
                 }
               }
 
@@ -655,18 +655,18 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         if (!landedOnUI && currentUIElement && currentUIElement.element) {
           if (currentUIElement.isPowerButton) {
             // Reset power button effects
-            currentUIElement.element.style.boxShadow = "";
-            currentUIElement.element.style.transform = "";
+            currentUIElement.element.style.boxShadow = '';
+            currentUIElement.element.style.transform = '';
           } else if (currentUIElement.isWeatherWidget) {
             // Reset weather widget effects
-            currentUIElement.element.style.boxShadow = "";
-            currentUIElement.element.style.transform = "";
-            currentUIElement.element.style.background = "";
-            currentUIElement.element.style.borderColor = "";
+            currentUIElement.element.style.boxShadow = '';
+            currentUIElement.element.style.transform = '';
+            currentUIElement.element.style.background = '';
+            currentUIElement.element.style.borderColor = '';
           } else if (currentUIElement.isText) {
-            currentUIElement.element.style.textShadow = "";
+            currentUIElement.element.style.textShadow = '';
           } else {
-            currentUIElement.element.style.boxShadow = "";
+            currentUIElement.element.style.boxShadow = '';
           }
           setIsOnUIElement(false);
           setCurrentUIElement(null);
@@ -736,8 +736,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         y: Math.min(prev.y, window.innerHeight - 80, PHYSICS.GROUND_Y),
       }));
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Handle keyboard controls
@@ -748,36 +748,36 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       // Reset sleep timer on any keyboard activity
       resetSleepTimer();
       
-      if (e.key === " " || e.key === "Spacebar") {
+      if (e.key === ' ' || e.key === 'Spacebar') {
         if (position.y === PHYSICS.GROUND_Y && !charging) {
           setCharging(true);
         }
         keys.current.jump = true;
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === 'ArrowLeft') {
         keys.current.left = true;
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === 'ArrowRight') {
         keys.current.right = true;
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === " " || e.key === "Spacebar") {
+      if (e.key === ' ' || e.key === 'Spacebar') {
         if (charging) {
           setCharging(false);
         }
         keys.current.jump = false;
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === 'ArrowLeft') {
         keys.current.left = false;
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === 'ArrowRight') {
         keys.current.right = false;
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
 
     // Cleanup
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("keyup", handleKeyUp);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
     };
   }, [isPickedUp, charging, position.y]);
 
@@ -859,79 +859,79 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       <style>{raccoonMascotStyles}</style>
       <div
         style={{
-          position: "fixed",
+          position: 'fixed',
           left: position.x,
           top: position.y,
           zIndex: 1000,
-          cursor: isPickedUp ? "grabbing" : "grab",
-          userSelect: "none",
-          pointerEvents: "auto",
+          cursor: isPickedUp ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          pointerEvents: 'auto',
         }}
       >
         {/* Sparkles effect */}
         {visualState.showSparkles && (
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -20,
               left: -20,
               right: -20,
               bottom: -20,
-              pointerEvents: "none",
-              animation: "sparkle 1s ease-out",
+              pointerEvents: 'none',
+              animation: 'sparkle 1s ease-out',
             }}
           >
             <span
               style={{
-                position: "absolute",
+                position: 'absolute',
                 top: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
-                fontSize: "20px",
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontSize: '20px',
               }}
             >
               ✨
             </span>
             <span
               style={{
-                position: "absolute",
-                top: "20%",
-                left: "20%",
-                fontSize: "16px",
-                animationDelay: "0.2s",
+                position: 'absolute',
+                top: '20%',
+                left: '20%',
+                fontSize: '16px',
+                animationDelay: '0.2s',
               }}
             >
               ⭐
             </span>
             <span
               style={{
-                position: "absolute",
-                top: "30%",
-                right: "20%",
-                fontSize: "18px",
-                animationDelay: "0.4s",
+                position: 'absolute',
+                top: '30%',
+                right: '20%',
+                fontSize: '18px',
+                animationDelay: '0.4s',
               }}
             >
               💫
             </span>
             <span
               style={{
-                position: "absolute",
-                bottom: "20%",
-                left: "30%",
-                fontSize: "14px",
-                animationDelay: "0.6s",
+                position: 'absolute',
+                bottom: '20%',
+                left: '30%',
+                fontSize: '14px',
+                animationDelay: '0.6s',
               }}
             >
               ✨
             </span>
             <span
               style={{
-                position: "absolute",
-                bottom: "10%",
-                right: "30%",
-                fontSize: "16px",
-                animationDelay: "0.8s",
+                position: 'absolute',
+                bottom: '10%',
+                right: '30%',
+                fontSize: '16px',
+                animationDelay: '0.8s',
               }}
             >
               ⭐
@@ -944,13 +944,13 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           <div
             key={emoji.id}
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -10,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "20px",
-              pointerEvents: "none",
-              animation: `floating-zzz 3s ease-out infinite`,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '20px',
+              pointerEvents: 'none',
+              animation: 'floating-zzz 3s ease-out infinite',
               animationDelay: `${emoji.delay}s`,
             }}
           >
@@ -962,17 +962,17 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {isOnWall && (
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -15,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "12px",
-              color: "#ff6b6b",
-              fontWeight: "bold",
-              background: "rgba(255,255,255,0.9)",
-              padding: "2px 6px",
-              borderRadius: "8px",
-              border: "1px solid #ff6b6b",
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '12px',
+              color: '#ff6b6b',
+              fontWeight: 'bold',
+              background: 'rgba(255,255,255,0.9)',
+              padding: '2px 6px',
+              borderRadius: '8px',
+              border: '1px solid #ff6b6b',
             }}
           >
             🧲
@@ -983,17 +983,17 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {isOnUIElement && (
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -15,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "14px",
-              color: "#6c3baa",
-              fontWeight: "bold",
-              background: "rgba(255,255,255,0.9)",
-              padding: "2px 6px",
-              borderRadius: "8px",
-              border: "1px solid #6c3baa",
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '14px',
+              color: '#6c3baa',
+              fontWeight: 'bold',
+              background: 'rgba(255,255,255,0.9)',
+              padding: '2px 6px',
+              borderRadius: '8px',
+              border: '1px solid #6c3baa',
             }}
           >
             {currentRaccoonEmoji}
@@ -1006,55 +1006,55 @@ const RaccoonMascot = memo(function RaccoonMascot() {
           onClick={handleClick}
           onMouseDown={handleMouseDown}
           style={{
-            width: "80px",
-            height: "80px",
-            background: "transparent",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: '80px',
+            height: '80px',
+            background: 'transparent',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             filter: isPickedUp
-              ? "drop-shadow(0 8px 16px rgba(0,0,0,0.3))"
-              : "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
+              ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))'
+              : 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
             transform: isPickedUp
-              ? "scale(1.2) rotate(5deg)"
+              ? 'scale(1.2) rotate(5deg)'
               : isOnUIElement
-                ? "scale(1) translateY(0px)" // Remove scale to prevent floating effect
-                : `scale(1) ${visualState.bounceCount % 2 === 0 ? "translateY(0px)" : "translateY(-2px)"}`,
+                ? 'scale(1) translateY(0px)' // Remove scale to prevent floating effect
+                : `scale(1) ${visualState.bounceCount % 2 === 0 ? 'translateY(0px)' : 'translateY(-2px)'}`,
             transition: isPickedUp
-              ? "all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)"
-              : "all 0.2s ease-in-out",
+              ? 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+              : 'all 0.2s ease-in-out',
             animation: isPickedUp
-              ? "bounce 0.5s ease-in-out"
+              ? 'bounce 0.5s ease-in-out'
               : isSleeping
-                ? "sleeping-breath 3s ease-in-out infinite" // Gentle breathing while sleeping
+                ? 'sleeping-breath 3s ease-in-out infinite' // Gentle breathing while sleeping
                 : isOnUIElement
-                  ? "sitting 3s ease-in-out infinite" // Special sitting animation
+                  ? 'sitting 3s ease-in-out infinite' // Special sitting animation
                   : isRunning
-                    ? "running 0.3s ease-in-out infinite" // CSS-only running animation
-                    : "idle 2s ease-in-out infinite",
+                    ? 'running 0.3s ease-in-out infinite' // CSS-only running animation
+                    : 'idle 2s ease-in-out infinite',
             boxShadow: isPickedUp
-              ? "0 8px 25px rgba(0,0,0,0.2)"
-              : "0 4px 15px rgba(0,0,0,0.1)",
-            cursor: isPickedUp ? "grabbing" : "grab",
+              ? '0 8px 25px rgba(0,0,0,0.2)'
+              : '0 4px 15px rgba(0,0,0,0.1)',
+            cursor: isPickedUp ? 'grabbing' : 'grab',
           }}
           title={
             isPickedUp
               ? "I'm being held! 🦝💕"
-              : "Click to pick up, use ← → to run, space to jump (triple jump available)!"
+              : 'Click to pick up, use ← → to run, space to jump (triple jump available)!'
           }
         >
           <img
             src="/racoon.png"
             alt="Racoon Mascot"
             style={{
-              width: "80px",
-              height: "80px",
-              pointerEvents: "none",
-              userSelect: "none",
+              width: '80px',
+              height: '80px',
+              pointerEvents: 'none',
+              userSelect: 'none',
               transform:
-                facingDirection === "left" ? "scaleX(-1)" : "scaleX(1)",
-              transition: "transform 0.1s ease-in-out",
+                facingDirection === 'left' ? 'scaleX(-1)' : 'scaleX(1)',
+              transition: 'transform 0.1s ease-in-out',
             }}
             draggable={false}
           />
@@ -1064,18 +1064,18 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {visualState.bounceCount > 0 && (
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: -30,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "12px",
-              color: "#666",
-              fontWeight: "bold",
-              background: "rgba(255,255,255,0.8)",
-              padding: "2px 6px",
-              borderRadius: "10px",
-              border: "1px solid rgba(0,0,0,0.1)",
-              backdropFilter: "blur(5px)",
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '12px',
+              color: '#666',
+              fontWeight: 'bold',
+              background: 'rgba(255,255,255,0.8)',
+              padding: '2px 6px',
+              borderRadius: '10px',
+              border: '1px solid rgba(0,0,0,0.1)',
+              backdropFilter: 'blur(5px)',
             }}
           >
             {visualState.bounceCount}
@@ -1086,18 +1086,18 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {jumpsUsed > 0 && (
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: isOnWall ? -45 : -30,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: "12px",
-              color: "#6c3baa",
-              fontWeight: "bold",
-              background: "rgba(255,255,255,0.9)",
-              padding: "2px 6px",
-              borderRadius: "10px",
-              border: "1px solid #6c3baa",
-              backdropFilter: "blur(5px)",
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '12px',
+              color: '#6c3baa',
+              fontWeight: 'bold',
+              background: 'rgba(255,255,255,0.9)',
+              padding: '2px 6px',
+              borderRadius: '10px',
+              border: '1px solid #6c3baa',
+              backdropFilter: 'blur(5px)',
             }}
           >
             {jumpsUsed}
@@ -1108,24 +1108,24 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {charging && (
           <div
             style={{
-              position: "absolute",
-              left: "50%",
+              position: 'absolute',
+              left: '50%',
               bottom: -20,
-              transform: "translateX(-50%)",
+              transform: 'translateX(-50%)',
               width: 70,
               height: 10,
-              background: "var(--brand-light-gray)",
+              background: 'var(--brand-light-gray)',
               borderRadius: 5,
-              border: "1px solid var(--brand-medium-gray)",
-              overflow: "hidden",
+              border: '1px solid var(--brand-medium-gray)',
+              overflow: 'hidden',
             }}
           >
             <div
               style={{
                 width: `${(charge / PHYSICS.CHARGE_MAX) * 100}%`,
-                height: "100%",
-                background: "linear-gradient(90deg, var(--brand-light-purple), var(--brand-accent-purple))",
-                transition: "width 0.1s",
+                height: '100%',
+                background: 'linear-gradient(90deg, var(--brand-light-purple), var(--brand-accent-purple))',
+                transition: 'width 0.1s',
               }}
             />
           </div>
@@ -1135,28 +1135,28 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         {visualState.showGif && (
           <div
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.8)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               zIndex: 2000,
-              cursor: "pointer",
+              cursor: 'pointer',
             }}
             onClick={handleCloseGif}
           >
             <div
               style={{
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                borderRadius: "15px",
-                overflow: "hidden",
-                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5)",
-                position: "relative",
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                borderRadius: '15px',
+                overflow: 'hidden',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+                position: 'relative',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1164,40 +1164,40 @@ const RaccoonMascot = memo(function RaccoonMascot() {
                 src="/racoon_celebration.gif"
                 alt="Raccoon GIF"
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  display: "block",
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
                 }}
               />
               <button
                 onClick={handleCloseGif}
                 style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  background: "rgba(0, 0, 0, 0.7)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  width: "40px",
-                  height: "40px",
-                  fontSize: "20px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.2s ease",
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   (e.target as HTMLElement).style.background =
-                    "rgba(255, 0, 0, 0.8)";
-                  (e.target as HTMLElement).style.transform = "scale(1.1)";
+                    'rgba(255, 0, 0, 0.8)';
+                  (e.target as HTMLElement).style.transform = 'scale(1.1)';
                 }}
                 onMouseLeave={(e) => {
                   (e.target as HTMLElement).style.background =
-                    "rgba(0, 0, 0, 0.7)";
-                  (e.target as HTMLElement).style.transform = "scale(1)";
+                    'rgba(0, 0, 0, 0.7)';
+                  (e.target as HTMLElement).style.transform = 'scale(1)';
                 }}
                 title="Close GIF"
               >

@@ -1,98 +1,98 @@
-import { stopEvent, downloadImage, copyImageToClipboard } from './imageUtils'
+import { stopEvent, downloadImage, copyImageToClipboard } from './imageUtils';
 
 describe('imageUtils', () => {
   describe('stopEvent', () => {
     it('should prevent default and stop propagation', () => {
       const mockEvent = {
         preventDefault: jest.fn(),
-        stopPropagation: jest.fn()
-      } as any
+        stopPropagation: jest.fn(),
+      } as any;
 
-      stopEvent(mockEvent)
+      stopEvent(mockEvent);
 
-      expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1)
-      expect(mockEvent.stopPropagation).toHaveBeenCalledTimes(1)
-    })
-  })
+      expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+      expect(mockEvent.stopPropagation).toHaveBeenCalledTimes(1);
+    });
+  });
 
   describe('downloadImage', () => {
-    let createElementSpy: jest.SpyInstance
-    let appendChildSpy: jest.SpyInstance
-    let removeChildSpy: jest.SpyInstance
-    let mockAnchor: HTMLAnchorElement
-    let revokeObjectURLSpy: jest.SpyInstance
+    let createElementSpy: jest.SpyInstance;
+    let appendChildSpy: jest.SpyInstance;
+    let removeChildSpy: jest.SpyInstance;
+    let mockAnchor: HTMLAnchorElement;
+    let revokeObjectURLSpy: jest.SpyInstance;
 
     beforeEach(() => {
       // Mock fetch
-      global.fetch = jest.fn()
+      global.fetch = jest.fn();
       
       // Mock URL methods
-      global.URL.createObjectURL = jest.fn().mockReturnValue('blob:mock-url')
-      global.URL.revokeObjectURL = jest.fn()
-      revokeObjectURLSpy = jest.spyOn(URL, 'revokeObjectURL')
+      global.URL.createObjectURL = jest.fn().mockReturnValue('blob:mock-url');
+      global.URL.revokeObjectURL = jest.fn();
+      revokeObjectURLSpy = jest.spyOn(URL, 'revokeObjectURL');
 
       // Mock DOM methods
       mockAnchor = {
         href: '',
         download: '',
-        click: jest.fn()
-      } as any
+        click: jest.fn(),
+      } as any;
 
-      createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor)
-      appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation()
-      removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation()
-    })
+      createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor);
+      appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation();
+      removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation();
+    });
 
     afterEach(() => {
-      jest.restoreAllMocks()
-    })
+      jest.restoreAllMocks();
+    });
 
     it('should download image successfully', async () => {
-      const mockBlob = new Blob(['mock image data'], { type: 'image/jpeg' })
+      const mockBlob = new Blob(['mock image data'], { type: 'image/jpeg' });
       const mockResponse = {
-        blob: jest.fn().mockResolvedValue(mockBlob)
+        blob: jest.fn().mockResolvedValue(mockBlob),
       }
-      ;(global.fetch as jest.Mock).mockResolvedValue(mockResponse)
+      ;(global.fetch as jest.Mock).mockResolvedValue(mockResponse);
 
-      const url = 'https://example.com/dog.jpg'
-      const breed = 'akita'
+      const url = 'https://example.com/dog.jpg';
+      const breed = 'akita';
 
-      await downloadImage(url, breed)
+      await downloadImage(url, breed);
 
       // Verify fetch was called
-      expect(global.fetch).toHaveBeenCalledWith(url)
-      expect(mockResponse.blob).toHaveBeenCalled()
+      expect(global.fetch).toHaveBeenCalledWith(url);
+      expect(mockResponse.blob).toHaveBeenCalled();
 
       // Verify object URL was created
-      expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob)
+      expect(URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
 
       // Verify anchor element was configured correctly
-      expect(createElementSpy).toHaveBeenCalledWith('a')
-      expect(mockAnchor.href).toBe('blob:mock-url')
-      expect(mockAnchor.download).toMatch(/^doggo-akita-\d+\.jpg$/)
+      expect(createElementSpy).toHaveBeenCalledWith('a');
+      expect(mockAnchor.href).toBe('blob:mock-url');
+      expect(mockAnchor.download).toMatch(/^doggo-akita-\d+\.jpg$/);
 
       // Verify DOM manipulation
-      expect(appendChildSpy).toHaveBeenCalledWith(mockAnchor)
-      expect(mockAnchor.click).toHaveBeenCalled()
-      expect(removeChildSpy).toHaveBeenCalledWith(mockAnchor)
+      expect(appendChildSpy).toHaveBeenCalledWith(mockAnchor);
+      expect(mockAnchor.click).toHaveBeenCalled();
+      expect(removeChildSpy).toHaveBeenCalledWith(mockAnchor);
 
       // Verify cleanup
-      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
-    })
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url');
+    });
 
     it('should handle fetch errors', async () => {
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'))
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       await expect(downloadImage('https://example.com/dog.jpg', 'beagle'))
-        .rejects.toThrow('Network error')
-    })
-  })
+        .rejects.toThrow('Network error');
+    });
+  });
 
   describe('copyImageToClipboard', () => {
-    let mockCanvas: HTMLCanvasElement
-    let mockContext: CanvasRenderingContext2D
-    let mockImage: HTMLImageElement
-    let createElementSpy: jest.SpyInstance
+    let mockCanvas: HTMLCanvasElement;
+    let mockContext: CanvasRenderingContext2D;
+    let mockImage: HTMLImageElement;
+    let createElementSpy: jest.SpyInstance;
 
     beforeEach(() => {
       // Mock Image constructor
@@ -102,193 +102,193 @@ describe('imageUtils', () => {
         onerror: null,
         src: '',
         width: 100,
-        height: 100
-      } as any
+        height: 100,
+      } as any;
 
-      global.Image = jest.fn().mockImplementation(() => mockImage) as any
+      global.Image = jest.fn().mockImplementation(() => mockImage) as any;
 
       // Mock canvas
       mockContext = {
-        drawImage: jest.fn()
-      } as any
+        drawImage: jest.fn(),
+      } as any;
 
       mockCanvas = {
         width: 0,
         height: 0,
         getContext: jest.fn().mockReturnValue(mockContext),
-        toBlob: jest.fn()
-      } as any
+        toBlob: jest.fn(),
+      } as any;
 
-      createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas)
+      createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas);
 
       // Mock clipboard API
       Object.defineProperty(navigator, 'clipboard', {
         value: {
           write: jest.fn(),
-          writeText: jest.fn()
+          writeText: jest.fn(),
         },
-        writable: true
-      })
+        writable: true,
+      });
 
-      global.ClipboardItem = jest.fn() as any
-    })
+      global.ClipboardItem = jest.fn() as any;
+    });
 
     afterEach(() => {
-      jest.restoreAllMocks()
-    })
+      jest.restoreAllMocks();
+    });
 
     it('should copy image to clipboard successfully', async () => {
-      const mockBlob = new Blob(['image data'], { type: 'image/png' })
+      const mockBlob = new Blob(['image data'], { type: 'image/png' });
       
       // Mock image loading
-      mockImage.onload = null
+      mockImage.onload = null;
       setTimeout(() => {
-        if (mockImage.onload) mockImage.onload({} as Event)
+        if (mockImage.onload) mockImage.onload({} as Event);
       }, 0)
 
       // Mock canvas.toBlob
       ;(mockCanvas.toBlob as jest.Mock).mockImplementation((callback) => {
-        callback(mockBlob)
+        callback(mockBlob);
       })
 
       // Mock clipboard write
-      ;(navigator.clipboard.write as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.write as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(true)
+      expect(result).toBe(true);
 
       // Verify image setup
-      expect(mockImage.crossOrigin).toBe('anonymous')
-      expect(mockImage.src).toBe(url)
+      expect(mockImage.crossOrigin).toBe('anonymous');
+      expect(mockImage.src).toBe(url);
 
       // Verify canvas operations
-      expect(createElementSpy).toHaveBeenCalledWith('canvas')
-      expect(mockCanvas.width).toBe(100)
-      expect(mockCanvas.height).toBe(100)
-      expect(mockContext.drawImage).toHaveBeenCalledWith(mockImage, 0, 0)
+      expect(createElementSpy).toHaveBeenCalledWith('canvas');
+      expect(mockCanvas.width).toBe(100);
+      expect(mockCanvas.height).toBe(100);
+      expect(mockContext.drawImage).toHaveBeenCalledWith(mockImage, 0, 0);
 
       // Verify clipboard write
       expect(navigator.clipboard.write).toHaveBeenCalledWith([
-        expect.any(ClipboardItem)
-      ])
-    })
+        expect.any(ClipboardItem),
+      ]);
+    });
 
     it('should fallback to URL copy when clipboard API is not available', async () => {
       // Remove clipboard write support
-      delete (navigator.clipboard as any).write
-      global.ClipboardItem = undefined as any
+      delete (navigator.clipboard as any).write;
+      global.ClipboardItem = undefined as any;
 
       // Mock image loading
       setTimeout(() => {
-        if (mockImage.onload) mockImage.onload({} as Event)
-      }, 0)
+        if (mockImage.onload) mockImage.onload({} as Event);
+      }, 0);
 
       // Mock canvas.toBlob
       const mockBlob = new Blob(['image data'], { type: 'image/png' })
       ;(mockCanvas.toBlob as jest.Mock).mockImplementation((callback) => {
-        callback(mockBlob)
+        callback(mockBlob);
       })
 
-      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(false)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url)
-    })
+      expect(result).toBe(false);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
 
     it('should handle image load errors', async () => {
       // Mock image loading error
       setTimeout(() => {
-        if (mockImage.onerror) mockImage.onerror({} as Event)
+        if (mockImage.onerror) mockImage.onerror({} as Event);
       }, 0)
 
-      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(false)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url)
-    })
+      expect(result).toBe(false);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
 
     it('should handle canvas context error', async () => {
       // Mock canvas context failure
-      ;(mockCanvas.getContext as jest.Mock).mockReturnValue(null)
+      ;(mockCanvas.getContext as jest.Mock).mockReturnValue(null);
 
       // Mock image loading
       setTimeout(() => {
-        if (mockImage.onload) mockImage.onload({} as Event)
+        if (mockImage.onload) mockImage.onload({} as Event);
       }, 0)
 
-      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(false)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url)
-    })
+      expect(result).toBe(false);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
 
     it('should handle blob creation failure', async () => {
       // Mock image loading
       setTimeout(() => {
-        if (mockImage.onload) mockImage.onload({} as Event)
+        if (mockImage.onload) mockImage.onload({} as Event);
       }, 0)
 
       // Mock canvas.toBlob failure
       ;(mockCanvas.toBlob as jest.Mock).mockImplementation((callback) => {
-        callback(null)
+        callback(null);
       })
 
-      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(false)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url)
-    })
+      expect(result).toBe(false);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
 
     it('should handle clipboard write error', async () => {
-      const mockBlob = new Blob(['image data'], { type: 'image/png' })
+      const mockBlob = new Blob(['image data'], { type: 'image/png' });
       
       // Mock image loading
       setTimeout(() => {
-        if (mockImage.onload) mockImage.onload({} as Event)
+        if (mockImage.onload) mockImage.onload({} as Event);
       }, 0)
 
       // Mock canvas.toBlob
       ;(mockCanvas.toBlob as jest.Mock).mockImplementation((callback) => {
-        callback(mockBlob)
+        callback(mockBlob);
       })
 
       // Mock clipboard write failure
       ;(navigator.clipboard.write as jest.Mock).mockRejectedValue(new Error('Clipboard error'))
-      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined)
+      ;(navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
 
-      const url = 'https://example.com/dog.jpg'
-      const result = await copyImageToClipboard(url)
+      const url = 'https://example.com/dog.jpg';
+      const result = await copyImageToClipboard(url);
 
-      expect(result).toBe(false)
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url)
-    })
+      expect(result).toBe(false);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(url);
+    });
 
     it('should handle final fallback error gracefully', async () => {
       // Mock image loading error
       setTimeout(() => {
-        if (mockImage.onerror) mockImage.onerror({} as Event)
+        if (mockImage.onerror) mockImage.onerror({} as Event);
       }, 0)
 
       // Mock clipboard writeText failure
-      ;(navigator.clipboard.writeText as jest.Mock).mockRejectedValue(new Error('Clipboard error'))
+      ;(navigator.clipboard.writeText as jest.Mock).mockRejectedValue(new Error('Clipboard error'));
 
-      const url = 'https://example.com/dog.jpg'
+      const url = 'https://example.com/dog.jpg';
       
-      await expect(copyImageToClipboard(url)).rejects.toThrow('Clipboard error')
-    })
-  })
-})
+      await expect(copyImageToClipboard(url)).rejects.toThrow('Clipboard error');
+    });
+  });
+});

@@ -3,7 +3,7 @@
  * Provides a clean interface for handling keyboard shortcuts
  */
 
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef } from 'react';
 
 interface Shortcut {
   /** Key to listen for */
@@ -31,34 +31,34 @@ interface UseKeyboardShortcutsOptions {
  */
 export function useKeyboardShortcuts(
   shortcuts: Shortcut[],
-  options: UseKeyboardShortcutsOptions = {}
+  options: UseKeyboardShortcutsOptions = {},
 ) {
-  const { enabled = true, target } = options
-  const shortcutsRef = useRef(shortcuts)
+  const { enabled = true, target } = options;
+  const shortcutsRef = useRef(shortcuts);
   
   // Update shortcuts ref when they change
   useEffect(() => {
-    shortcutsRef.current = shortcuts
-  }, [shortcuts])
+    shortcutsRef.current = shortcuts;
+  }, [shortcuts]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!enabled) return
+    if (!enabled) return;
 
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     
     for (const shortcut of shortcutsRef.current) {
       // Check if key matches
-      if (event.key.toLowerCase() !== shortcut.key.toLowerCase()) continue
+      if (event.key.toLowerCase() !== shortcut.key.toLowerCase()) continue;
 
       // Check modifiers
-      const modifiers = shortcut.modifiers || []
-      const hasCtrl = modifiers.includes('ctrl')
-      const hasCmd = modifiers.includes('cmd')
-      const hasAlt = modifiers.includes('alt')
-      const hasShift = modifiers.includes('shift')
+      const modifiers = shortcut.modifiers || [];
+      const hasCtrl = modifiers.includes('ctrl');
+      const hasCmd = modifiers.includes('cmd');
+      const hasAlt = modifiers.includes('alt');
+      const hasShift = modifiers.includes('shift');
 
       // Handle cmd/ctrl based on platform
-      const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey
+      const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
       
       const modifiersMatch =
         (!hasCtrl && !hasCmd || (hasCtrl && event.ctrlKey) || (hasCmd && event.metaKey) || ((hasCtrl || hasCmd) && ctrlOrCmd)) &&
@@ -67,33 +67,33 @@ export function useKeyboardShortcuts(
         // Ensure no extra modifiers are pressed
         (hasCtrl || hasCmd || !ctrlOrCmd) &&
         (hasAlt || !event.altKey) &&
-        (hasShift || !event.shiftKey)
+        (hasShift || !event.shiftKey);
 
       if (modifiersMatch) {
         if (shortcut.preventDefault) {
-          event.preventDefault()
+          event.preventDefault();
         }
-        shortcut.handler()
-        break
+        shortcut.handler();
+        break;
       }
     }
-  }, [enabled])
+  }, [enabled]);
 
   useEffect(() => {
-    const targetElement = target || document
+    const targetElement = target || document;
     
-    targetElement.addEventListener('keydown', handleKeyDown as EventListener)
-    return () => targetElement.removeEventListener('keydown', handleKeyDown as EventListener)
-  }, [handleKeyDown, target])
+    targetElement.addEventListener('keydown', handleKeyDown as EventListener);
+    return () => targetElement.removeEventListener('keydown', handleKeyDown as EventListener);
+  }, [handleKeyDown, target]);
 
   // Return shortcut info for display
   return {
     shortcuts: shortcuts.map(s => ({
       key: s.key,
       modifiers: s.modifiers || [],
-      description: s.description || ''
-    }))
-  }
+      description: s.description || '',
+    })),
+  };
 }
 
 /**
@@ -102,31 +102,31 @@ export function useKeyboardShortcuts(
  */
 export function formatShortcut(
   key: string,
-  modifiers?: ('ctrl' | 'cmd' | 'alt' | 'shift')[]
+  modifiers?: ('ctrl' | 'cmd' | 'alt' | 'shift')[],
 ): string {
-  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
-  const parts: string[] = []
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const parts: string[] = [];
 
   if (modifiers) {
     if (modifiers.includes('ctrl') || modifiers.includes('cmd')) {
-      parts.push(isMac ? '⌘' : 'Ctrl')
+      parts.push(isMac ? '⌘' : 'Ctrl');
     }
     if (modifiers.includes('alt')) {
-      parts.push(isMac ? '⌥' : 'Alt')
+      parts.push(isMac ? '⌥' : 'Alt');
     }
     if (modifiers.includes('shift')) {
-      parts.push(isMac ? '⇧' : 'Shift')
+      parts.push(isMac ? '⇧' : 'Shift');
     }
   }
 
   // Format special keys
   const formattedKey = key.length === 1 
     ? key.toUpperCase() 
-    : key.charAt(0).toUpperCase() + key.slice(1)
+    : key.charAt(0).toUpperCase() + key.slice(1);
   
-  parts.push(formattedKey)
+  parts.push(formattedKey);
   
-  return parts.join(isMac ? '' : '+')
+  return parts.join(isMac ? '' : '+');
 }
 
 /**
@@ -138,5 +138,5 @@ export const COMMON_SHORTCUTS = {
   NEW: { key: 'n', modifiers: ['cmd', 'ctrl'] as const },
   CLOSE: { key: 'Escape', modifiers: [] as const },
   SUBMIT: { key: 'Enter', modifiers: ['cmd', 'ctrl'] as const },
-  SETTINGS: { key: ',', modifiers: ['cmd', 'ctrl'] as const }
-} as const
+  SETTINGS: { key: ',', modifiers: ['cmd', 'ctrl'] as const },
+} as const;

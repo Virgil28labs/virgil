@@ -2,29 +2,29 @@ export const supabase = {
   auth: {
     getSession: jest.fn().mockResolvedValue({ 
       data: { session: null }, 
-      error: null 
+      error: null, 
     }),
     signInWithPassword: jest.fn().mockResolvedValue({ 
       data: { 
         user: {
           id: 'test-user-id',
-          email: 'test@example.com'
+          email: 'test@example.com',
         }, 
         session: {
           access_token: 'test-token',
-          refresh_token: 'test-refresh'
-        }
+          refresh_token: 'test-refresh',
+        },
       }, 
-      error: null 
+      error: null, 
     }),
     signUp: jest.fn().mockResolvedValue({ 
       data: { 
         user: {
           id: 'test-user-id',
-          email: 'test@example.com'
-        }
+          email: 'test@example.com',
+        },
       }, 
-      error: null 
+      error: null, 
     }),
     signOut: jest.fn().mockResolvedValue({ error: null }),
     onAuthStateChange: jest.fn(() => {
@@ -32,11 +32,11 @@ export const supabase = {
       return {
         data: { 
           subscription: { 
-            unsubscribe: jest.fn() 
-          } 
-        }
+            unsubscribe: jest.fn(), 
+          }, 
+        },
       };
-    })
+    }),
   },
   from: jest.fn(() => ({
     select: jest.fn().mockReturnThis(),
@@ -46,6 +46,6 @@ export const supabase = {
     eq: jest.fn().mockReturnThis(),
     single: jest.fn().mockResolvedValue({ data: null, error: null }),
     limit: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis()
-  }))
+    order: jest.fn().mockReturnThis(),
+  })),
 };

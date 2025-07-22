@@ -92,7 +92,7 @@ describe('DateTime', () => {
     const testDates = [
       { date: new Date('2024-12-25T09:00:00'), expectedDate: 'Dec 25, 2024', expectedDay: 'wednesday' },
       { date: new Date('2024-07-04T18:45:00'), expectedDate: 'Jul 4, 2024', expectedDay: 'thursday' },
-      { date: new Date('2024-02-29T23:59:00'), expectedDate: 'Feb 29, 2024', expectedDay: 'thursday' }
+      { date: new Date('2024-02-29T23:59:00'), expectedDate: 'Feb 29, 2024', expectedDay: 'thursday' },
     ];
 
     testDates.forEach(({ date, expectedDate, expectedDay }) => {
@@ -110,7 +110,7 @@ describe('DateTime', () => {
       { date: new Date('2024-01-15T00:00:00'), expectedTime: '00:00' },
       { date: new Date('2024-01-15T12:00:00'), expectedTime: '12:00' },
       { date: new Date('2024-01-15T13:30:00'), expectedTime: '13:30' },
-      { date: new Date('2024-01-15T23:45:00'), expectedTime: '23:45' }
+      { date: new Date('2024-01-15T23:45:00'), expectedTime: '23:45' },
     ];
 
     testTimes.forEach(({ date, expectedTime }) => {

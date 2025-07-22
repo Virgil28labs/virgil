@@ -6,9 +6,7 @@ jest.mock('node-fetch', () => jest.fn());
 const fetch = require('node-fetch');
 
 // Mock rate limiter
-jest.mock('express-rate-limit', () => {
-  return jest.fn(() => (req, res, next) => next());
-});
+jest.mock('express-rate-limit', () => jest.fn(() => (req, res, next) => next()));
 
 const weatherRouter = require('../weather');
 
@@ -22,7 +20,7 @@ describe('Weather Routes', () => {
       id: 800,
       main: 'Clear',
       description: 'clear sky',
-      icon: '01d'
+      icon: '01d',
     }],
     main: {
       temp: 72.5,
@@ -30,12 +28,12 @@ describe('Weather Routes', () => {
       temp_min: 68.1,
       temp_max: 75.9,
       pressure: 1013,
-      humidity: 45
+      humidity: 45,
     },
     visibility: 10000,
     wind: {
       speed: 8.5,
-      deg: 230
+      deg: 230,
     },
     clouds: { all: 1 },
     dt: 1624301234,
@@ -44,23 +42,23 @@ describe('Weather Routes', () => {
       id: 5141,
       country: 'US',
       sunrise: 1624265400,
-      sunset: 1624318800
+      sunset: 1624318800,
     },
     timezone: -14400,
     id: 5128581,
     name: 'New York',
-    cod: 200
+    cod: 200,
   };
 
   beforeEach(() => {
     app = express();
     app.use(express.json());
     app.use('/api/v1/weather', weatherRouter);
-    
+
     // Reset mocks
     jest.clearAllMocks();
     fetch.mockClear();
-    
+
     // Set up default environment
     process.env.OPENWEATHER_API_KEY = 'test-weather-api-key';
 
@@ -80,7 +78,7 @@ describe('Weather Routes', () => {
       fetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       const response = await request(app)
@@ -105,17 +103,17 @@ describe('Weather Routes', () => {
             id: 800,
             main: 'Clear',
             description: 'clear sky',
-            icon: '01d'
+            icon: '01d',
           },
           cityName: 'New York',
           country: 'US',
-          timestamp: expect.any(Number)
+          timestamp: expect.any(Number),
         },
-        cached: false
+        cached: false,
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('https://api.openweathermap.org/data/2.5/weather?lat=40.7128&lon=-74.006')
+        expect.stringContaining('https://api.openweathermap.org/data/2.5/weather?lat=40.7128&lon=-74.006'),
       );
     });
 
@@ -123,7 +121,7 @@ describe('Weather Routes', () => {
       // First request to populate cache
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       await request(app)
@@ -148,7 +146,7 @@ describe('Weather Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Invalid coordinates provided'
+        error: 'Invalid coordinates provided',
       });
     });
 
@@ -160,7 +158,7 @@ describe('Weather Routes', () => {
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'Weather service is not properly configured'
+        error: 'Weather service is not properly configured',
       });
     });
 
@@ -168,7 +166,7 @@ describe('Weather Routes', () => {
       fetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ message: 'Invalid API key' })
+        json: jest.fn().mockResolvedValue({ message: 'Invalid API key' }),
       });
 
       const response = await request(app)
@@ -177,7 +175,7 @@ describe('Weather Routes', () => {
 
       expect(response.body).toEqual({
         error: 'Failed to fetch weather data',
-        status: 401
+        status: 401,
       });
     });
 
@@ -190,7 +188,7 @@ describe('Weather Routes', () => {
 
       expect(response.body).toEqual({
         error: 'Internal server error',
-        message: 'Failed to process weather request'
+        message: 'Failed to process weather request',
       });
     });
   });
@@ -199,7 +197,7 @@ describe('Weather Routes', () => {
     it('should fetch weather data by city name', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       const response = await request(app)
@@ -210,20 +208,20 @@ describe('Weather Routes', () => {
         success: true,
         data: expect.objectContaining({
           cityName: 'New York',
-          country: 'US'
+          country: 'US',
         }),
-        cached: false
+        cached: false,
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('q=New%20York')
+        expect.stringContaining('q=New%20York'),
       );
     });
 
     it('should fetch weather data by city and country', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       await request(app)
@@ -231,14 +229,14 @@ describe('Weather Routes', () => {
         .expect(200);
 
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('q=London%2CUK')
+        expect.stringContaining('q=London%2CUK'),
       );
     });
 
     it('should use cache for city searches', async () => {
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       // First request
@@ -265,7 +263,7 @@ describe('Weather Routes', () => {
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'Weather service is not properly configured'
+        error: 'Weather service is not properly configured',
       });
     });
 
@@ -273,7 +271,7 @@ describe('Weather Routes', () => {
       fetch.mockResolvedValue({
         ok: false,
         status: 404,
-        json: jest.fn().mockResolvedValue({ message: 'City not found' })
+        json: jest.fn().mockResolvedValue({ message: 'City not found' }),
       });
 
       const response = await request(app)
@@ -282,7 +280,7 @@ describe('Weather Routes', () => {
 
       expect(response.body).toEqual({
         error: 'Failed to fetch weather data',
-        status: 404
+        status: 404,
       });
     });
   });
@@ -299,7 +297,7 @@ describe('Weather Routes', () => {
         configured: true,
         apiKeyPrefix: 'test-wea...',
         cacheSize: 0,
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
     });
 
@@ -316,7 +314,7 @@ describe('Weather Routes', () => {
         configured: false,
         apiKeyPrefix: 'none',
         cacheSize: 0,
-        timestamp: expect.any(String)
+        timestamp: expect.any(String),
       });
     });
 
@@ -324,7 +322,7 @@ describe('Weather Routes', () => {
       // Populate cache with a request
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       await request(app)
@@ -344,7 +342,7 @@ describe('Weather Routes', () => {
       fetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       const response = await request(app)
@@ -356,7 +354,7 @@ describe('Weather Routes', () => {
         status: 200,
         data: mockWeatherResponse,
         error: null,
-        apiKeyPrefix: 'test-wea...'
+        apiKeyPrefix: 'test-wea...',
       });
     });
 
@@ -364,7 +362,7 @@ describe('Weather Routes', () => {
       fetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ message: 'Invalid API key' })
+        json: jest.fn().mockResolvedValue({ message: 'Invalid API key' }),
       });
 
       const response = await request(app)
@@ -376,7 +374,7 @@ describe('Weather Routes', () => {
         status: 401,
         data: null,
         error: { message: 'Invalid API key' },
-        apiKeyPrefix: 'test-wea...'
+        apiKeyPrefix: 'test-wea...',
       });
     });
 
@@ -389,7 +387,7 @@ describe('Weather Routes', () => {
 
       expect(response.body).toEqual({
         error: 'Weather service is not properly configured',
-        hasKey: false
+        hasKey: false,
       });
     });
   });
@@ -399,7 +397,7 @@ describe('Weather Routes', () => {
       // Populate cache
       fetch.mockResolvedValue({
         ok: true,
-        json: jest.fn().mockResolvedValue(mockWeatherResponse)
+        json: jest.fn().mockResolvedValue(mockWeatherResponse),
       });
 
       await request(app)
@@ -410,7 +408,7 @@ describe('Weather Routes', () => {
       let healthResponse = await request(app)
         .get('/api/v1/weather/health')
         .expect(200);
-      
+
       expect(healthResponse.body.cacheSize).toBe(1);
 
       // Fast forward time past cache duration (10 minutes + 1 minute for cleanup interval)
@@ -420,7 +418,7 @@ describe('Weather Routes', () => {
       healthResponse = await request(app)
         .get('/api/v1/weather/health')
         .expect(200);
-      
+
       expect(healthResponse.body.cacheSize).toBe(0);
     });
   });
@@ -433,7 +431,7 @@ describe('Weather Routes', () => {
         max: 20,
         message: 'Too many weather requests, please try again later.',
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
       });
     });
   });

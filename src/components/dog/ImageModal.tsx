@@ -1,6 +1,6 @@
-import { memo, useEffect, useCallback, useState } from 'react'
-import type { ImageModalProps } from '../../types'
-import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils'
+import { memo, useEffect, useCallback, useState } from 'react';
+import type { ImageModalProps } from '../../types';
+import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 
 export const ImageModal = memo(function ImageModal({ 
   dogs, 
@@ -8,96 +8,96 @@ export const ImageModal = memo(function ImageModal({
   isFavorited,
   onClose, 
   onNavigate,
-  onFavoriteToggle
+  onFavoriteToggle,
 }: ImageModalProps) {
-  const hasPrevious = currentIndex !== null && currentIndex > 0
-  const hasNext = currentIndex !== null && currentIndex < dogs.length - 1
-  const currentDog = currentIndex !== null ? dogs[currentIndex] : null
+  const hasPrevious = currentIndex !== null && currentIndex > 0;
+  const hasNext = currentIndex !== null && currentIndex < dogs.length - 1;
+  const currentDog = currentIndex !== null ? dogs[currentIndex] : null;
 
   const handlePrevious = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (hasPrevious && currentIndex !== null) {
-      onNavigate(currentIndex - 1)
+      onNavigate(currentIndex - 1);
     }
-  }, [hasPrevious, currentIndex, onNavigate])
+  }, [hasPrevious, currentIndex, onNavigate]);
 
   const handleNext = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (hasNext && currentIndex !== null) {
-      onNavigate(currentIndex + 1)
+      onNavigate(currentIndex + 1);
     }
-  }, [hasNext, currentIndex, onNavigate])
+  }, [hasNext, currentIndex, onNavigate]);
 
-  const [showCopied, setShowCopied] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
+  const [showCopied, setShowCopied] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
 
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
-    if (!currentDog) return
+    stopEvent(e);
+    if (!currentDog) return;
     
     try {
-      await downloadImage(currentDog.url, currentDog.breed)
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      await downloadImage(currentDog.url, currentDog.breed);
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download image:', error)
+      console.error('Failed to download image:', error);
     }
-  }, [currentDog])
+  }, [currentDog]);
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
-    if (!currentDog) return
+    stopEvent(e);
+    if (!currentDog) return;
     
     try {
-      await copyImageToClipboard(currentDog.url)
-      setShowCopied(true)
-      setTimeout(() => setShowCopied(false), 2000)
+      await copyImageToClipboard(currentDog.url);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy image:', error)
+      console.error('Failed to copy image:', error);
     }
-  }, [currentDog])
+  }, [currentDog]);
 
   const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (currentDog) {
-      onFavoriteToggle(currentDog)
+      onFavoriteToggle(currentDog);
     }
-  }, [currentDog, onFavoriteToggle])
+  }, [currentDog, onFavoriteToggle]);
 
   // Handle keyboard navigation
   useEffect(() => {
-    if (currentIndex === null) return
+    if (currentIndex === null) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onClose()
-          break
+          onClose();
+          break;
         case 'ArrowLeft':
           if (hasPrevious && currentIndex !== null) {
-            onNavigate(currentIndex - 1)
+            onNavigate(currentIndex - 1);
           }
-          break
+          break;
         case 'ArrowRight':
           if (hasNext && currentIndex !== null) {
-            onNavigate(currentIndex + 1)
+            onNavigate(currentIndex + 1);
           }
-          break
+          break;
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext])
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext]);
 
-  if (currentIndex === null || !currentDog) return null
+  if (currentIndex === null || !currentDog) return null;
 
   return (
     <div 
       className="doggo-image-modal" 
       onClick={(e) => {
-        e.stopPropagation()
-        onClose()
+        e.stopPropagation();
+        onClose();
       }}
     >
       <div className="doggo-modal-content">
@@ -168,5 +168,5 @@ export const ImageModal = memo(function ImageModal({
         {currentIndex + 1} / {dogs.length}
       </div>
     </div>
-  )
-})
+  );
+});

@@ -2,7 +2,7 @@ const CACHE_NAME = 'virgil-cache-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
 ];
 
 // Cache strategy: Cache First for static assets, Network First for API calls
@@ -14,7 +14,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -27,9 +27,9 @@ self.addEventListener('activate', (event) => {
           if (cacheName !== STATIC_CACHE_NAME && cacheName !== API_CACHE_NAME) {
             return caches.delete(cacheName);
           }
-        })
+        }),
       );
-    }).then(() => self.clients.claim())
+    }).then(() => self.clients.claim()),
   );
 });
 
@@ -79,7 +79,7 @@ async function cacheFirstStrategy(request) {
     return networkResponse;
   } catch (error) {
     // If both cache and network fail, return offline page or error
-    /* eslint-disable-next-line no-console */
+     
     console.error('Cache First strategy failed:', error);
     throw error;
   }
@@ -98,7 +98,7 @@ async function networkFirstStrategy(request) {
       const cachedResponse = new Response(responseClone.body, {
         status: responseClone.status,
         statusText: responseClone.statusText,
-        headers: headers
+        headers: headers,
       });
       cache.put(request, cachedResponse);
     }

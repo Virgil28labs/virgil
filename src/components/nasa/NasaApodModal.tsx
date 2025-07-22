@@ -1,11 +1,11 @@
-import { memo, useEffect, useCallback, useState } from 'react'
-import type { ApodImage } from '../../types/nasa.types'
+import { memo, useEffect, useCallback, useState } from 'react';
+import type { ApodImage } from '../../types/nasa.types';
 import { 
   stopEvent, 
   downloadApodImage, 
   copyApodToClipboard, 
-  shareApod 
-} from './utils/nasaImageUtils'
+  shareApod, 
+} from './utils/nasaImageUtils';
 
 interface NasaApodModalProps {
   favorites: ApodImage[]
@@ -22,126 +22,126 @@ export const NasaApodModal = memo(function NasaApodModal({
   isFavorited,
   onClose,
   onNavigate,
-  onFavoriteToggle
+  onFavoriteToggle,
 }: NasaApodModalProps) {
-  const hasPrevious = currentIndex !== null && currentIndex > 0
-  const hasNext = currentIndex !== null && currentIndex < favorites.length - 1
-  const currentApod = currentIndex !== null ? favorites[currentIndex] : null
+  const hasPrevious = currentIndex !== null && currentIndex > 0;
+  const hasNext = currentIndex !== null && currentIndex < favorites.length - 1;
+  const currentApod = currentIndex !== null ? favorites[currentIndex] : null;
 
-  const [showCopied, setShowCopied] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
-  const [showShared, setShowShared] = useState(false)
-  const [showDownloadMenu, setShowDownloadMenu] = useState(false)
-  const [showDescription, setShowDescription] = useState(false)
+  const [showCopied, setShowCopied] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
+  const [showShared, setShowShared] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
 
   const handlePrevious = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (hasPrevious && currentIndex !== null) {
-      onNavigate(currentIndex - 1)
+      onNavigate(currentIndex - 1);
     }
-  }, [hasPrevious, currentIndex, onNavigate])
+  }, [hasPrevious, currentIndex, onNavigate]);
 
   const handleNext = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (hasNext && currentIndex !== null) {
-      onNavigate(currentIndex + 1)
+      onNavigate(currentIndex + 1);
     }
-  }, [hasNext, currentIndex, onNavigate])
+  }, [hasNext, currentIndex, onNavigate]);
 
   const handleDownload = useCallback(async (e: React.MouseEvent, quality: 'standard' | 'hd') => {
-    stopEvent(e)
-    if (!currentApod) return
+    stopEvent(e);
+    if (!currentApod) return;
     
-    setShowDownloadMenu(false)
+    setShowDownloadMenu(false);
     try {
-      await downloadApodImage(currentApod, quality)
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      await downloadApodImage(currentApod, quality);
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download APOD:', error)
+      console.error('Failed to download APOD:', error);
     }
-  }, [currentApod])
+  }, [currentApod]);
 
   const handleDownloadClick = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
-    if (!currentApod) return
+    stopEvent(e);
+    if (!currentApod) return;
     
     if (currentApod.hdImageUrl) {
-      setShowDownloadMenu(!showDownloadMenu)
+      setShowDownloadMenu(!showDownloadMenu);
     } else {
-      handleDownload(e, 'standard')
+      handleDownload(e, 'standard');
     }
-  }, [currentApod, showDownloadMenu, handleDownload])
+  }, [currentApod, showDownloadMenu, handleDownload]);
 
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
-    if (!currentApod) return
+    stopEvent(e);
+    if (!currentApod) return;
     
     try {
-      await copyApodToClipboard(currentApod)
-      setShowCopied(true)
-      setTimeout(() => setShowCopied(false), 2000)
+      await copyApodToClipboard(currentApod);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy APOD:', error)
+      console.error('Failed to copy APOD:', error);
     }
-  }, [currentApod])
+  }, [currentApod]);
 
   const handleShare = useCallback(async (e: React.MouseEvent) => {
-    stopEvent(e)
-    if (!currentApod) return
+    stopEvent(e);
+    if (!currentApod) return;
     
     try {
-      const sharedNatively = await shareApod(currentApod)
+      const sharedNatively = await shareApod(currentApod);
       if (!sharedNatively) {
-        setShowShared(true)
-        setTimeout(() => setShowShared(false), 2000)
+        setShowShared(true);
+        setTimeout(() => setShowShared(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to share APOD:', error)
+      console.error('Failed to share APOD:', error);
     }
-  }, [currentApod])
+  }, [currentApod]);
 
   const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
-    stopEvent(e)
+    stopEvent(e);
     if (currentApod) {
-      onFavoriteToggle(currentApod)
+      onFavoriteToggle(currentApod);
     }
-  }, [currentApod, onFavoriteToggle])
+  }, [currentApod, onFavoriteToggle]);
 
   // Handle keyboard navigation
   useEffect(() => {
-    if (currentIndex === null) return
+    if (currentIndex === null) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'Escape':
-          onClose()
-          break
+          onClose();
+          break;
         case 'ArrowLeft':
           if (hasPrevious && currentIndex !== null) {
-            onNavigate(currentIndex - 1)
+            onNavigate(currentIndex - 1);
           }
-          break
+          break;
         case 'ArrowRight':
           if (hasNext && currentIndex !== null) {
-            onNavigate(currentIndex + 1)
+            onNavigate(currentIndex + 1);
           }
-          break
+          break;
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext])
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, onClose, onNavigate, hasPrevious, hasNext]);
 
-  if (currentIndex === null || !currentApod) return null
+  if (currentIndex === null || !currentApod) return null;
 
   return (
     <div 
       className="nasa-apod-modal" 
       onClick={(e) => {
-        e.stopPropagation()
-        onClose()
+        e.stopPropagation();
+        onClose();
       }}
     >
       <div className="nasa-apod-modal-content">
@@ -168,7 +168,7 @@ export const NasaApodModal = memo(function NasaApodModal({
               weekday: 'long',
               year: 'numeric',
               month: 'long',
-              day: 'numeric'
+              day: 'numeric',
             })}
           </p>
         </div>
@@ -232,8 +232,8 @@ export const NasaApodModal = memo(function NasaApodModal({
           <button
             className={`nasa-apod-modal-action ${showDescription ? 'active' : ''}`}
             onClick={(e) => {
-              stopEvent(e)
-              setShowDescription(!showDescription)
+              stopEvent(e);
+              setShowDescription(!showDescription);
             }}
             aria-label="Toggle description"
             title="Toggle description"
@@ -285,5 +285,5 @@ export const NasaApodModal = memo(function NasaApodModal({
         {currentIndex + 1} / {favorites.length}
       </div>
     </div>
-  )
-})
+  );
+});

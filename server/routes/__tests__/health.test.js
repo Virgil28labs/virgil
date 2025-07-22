@@ -5,12 +5,12 @@ const healthRouter = require('../health');
 // Mock the cache and queue modules to avoid import errors
 jest.mock('../../middleware/cache', () => ({
   cache: {
-    get: jest.fn()
-  }
+    get: jest.fn(),
+  },
 }));
 
 jest.mock('../../services/queue', () => ({
-  RequestQueue: {}
+  RequestQueue: {},
 }));
 
 describe('Health Routes', () => {
@@ -33,7 +33,7 @@ describe('Health Routes', () => {
         status: 'healthy',
         timestamp: expect.any(String),
         uptime: expect.any(Number),
-        environment: 'test'
+        environment: 'test',
       });
     });
 
@@ -65,11 +65,11 @@ describe('Health Routes', () => {
             rss: expect.stringMatching(/\d+\.\d+ MB/),
             heapTotal: expect.stringMatching(/\d+\.\d+ MB/),
             heapUsed: expect.stringMatching(/\d+\.\d+ MB/),
-            external: expect.stringMatching(/\d+\.\d+ MB/)
-          }
+            external: expect.stringMatching(/\d+\.\d+ MB/),
+          },
         },
         system: expect.any(Object),
-        services: expect.any(Object)
+        services: expect.any(Object),
       });
     });
 

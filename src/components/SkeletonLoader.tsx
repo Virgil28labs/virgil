@@ -11,7 +11,7 @@ export const SkeletonLoader = memo(function SkeletonLoader({
   width = '100%',
   height = '20px',
   borderRadius = '4px',
-  className = ''
+  className = '',
 }: SkeletonLoaderProps) {
   return (
     <div
@@ -24,7 +24,7 @@ export const SkeletonLoader = memo(function SkeletonLoader({
         borderRadius,
         background: 'linear-gradient(90deg, var(--brand-dark-purple) 25%, var(--brand-light-purple) 50%, var(--brand-dark-purple) 75%)',
         backgroundSize: '200% 100%',
-        animation: 'skeleton-loading 1.5s infinite'
+        animation: 'skeleton-loading 1.5s infinite',
       }}
     />
   );

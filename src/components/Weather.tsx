@@ -62,7 +62,7 @@ export const Weather = memo(function Weather() {
         <div onClick={toggleUnit} title={`${data.condition.description} - Click to toggle unit`}>
           <div className="weather-content">
             <span className="weather-emoji" aria-hidden="true">
-              {weatherService.getWeatherEmoji(data.condition.id)}
+              {weatherService.getWeatherEmoji(data.condition.id || 0)}
             </span>
             <span className="weather-temp">
               {data.temperature}{unit === 'fahrenheit' ? '°F' : '°C'}

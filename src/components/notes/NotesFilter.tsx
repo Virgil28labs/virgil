@@ -3,10 +3,10 @@
  * Provides tag-based filtering and text search functionality
  */
 
-import React, { useState, useCallback } from 'react'
-import { FilterType, ActionFilterType } from './types'
-import { DOMAIN_FILTERS, ACTION_FILTERS } from './constants'
-import './NotesFilter.css'
+import React, { useState, useCallback } from 'react';
+import type { FilterType, ActionFilterType } from './types';
+import { DOMAIN_FILTERS, ACTION_FILTERS } from './constants';
+import './NotesFilter.css';
 
 interface NotesFilterProps {
   /** Currently active filter */
@@ -35,20 +35,20 @@ export const NotesFilter = ({
   activeActionFilter = 'all',
   onActionFilterChange,
   searchQuery,
-  onSearchChange 
+  onSearchChange, 
 }: NotesFilterProps) => {
-  const [showSearch, setShowSearch] = useState(false)
+  const [showSearch, setShowSearch] = useState(false);
 
   const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      setShowSearch(false)
-      onSearchChange('')
+      setShowSearch(false);
+      onSearchChange('');
     }
-  }, [onSearchChange])
+  }, [onSearchChange]);
 
   // Use centralized filter constants
-  const filters = DOMAIN_FILTERS
-  const actionFilters = ACTION_FILTERS
+  const filters = DOMAIN_FILTERS;
+  const actionFilters = ACTION_FILTERS;
 
   return (
     <div className="notes-filter-container" role="toolbar" aria-label="Note filters">
@@ -128,5 +128,5 @@ export const NotesFilter = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

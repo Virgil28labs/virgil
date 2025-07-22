@@ -10,7 +10,7 @@ describe('validateRequest', () => {
     app = express();
     app.use(express.json());
     mockHandler = jest.fn((req, res) => res.json({ success: true }));
-    
+
     app.post('/test', validateRequest, mockHandler);
   });
 
@@ -21,8 +21,8 @@ describe('validateRequest', () => {
         .send({
           messages: [
             { role: 'user', content: 'Hello' },
-            { role: 'assistant', content: 'Hi there!' }
-          ]
+            { role: 'assistant', content: 'Hi there!' },
+          ],
         })
         .expect(200);
 
@@ -37,7 +37,7 @@ describe('validateRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
       expect(mockHandler).not.toHaveBeenCalled();
     });
@@ -49,7 +49,7 @@ describe('validateRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     });
 
@@ -60,7 +60,7 @@ describe('validateRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     });
 
@@ -69,13 +69,13 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [
-            { content: 'Hello' }
-          ]
+            { content: 'Hello' },
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Each message must have role and content properties'
+        error: 'Each message must have role and content properties',
       });
     });
 
@@ -84,13 +84,13 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [
-            { role: 'user' }
-          ]
+            { role: 'user' },
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Each message must have role and content properties'
+        error: 'Each message must have role and content properties',
       });
     });
 
@@ -99,13 +99,13 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [
-            { role: 'invalid', content: 'Hello' }
-          ]
+            { role: 'invalid', content: 'Hello' },
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Message role must be system, user, or assistant'
+        error: 'Message role must be system, user, or assistant',
       });
     });
 
@@ -116,8 +116,8 @@ describe('validateRequest', () => {
           messages: [
             { role: 'system', content: 'You are helpful' },
             { role: 'user', content: 'Hello' },
-            { role: 'assistant', content: 'Hi!' }
-          ]
+            { role: 'assistant', content: 'Hi!' },
+          ],
         })
         .expect(200);
 
@@ -129,13 +129,13 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [
-            { role: 'user', content: 123 }
-          ]
+            { role: 'user', content: 123 },
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Message content must be a string'
+        error: 'Message content must be a string',
       });
     });
   });
@@ -146,7 +146,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: 0.7
+          temperature: 0.7,
         })
         .expect(200);
 
@@ -158,7 +158,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: 0
+          temperature: 0,
         })
         .expect(200);
 
@@ -166,7 +166,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: 2
+          temperature: 2,
         })
         .expect(200);
     });
@@ -176,12 +176,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: '0.7'
+          temperature: '0.7',
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Temperature must be a number between 0 and 2'
+        error: 'Temperature must be a number between 0 and 2',
       });
     });
 
@@ -190,12 +190,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: -0.1
+          temperature: -0.1,
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Temperature must be a number between 0 and 2'
+        error: 'Temperature must be a number between 0 and 2',
       });
     });
 
@@ -204,12 +204,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          temperature: 2.1
+          temperature: 2.1,
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Temperature must be a number between 0 and 2'
+        error: 'Temperature must be a number between 0 and 2',
       });
     });
 
@@ -217,7 +217,7 @@ describe('validateRequest', () => {
       const response = await request(app)
         .post('/test')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(200);
 
@@ -231,7 +231,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: 256
+          maxTokens: 256,
         })
         .expect(200);
 
@@ -243,7 +243,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: 1
+          maxTokens: 1,
         })
         .expect(200);
 
@@ -251,7 +251,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: 4096
+          maxTokens: 4096,
         })
         .expect(200);
     });
@@ -261,12 +261,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: '256'
+          maxTokens: '256',
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Max tokens must be a number between 1 and 4096'
+        error: 'Max tokens must be a number between 1 and 4096',
       });
     });
 
@@ -275,12 +275,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: 0
+          maxTokens: 0,
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Max tokens must be a number between 1 and 4096'
+        error: 'Max tokens must be a number between 1 and 4096',
       });
     });
 
@@ -289,12 +289,12 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          maxTokens: 4097
+          maxTokens: 4097,
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Max tokens must be a number between 1 and 4096'
+        error: 'Max tokens must be a number between 1 and 4096',
       });
     });
   });
@@ -311,7 +311,7 @@ describe('validateRequest', () => {
         'claude-3-opus',
         'llama2',
         'mistral',
-        'codellama'
+        'codellama',
       ];
 
       for (const model of validModels) {
@@ -319,7 +319,7 @@ describe('validateRequest', () => {
           .post('/test')
           .send({
             messages: [{ role: 'user', content: 'Hello' }],
-            model
+            model,
           })
           .expect(200);
 
@@ -332,7 +332,7 @@ describe('validateRequest', () => {
         .post('/test')
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
-          model: 'invalid-model'
+          model: 'invalid-model',
         })
         .expect(400);
 
@@ -343,7 +343,7 @@ describe('validateRequest', () => {
       const response = await request(app)
         .post('/test')
         .send({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         })
         .expect(200);
 
@@ -358,11 +358,11 @@ describe('validateRequest', () => {
         .send({
           messages: [
             { role: 'system', content: 'You are helpful' },
-            { role: 'user', content: 'Hello' }
+            { role: 'user', content: 'Hello' },
           ],
           model: 'gpt-4o-mini',
           temperature: 0.7,
-          maxTokens: 256
+          maxTokens: 256,
         })
         .expect(200);
 
@@ -380,7 +380,7 @@ describe('validateBatchRequest', () => {
     app = express();
     app.use(express.json());
     mockHandler = jest.fn((req, res) => res.json({ success: true }));
-    
+
     app.post('/batch', validateBatchRequest, mockHandler);
   });
 
@@ -391,8 +391,8 @@ describe('validateBatchRequest', () => {
         .send({
           requests: [
             { messages: [{ role: 'user', content: 'Hello 1' }] },
-            { messages: [{ role: 'user', content: 'Hello 2' }] }
-          ]
+            { messages: [{ role: 'user', content: 'Hello 2' }] },
+          ],
         })
         .expect(200);
 
@@ -407,7 +407,7 @@ describe('validateBatchRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Requests must be an array'
+        error: 'Requests must be an array',
       });
     });
 
@@ -418,7 +418,7 @@ describe('validateBatchRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Requests must be an array'
+        error: 'Requests must be an array',
       });
     });
 
@@ -429,13 +429,13 @@ describe('validateBatchRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Requests array must not be empty'
+        error: 'Requests array must not be empty',
       });
     });
 
     it('should reject more than 10 requests', async () => {
       const requests = Array(11).fill({
-        messages: [{ role: 'user', content: 'Hello' }]
+        messages: [{ role: 'user', content: 'Hello' }],
       });
 
       const response = await request(app)
@@ -444,13 +444,13 @@ describe('validateBatchRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Maximum 10 requests allowed in a batch'
+        error: 'Maximum 10 requests allowed in a batch',
       });
     });
 
     it('should accept exactly 10 requests', async () => {
       const requests = Array(10).fill({
-        messages: [{ role: 'user', content: 'Hello' }]
+        messages: [{ role: 'user', content: 'Hello' }],
       });
 
       const response = await request(app)
@@ -470,13 +470,13 @@ describe('validateBatchRequest', () => {
           requests: [
             { messages: [{ role: 'user', content: 'Valid' }] },
             { messages: 'not an array' },
-            { messages: [{ role: 'user', content: 'Valid' }] }
-          ]
+            { messages: [{ role: 'user', content: 'Valid' }] },
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Request 1: Messages array is required'
+        error: 'Request 1: Messages array is required',
       });
     });
 
@@ -486,13 +486,13 @@ describe('validateBatchRequest', () => {
         .send({
           requests: [
             { messages: [{ role: 'user', content: 'Valid' }] },
-            { messages: [{ role: 'user' }] } // Missing content
-          ]
+            { messages: [{ role: 'user' }] }, // Missing content
+          ],
         })
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Request 1: Each message must have role and content'
+        error: 'Request 1: Each message must have role and content',
       });
     });
 
@@ -501,23 +501,23 @@ describe('validateBatchRequest', () => {
         .post('/batch')
         .send({
           requests: [
-            { 
+            {
               messages: [
                 { role: 'system', content: 'Be helpful' },
-                { role: 'user', content: 'Question 1' }
-              ]
+                { role: 'user', content: 'Question 1' },
+              ],
             },
-            { 
+            {
               messages: [
                 { role: 'user', content: 'Question 2' },
                 { role: 'assistant', content: 'Answer 2' },
-                { role: 'user', content: 'Follow-up' }
-              ]
+                { role: 'user', content: 'Follow-up' },
+              ],
             },
-            { 
-              messages: [{ role: 'user', content: 'Question 3' }]
-            }
-          ]
+            {
+              messages: [{ role: 'user', content: 'Question 3' }],
+            },
+          ],
         })
         .expect(200);
 

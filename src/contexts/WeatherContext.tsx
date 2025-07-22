@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from './LocationContext';
 import type { 
@@ -6,7 +7,7 @@ import type {
   WeatherState, 
   WeatherAction,
   WeatherData,
-  ForecastData 
+  ForecastData, 
 } from '../types/weather.types';
 
 /**
@@ -35,19 +36,19 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
         data: action.payload,
         loading: false, 
         error: null,
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       };
     case 'SET_FORECAST_DATA':
       return { 
         ...state, 
-        forecast: action.payload
+        forecast: action.payload,
       };
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
     case 'TOGGLE_UNIT':
       return { 
         ...state, 
-        unit: state.unit === 'fahrenheit' ? 'celsius' : 'fahrenheit' 
+        unit: state.unit === 'fahrenheit' ? 'celsius' : 'fahrenheit', 
       };
     case 'CLEAR_ERROR':
       return { ...state, error: null };
@@ -62,7 +63,7 @@ const initialState: WeatherState = {
   loading: false,  // Start with loading false to allow initial fetch
   error: null,
   lastUpdated: null,
-  unit: 'fahrenheit'
+  unit: 'fahrenheit',
 };
 
 interface WeatherProviderProps {
@@ -120,14 +121,14 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       if (coordinates) {
         weatherData = await weatherService.getWeatherByCoordinates(
           coordinates.latitude,
-          coordinates.longitude
+          coordinates.longitude,
         );
         
         // Fetch forecast data in parallel
         try {
           const forecastData = await weatherService.getForecastByCoordinates(
             coordinates.latitude,
-            coordinates.longitude
+            coordinates.longitude,
           );
           dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
         } catch (forecastError) {
@@ -137,14 +138,14 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       } else if (ipLocation?.city) {
         weatherData = await weatherService.getWeatherByCity(
           ipLocation.city,
-          ipLocation.country
+          ipLocation.country,
         );
         
         // Fetch forecast data in parallel
         try {
           const forecastData = await weatherService.getForecastByCity(
             ipLocation.city,
-            ipLocation.country
+            ipLocation.country,
           );
           dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
         } catch (forecastError) {
@@ -198,7 +199,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
         temperature: weatherService.convertTemperature(state.data.temperature, true),
         feelsLike: weatherService.convertTemperature(state.data.feelsLike, true),
         tempMin: weatherService.convertTemperature(state.data.tempMin, true),
-        tempMax: weatherService.convertTemperature(state.data.tempMax, true)
+        tempMax: weatherService.convertTemperature(state.data.tempMax, true),
       };
     }
 
@@ -215,8 +216,8 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
         forecasts: state.forecast.forecasts.map(day => ({
           ...day,
           tempMin: weatherService.convertTemperature(day.tempMin, true),
-          tempMax: weatherService.convertTemperature(day.tempMax, true)
-        }))
+          tempMax: weatherService.convertTemperature(day.tempMax, true),
+        })),
       };
     }
 
@@ -231,7 +232,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     fetchWeather,
     toggleUnit,
     clearError,
-    hasWeather: !!state.data
+    hasWeather: !!state.data,
   }), [state, displayData, displayForecast, fetchWeather, toggleUnit, clearError]);
 
   return (

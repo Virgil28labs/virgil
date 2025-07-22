@@ -108,12 +108,12 @@ describe('SignUpForm', () => {
     const user = userEvent.setup();
     const mockUser = {
       id: 'test-id',
-      email: 'newuser@example.com'
+      email: 'newuser@example.com',
     };
     
     (supabase.auth.signUp as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
-      error: null
+      error: null,
     });
     
     render(<SignUpForm onSuccess={mockOnSuccess} />);
@@ -134,9 +134,9 @@ describe('SignUpForm', () => {
         password: 'password123',
         options: {
           data: {
-            name: 'Test User'
-          }
-        }
+            name: 'Test User',
+          },
+        },
       });
     });
     
@@ -149,7 +149,7 @@ describe('SignUpForm', () => {
     
     (supabase.auth.signUp as jest.Mock).mockResolvedValue({
       data: null,
-      error: { message: 'User already exists' }
+      error: { message: 'User already exists' },
     });
     
     render(<SignUpForm />);
@@ -198,7 +198,7 @@ describe('SignUpForm', () => {
     const user = userEvent.setup();
     
     (supabase.auth.signUp as jest.Mock).mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 100))
+      () => new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 100)),
     );
     
     render(<SignUpForm />);
@@ -229,7 +229,7 @@ describe('SignUpForm', () => {
     
     (supabase.auth.signUp as jest.Mock).mockResolvedValue({
       data: { user: { email: 'test@example.com' } },
-      error: null
+      error: null,
     });
     
     render(<SignUpForm />);
@@ -250,9 +250,9 @@ describe('SignUpForm', () => {
         password: 'password123',
         options: {
           data: {
-            name: 'Test User'
-          }
-        }
+            name: 'Test User',
+          },
+        },
       });
     });
   });
@@ -262,7 +262,7 @@ describe('SignUpForm', () => {
     
     (supabase.auth.signUp as jest.Mock).mockResolvedValue({
       data: { user: { email: 'test@example.com' } },
-      error: null
+      error: null,
     });
     
     render(<SignUpForm />);

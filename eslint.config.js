@@ -1,19 +1,19 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from '@typescript-eslint/eslint-plugin'
-import parser from '@typescript-eslint/parser'
-import importPlugin from 'eslint-plugin-import'
-import jsxA11y from 'eslint-plugin-jsx-a11y'
-import react from 'eslint-plugin-react'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import parser from '@typescript-eslint/parser';
+import importPlugin from 'eslint-plugin-import';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import react from 'eslint-plugin-react';
 
 export default [
   { ignores: ['dist', 'coverage', 'node_modules'] },
   js.configs.recommended,
   // Server files (Node.js)
   {
-    files: ['server/**/*.js'],
+    files: ['server/**/*.js', 'scripts/**/*.js'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -46,7 +46,7 @@ export default [
       'no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_'
+        caughtErrorsIgnorePattern: '^_',
       }],
       'prefer-const': 'error',
       'no-var': 'error',
@@ -71,7 +71,10 @@ export default [
     },
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        React: 'readonly',
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -164,12 +167,7 @@ export default [
       'react/react-in-jsx-scope': 'off', // Not needed in React 17+
       'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
       'import/prefer-default-export': 'off',
-      'import/extensions': ['error', 'ignorePackages', {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      }],
+      'import/extensions': 'off',
     },
   },
   // Jest environment for test files
@@ -213,6 +211,7 @@ export default [
         NodeJS: 'readonly',
         RequestInit: 'readonly',
         NodeListOf: 'readonly',
+        google: 'readonly',
       },
     },
     plugins: {
@@ -256,7 +255,7 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { 
         varsIgnorePattern: '^[A-Z_]',
         argsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_'
+        caughtErrorsIgnorePattern: '^_',
       }],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       '@typescript-eslint/no-non-null-assertion': 'warn',
@@ -304,22 +303,16 @@ export default [
       'comma-dangle': ['error', 'always-multiline'],
       'quotes': ['error', 'single', { avoidEscape: true }],
       'semi': ['error', 'always'],
-      'indent': 'off', // Use @typescript-eslint/indent
-      '@typescript-eslint/indent': ['error', 2, { SwitchCase: 1 }],
+      'indent': ['error', 2, { SwitchCase: 1 }],
       'object-curly-spacing': ['error', 'always'],
       'array-bracket-spacing': ['error', 'never'],
       // TypeScript specific adjustments
       'react/react-in-jsx-scope': 'off',
       'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
-      'import/extensions': ['error', 'ignorePackages', {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      }],
+      'import/extensions': 'off',
       'react/require-default-props': 'off', // We use TypeScript for prop validation
       'react/prop-types': 'off', // TypeScript handles this
       'import/prefer-default-export': 'off',
     },
   },
-]
+];

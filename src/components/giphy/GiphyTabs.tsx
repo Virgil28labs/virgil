@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo } from 'react';
 
 export interface GiphyTabsProps {
   currentTab: 'search' | 'trending' | 'favorites'
@@ -13,7 +13,7 @@ export const GiphyTabs = memo(function GiphyTabs({
   searchCount,
   trendingCount,
   favoritesCount,
-  onTabChange
+  onTabChange,
 }: GiphyTabsProps) {
   return (
     <div className="giphy-gallery-tabs">
@@ -50,5 +50,5 @@ export const GiphyTabs = memo(function GiphyTabs({
         )}
       </button>
     </div>
-  )
-})
+  );
+});

@@ -1,5 +1,7 @@
-import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import React from 'react';
+import type { RenderOptions } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { AuthProvider } from './contexts/AuthContext';
 import { LocationProvider } from './contexts/LocationContext';
 import { WeatherProvider } from './contexts/WeatherContext';
@@ -12,14 +14,14 @@ export const mockUser = {
   app_metadata: {},
   user_metadata: {},
   aud: 'authenticated',
-  created_at: '2024-01-01T00:00:00.000Z'
+  created_at: '2024-01-01T00:00:00.000Z',
 };
 
 // Mock auth context value
 export const mockAuthContextValue = {
   user: mockUser,
   loading: false,
-  signOut: jest.fn()
+  signOut: jest.fn(),
 };
 
 // Mock location context value
@@ -32,7 +34,7 @@ export const mockLocationContextValue = {
   hasGPSLocation: true,
   hasIPLocation: true,
   refreshLocation: jest.fn(),
-  requestLocationPermission: jest.fn()
+  requestLocationPermission: jest.fn(),
 };
 
 // Mock weather context value
@@ -45,11 +47,11 @@ export const mockWeatherContextValue = {
     windSpeed: 10,
     icon: '01d',
     location: 'New York, NY',
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   },
   weatherLoading: false,
   weatherError: null,
-  refreshWeather: jest.fn()
+  refreshWeather: jest.fn(),
 };
 
 interface AllTheProvidersProps {
@@ -64,7 +66,7 @@ const AllTheProviders: React.FC<AllTheProvidersProps> = ({
   children,
   authValue: _authValue = mockAuthContextValue,
   locationValue: _locationValue = mockLocationContextValue,
-  weatherValue: _weatherValue = mockWeatherContextValue
+  weatherValue: _weatherValue = mockWeatherContextValue,
 }) => {
   // Note: This is a simplified test setup that uses the default providers
   // The unused parameters are prefixed with _ to indicate they are intentionally unused
@@ -88,7 +90,7 @@ const customRender = (
     authValue?: typeof mockAuthContextValue;
     locationValue?: typeof mockLocationContextValue;
     weatherValue?: typeof mockWeatherContextValue;
-  }
+  },
 ) => {
   const { authValue, locationValue, weatherValue, ...renderOptions } = options || {};
   
@@ -102,7 +104,7 @@ const customRender = (
         {children}
       </AllTheProviders>
     ),
-    ...renderOptions
+    ...renderOptions,
   });
 };
 
@@ -123,8 +125,8 @@ export const mockFetch = (data: any, options: { ok?: boolean; status?: number } 
       status,
       json: () => Promise.resolve(data),
       text: () => Promise.resolve(JSON.stringify(data)),
-      headers: new Headers()
-    })
+      headers: new Headers(),
+    }),
   );
 };
 
@@ -136,8 +138,8 @@ export const mockSupabaseClient = {
     signUp: jest.fn().mockResolvedValue({ data: { user: mockUser }, error: null }),
     signOut: jest.fn().mockResolvedValue({ error: null }),
     onAuthStateChange: jest.fn(() => ({
-      data: { subscription: { unsubscribe: jest.fn() } }
-    }))
+      data: { subscription: { unsubscribe: jest.fn() } },
+    })),
   },
   from: jest.fn(() => ({
     select: jest.fn().mockReturnThis(),
@@ -145,8 +147,8 @@ export const mockSupabaseClient = {
     update: jest.fn().mockReturnThis(),
     delete: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
-    single: jest.fn().mockResolvedValue({ data: null, error: null })
-  }))
+    single: jest.fn().mockResolvedValue({ data: null, error: null }),
+  })),
 };
 
 // Helper to create mock FormEvent
@@ -155,7 +157,7 @@ export const createMockFormEvent = (target?: any): React.FormEvent<HTMLFormEleme
     preventDefault: jest.fn(),
     stopPropagation: jest.fn(),
     target: target || document.createElement('form'),
-    currentTarget: target || document.createElement('form')
+    currentTarget: target || document.createElement('form'),
   } as unknown as React.FormEvent<HTMLFormElement>;
   
   return event;
@@ -171,6 +173,6 @@ export const createMockChangeEvent = (value: string, name?: string): React.Chang
     target,
     currentTarget: target,
     preventDefault: jest.fn(),
-    stopPropagation: jest.fn()
+    stopPropagation: jest.fn(),
   } as unknown as React.ChangeEvent<HTMLInputElement>;
 };

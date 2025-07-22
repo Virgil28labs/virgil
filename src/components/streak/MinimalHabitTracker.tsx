@@ -1,8 +1,8 @@
-import { memo, useState, useCallback } from 'react'
-import { useHabits } from '../../hooks/useHabits'
-import { HabitCard } from './HabitCard'
-import { AddHabitForm } from './AddHabitForm'
-import './MinimalHabitTracker.css'
+import { memo, useState, useCallback } from 'react';
+import { useHabits } from '../../hooks/useHabits';
+import { HabitCard } from './HabitCard';
+import { AddHabitForm } from './AddHabitForm';
+import './MinimalHabitTracker.css';
 
 interface MinimalHabitTrackerProps {
   isOpen: boolean
@@ -11,7 +11,7 @@ interface MinimalHabitTrackerProps {
 
 export const MinimalHabitTracker = memo(function MinimalHabitTracker({
   isOpen,
-  onClose
+  onClose,
 }: MinimalHabitTrackerProps) {
   const {
     habits,
@@ -21,17 +21,17 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
     updateHabit,
     deleteHabit,
     undoCheckIn,
-    canCheckInToday
-  } = useHabits()
+    canCheckInToday,
+  } = useHabits();
 
-  const [isAddingHabit, setIsAddingHabit] = useState(false)
+  const [isAddingHabit, setIsAddingHabit] = useState(false);
 
   const handleAddHabit = useCallback((name: string, emoji: string) => {
-    addHabit(name, emoji)
-    setIsAddingHabit(false)
-  }, [addHabit])
+    addHabit(name, emoji);
+    setIsAddingHabit(false);
+  }, [addHabit]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div 
@@ -90,9 +90,9 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             data-start-date={
               stats.bestStreakStartDate 
                 ? `Started ${new Date(stats.bestStreakStartDate).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}`
+                  month: 'short', 
+                  day: 'numeric', 
+                })}`
                 : ''
             }
           >
@@ -139,5 +139,5 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
         </div>
       </div>
     </div>
-  )
-})
+  );
+});

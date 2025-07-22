@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { SavedPlace } from '../../types/maps.types'
-import './RouteInputBar.css'
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import type { SavedPlace } from '../../types/maps.types';
+import './RouteInputBar.css';
 
 interface RouteInputBarProps {
   currentLocation: google.maps.LatLngLiteral | null
@@ -27,204 +27,204 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   onSavePlace,
   onRemoveSavedPlace,
   hasRoute = false,
-  onClearRoute
+  onClearRoute,
 }) => {
   // Load last destination from localStorage
   const getLastDestination = () => {
     try {
-      return localStorage.getItem('virgil_last_destination') || ''
+      return localStorage.getItem('virgil_last_destination') || '';
     } catch {
-      return ''
+      return '';
     }
-  }
+  };
   
-  const [origin, setOrigin] = useState(currentAddress || 'Current Location')
-  const [destination, setDestination] = useState(getLastDestination())
-  const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true)
-  const [showSavedPlaces, setShowSavedPlaces] = useState(false)
+  const [origin, setOrigin] = useState(currentAddress || 'Current Location');
+  const [destination, setDestination] = useState(getLastDestination());
+  const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true);
+  const [showSavedPlaces, setShowSavedPlaces] = useState(false);
   
-  const originInputRef = useRef<HTMLInputElement>(null)
-  const destinationInputRef = useRef<HTMLInputElement>(null)
-  const originAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
-  const destinationAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
+  const originAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const destinationAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   // Initialize autocomplete for origin
   useEffect(() => {
-    if (!originInputRef.current || !window.google?.maps?.places) return
+    if (!originInputRef.current || !window.google?.maps?.places) return;
 
     const autocomplete = new google.maps.places.Autocomplete(originInputRef.current, {
       fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-      types: ['geocode', 'establishment']
-    })
+      types: ['geocode', 'establishment'],
+    });
 
     autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace()
+      const place = autocomplete.getPlace();
       if (place && place.geometry) {
-        setOrigin(place.name || place.formatted_address || '')
-        setIsOriginCurrentLocation(false)
+        setOrigin(place.name || place.formatted_address || '');
+        setIsOriginCurrentLocation(false);
         if (onOriginSelect) {
-          onOriginSelect(place)
+          onOriginSelect(place);
         }
         // Auto-trigger route if destination is set
         if (destination) {
-          onRouteRequest(place.name || place.formatted_address || '', destination)
+          onRouteRequest(place.name || place.formatted_address || '', destination);
         }
       }
-    })
+    });
 
-    originAutocompleteRef.current = autocomplete
+    originAutocompleteRef.current = autocomplete;
 
     return () => {
       if (originAutocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(originAutocompleteRef.current)
+        google.maps.event.clearInstanceListeners(originAutocompleteRef.current);
       }
-    }
-  }, [destination, onOriginSelect, onRouteRequest])
+    };
+  }, [destination, onOriginSelect, onRouteRequest]);
 
   // Initialize autocomplete for destination
   useEffect(() => {
-    if (!destinationInputRef.current || !window.google?.maps?.places) return
+    if (!destinationInputRef.current || !window.google?.maps?.places) return;
 
     const autocomplete = new google.maps.places.Autocomplete(destinationInputRef.current, {
       fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-      types: ['geocode', 'establishment']
-    })
+      types: ['geocode', 'establishment'],
+    });
 
     autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace()
+      const place = autocomplete.getPlace();
       if (place && place.geometry) {
-        const destinationText = place.name || place.formatted_address || ''
-        setDestination(destinationText)
+        const destinationText = place.name || place.formatted_address || '';
+        setDestination(destinationText);
         // Save to localStorage
         try {
-          localStorage.setItem('virgil_last_destination', destinationText)
+          localStorage.setItem('virgil_last_destination', destinationText);
         } catch (error) {
           // localStorage might be full or disabled
-          console.warn('Failed to save destination to localStorage:', error)
+          console.warn('Failed to save destination to localStorage:', error);
         }
         
         if (onDestinationSelect) {
-          onDestinationSelect(place)
+          onDestinationSelect(place);
         }
         // Auto-trigger route
-        onRouteRequest(origin, destinationText)
+        onRouteRequest(origin, destinationText);
       }
-    })
+    });
 
-    destinationAutocompleteRef.current = autocomplete
+    destinationAutocompleteRef.current = autocomplete;
 
     return () => {
       if (destinationAutocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(destinationAutocompleteRef.current)
+        google.maps.event.clearInstanceListeners(destinationAutocompleteRef.current);
       }
-    }
-  }, [origin, onDestinationSelect, onRouteRequest])
+    };
+  }, [origin, onDestinationSelect, onRouteRequest]);
 
   // Update origin when current address changes
   useEffect(() => {
     if (isOriginCurrentLocation && currentAddress) {
-      setOrigin(currentAddress)
+      setOrigin(currentAddress);
     }
-  }, [currentAddress, isOriginCurrentLocation])
+  }, [currentAddress, isOriginCurrentLocation]);
 
   const handleOriginFocus = useCallback(() => {
     if (isOriginCurrentLocation) {
-      setOrigin('')
-      setIsOriginCurrentLocation(false)
+      setOrigin('');
+      setIsOriginCurrentLocation(false);
     }
-  }, [isOriginCurrentLocation])
+  }, [isOriginCurrentLocation]);
 
   const handleOriginChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrigin(e.target.value)
-    setIsOriginCurrentLocation(false)
-  }, [])
+    setOrigin(e.target.value);
+    setIsOriginCurrentLocation(false);
+  }, []);
 
   const handleDestinationChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setDestination(e.target.value)
+    setDestination(e.target.value);
     // Hide saved places dropdown when typing
     if (e.target.value) {
-      setShowSavedPlaces(false)
+      setShowSavedPlaces(false);
     }
-  }, [])
+  }, []);
 
   const handleSwapLocations = useCallback(() => {
-    const temp = origin
-    setOrigin(destination)
-    setDestination(temp)
-    setIsOriginCurrentLocation(false)
+    const temp = origin;
+    setOrigin(destination);
+    setDestination(temp);
+    setIsOriginCurrentLocation(false);
     
     if (origin && destination) {
-      onRouteRequest(destination, origin)
+      onRouteRequest(destination, origin);
     }
-  }, [origin, destination, onRouteRequest])
+  }, [origin, destination, onRouteRequest]);
 
   const handleUseCurrentLocation = useCallback(() => {
-    setOrigin(currentAddress || 'Current Location')
-    setIsOriginCurrentLocation(true)
+    setOrigin(currentAddress || 'Current Location');
+    setIsOriginCurrentLocation(true);
     
     if (destination) {
-      onRouteRequest(currentAddress || 'Current Location', destination)
+      onRouteRequest(currentAddress || 'Current Location', destination);
     }
-  }, [currentAddress, destination, onRouteRequest])
+  }, [currentAddress, destination, onRouteRequest]);
 
   // Check if current destination is saved
   const isDestinationSaved = useCallback(() => {
-    if (!currentDestinationPlace?.place_id) return false
-    return savedPlaces.some(p => p.placeId === currentDestinationPlace.place_id)
-  }, [currentDestinationPlace, savedPlaces])
+    if (!currentDestinationPlace?.place_id) return false;
+    return savedPlaces.some(p => p.placeId === currentDestinationPlace.place_id);
+  }, [currentDestinationPlace, savedPlaces]);
 
   // Handle save/unsave destination
   const handleToggleSaveDestination = useCallback(() => {
-    if (!currentDestinationPlace || !onSavePlace || !onRemoveSavedPlace) return
+    if (!currentDestinationPlace || !onSavePlace || !onRemoveSavedPlace) return;
     
     if (isDestinationSaved()) {
-      onRemoveSavedPlace(currentDestinationPlace.place_id)
+      onRemoveSavedPlace(currentDestinationPlace.place_id);
     } else {
-      onSavePlace(currentDestinationPlace)
+      onSavePlace(currentDestinationPlace);
     }
-  }, [currentDestinationPlace, isDestinationSaved, onSavePlace, onRemoveSavedPlace])
+  }, [currentDestinationPlace, isDestinationSaved, onSavePlace, onRemoveSavedPlace]);
 
   // Handle saved place selection
   const handleSelectSavedPlace = useCallback((place: SavedPlace) => {
-    setDestination(place.name)
-    setShowSavedPlaces(false)
+    setDestination(place.name);
+    setShowSavedPlaces(false);
     
     // Save to localStorage
     try {
-      localStorage.setItem('virgil_last_destination', place.name)
+      localStorage.setItem('virgil_last_destination', place.name);
     } catch (error) {
       // localStorage might be full or disabled
-      console.warn('Failed to save destination to localStorage:', error)
+      console.warn('Failed to save destination to localStorage:', error);
     }
     
     // Create a PlaceResult-like object for routing
     if (place.placeId) {
       // Use place ID for routing
-      onRouteRequest(origin, place.name)
+      onRouteRequest(origin, place.name);
     } else {
       // Fallback to address
-      onRouteRequest(origin, place.address || place.name)
+      onRouteRequest(origin, place.address || place.name);
     }
-  }, [origin, onRouteRequest])
+  }, [origin, onRouteRequest]);
 
   // Show/hide saved places dropdown
   const handleDestinationClick = useCallback(() => {
     if (!destination && savedPlaces.length > 0) {
-      setShowSavedPlaces(true)
+      setShowSavedPlaces(true);
     }
-  }, [destination, savedPlaces])
+  }, [destination, savedPlaces]);
 
   const handleDestinationBlur = useCallback(() => {
     // Delay to allow click on dropdown items
-    setTimeout(() => setShowSavedPlaces(false), 200)
-  }, [])
+    setTimeout(() => setShowSavedPlaces(false), 200);
+  }, []);
 
   return (
     <div className="route-input-bar">
       <div className="route-inputs">
         <div className="route-input-group">
           <div className="input-icon">
-            <div className="location-dot origin"></div>
+            <div className="location-dot origin" />
           </div>
           <input
             ref={originInputRef}
@@ -242,8 +242,8 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
               title="Use current location"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="2"/>
-                <circle cx="8" cy="8" r="3" fill="currentColor"/>
+                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="2" />
+                <circle cx="8" cy="8" r="3" fill="currentColor" />
               </svg>
             </button>
           )}
@@ -256,7 +256,8 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
           title="Swap locations"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 6L6 3M6 3L9 6M6 3V13M13 10L10 13M10 13L7 10M10 13V3" 
+            <path
+              d="M3 6L6 3M6 3L9 6M6 3V13M13 10L10 13M10 13L7 10M10 13V3" 
               stroke="currentColor" 
               strokeWidth="2" 
               strokeLinecap="round" 
@@ -267,7 +268,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
 
         <div className="route-input-group">
           <div className="input-icon">
-            <div className="location-dot destination"></div>
+            <div className="location-dot destination" />
           </div>
           <input
             ref={destinationInputRef}
@@ -341,7 +342,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       </div>
 
       {/* Visual connection line */}
-      <div className="route-connection-line"></div>
+      <div className="route-connection-line" />
     </div>
-  )
-}
+  );
+};

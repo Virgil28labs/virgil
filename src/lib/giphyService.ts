@@ -1,10 +1,9 @@
 import type { 
   GiphyApiResponse, 
-  GiphySingleApiResponse,
   GiphyGif, 
   GiphyImage, 
   GiphySearchParams, 
-  GiphyTrendingParams
+  GiphyTrendingParams,
 } from '../types/giphy.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
@@ -20,7 +19,7 @@ class GiphyService {
   private defaultParams = {
     limit: 25,
     rating: 'pg' as const,
-    fmt: 'json' as const
+    fmt: 'json' as const,
   };
 
   constructor() {
@@ -48,7 +47,7 @@ class GiphyService {
       username: gif.username || undefined,
       user: gif.user,
       source: gif.source || undefined,
-      tags: gif.tags
+      tags: gif.tags,
     };
   }
 
@@ -66,7 +65,7 @@ class GiphyService {
     const allParams = {
       api_key: GIPHY_API_KEY,
       ...this.defaultParams,
-      ...params
+      ...params,
     };
 
     // Add parameters to URL
@@ -83,9 +82,8 @@ class GiphyService {
             method: 'GET',
             headers: {
               'Accept': 'application/json',
-              'User-Agent': 'Virgil-App/1.0'
+              'User-Agent': 'Virgil-App/1.0',
             },
-            timeout: REQUEST_TIMEOUT
           });
 
           if (!res.ok) {
@@ -107,8 +105,8 @@ class GiphyService {
           initialDelay: 1000,
           onRetry: (attempt, error) => {
             console.warn(`Giphy API retry ${attempt}:`, error.message);
-          }
-        }
+          },
+        },
       );
 
       return response;
@@ -149,7 +147,7 @@ class GiphyService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: result,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return result;
@@ -189,7 +187,7 @@ class GiphyService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: result,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return result;

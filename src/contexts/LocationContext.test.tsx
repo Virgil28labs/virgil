@@ -14,9 +14,9 @@ jest.mock('../lib/locationService', () => ({
     getFullLocationData: jest.fn(),
     getQuickLocation: jest.fn().mockResolvedValue({ 
       ipLocation: undefined,
-      timestamp: Date.now()
-    })
-  }
+      timestamp: Date.now(),
+    }),
+  },
 }));
 
 const mockLocationService = locationService as jest.Mocked<typeof locationService>;
@@ -25,14 +25,14 @@ const mockLocationService = locationService as jest.Mocked<typeof locationServic
 const mockGeolocation = {
   getCurrentPosition: jest.fn(),
   watchPosition: jest.fn(),
-  clearWatch: jest.fn()
+  clearWatch: jest.fn(),
 };
 
 const mockCoordinates = {
   latitude: 40.7128,
   longitude: -74.0060,
   accuracy: 10,
-  timestamp: Date.now()
+  timestamp: Date.now(),
 };
 
 const mockAddress = {
@@ -41,7 +41,7 @@ const mockAddress = {
   city: 'New York',
   postcode: '10001',
   country: 'USA',
-  formatted: '123 Main St, New York, NY 10001, USA'
+  formatted: '123 Main St, New York, NY 10001, USA',
 };
 
 const mockIPLocation = {
@@ -49,7 +49,7 @@ const mockIPLocation = {
   city: 'New York',
   region: 'NY',
   country: 'US',
-  timezone: 'America/New_York'
+  timezone: 'America/New_York',
 };
 
 // Wrapper component for the hook
@@ -63,7 +63,7 @@ describe('LocationContext', () => {
     // Setup geolocation mock
     Object.defineProperty(global.navigator, 'geolocation', {
       value: mockGeolocation,
-      writable: true
+      writable: true,
     });
     // Setup permissions mock
     Object.defineProperty(global.navigator, 'permissions', {
@@ -71,22 +71,22 @@ describe('LocationContext', () => {
         query: jest.fn().mockResolvedValue({ 
           state: 'granted',
           addEventListener: jest.fn(),
-          removeEventListener: jest.fn()
-        })
+          removeEventListener: jest.fn(),
+        }),
       },
-      writable: true
+      writable: true,
     });
     
     // Reset all mock implementations to default
     mockLocationService.getQuickLocation.mockResolvedValue({ 
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: undefined,
       address: undefined,
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     mockLocationService.getCurrentPosition.mockResolvedValue(mockCoordinates);
     mockLocationService.getAddressFromCoordinates.mockResolvedValue(mockAddress);
@@ -104,7 +104,7 @@ describe('LocationContext', () => {
     };
     
     expect(() => render(<TestComponent />)).toThrow(
-      'useLocation must be used within a LocationProvider'
+      'useLocation must be used within a LocationProvider',
     );
     
     consoleSpy.mockRestore();
@@ -116,7 +116,7 @@ describe('LocationContext', () => {
       coordinates: undefined,
       address: undefined,
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -144,7 +144,7 @@ describe('LocationContext', () => {
       coordinates: mockCoordinates,
       address: mockAddress,
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     
     mockLocationService.getFullLocationData.mockResolvedValue(mockLocationData);
@@ -167,16 +167,16 @@ describe('LocationContext', () => {
         query: jest.fn().mockResolvedValue({ 
           state: 'denied',
           addEventListener: jest.fn(),
-          removeEventListener: jest.fn()
-        })
+          removeEventListener: jest.fn(),
+        }),
       },
-      writable: true
+      writable: true,
     });
     
     // Mock getQuickLocation to return IP location
     mockLocationService.getQuickLocation.mockResolvedValue({
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     // Mock getFullLocationData to return only IP location (simulating GPS denied)
@@ -184,7 +184,7 @@ describe('LocationContext', () => {
       coordinates: undefined,
       address: undefined,
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -202,7 +202,7 @@ describe('LocationContext', () => {
   it('handles geolocation timeout', async () => {
     // Mock getQuickLocation to throw timeout error
     mockLocationService.getQuickLocation.mockRejectedValue(
-      new Error('Location request timed out')
+      new Error('Location request timed out'),
     );
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -219,7 +219,7 @@ describe('LocationContext', () => {
       coordinates: mockCoordinates,
       address: mockAddress,
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     
     mockLocationService.getFullLocationData.mockResolvedValue(initialLocationData);
@@ -236,7 +236,7 @@ describe('LocationContext', () => {
     // Update mock with new data for refresh
     const updatedLocationData = {
       ...initialLocationData,
-      timestamp: Date.now() + 1000
+      timestamp: Date.now() + 1000,
     };
     mockLocationService.getFullLocationData.mockResolvedValue(updatedLocationData);
     
@@ -250,7 +250,7 @@ describe('LocationContext', () => {
   it('clears error when clearError is called', async () => {
     // Mock getQuickLocation to throw an error
     mockLocationService.getQuickLocation.mockRejectedValue(
-      new Error('Position unavailable')
+      new Error('Position unavailable'),
     );
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -273,7 +273,7 @@ describe('LocationContext', () => {
       coordinates: mockCoordinates,
       address: undefined,
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -292,13 +292,13 @@ describe('LocationContext', () => {
     // Start with no location data
     mockLocationService.getQuickLocation.mockResolvedValue({
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: undefined,
       address: undefined,
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -313,13 +313,13 @@ describe('LocationContext', () => {
     // Update mocks to return coordinates
     mockLocationService.getQuickLocation.mockResolvedValue({
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
       address: mockAddress,
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     await act(async () => {
@@ -338,7 +338,7 @@ describe('LocationContext', () => {
       coordinates: mockCoordinates,
       address: undefined,
       ipLocation: undefined,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });
@@ -354,13 +354,13 @@ describe('LocationContext', () => {
   it('handles missing geolocation API', async () => {
     Object.defineProperty(global.navigator, 'geolocation', {
       value: undefined,
-      writable: true
+      writable: true,
     });
     
     // Mock getQuickLocation to return IP location only
     mockLocationService.getQuickLocation.mockResolvedValue({
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     // Mock getFullLocationData to return only IP location (no GPS available)
@@ -368,7 +368,7 @@ describe('LocationContext', () => {
       coordinates: undefined,
       address: undefined,
       ipLocation: mockIPLocation,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     
     const { result } = renderHook(() => useLocation(), { wrapper });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 interface DeviceInfo {
   // Location & Network
@@ -55,99 +55,99 @@ interface PermissionStatus {
 
 // Parse user agent for device info
 const parseUserAgent = () => {
-  const ua = navigator.userAgent
-  let device = 'Unknown Device'
-  let os = 'Unknown OS'
-  let browser = 'Unknown Browser'
+  const ua = navigator.userAgent;
+  let device = 'Unknown Device';
+  let os = 'Unknown OS';
+  let browser = 'Unknown Browser';
   
   // Detect OS
-  if (ua.includes('Mac')) os = `macOS ${ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, '.') || ''}`
-  else if (ua.includes('Windows')) os = `Windows ${ua.match(/Windows NT ([\d.]+)/)?.[1] || ''}`
-  else if (ua.includes('Linux')) os = 'Linux'
-  else if (ua.includes('Android')) os = `Android ${ua.match(/Android ([\d.]+)/)?.[1] || ''}`
-  else if (ua.includes('iOS')) os = `iOS ${ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g, '.') || ''}`
+  if (ua.includes('Mac')) os = `macOS ${ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g, '.') || ''}`;
+  else if (ua.includes('Windows')) os = `Windows ${ua.match(/Windows NT ([\d.]+)/)?.[1] || ''}`;
+  else if (ua.includes('Linux')) os = 'Linux';
+  else if (ua.includes('Android')) os = `Android ${ua.match(/Android ([\d.]+)/)?.[1] || ''}`;
+  else if (ua.includes('iOS')) os = `iOS ${ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g, '.') || ''}`;
   
   // Detect Browser
   if (ua.includes('Chrome/') && !ua.includes('Edg/')) {
-    browser = `Chrome ${ua.match(/Chrome\/([\d.]+)/)?.[1] || ''}`
+    browser = `Chrome ${ua.match(/Chrome\/([\d.]+)/)?.[1] || ''}`;
   } else if (ua.includes('Safari/') && !ua.includes('Chrome')) {
-    browser = `Safari ${ua.match(/Version\/([\d.]+)/)?.[1] || ''}`
+    browser = `Safari ${ua.match(/Version\/([\d.]+)/)?.[1] || ''}`;
   } else if (ua.includes('Firefox/')) {
-    browser = `Firefox ${ua.match(/Firefox\/([\d.]+)/)?.[1] || ''}`
+    browser = `Firefox ${ua.match(/Firefox\/([\d.]+)/)?.[1] || ''}`;
   } else if (ua.includes('Edg/')) {
-    browser = `Edge ${ua.match(/Edg\/([\d.]+)/)?.[1] || ''}`
+    browser = `Edge ${ua.match(/Edg\/([\d.]+)/)?.[1] || ''}`;
   }
   
   // Detect Device Type
-  if (ua.includes('iPhone')) device = 'iPhone'
-  else if (ua.includes('iPad')) device = 'iPad'
-  else if (ua.includes('Android')) device = 'Android Device'
-  else if (ua.includes('Mac')) device = 'Mac'
-  else if (ua.includes('Windows')) device = 'Windows PC'
+  if (ua.includes('iPhone')) device = 'iPhone';
+  else if (ua.includes('iPad')) device = 'iPad';
+  else if (ua.includes('Android')) device = 'Android Device';
+  else if (ua.includes('Mac')) device = 'Mac';
+  else if (ua.includes('Windows')) device = 'Windows PC';
   
-  return { device, os, browser }
-}
+  return { device, os, browser };
+};
 
 // Format bytes to human readable
 const formatBytes = (bytes: number): string => {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
-}
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+};
 
 export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null)
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [permissions, setPermissions] = useState<PermissionStatus>({
     geolocation: 'unknown',
     camera: 'unknown',
     microphone: 'unknown',
     notifications: 'unknown',
     clipboard: 'unknown',
-  })
-  const [sessionStart] = useState(Date.now())
+  });
+  const [sessionStart] = useState(Date.now());
 
   // Check permission status
   const checkPermission = async (name: string): Promise<PermissionState | 'unknown'> => {
     try {
       if ('permissions' in navigator) {
-        const result = await navigator.permissions.query({ name: name as any })
-        return result.state
+        const result = await navigator.permissions.query({ name: name as any });
+        return result.state;
       }
     } catch {
       // Permission not supported or error
     }
-    return 'unknown'
-  }
+    return 'unknown';
+  };
 
   // Collect device information
   const collectInfo = async () => {
-    const { device, os, browser } = parseUserAgent()
+    const { device, os, browser } = parseUserAgent();
     
     // Get network information
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
+    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
     
     // Get battery info
-    let batteryLevel = null
-    let batteryCharging = null
+    let batteryLevel = null;
+    let batteryCharging = null;
     try {
       if ('getBattery' in navigator) {
-        const battery = await (navigator as any).getBattery()
-        batteryLevel = Math.round(battery.level * 100)
-        batteryCharging = battery.charging
+        const battery = await (navigator as any).getBattery();
+        batteryLevel = Math.round(battery.level * 100);
+        batteryCharging = battery.charging;
       }
     } catch {
       // Battery API not supported
     }
     
     // Get storage quota
-    let storageQuota = 'N/A'
+    let storageQuota = 'N/A';
     try {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
-        const estimate = await navigator.storage.estimate()
+        const estimate = await navigator.storage.estimate();
         if (estimate.quota) {
-          storageQuota = formatBytes(estimate.quota)
+          storageQuota = formatBytes(estimate.quota);
         }
       }
     } catch {
@@ -197,10 +197,10 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       
       // Storage
       storageQuota,
-    }
+    };
     
-    setDeviceInfo(info)
-  }
+    setDeviceInfo(info);
+  };
 
   // Check all permissions
   const checkAllPermissions = async () => {
@@ -210,85 +210,85 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       microphone: await checkPermission('microphone'),
       notifications: await checkPermission('notifications'),
       clipboard: await checkPermission('clipboard-read'),
-    }
-    setPermissions(newPermissions)
-  }
+    };
+    setPermissions(newPermissions);
+  };
 
   // Request specific permission
   const requestPermission = async (type: keyof PermissionStatus) => {
     switch (type) {
       case 'geolocation':
         navigator.geolocation.getCurrentPosition(() => {
-          checkAllPermissions()
+          checkAllPermissions();
         }, () => {
-          checkAllPermissions()
-        })
-        break
+          checkAllPermissions();
+        });
+        break;
       case 'camera':
         try {
-          await navigator.mediaDevices.getUserMedia({ video: true })
-          checkAllPermissions()
+          await navigator.mediaDevices.getUserMedia({ video: true });
+          checkAllPermissions();
         } catch {
-          checkAllPermissions()
+          checkAllPermissions();
         }
-        break
+        break;
       case 'microphone':
         try {
-          await navigator.mediaDevices.getUserMedia({ audio: true })
-          checkAllPermissions()
+          await navigator.mediaDevices.getUserMedia({ audio: true });
+          checkAllPermissions();
         } catch {
-          checkAllPermissions()
+          checkAllPermissions();
         }
-        break
+        break;
       case 'notifications':
         try {
-          await Notification.requestPermission()
-          checkAllPermissions()
+          await Notification.requestPermission();
+          checkAllPermissions();
         } catch {
-          checkAllPermissions()
+          checkAllPermissions();
         }
-        break
+        break;
       case 'clipboard':
         try {
-          await navigator.clipboard.readText()
-          checkAllPermissions()
+          await navigator.clipboard.readText();
+          checkAllPermissions();
         } catch {
-          checkAllPermissions()
+          checkAllPermissions();
         }
-        break
+        break;
     }
-  }
+  };
 
   useEffect(() => {
-    collectInfo()
-    checkAllPermissions()
+    collectInfo();
+    checkAllPermissions();
     
     // Update live data every second
     const interval = setInterval(() => {
-      collectInfo()
-    }, 1000)
+      collectInfo();
+    }, 1000);
     
     // Listen for online/offline events
-    const handleOnline = () => collectInfo()
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOnline)
+    const handleOnline = () => collectInfo();
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOnline);
     
     // Listen for visibility change
-    const handleVisibility = () => collectInfo()
-    document.addEventListener('visibilitychange', handleVisibility)
+    const handleVisibility = () => collectInfo();
+    document.addEventListener('visibilitychange', handleVisibility);
     
     // Listen for window resize
-    const handleResize = () => collectInfo()
-    window.addEventListener('resize', handleResize)
+    const handleResize = () => collectInfo();
+    window.addEventListener('resize', handleResize);
     
     return () => {
-      clearInterval(interval)
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOnline)
-      document.removeEventListener('visibilitychange', handleVisibility)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [ipLocation, sessionStart])
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOnline);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [ipLocation, sessionStart]);
 
-  return { deviceInfo, permissions, requestPermission }
-}
+  return { deviceInfo, permissions, requestPermission };
+};

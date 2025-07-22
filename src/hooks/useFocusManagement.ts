@@ -12,7 +12,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
     autoFocus = true,
     restoreFocus = true,
     trapFocus = false,
-    initialFocusSelector = 'input, button, select, textarea, [tabindex]:not([tabindex="-1"])'
+    initialFocusSelector = 'input, button, select, textarea, [tabindex]:not([tabindex="-1"])',
   } = options;
 
   const containerRef = useRef<HTMLElement>(null);
@@ -28,7 +28,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
       'textarea:not([disabled]):not([tabindex="-1"])',
       'a[href]:not([tabindex="-1"])',
       '[tabindex]:not([tabindex="-1"])',
-      '[contenteditable]:not([tabindex="-1"])'
+      '[contenteditable]:not([tabindex="-1"])',
     ].join(', ');
 
     return Array.from(containerRef.current.querySelectorAll(focusableSelectors))
@@ -51,7 +51,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
     if (focusableElements.length > 0) {
       // Try to find element matching initial focus selector first
       let targetElement = focusableElements.find(el => 
-        el.matches(initialFocusSelector)
+        el.matches(initialFocusSelector),
       );
       
       // Fallback to first focusable element
@@ -121,6 +121,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
         previousActiveElementRef.current = null;
       }
     }
+    return undefined;
   }, [isActive, autoFocus, restoreFocus, focusFirstElement]);
 
   // Setup keyboard event listeners
@@ -156,6 +157,6 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
     focusFirstElement,
     focusElement,
     getFocusableElements,
-    contains
+    contains,
   };
 }

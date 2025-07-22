@@ -1,53 +1,53 @@
-import { memo, useState, useCallback } from 'react'
-import { giphyService } from '../../lib/giphyService'
-import type { GiphyCardProps } from '../../types'
+import { memo, useState, useCallback } from 'react';
+import { giphyService } from '../../lib/giphyService';
+import type { GiphyCardProps } from '../../types';
 
 export const GiphyCard = memo(function GiphyCard({ 
   gif, 
   index, 
   isFavorited, 
   onImageClick, 
-  onFavoriteToggle 
+  onFavoriteToggle, 
 }: GiphyCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
-  const [showCopied, setShowCopied] = useState(false)
-  const [showDownloaded, setShowDownloaded] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Handle copy URL
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     
     try {
-      const success = await giphyService.copyGifUrl(gif)
+      const success = await giphyService.copyGifUrl(gif);
       if (success) {
-        setShowCopied(true)
-        setTimeout(() => setShowCopied(false), 2000)
+        setShowCopied(true);
+        setTimeout(() => setShowCopied(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to copy GIF URL:', error)
+      console.error('Failed to copy GIF URL:', error);
     }
-  }, [gif])
+  }, [gif]);
 
   // Handle download
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     
     try {
-      await giphyService.downloadGif(gif, `${gif.title || 'gif'}-${gif.id}.gif`)
-      setShowDownloaded(true)
-      setTimeout(() => setShowDownloaded(false), 2000)
+      await giphyService.downloadGif(gif, `${gif.title || 'gif'}-${gif.id}.gif`);
+      setShowDownloaded(true);
+      setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download GIF:', error)
+      console.error('Failed to download GIF:', error);
     }
-  }, [gif])
+  }, [gif]);
 
   // Handle favorite toggle
   const handleFavoriteToggle = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onFavoriteToggle()
-  }, [onFavoriteToggle])
+    e.stopPropagation();
+    onFavoriteToggle();
+  }, [onFavoriteToggle]);
 
   return (
     <div
@@ -68,7 +68,7 @@ export const GiphyCard = memo(function GiphyCard({
               inset: 0,
               background: 'linear-gradient(90deg, rgba(178, 165, 193, 0.1) 0%, rgba(178, 165, 193, 0.2) 50%, rgba(178, 165, 193, 0.1) 100%)',
               backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite'
+              animation: 'shimmer 1.5s infinite',
             }}
           />
         </div>
@@ -141,27 +141,29 @@ export const GiphyCard = memo(function GiphyCard({
             opacity: isHovered ? 1 : 0,
             transition: 'opacity 0.3s ease',
             pointerEvents: 'none',
-            zIndex: 1
+            zIndex: 1,
           }}
         >
           <div style={{ 
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
+            whiteSpace: 'nowrap',
+          }}
+          >
             {gif.title}
           </div>
           {gif.username && (
             <div style={{ 
               fontSize: '0.7rem',
               opacity: 0.8,
-              marginTop: '0.25rem'
-            }}>
+              marginTop: '0.25rem',
+            }}
+            >
               by {gif.username}
             </div>
           )}
         </div>
       )}
     </div>
-  )
-})
+  );
+});

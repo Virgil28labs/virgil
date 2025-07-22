@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { PomodoroEmojiButton } from './PomodoroEmojiButton'
-import { EmojiButton } from '../common/EmojiButton'
-import { PomodoroTimer } from './PomodoroTimer'
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { PomodoroEmojiButton } from './PomodoroEmojiButton';
+import { EmojiButton } from '../common/EmojiButton';
+import { PomodoroTimer } from './PomodoroTimer';
 
 // Mock the EmojiButton component
 jest.mock('../common/EmojiButton', () => ({
@@ -10,46 +10,46 @@ jest.mock('../common/EmojiButton', () => ({
     <button 
       aria-label={ariaLabel}
       onClick={() => {
-        if (onClick) onClick()
+        if (onClick) onClick();
         // Simulate opening the gallery
         if (GalleryComponent) {
-          render(<GalleryComponent onClose={() => {}} />)
+          render(<GalleryComponent onClose={() => {}} />);
         }
       }}
     >
       {emoji}
     </button>
-  ))
-}))
+  )),
+}));
 
 // Mock PomodoroTimer
 jest.mock('./PomodoroTimer', () => ({
   PomodoroTimer: jest.fn(({ isOpen }) => 
-    isOpen ? <div data-testid="pomodoro-app">Pomodoro App</div> : null
-  )
-}))
+    isOpen ? <div data-testid="pomodoro-app">Pomodoro App</div> : null,
+  ),
+}));
 
-const mockEmojiButton = EmojiButton as jest.MockedFunction<typeof EmojiButton>
+const mockEmojiButton = EmojiButton as jest.MockedFunction<typeof EmojiButton>;
 
 describe('PomodoroEmojiButton', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+  });
 
   it('renders emoji button with tomato emoji', () => {
-    render(<PomodoroEmojiButton />)
+    render(<PomodoroEmojiButton />);
     
-    expect(screen.getByText('🍅')).toBeInTheDocument()
-  })
+    expect(screen.getByText('🍅')).toBeInTheDocument();
+  });
 
   it('has correct aria label', () => {
-    render(<PomodoroEmojiButton />)
+    render(<PomodoroEmojiButton />);
     
-    expect(screen.getByLabelText('Open Pomodoro Timer')).toBeInTheDocument()
-  })
+    expect(screen.getByLabelText('Open Pomodoro Timer')).toBeInTheDocument();
+  });
 
   it('passes correct props to EmojiButton', () => {
-    render(<PomodoroEmojiButton />)
+    render(<PomodoroEmojiButton />);
     
     expect(mockEmojiButton).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -60,39 +60,39 @@ describe('PomodoroEmojiButton', () => {
         hoverColor: {
           background: 'linear-gradient(135deg, rgba(239, 176, 194, 0.3) 0%, rgba(178, 165, 193, 0.3) 100%)',
           border: 'rgba(239, 176, 194, 0.6)',
-          glow: 'rgba(239, 176, 194, 0.4)'
+          glow: 'rgba(239, 176, 194, 0.4)',
         },
         title: 'Pomodoro Timer',
-        className: 'opacity-80 hover:opacity-100'
+        className: 'opacity-80 hover:opacity-100',
       }),
-      expect.anything()
-    )
-  })
+      expect.anything(),
+    );
+  });
 
   it('opens PomodoroApp when clicked', async () => {
-    const user = userEvent.setup()
-    render(<PomodoroEmojiButton />)
+    const user = userEvent.setup();
+    render(<PomodoroEmojiButton />);
     
-    await user.click(screen.getByText('🍅'))
+    await user.click(screen.getByText('🍅'));
     
-    expect(screen.getByTestId('pomodoro-app')).toBeInTheDocument()
-  })
+    expect(screen.getByTestId('pomodoro-app')).toBeInTheDocument();
+  });
 
   it('passes GalleryComponent that renders PomodoroApp with isOpen=true', () => {
-    render(<PomodoroEmojiButton />)
+    render(<PomodoroEmojiButton />);
     
-    const callArgs = mockEmojiButton.mock.calls[0][0]
-    const GalleryComponent = callArgs.GalleryComponent
+    const callArgs = mockEmojiButton.mock.calls[0][0];
+    const GalleryComponent = callArgs.GalleryComponent;
     
     // Test the wrapper component
-    render(<GalleryComponent onClose={jest.fn()} />)
+    render(<GalleryComponent onClose={jest.fn()} />);
     
     expect(PomodoroTimer).toHaveBeenCalledWith(
       expect.objectContaining({
         isOpen: true,
-        onClose: expect.any(Function)
+        onClose: expect.any(Function),
       }),
-      expect.anything()
-    )
-  })
-})
+      expect.anything(),
+    );
+  });
+});

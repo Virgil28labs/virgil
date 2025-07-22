@@ -3,7 +3,7 @@
  * Renders only visible items to handle large lists efficiently
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 interface VirtualizationOptions {
   /** Total number of items */
@@ -37,53 +37,53 @@ export function useVirtualization({
   itemCount,
   itemHeight,
   containerHeight,
-  overscan = 3
+  overscan = 3,
 }: VirtualizationOptions): VirtualizationResult {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [scrollTop, setScrollTop] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
-    const visibleStart = Math.floor(scrollTop / itemHeight)
-    const visibleEnd = Math.ceil((scrollTop + containerHeight) / itemHeight)
+    const visibleStart = Math.floor(scrollTop / itemHeight);
+    const visibleEnd = Math.ceil((scrollTop + containerHeight) / itemHeight);
     
     // Add overscan
-    const start = Math.max(0, visibleStart - overscan)
-    const end = Math.min(itemCount, visibleEnd + overscan)
+    const start = Math.max(0, visibleStart - overscan);
+    const end = Math.min(itemCount, visibleEnd + overscan);
     
-    return { start, end }
-  }, [scrollTop, itemHeight, containerHeight, itemCount, overscan])
+    return { start, end };
+  }, [scrollTop, itemHeight, containerHeight, itemCount, overscan]);
 
   // Calculate total height
-  const totalHeight = itemCount * itemHeight
+  const totalHeight = itemCount * itemHeight;
 
   // Calculate offset for visible items
-  const offsetY = visibleRange.start * itemHeight
+  const offsetY = visibleRange.start * itemHeight;
 
   // Handle scroll events
   const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
-      setScrollTop(scrollContainerRef.current.scrollTop)
+      setScrollTop(scrollContainerRef.current.scrollTop);
     }
-  }, [])
+  }, []);
 
   // Set up scroll listener
   useEffect(() => {
-    const container = scrollContainerRef.current
+    const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll, { passive: true })
-      return () => container.removeEventListener('scroll', handleScroll)
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      return () => container.removeEventListener('scroll', handleScroll);
     }
-    return undefined
-  }, [handleScroll])
+    return undefined;
+  }, [handleScroll]);
 
   return {
     visibleRange,
     totalHeight,
     offsetY,
     scrollContainerRef,
-    handleScroll
-  }
+    handleScroll,
+  };
 }
 
 /**
@@ -94,88 +94,88 @@ export function useDynamicVirtualization<T>(
   items: T[],
   estimatedItemHeight: number,
   containerHeight: number,
-  _getItemHeight?: (item: T, index: number) => number
+  _getItemHeight?: (item: T, index: number) => number,
 ) {
-  const [itemHeights, setItemHeights] = useState<number[]>([])
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [scrollTop, setScrollTop] = useState(0)
+  const [itemHeights, setItemHeights] = useState<number[]>([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
 
   // Calculate cumulative heights
   const cumulativeHeights = useMemo(() => {
-    const heights = [0]
-    let total = 0
+    const heights = [0];
+    let total = 0;
     
     for (let i = 0; i < items.length; i++) {
-      const height = itemHeights[i] || estimatedItemHeight
-      total += height
-      heights.push(total)
+      const height = itemHeights[i] || estimatedItemHeight;
+      total += height;
+      heights.push(total);
     }
     
-    return heights
-  }, [items.length, itemHeights, estimatedItemHeight])
+    return heights;
+  }, [items.length, itemHeights, estimatedItemHeight]);
 
   // Calculate visible range
   const visibleRange = useMemo(() => {
-    let start = 0
-    let end = items.length
+    let start = 0;
+    let end = items.length;
 
     // Binary search for start
-    let low = 0
-    let high = items.length
+    let low = 0;
+    let high = items.length;
     while (low < high) {
-      const mid = Math.floor((low + high) / 2)
+      const mid = Math.floor((low + high) / 2);
       if (cumulativeHeights[mid] < scrollTop) {
-        low = mid + 1
+        low = mid + 1;
       } else {
-        high = mid
+        high = mid;
       }
     }
-    start = Math.max(0, low - 1)
+    start = Math.max(0, low - 1);
 
     // Find end
     for (let i = start; i < items.length; i++) {
       if (cumulativeHeights[i] > scrollTop + containerHeight) {
-        end = i + 1
-        break
+        end = i + 1;
+        break;
       }
     }
 
-    return { start, end: Math.min(end, items.length) }
-  }, [scrollTop, containerHeight, items.length, cumulativeHeights])
+    return { start, end: Math.min(end, items.length) };
+  }, [scrollTop, containerHeight, items.length, cumulativeHeights]);
 
   // Update item height
   const updateItemHeight = useCallback((index: number, height: number) => {
     setItemHeights(prev => {
       if (prev[index] !== height) {
-        const next = [...prev]
-        next[index] = height
-        return next
+        const next = [...prev];
+        next[index] = height;
+        return next;
       }
-      return prev
-    })
-  }, [])
+      return prev;
+    });
+  }, []);
 
   // Handle scroll
   const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
-      setScrollTop(scrollContainerRef.current.scrollTop)
+      setScrollTop(scrollContainerRef.current.scrollTop);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const container = scrollContainerRef.current
+    const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll, { passive: true })
-      return () => container.removeEventListener('scroll', handleScroll)
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      return () => container.removeEventListener('scroll', handleScroll);
     }
-    return undefined
-  }, [handleScroll])
+    return undefined;
+  }, [handleScroll]);
 
   return {
     visibleRange,
     totalHeight: cumulativeHeights[cumulativeHeights.length - 1],
     getItemOffset: (index: number) => cumulativeHeights[index] || 0,
     scrollContainerRef,
-    updateItemHeight
-  }
+    updateItemHeight,
+  };
 }

@@ -11,13 +11,13 @@ const defaultBreakpoints: BreakpointConfig = {
   mobile: 480,
   tablet: 768,
   desktop: 1024,
-  wide: 1440
+  wide: 1440,
 };
 
 export function useResponsive(breakpoints: BreakpointConfig = defaultBreakpoints) {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
   });
 
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
@@ -69,7 +69,7 @@ export function useResponsive(breakpoints: BreakpointConfig = defaultBreakpoints
     isDesktopOrWide,
     isTouchDevice,
     deviceType,
-    breakpoints
+    breakpoints,
   };
 }
 
@@ -106,7 +106,7 @@ export function useViewport() {
     height: typeof window !== 'undefined' ? window.innerHeight : 0,
     visualViewportHeight: typeof window !== 'undefined' && window.visualViewport 
       ? window.visualViewport.height 
-      : (typeof window !== 'undefined' ? window.innerHeight : 0)
+      : (typeof window !== 'undefined' ? window.innerHeight : 0),
   });
 
   useEffect(() => {
@@ -114,14 +114,14 @@ export function useViewport() {
       setViewport({
         width: window.innerWidth,
         height: window.innerHeight,
-        visualViewportHeight: window.visualViewport?.height || window.innerHeight
+        visualViewportHeight: window.visualViewport?.height || window.innerHeight,
       });
     };
 
     const handleVisualViewportChange = () => {
       setViewport(prev => ({
         ...prev,
-        visualViewportHeight: window.visualViewport?.height || window.innerHeight
+        visualViewportHeight: window.visualViewport?.height || window.innerHeight,
       }));
     };
 
@@ -139,6 +139,6 @@ export function useViewport() {
 
   return {
     ...viewport,
-    isKeyboardOpen
+    isKeyboardOpen,
   };
 }

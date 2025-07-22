@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
-import './DeleteConfirmModal.css'
+import { useCallback } from 'react';
+import './DeleteConfirmModal.css';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean
@@ -9,14 +9,14 @@ interface DeleteConfirmModalProps {
 
 export const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel }: DeleteConfirmModalProps) => {
   const handleConfirm = useCallback(() => {
-    onConfirm()
-  }, [onConfirm])
+    onConfirm();
+  }, [onConfirm]);
 
   const handleCancel = useCallback(() => {
-    onCancel()
-  }, [onCancel])
+    onCancel();
+  }, [onCancel]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="delete-confirm-backdrop" onClick={handleCancel}>
@@ -41,5 +41,5 @@ export const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel }: DeleteConfir
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

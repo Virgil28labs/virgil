@@ -9,8 +9,8 @@ jest.mock('../lib/supabase');
 // Mock useFocusManagement hook
 jest.mock('../hooks/useFocusManagement', () => ({
   useFocusManagement: () => ({
-    containerRef: { current: null }
-  })
+    containerRef: { current: null },
+  }),
 }));
 
 describe('LoginForm', () => {
@@ -73,17 +73,17 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     const mockUser = {
       id: 'test-id',
-      email: 'test@example.com'
+      email: 'test@example.com',
     };
     
     (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
       data: { user: mockUser },
-      error: null
+      error: null,
     });
     
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: { user: mockUser } },
-      error: null
+      error: null,
     });
     
     render(<LoginForm onSuccess={mockOnSuccess} />);
@@ -99,7 +99,7 @@ describe('LoginForm', () => {
     await waitFor(() => {
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       });
     });
     
@@ -113,7 +113,7 @@ describe('LoginForm', () => {
     
     (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
       data: null,
-      error: { message: 'Invalid credentials' }
+      error: { message: 'Invalid credentials' },
     });
     
     render(<LoginForm />);
@@ -158,7 +158,7 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     
     (supabase.auth.signInWithPassword as jest.Mock).mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 100))
+      () => new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 100)),
     );
     
     render(<LoginForm />);
@@ -186,7 +186,7 @@ describe('LoginForm', () => {
     
     (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
       data: { user: { email: 'test@example.com' } },
-      error: null
+      error: null,
     });
     
     render(<LoginForm />);
@@ -202,7 +202,7 @@ describe('LoginForm', () => {
     await waitFor(() => {
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       });
     });
   });
@@ -212,12 +212,12 @@ describe('LoginForm', () => {
     
     (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
       data: { user: { email: 'test@example.com' } },
-      error: null
+      error: null,
     });
     
     (supabase.auth.getSession as jest.Mock).mockResolvedValue({
       data: { session: {} },
-      error: null
+      error: null,
     });
     
     render(<LoginForm />);

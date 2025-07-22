@@ -1,2 +1,2 @@
 // Export only the public API
-export { TimezoneWidget } from './TimezoneWidget'
+export { TimezoneWidget } from './TimezoneWidget';

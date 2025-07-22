@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     // Validate request
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
-        error: 'Messages array is required and must not be empty'
+        error: 'Messages array is required and must not be empty',
       });
     }
 
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
     if (!openaiApiKey) {
       console.error('OpenAI API key not configured');
       return res.status(500).json({
-        error: 'Chat service is not properly configured'
+        error: 'Chat service is not properly configured',
       });
     }
 
@@ -44,44 +44,44 @@ router.post('/', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiApiKey}`
+        'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
         model,
         messages,
         max_tokens,
-        temperature
-      })
+        temperature,
+      }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('OpenAI API error:', response.status, errorData);
-      
+
       // Don't expose internal error details to client
       return res.status(response.status).json({
         error: 'Failed to get response from chat service',
-        status: response.status
+        status: response.status,
       });
     }
 
     const data = await response.json();
-    
+
     // Return only necessary data to client
     res.json({
       success: true,
       message: {
         role: 'assistant',
-        content: data.choices[0].message.content
+        content: data.choices[0].message.content,
       },
-      usage: data.usage
+      usage: data.usage,
     });
 
   } catch (error) {
     console.error('Chat endpoint error:', error);
     res.status(500).json({
       error: 'Internal server error',
-      message: 'Failed to process chat request'
+      message: 'Failed to process chat request',
     });
   }
 });
@@ -92,12 +92,12 @@ router.post('/', async (req, res) => {
  */
 router.get('/health', (req, res) => {
   const hasApiKey = !!process.env.OPENAI_API_KEY;
-  
+
   res.json({
     status: hasApiKey ? 'healthy' : 'unhealthy',
     service: 'chat',
     configured: hasApiKey,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

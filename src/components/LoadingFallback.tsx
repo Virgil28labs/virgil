@@ -10,7 +10,7 @@ interface LoadingFallbackProps {
 export const LoadingFallback = memo(function LoadingFallback({ 
   message = 'Loading...', 
   size = 'medium',
-  variant = 'spinner'
+  variant = 'spinner',
 }: LoadingFallbackProps) {
   if (variant === 'skeleton') {
     const skeletonCount = size === 'small' ? 1 : size === 'medium' ? 3 : 5;
@@ -47,7 +47,7 @@ export const LoadingFallback = memo(function LoadingFallback({
           justifyContent: 'center',
           padding: '1rem',
           color: 'var(--brand-light-gray)',
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
         }}
       >
         <div className="loading-dots" style={{ display: 'flex', gap: '4px', marginRight: '0.5rem' }}>
@@ -60,7 +60,7 @@ export const LoadingFallback = memo(function LoadingFallback({
                 height: size === 'small' ? '4px' : size === 'medium' ? '8px' : '12px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--brand-light-purple)',
-                animation: `dot-pulse 1.4s ease-in-out ${i * 0.16}s infinite both`
+                animation: `dot-pulse 1.4s ease-in-out ${i * 0.16}s infinite both`,
               }}
             />
           ))}
@@ -83,7 +83,7 @@ export const LoadingFallback = memo(function LoadingFallback({
           justifyContent: 'center',
           padding: '1rem',
           color: 'var(--brand-light-gray)',
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
         }}
       >
         {message}
@@ -94,7 +94,7 @@ export const LoadingFallback = memo(function LoadingFallback({
   const sizeClasses = {
     small: 'w-4 h-4',
     medium: 'w-8 h-8', 
-    large: 'w-12 h-12'
+    large: 'w-12 h-12',
   };
 
   return (
@@ -109,7 +109,7 @@ export const LoadingFallback = memo(function LoadingFallback({
         justifyContent: 'center',
         padding: '1rem',
         color: 'var(--brand-light-gray)',
-        fontSize: '0.875rem'
+        fontSize: '0.875rem',
       }}
     >
       <div 
@@ -121,7 +121,7 @@ export const LoadingFallback = memo(function LoadingFallback({
           borderTop: '2px solid transparent',
           borderRadius: '50%',
           animation: 'spin 1s linear infinite',
-          marginRight: '0.5rem'
+          marginRight: '0.5rem',
         }}
       />
       {message}

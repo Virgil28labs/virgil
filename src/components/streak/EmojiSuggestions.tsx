@@ -1,5 +1,5 @@
-import { memo, useMemo } from 'react'
-import { EMOJI_DATABASE, POPULAR_EMOJIS } from '../../data/habitEmojis'
+import { memo, useMemo } from 'react';
+import { EMOJI_DATABASE, POPULAR_EMOJIS } from '../../data/habitEmojis';
 
 interface EmojiSuggestionsProps {
   searchTerm: string
@@ -12,24 +12,24 @@ interface EmojiSuggestionsProps {
 export const EmojiSuggestions = memo(function EmojiSuggestions({
   searchTerm,
   onSelect,
-  currentEmoji
+  currentEmoji,
 }: EmojiSuggestionsProps) {
   const suggestions = useMemo(() => {
     if (!searchTerm.trim()) {
-      return POPULAR_EMOJIS
+      return POPULAR_EMOJIS;
     }
     
-    const term = searchTerm.toLowerCase()
+    const term = searchTerm.toLowerCase();
     const matches = EMOJI_DATABASE
       .filter(({ keywords }) => 
-        keywords.some(keyword => keyword.includes(term))
+        keywords.some(keyword => keyword.includes(term)),
       )
       .map(({ emoji }) => emoji)
-      .slice(0, 20)
+      .slice(0, 20);
     
     // If no matches, show popular emojis
-    return matches.length > 0 ? matches : POPULAR_EMOJIS
-  }, [searchTerm])
+    return matches.length > 0 ? matches : POPULAR_EMOJIS;
+  }, [searchTerm]);
   
   return (
     <div className="emoji-suggestions">
@@ -50,5 +50,5 @@ export const EmojiSuggestions = memo(function EmojiSuggestions({
         ))}
       </div>
     </div>
-  )
-})
+  );
+});

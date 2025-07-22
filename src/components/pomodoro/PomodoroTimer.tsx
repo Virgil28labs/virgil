@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useUserProfile } from '../../hooks/useUserProfile'
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useUserProfile } from '../../hooks/useUserProfile';
 
 interface PomodoroTimerProps {
   isOpen: boolean
@@ -7,323 +7,323 @@ interface PomodoroTimerProps {
 }
 
 // Constants
-const DEFAULT_MINUTES = 25
-const MIN_MINUTES = 1
-const MAX_MINUTES = 60
-const PRESET_TIMES = [5, 10, 25]
-const SNAP_POINTS = [5, 10, 15, 20, 25, 30, 45, 60]
-const SNAP_THRESHOLD = 3
+const DEFAULT_MINUTES = 25;
+const MIN_MINUTES = 1;
+const MAX_MINUTES = 60;
+const PRESET_TIMES = [5, 10, 25];
+const SNAP_POINTS = [5, 10, 15, 20, 25, 30, 45, 60];
+const SNAP_THRESHOLD = 3;
 
 // Clock dimensions
-const CLOCK_RADIUS = 120
-const INNER_RADIUS = 85
-const CENTER_X = 140
-const CENTER_Y = 140
+const CLOCK_RADIUS = 120;
+const INNER_RADIUS = 85;
+const CENTER_X = 140;
+const CENTER_Y = 140;
 
 export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose }) => {
-  const { profile } = useUserProfile()
-  const userName = profile?.nickname || profile?.fullName || ''
+  const { profile } = useUserProfile();
+  const userName = profile?.nickname || profile?.fullName || '';
   
-  const [selectedMinutes, setSelectedMinutes] = useState(DEFAULT_MINUTES)
-  const [timeRemaining, setTimeRemaining] = useState(DEFAULT_MINUTES * 60)
-  const [isRunning, setIsRunning] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [showCelebration, setShowCelebration] = useState(false)
-  const [motivationalMessage, setMotivationalMessage] = useState('')
-  const [particles, setParticles] = useState<Array<{ id: number; x: number }>>([])
+  const [selectedMinutes, setSelectedMinutes] = useState(DEFAULT_MINUTES);
+  const [timeRemaining, setTimeRemaining] = useState(DEFAULT_MINUTES * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [motivationalMessage, setMotivationalMessage] = useState('');
+  const [particles, setParticles] = useState<Array<{ id: number; x: number }>>([]);
   
   // Refs
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const dialRef = useRef<HTMLDivElement>(null)
-  const isDraggingRef = useRef(false)
-  const panelRef = useRef<HTMLDivElement>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const dialRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const panelRef = useRef<HTMLDivElement>(null);
   
   // Calculate total duration for current session
-  const totalDuration = selectedMinutes * 60
-  const progress = ((totalDuration - timeRemaining) / totalDuration) * 100
+  const totalDuration = selectedMinutes * 60;
+  const progress = ((totalDuration - timeRemaining) / totalDuration) * 100;
   
   
   // Calculate minutes from angle
   const angleToMinutes = (angle: number) => {
-    const minutes = Math.round((angle / 360) * 60)
-    return Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, minutes))
-  }
+    const minutes = Math.round((angle / 360) * 60);
+    return Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, minutes));
+  };
   
   // Update motivational message based on timer progress
   useEffect(() => {
-    const name = userName || 'Champion'
+    const name = userName || 'Champion';
     
     if (showCelebration) {
-      setMotivationalMessage(`Fantastic work, ${name}! You crushed it! 🎉`)
-      return
+      setMotivationalMessage(`Fantastic work, ${name}! You crushed it! 🎉`);
+      return;
     }
     
     if (!isRunning) {
-      setMotivationalMessage('')
-      return
+      setMotivationalMessage('');
+      return;
     }
     
     // Contextual messages based on progress ranges
     if (progress < 5) {
-      setMotivationalMessage(`Let's do this, ${name}! Focus mode activated 🚀`)
+      setMotivationalMessage(`Let's do this, ${name}! Focus mode activated 🚀`);
     } else if (progress >= 15 && progress < 30) {
-      setMotivationalMessage(`Great start, ${name}! You're in the zone 💫`)
+      setMotivationalMessage(`Great start, ${name}! You're in the zone 💫`);
     } else if (progress >= 40 && progress < 60) {
-      setMotivationalMessage(`Halfway there, ${name}! Keep that momentum going 💪`)
+      setMotivationalMessage(`Halfway there, ${name}! Keep that momentum going 💪`);
     } else if (progress >= 70 && progress < 85) {
-      setMotivationalMessage(`Almost done, ${name}! You've got this 🔥`)
+      setMotivationalMessage(`Almost done, ${name}! You've got this 🔥`);
     } else if (progress >= 90 && progress < 95) {
-      setMotivationalMessage(`Final minute, ${name}! Finish strong 🏁`)
+      setMotivationalMessage(`Final minute, ${name}! Finish strong 🏁`);
     }
-  }, [progress, isRunning, showCelebration, userName])
+  }, [progress, isRunning, showCelebration, userName]);
   
   
   
   // Handle dial dragging
   const handleDialStart = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isRunning) return
-    isDraggingRef.current = true
-    e.preventDefault()
-  }
+    if (isRunning) return;
+    isDraggingRef.current = true;
+    e.preventDefault();
+  };
   
   const handleDialMove = useCallback((e: MouseEvent | TouchEvent) => {
-    if (!isDraggingRef.current || !dialRef.current) return
+    if (!isDraggingRef.current || !dialRef.current) return;
     
-    const rect = dialRef.current.getBoundingClientRect()
-    const dialCenterX = rect.left + rect.width / 2
-    const dialCenterY = rect.top + rect.height / 2
+    const rect = dialRef.current.getBoundingClientRect();
+    const dialCenterX = rect.left + rect.width / 2;
+    const dialCenterY = rect.top + rect.height / 2;
     
-    let clientX: number, clientY: number
+    let clientX: number, clientY: number;
     if (e instanceof MouseEvent) {
-      clientX = e.clientX
-      clientY = e.clientY
+      clientX = e.clientX;
+      clientY = e.clientY;
     } else {
-      clientX = e.touches[0].clientX
-      clientY = e.touches[0].clientY
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
     }
     
-    const angle = Math.atan2(clientY - dialCenterY, clientX - dialCenterX)
-    const degrees = (angle * 180 / Math.PI + 90 + 360) % 360
-    const minutes = angleToMinutes(degrees)
+    const angle = Math.atan2(clientY - dialCenterY, clientX - dialCenterX);
+    const degrees = (angle * 180 / Math.PI + 90 + 360) % 360;
+    const minutes = angleToMinutes(degrees);
     
     // Snap to common values
-    let snappedMinutes = minutes
+    let snappedMinutes = minutes;
     
     for (const point of SNAP_POINTS) {
       if (Math.abs(minutes - point) <= SNAP_THRESHOLD) {
-        snappedMinutes = point
-        break
+        snappedMinutes = point;
+        break;
       }
     }
     
-    setSelectedMinutes(snappedMinutes)
-    setTimeRemaining(snappedMinutes * 60)
-  }, [])
+    setSelectedMinutes(snappedMinutes);
+    setTimeRemaining(snappedMinutes * 60);
+  }, []);
   
   const handleDialEnd = useCallback(() => {
-    isDraggingRef.current = false
-  }, [])
+    isDraggingRef.current = false;
+  }, []);
   
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     // Intercept all arrow keys
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      e.preventDefault()
-      e.stopPropagation()
+      e.preventDefault();
+      e.stopPropagation();
       
       // Remove focus from any active element
       if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur()
+        document.activeElement.blur();
       }
       
       // Only handle left/right for timer adjustment when not running
       if (!isRunning && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
         if (e.key === 'ArrowLeft') {
-          const newMinutes = Math.max(MIN_MINUTES, selectedMinutes - 1)
-          setSelectedMinutes(newMinutes)
-          setTimeRemaining(newMinutes * 60)
+          const newMinutes = Math.max(MIN_MINUTES, selectedMinutes - 1);
+          setSelectedMinutes(newMinutes);
+          setTimeRemaining(newMinutes * 60);
         } else if (e.key === 'ArrowRight') {
-          const newMinutes = Math.min(MAX_MINUTES, selectedMinutes + 1)
-          setSelectedMinutes(newMinutes)
-          setTimeRemaining(newMinutes * 60)
+          const newMinutes = Math.min(MAX_MINUTES, selectedMinutes + 1);
+          setSelectedMinutes(newMinutes);
+          setTimeRemaining(newMinutes * 60);
         }
       }
     }
-  }, [isRunning, selectedMinutes])
+  }, [isRunning, selectedMinutes]);
   
   // Add global mouse/touch listeners
   useEffect(() => {
-    window.addEventListener('mousemove', handleDialMove)
-    window.addEventListener('mouseup', handleDialEnd)
-    window.addEventListener('touchmove', handleDialMove)
-    window.addEventListener('touchend', handleDialEnd)
+    window.addEventListener('mousemove', handleDialMove);
+    window.addEventListener('mouseup', handleDialEnd);
+    window.addEventListener('touchmove', handleDialMove);
+    window.addEventListener('touchend', handleDialEnd);
     
     return () => {
-      window.removeEventListener('mousemove', handleDialMove)
-      window.removeEventListener('mouseup', handleDialEnd)
-      window.removeEventListener('touchmove', handleDialMove)
-      window.removeEventListener('touchend', handleDialEnd)
-    }
-  }, [handleDialMove, handleDialEnd])
+      window.removeEventListener('mousemove', handleDialMove);
+      window.removeEventListener('mouseup', handleDialEnd);
+      window.removeEventListener('touchmove', handleDialMove);
+      window.removeEventListener('touchend', handleDialEnd);
+    };
+  }, [handleDialMove, handleDialEnd]);
   
   // Focus panel when opened
   useEffect(() => {
     if (isOpen && panelRef.current) {
-      panelRef.current.focus()
+      panelRef.current.focus();
     }
-  }, [isOpen])
+  }, [isOpen]);
   
   
   // Format time display
   const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
   
   // Play sound
   const playSound = useCallback((type: 'tick' | 'complete' | 'milestone') => {
-    if (!soundEnabled) return
+    if (!soundEnabled) return;
     
     try {
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       }
       
-      const ctx = audioContextRef.current
-      const oscillator = ctx.createOscillator()
-      const gainNode = ctx.createGain()
+      const ctx = audioContextRef.current;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
       
-      oscillator.connect(gainNode)
-      gainNode.connect(ctx.destination)
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
       
       if (type === 'complete') {
         // Pleasant completion sound
-        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime) // C5
-        oscillator.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1) // E5
-        oscillator.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2) // G5
-        gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.5)
+        oscillator.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+        oscillator.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+        oscillator.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.5);
       } else if (type === 'milestone') {
         // Milestone sound
-        oscillator.frequency.setValueAtTime(440, ctx.currentTime) // A4
-        oscillator.frequency.setValueAtTime(554.37, ctx.currentTime + 0.1) // C#5
-        gainNode.gain.setValueAtTime(0.2, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.3)
+        oscillator.frequency.setValueAtTime(440, ctx.currentTime); // A4
+        oscillator.frequency.setValueAtTime(554.37, ctx.currentTime + 0.1); // C#5
+        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.3);
       } else {
         // Tick sound
-        oscillator.frequency.setValueAtTime(800, ctx.currentTime)
-        gainNode.gain.setValueAtTime(0.1, ctx.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1)
-        oscillator.start(ctx.currentTime)
-        oscillator.stop(ctx.currentTime + 0.1)
+        oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.1);
       }
     } catch (error) {
-      console.error('Error playing sound:', error)
+      console.error('Error playing sound:', error);
     }
-  }, [soundEnabled])
+  }, [soundEnabled]);
   
   // Create milestone particles
   const createMilestoneParticles = () => {
     const newParticles = Array.from({ length: 10 }, (_, i) => ({
       id: Date.now() + i,
-      x: Math.random() * 200 - 100
-    }))
-    setParticles(prev => [...prev, ...newParticles])
+      x: Math.random() * 200 - 100,
+    }));
+    setParticles(prev => [...prev, ...newParticles]);
     
     // Clear particles after animation
     setTimeout(() => {
-      setParticles(prev => prev.filter(p => !newParticles.some(np => np.id === p.id)))
-    }, 2000)
-  }
+      setParticles(prev => prev.filter(p => !newParticles.some(np => np.id === p.id)));
+    }, 2000);
+  };
   
   // Handle timer completion
   const handleTimerComplete = useCallback(() => {
-    setIsRunning(false)
-    playSound('complete')
-    setShowCelebration(true)
+    setIsRunning(false);
+    playSound('complete');
+    setShowCelebration(true);
     
     
     // Create particles
     const celebrationParticles = Array.from({ length: 20 }, (_, i) => ({
       id: Date.now() + i,
-      x: Math.random() * 200 - 100
-    }))
-    setParticles(celebrationParticles)
+      x: Math.random() * 200 - 100,
+    }));
+    setParticles(celebrationParticles);
     
     // Hide celebration
     setTimeout(() => {
-      setShowCelebration(false)
-      setParticles([])
-    }, 2000)
+      setShowCelebration(false);
+      setParticles([]);
+    }, 2000);
     
-  }, [playSound])
+  }, [playSound]);
   
   // Timer tick
   useEffect(() => {
     if (isRunning && timeRemaining > 0) {
-      let lastMilestone = Math.floor((1 - timeRemaining / totalDuration) * 4)
+      let lastMilestone = Math.floor((1 - timeRemaining / totalDuration) * 4);
       
       intervalRef.current = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
-            handleTimerComplete()
-            return 0
+            handleTimerComplete();
+            return 0;
           }
           
           // Check for milestones (25%, 50%, 75%)
-          const currentProgress = (totalDuration - (prev - 1)) / totalDuration
-          const currentMilestone = Math.floor(currentProgress * 4)
+          const currentProgress = (totalDuration - (prev - 1)) / totalDuration;
+          const currentMilestone = Math.floor(currentProgress * 4);
           if (currentMilestone > lastMilestone && currentMilestone < 4) {
-            playSound('milestone')
-            createMilestoneParticles()
-            lastMilestone = currentMilestone
+            playSound('milestone');
+            createMilestoneParticles();
+            lastMilestone = currentMilestone;
           }
           
           // Play tick in last 5 seconds
           if (prev <= 5) {
-            playSound('tick')
+            playSound('tick');
           }
           
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
     } else {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     }
     
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
-    }
-  }, [isRunning, timeRemaining, totalDuration, handleTimerComplete, playSound])
+    };
+  }, [isRunning, timeRemaining, totalDuration, handleTimerComplete, playSound]);
   
   // Control functions
-  const startTimer = () => setIsRunning(true)
-  const pauseTimer = () => setIsRunning(false)
+  const startTimer = () => setIsRunning(true);
+  const pauseTimer = () => setIsRunning(false);
   const resetTimer = () => {
-    setIsRunning(false)
-    setTimeRemaining(selectedMinutes * 60)
-    setMotivationalMessage('')
-  }
+    setIsRunning(false);
+    setTimeRemaining(selectedMinutes * 60);
+    setMotivationalMessage('');
+  };
   
-  if (!isOpen) return null
+  if (!isOpen) return null;
   
   // Calculate visual elements for clock
   // For setup: show filled segment based on selected minutes
   // For running: show remaining time as filled segment
-  const setupAngle = (selectedMinutes / 60) * 360
-  const remainingAngle = setupAngle * (timeRemaining / (selectedMinutes * 60))
-  const fillAngle = isRunning ? remainingAngle : setupAngle
+  const setupAngle = (selectedMinutes / 60) * 360;
+  const remainingAngle = setupAngle * (timeRemaining / (selectedMinutes * 60));
+  const fillAngle = isRunning ? remainingAngle : setupAngle;
   
   
   return (
@@ -375,11 +375,11 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
                 { num: 60, angle: -90 },
                 { num: 15, angle: 0 },
                 { num: 30, angle: 90 },
-                { num: 45, angle: 180 }
+                { num: 45, angle: 180 },
               ].map(({ num, angle }) => {
-                const radian = angle * Math.PI / 180
-                const x = CENTER_X + Math.cos(radian) * (CLOCK_RADIUS - 15)
-                const y = CENTER_Y + Math.sin(radian) * (CLOCK_RADIUS - 15)
+                const radian = angle * Math.PI / 180;
+                const x = CENTER_X + Math.cos(radian) * (CLOCK_RADIUS - 15);
+                const y = CENTER_Y + Math.sin(radian) * (CLOCK_RADIUS - 15);
                 return (
                   <text
                     key={num}
@@ -394,19 +394,19 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
                   >
                     {num}
                   </text>
-                )
+                );
               })}
               
               {/* Hour and 5-minute markers */}
               {Array.from({ length: 12 }, (_, i) => {
                 // Skip tick marks where numbers are displayed
-                if (i % 3 === 0) return null
+                if (i % 3 === 0) return null;
                 
-                const angle = (i * 30) - 90
-                const x1 = CENTER_X + Math.cos(angle * Math.PI / 180) * (CLOCK_RADIUS - 5)
-                const y1 = CENTER_Y + Math.sin(angle * Math.PI / 180) * (CLOCK_RADIUS - 5)
-                const x2 = CENTER_X + Math.cos(angle * Math.PI / 180) * (CLOCK_RADIUS - 10)
-                const y2 = CENTER_Y + Math.sin(angle * Math.PI / 180) * (CLOCK_RADIUS - 10)
+                const angle = (i * 30) - 90;
+                const x1 = CENTER_X + Math.cos(angle * Math.PI / 180) * (CLOCK_RADIUS - 5);
+                const y1 = CENTER_Y + Math.sin(angle * Math.PI / 180) * (CLOCK_RADIUS - 5);
+                const x2 = CENTER_X + Math.cos(angle * Math.PI / 180) * (CLOCK_RADIUS - 10);
+                const y2 = CENTER_Y + Math.sin(angle * Math.PI / 180) * (CLOCK_RADIUS - 10);
                 
                 return (
                   <line
@@ -419,7 +419,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
                     strokeWidth="1"
                     strokeLinecap="round"
                   />
-                )
+                );
               })}
               
               
@@ -481,8 +481,8 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
                   key={minutes}
                   className={`preset-btn ${selectedMinutes === minutes ? 'active' : ''}`}
                   onClick={() => {
-                    setSelectedMinutes(minutes)
-                    setTimeRemaining(minutes * 60)
+                    setSelectedMinutes(minutes);
+                    setTimeRemaining(minutes * 60);
                   }}
                   tabIndex={-1}
                 >
@@ -535,7 +535,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
                 style={{
                   left: '50%',
                   top: '40%',
-                  '--x-drift': `${particle.x}px`
+                  '--x-drift': `${particle.x}px`,
                 } as React.CSSProperties}
               />
             ))}
@@ -543,5 +543,5 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
         )}
       </div>
     </div>
-  )
-}
+  );
+};

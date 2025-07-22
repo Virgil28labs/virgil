@@ -185,26 +185,26 @@ export const NOTABLE_APOD_DATES: ApodDatePreset[] = [
     id: 'first',
     label: 'First APOD',
     date: '1995-06-16',
-    description: 'The very first Astronomy Picture of the Day'
+    description: 'The very first Astronomy Picture of the Day',
   },
   {
     id: 'hubble-deep-field',
     label: 'Hubble Deep Field',
     date: '1996-01-15',
-    description: 'The famous Hubble Deep Field image'
+    description: 'The famous Hubble Deep Field image',
   },
   {
     id: 'pale-blue-dot',
     label: 'Pale Blue Dot',
     date: '2020-02-14',
-    description: 'Voyager 1\'s iconic Earth photograph'
+    description: 'Voyager 1\'s iconic Earth photograph',
   },
   {
     id: 'black-hole',
     label: 'First Black Hole Image',
     date: '2019-04-10',
-    description: 'First image of a black hole from Event Horizon Telescope'
-  }
+    description: 'First image of a black hole from Event Horizon Telescope',
+  },
 ];
 
 // Constants

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react'
-import './Modal.css'
+import React, { useCallback, useEffect } from 'react';
+import './Modal.css';
 
 interface ModalProps {
   isOpen: boolean
@@ -16,29 +16,29 @@ export const Modal: React.FC<ModalProps> = ({
   title, 
   children, 
   className = '',
-  size = 'medium' 
+  size = 'medium', 
 }) => {
   // Handle escape key
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [isOpen, onClose])
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isOpen, onClose]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose()
+      onClose();
     }
-  }, [onClose])
+  }, [onClose]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
@@ -62,5 +62,5 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

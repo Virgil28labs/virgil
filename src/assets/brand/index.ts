@@ -9,5 +9,5 @@ export {
   getColorForBackground,
   type ColorPalette,
   type SemanticColors,
-  type DesignTokens
-} from './colors'
+  type DesignTokens,
+} from './colors';

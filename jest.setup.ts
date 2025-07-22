@@ -13,12 +13,12 @@ Object.defineProperty(globalThis, 'import', {
         VITE_DOG_DOCS_URL: 'https://dog.ceo/dog-api/',
         VITE_GOOGLE_MAPS_API_KEY: 'test-google-maps-key',
         BASE_URL: '/',
-        PROD: false
-      }
-    }
+        PROD: false,
+      },
+    },
   },
   writable: true,
-  configurable: true
+  configurable: true,
 });
 
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
@@ -102,7 +102,7 @@ Object.defineProperty(global, 'crypto', {
       }
       return arr;
     },
-    subtle: {} // Mock subtle crypto API if needed
+    subtle: {}, // Mock subtle crypto API if needed
   },
 });
 

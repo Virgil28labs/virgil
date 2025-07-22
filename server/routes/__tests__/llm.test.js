@@ -5,9 +5,7 @@ const { createLLMRouter } = require('../llm');
 // Mock dependencies
 jest.mock('../../middleware/validation');
 jest.mock('../../middleware/cache');
-jest.mock('express-rate-limit', () => {
-  return jest.fn(() => (req, res, next) => next());
-});
+jest.mock('express-rate-limit', () => jest.fn(() => (req, res, next) => next()));
 
 const { validateRequest, validateBatchRequest } = require('../../middleware/validation');
 const { cacheMiddleware } = require('../../middleware/cache');
@@ -20,19 +18,19 @@ describe('LLM Routes', () => {
   beforeEach(() => {
     app = express();
     app.use(express.json());
-    
+
     // Set up mock implementations
     mockLLMProxy = {
       complete: jest.fn(),
       completeStream: jest.fn(),
       getAvailableModels: jest.fn(),
-      countTokens: jest.fn()
+      countTokens: jest.fn(),
     };
-    
+
     mockRequestQueue = {
-      add: jest.fn((fn) => fn())
+      add: jest.fn(fn => fn()),
     };
-    
+
     // Mock middleware
     validateRequest.mockImplementation((req, res, next) => next());
     validateBatchRequest.mockImplementation((req, res, next) => next());
@@ -40,11 +38,11 @@ describe('LLM Routes', () => {
       res.locals = { cached: false };
       next();
     });
-    
+
     // Create router with mocked dependencies
     const llmRouter = createLLMRouter(mockLLMProxy, mockRequestQueue);
     app.use('/api/v1/llm', llmRouter);
-    
+
     // Reset mocks
     jest.clearAllMocks();
   });
@@ -58,10 +56,10 @@ describe('LLM Routes', () => {
         usage: {
           prompt_tokens: 10,
           completion_tokens: 5,
-          total_tokens: 15
-        }
+          total_tokens: 15,
+        },
       };
-      
+
       mockLLMProxy.complete.mockResolvedValue(mockResponse);
 
       const response = await request(app)
@@ -69,7 +67,7 @@ describe('LLM Routes', () => {
         .send({
           messages: [{ role: 'user', content: 'Hello' }],
           model: 'gpt-4o-mini',
-          temperature: 0.7
+          temperature: 0.7,
         })
         .expect('Content-Type', /json/)
         .expect(200);
@@ -78,7 +76,7 @@ describe('LLM Routes', () => {
         success: true,
         data: mockResponse,
         usage: mockResponse.usage,
-        cached: false
+        cached: false,
       });
 
       expect(mockLLMProxy.complete).toHaveBeenCalledWith({
@@ -88,7 +86,7 @@ describe('LLM Routes', () => {
         maxTokens: 256,
         systemPrompt: null,
         context: {},
-        provider: 'openai'
+        provider: 'openai',
       });
     });
 
@@ -98,7 +96,7 @@ describe('LLM Routes', () => {
       await request(app)
         .post('/api/v1/llm/complete')
         .send({
-          messages: [{ role: 'user', content: 'Test' }]
+          messages: [{ role: 'user', content: 'Test' }],
         })
         .expect(200);
 
@@ -107,8 +105,8 @@ describe('LLM Routes', () => {
           model: 'gpt-4o-mini',
           temperature: 0.7,
           maxTokens: 256,
-          provider: 'openai'
-        })
+          provider: 'openai',
+        }),
       );
     });
 
@@ -119,14 +117,14 @@ describe('LLM Routes', () => {
         .post('/api/v1/llm/complete')
         .send({
           messages: [{ role: 'user', content: 'Test' }],
-          systemPrompt: 'You are a helpful assistant'
+          systemPrompt: 'You are a helpful assistant',
         })
         .expect(200);
 
       expect(mockLLMProxy.complete).toHaveBeenCalledWith(
         expect.objectContaining({
-          systemPrompt: 'You are a helpful assistant'
-        })
+          systemPrompt: 'You are a helpful assistant',
+        }),
       );
     });
 
@@ -136,7 +134,7 @@ describe('LLM Routes', () => {
       await request(app)
         .post('/api/v1/llm/complete')
         .send({
-          messages: [{ role: 'user', content: 'Test' }]
+          messages: [{ role: 'user', content: 'Test' }],
         })
         .expect(200);
 
@@ -147,15 +145,15 @@ describe('LLM Routes', () => {
       // Create a new app with updated cache middleware
       const testApp = express();
       testApp.use(express.json());
-      
+
       // Mock cache middleware to set cached: true
       cacheMiddleware.mockImplementation((req, res, next) => {
         res.locals = { cached: true };
         next();
       });
-      
+
       mockLLMProxy.complete.mockResolvedValue({ content: 'Cached response' });
-      
+
       // Create a new router instance
       const testRouter = createLLMRouter(mockLLMProxy, mockRequestQueue);
       testApp.use('/api/v1/llm', testRouter);
@@ -163,7 +161,7 @@ describe('LLM Routes', () => {
       const response = await request(testApp)
         .post('/api/v1/llm/complete')
         .send({
-          messages: [{ role: 'user', content: 'Test' }]
+          messages: [{ role: 'user', content: 'Test' }],
         })
         .expect(200);
 
@@ -181,12 +179,12 @@ describe('LLM Routes', () => {
       const response = await request(app)
         .post('/api/v1/llm/complete')
         .send({
-          messages: [{ role: 'user', content: 'Test' }]
+          messages: [{ role: 'user', content: 'Test' }],
         })
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'LLM service error'
+        error: 'LLM service error',
       });
     });
   });
@@ -198,13 +196,13 @@ describe('LLM Routes', () => {
         yield { content: ' world' };
         yield { content: '!' };
       };
-      
+
       mockLLMProxy.completeStream.mockResolvedValue(mockStream());
 
       const response = await request(app)
         .post('/api/v1/llm/stream')
         .send({
-          messages: [{ role: 'user', content: 'Say hello' }]
+          messages: [{ role: 'user', content: 'Say hello' }],
         })
         .expect('Content-Type', /text\/event-stream/)
         .expect(200);
@@ -221,13 +219,13 @@ describe('LLM Routes', () => {
         yield { content: 'Start' };
         throw new Error('Stream error');
       };
-      
+
       mockLLMProxy.completeStream.mockResolvedValue(mockStream());
 
       const response = await request(app)
         .post('/api/v1/llm/stream')
         .send({
-          messages: [{ role: 'user', content: 'Test' }]
+          messages: [{ role: 'user', content: 'Test' }],
         })
         .expect(200);
 
@@ -239,9 +237,9 @@ describe('LLM Routes', () => {
     it('should process batch requests', async () => {
       const mockResponses = [
         { id: '1', content: 'Response 1' },
-        { id: '2', content: 'Response 2' }
+        { id: '2', content: 'Response 2' },
       ];
-      
+
       mockLLMProxy.complete
         .mockResolvedValueOnce(mockResponses[0])
         .mockResolvedValueOnce(mockResponses[1]);
@@ -251,14 +249,14 @@ describe('LLM Routes', () => {
         .send({
           requests: [
             { messages: [{ role: 'user', content: 'Question 1' }] },
-            { messages: [{ role: 'user', content: 'Question 2' }] }
-          ]
+            { messages: [{ role: 'user', content: 'Question 2' }] },
+          ],
         })
         .expect(200);
 
       expect(response.body).toEqual({
         success: true,
-        data: mockResponses
+        data: mockResponses,
       });
 
       expect(mockLLMProxy.complete).toHaveBeenCalledTimes(2);
@@ -274,8 +272,8 @@ describe('LLM Routes', () => {
         .send({
           requests: [
             { messages: [{ role: 'user', content: 'Good request' }] },
-            { messages: [{ role: 'user', content: 'Bad request' }] }
-          ]
+            { messages: [{ role: 'user', content: 'Bad request' }] },
+          ],
         })
         .expect(200);
 
@@ -283,8 +281,8 @@ describe('LLM Routes', () => {
         success: true,
         data: [
           { content: 'Success' },
-          { error: 'Request failed' }
-        ]
+          { error: 'Request failed' },
+        ],
       });
     });
 
@@ -295,7 +293,7 @@ describe('LLM Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Requests array must not be empty'
+        error: 'Requests array must not be empty',
       });
     });
 
@@ -306,7 +304,7 @@ describe('LLM Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Requests must be an array'
+        error: 'Requests must be an array',
       });
     });
 
@@ -319,7 +317,7 @@ describe('LLM Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Batch size cannot exceed 10 requests'
+        error: 'Batch size cannot exceed 10 requests',
       });
     });
   });
@@ -328,9 +326,9 @@ describe('LLM Routes', () => {
     it('should return available models', async () => {
       const mockModels = {
         openai: ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4'],
-        anthropic: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus']
+        anthropic: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus'],
       };
-      
+
       mockLLMProxy.getAvailableModels.mockResolvedValue(mockModels);
 
       const response = await request(app)
@@ -339,7 +337,7 @@ describe('LLM Routes', () => {
 
       expect(response.body).toEqual({
         success: true,
-        data: mockModels
+        data: mockModels,
       });
     });
 
@@ -356,7 +354,7 @@ describe('LLM Routes', () => {
         .expect(500);
 
       expect(response.body).toEqual({
-        error: 'Service unavailable'
+        error: 'Service unavailable',
       });
     });
   });
@@ -370,7 +368,7 @@ describe('LLM Routes', () => {
         .post('/api/v1/llm/tokenize')
         .send({
           text: 'This is a sample text to tokenize',
-          model: 'gpt-4o-mini'
+          model: 'gpt-4o-mini',
         })
         .expect(200);
 
@@ -379,13 +377,13 @@ describe('LLM Routes', () => {
         data: {
           text: 'This is a sample text to tokenize',
           model: 'gpt-4o-mini',
-          tokenCount: 9
-        }
+          tokenCount: 9,
+        },
       });
 
       expect(mockLLMProxy.countTokens).toHaveBeenCalledWith(
         'This is a sample text to tokenize',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
       );
     });
 
@@ -400,7 +398,7 @@ describe('LLM Routes', () => {
 
       expect(mockLLMProxy.countTokens).toHaveBeenCalledWith(
         'Test text',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
       );
     });
 
@@ -411,7 +409,7 @@ describe('LLM Routes', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Text is required'
+        error: 'Text is required',
       });
     });
   });
@@ -421,10 +419,10 @@ describe('LLM Routes', () => {
       // Clear the mock to test fresh
       const rateLimit = require('express-rate-limit');
       rateLimit.mockClear();
-      
+
       // Create a new router which should call rateLimit
       createLLMRouter();
-      
+
       expect(rateLimit).toHaveBeenCalled();
     });
   });

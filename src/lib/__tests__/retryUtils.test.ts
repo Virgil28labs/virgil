@@ -67,7 +67,7 @@ describe('retryWithBackoff', () => {
       const promise = retryWithBackoff(mockFn, {
         maxRetries: 3,
         initialDelay: 100,
-        backoffFactor: 2
+        backoffFactor: 2,
       });
 
       // Process all timers
@@ -90,7 +90,7 @@ describe('retryWithBackoff', () => {
       const promise = retryWithBackoff(mockFn, {
         initialDelay: 5000,
         maxDelay: 1000,
-        backoffFactor: 3
+        backoffFactor: 3,
       });
 
       await jest.runAllTimersAsync();
@@ -132,7 +132,7 @@ describe('retryWithBackoff', () => {
       // Run timers and await the promise simultaneously
       const [result] = await Promise.allSettled([
         promise,
-        jest.runAllTimersAsync()
+        jest.runAllTimersAsync(),
       ]);
 
       expect(result.status).toBe('rejected');
@@ -144,7 +144,7 @@ describe('retryWithBackoff', () => {
       const errors = [
         new Error('Error 1'),
         new Error('Error 2'),
-        new Error('Error 3')
+        new Error('Error 3'),
       ];
       
       const mockFn = jest.fn()
@@ -156,7 +156,7 @@ describe('retryWithBackoff', () => {
       
       const [result] = await Promise.allSettled([
         promise,
-        jest.runAllTimersAsync()
+        jest.runAllTimersAsync(),
       ]);
 
       expect(result.status).toBe('rejected');
@@ -185,7 +185,7 @@ describe('retryWithBackoff', () => {
       
       const [result] = await Promise.allSettled([
         promise,
-        jest.runAllTimersAsync()
+        jest.runAllTimersAsync(),
       ]);
 
       expect(result.status).toBe('rejected');
@@ -219,7 +219,7 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, {
         initialDelay: 500,
-        backoffFactor: 1
+        backoffFactor: 1,
       });
 
       await jest.runAllTimersAsync();

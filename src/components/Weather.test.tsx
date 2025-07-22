@@ -16,6 +16,7 @@ describe('Weather', () => {
   it('renders loading state', () => {
     mockUseWeather.mockReturnValue({
       data: null,
+      forecast: null,
       loading: true,
       error: null,
       unit: 'fahrenheit',
@@ -23,7 +24,7 @@ describe('Weather', () => {
       hasWeather: false,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: null
+      lastUpdated: null,
     });
 
     render(<Weather />);
@@ -35,6 +36,7 @@ describe('Weather', () => {
   it('renders error state', () => {
     mockUseWeather.mockReturnValue({
       data: null,
+      forecast: null,
       loading: false,
       error: 'Failed to fetch weather data',
       unit: 'fahrenheit',
@@ -42,7 +44,7 @@ describe('Weather', () => {
       hasWeather: false,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: null
+      lastUpdated: null,
     });
 
     render(<Weather />);
@@ -69,18 +71,19 @@ describe('Weather', () => {
         id: 800,
         main: 'Clear',
         description: 'clear sky',
-        icon: '01d'
+        icon: '01d',
       },
       sunrise: 1643000000,
       sunset: 1643040000,
       timezone: -28800,
       cityName: 'New York, NY',
       country: 'US',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -88,7 +91,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
 
     render(<Weather />);
@@ -106,6 +109,7 @@ describe('Weather', () => {
   it('renders without weather data', () => {
     mockUseWeather.mockReturnValue({
       data: null,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -113,7 +117,7 @@ describe('Weather', () => {
       hasWeather: false,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: null
+      lastUpdated: null,
     });
 
     const { container } = render(<Weather />);
@@ -140,18 +144,19 @@ describe('Weather', () => {
         id: 802,
         main: 'Clouds',
         description: 'scattered clouds',
-        icon: '02d'
+        icon: '02d',
       },
       sunrise: 1643000000,
       sunset: 1643040000,
       timezone: -28800,
       cityName: 'San Francisco, CA',
       country: 'US',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -159,7 +164,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
 
     const { container } = render(<Weather />);
@@ -190,18 +195,19 @@ describe('Weather', () => {
         id: 501,  // Rain
         main: 'Rain',
         description: 'moderate rain',
-        icon: '10d'
+        icon: '10d',
       },
       sunrise: 1643000000,
       sunset: 1643040000,
       timezone: -28800,
       cityName: 'Seattle, WA',
       country: 'US',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -209,7 +215,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
 
     render(<Weather />);
@@ -234,18 +240,19 @@ describe('Weather', () => {
         id: 800,
         main: 'Clear',
         description: 'clear sky',
-        icon: '01n'
+        icon: '01n',
       },
       sunrise: 1643000000,
       sunset: 1643040000,
       timezone: -28800,
       cityName: '',  // Empty location
       country: 'US',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     mockUseWeather.mockReturnValue({
       data: mockWeatherData,
+      forecast: null,
       loading: false,
       error: null,
       unit: 'fahrenheit',
@@ -253,7 +260,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
 
     render(<Weather />);

@@ -97,7 +97,7 @@ describe('ProgressIndicator', () => {
 
   it('linear variant shows progress bar fill', () => {
     const { container } = render(
-      <ProgressIndicator progress={65} variant="linear" />
+      <ProgressIndicator progress={65} variant="linear" />,
     );
     
     const progressBar = container.querySelector('[role="progressbar"]');
@@ -114,7 +114,7 @@ describe('ProgressIndicator', () => {
         variant="linear" 
         label="Processing" 
         showPercentage 
-      />
+      />,
     );
     
     expect(screen.getByText('Processing')).toBeInTheDocument();
@@ -145,7 +145,7 @@ describe('ProgressIndicator', () => {
 
   it('applies custom color', () => {
     const { container } = render(
-      <ProgressIndicator progress={50} color="red" variant="linear" />
+      <ProgressIndicator progress={50} color="red" variant="linear" />,
     );
     
     const progressFill = container.querySelector('[role="progressbar"] > div') as HTMLElement;

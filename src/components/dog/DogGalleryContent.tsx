@@ -1,8 +1,8 @@
-import { memo } from 'react'
-import { FetchControls } from './FetchControls'
-import { DogGrid } from './DogGrid'
-import { DogImageStates } from './DogImageStates'
-import { useDogGallery } from './DogGalleryProvider'
+import { memo } from 'react';
+import { FetchControls } from './FetchControls';
+import { DogGrid } from './DogGrid';
+import { DogImageStates } from './DogImageStates';
+import { useDogGallery } from './DogGalleryProvider';
 
 export const DogGalleryContent = memo(function DogGalleryContent() {
   const {
@@ -18,23 +18,23 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
     setSelectedImageIndex,
     fetchDogs,
     isFavorited,
-    toggleFavorite
-  } = useDogGallery()
+    toggleFavorite,
+  } = useDogGallery();
 
-  const displayDogs = state.activeTab === 'fetch' ? dogs : favorites
+  const displayDogs = state.activeTab === 'fetch' ? dogs : favorites;
 
   const handleImageClick = (url: string) => {
-    const index = displayDogs.findIndex(dog => dog.url === url)
-    if (index !== -1) setSelectedImageIndex(index)
-  }
+    const index = displayDogs.findIndex(dog => dog.url === url);
+    if (index !== -1) setSelectedImageIndex(index);
+  };
 
   const handleFetch = () => {
-    fetchDogs()
-  }
+    fetchDogs();
+  };
 
   const handleSwitchToFetch = () => {
-    setActiveTab('fetch')
-  }
+    setActiveTab('fetch');
+  };
 
   return (
     <div className="doggo-sanctuary-content">
@@ -70,5 +70,5 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
         />
       )}
     </div>
-  )
-})
+  );
+});

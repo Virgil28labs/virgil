@@ -70,7 +70,7 @@ export class ResponseCache {
     this.cache.set(key, {
       value,
       expiresAt: Date.now() + (ttl * 1000),
-      createdAt: Date.now()
+      createdAt: Date.now(),
     });
     
     this.accessOrder.set(key, Date.now());
@@ -113,7 +113,7 @@ export class ResponseCache {
       hits: this.hits,
       misses: this.misses,
       hitRate: `${hitRate}%`,
-      ttl: this.ttl
+      ttl: this.ttl,
     };
   }
 

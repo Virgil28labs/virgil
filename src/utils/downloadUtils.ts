@@ -65,7 +65,7 @@ export async function downloadImagesAsZip(_images: DownloadableImage[], _zipFile
 export async function copyImageUrl(url: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(url);
-  } catch (error) {
+  } catch (_error) {
     // Fallback for older browsers
     const textArea = document.createElement('textarea');
     textArea.value = url;

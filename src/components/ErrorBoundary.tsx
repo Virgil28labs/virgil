@@ -1,4 +1,5 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -52,8 +53,9 @@ export class ErrorBoundary extends Component<Props, State> {
           border: '1px solid var(--brand-light-purple)',
           borderRadius: '8px',
           textAlign: 'center',
-          margin: '1rem'
-        }}>
+          margin: '1rem',
+        }}
+        >
           <h2 style={{ color: 'var(--brand-accent-pink)', marginBottom: '1rem' }}>
             Something went wrong
           </h2>
@@ -69,7 +71,7 @@ export class ErrorBoundary extends Component<Props, State> {
               padding: '0.5rem 1rem',
               borderRadius: '4px',
               cursor: 'pointer',
-              marginRight: '0.5rem'
+              marginRight: '0.5rem',
             }}
           >
             Try Again
@@ -82,7 +84,7 @@ export class ErrorBoundary extends Component<Props, State> {
               border: '1px solid var(--brand-light-purple)',
               padding: '0.5rem 1rem',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             Refresh Page
@@ -97,8 +99,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 padding: '1rem', 
                 borderRadius: '4px',
                 fontSize: '0.875rem',
-                overflow: 'auto'
-              }}>
+                overflow: 'auto',
+              }}
+              >
                 {this.state.error.stack}
               </pre>
             </details>

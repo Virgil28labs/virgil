@@ -37,14 +37,14 @@ describe('SkeletonLoader', () => {
         width="300px" 
         height="100px" 
         borderRadius="8px" 
-      />
+      />,
     );
     
     const skeleton = screen.getByTestId('skeleton-loader');
     expect(skeleton).toHaveStyle({
       width: '300px',
       height: '100px',
-      borderRadius: '8px'
+      borderRadius: '8px',
     });
   });
 
@@ -54,7 +54,7 @@ describe('SkeletonLoader', () => {
     const skeleton = screen.getByTestId('skeleton-loader');
     expect(skeleton).toHaveStyle({
       width: '50%',
-      height: '80%'
+      height: '80%',
     });
   });
 
@@ -82,7 +82,7 @@ describe('SkeletonLoader', () => {
         <SkeletonLoader width="100px" height="20px" />
         <SkeletonLoader width="200px" height="40px" />
         <SkeletonLoader width="300px" height="60px" />
-      </>
+      </>,
     );
     
     const skeletons = container.querySelectorAll('.skeleton-loader');

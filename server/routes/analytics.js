@@ -8,8 +8,8 @@ const analytics = {
   usage: {
     total: 0,
     byModel: {},
-    byProvider: {}
-  }
+    byProvider: {},
+  },
 };
 
 /**
@@ -21,12 +21,12 @@ router.post('/track', (req, res) => {
     const {
       event,
       data,
-      timestamp = new Date().toISOString()
+      timestamp = new Date().toISOString(),
     } = req.body;
 
     if (!event) {
       return res.status(400).json({
-        error: 'Event name is required'
+        error: 'Event name is required',
       });
     }
 
@@ -35,7 +35,7 @@ router.post('/track', (req, res) => {
       data,
       timestamp,
       sessionId: req.sessionID,
-      ip: req.ip
+      ip: req.ip,
     };
 
     // Store event based on type
@@ -70,12 +70,12 @@ router.get('/summary', (req, res) => {
       requestsByProvider: analytics.usage.byProvider,
       errorRate: calculateErrorRate(),
       averageLatency: calculateAverageLatency(),
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     res.json({
       success: true,
-      data: summary
+      data: summary,
     });
 
   } catch (error) {
@@ -97,8 +97,8 @@ router.get('/usage', (req, res) => {
       success: true,
       data: {
         period,
-        usage
-      }
+        usage,
+      },
     });
 
   } catch (error) {
@@ -119,15 +119,15 @@ router.get('/errors', (req, res) => {
       .reverse()
       .map(error => ({
         ...error,
-        ip: undefined // Remove sensitive data
+        ip: undefined, // Remove sensitive data
       }));
 
     res.json({
       success: true,
       data: {
         total: analytics.errors.length,
-        recent: recentErrors
-      }
+        recent: recentErrors,
+      },
     });
 
   } catch (error) {
@@ -139,22 +139,22 @@ router.get('/errors', (req, res) => {
 // Helper functions
 function trackLLMRequest(event) {
   const { model, provider, tokens, latency } = event.data || {};
-  
+
   analytics.usage.total += 1;
-  
+
   if (model) {
     analytics.usage.byModel[model] = (analytics.usage.byModel[model] || 0) + 1;
   }
-  
+
   if (provider) {
     analytics.usage.byProvider[provider] = (analytics.usage.byProvider[provider] || 0) + 1;
   }
-  
+
   // Track token usage if available
   if (tokens && typeof tokens === 'number') {
     analytics.usage.totalTokens = (analytics.usage.totalTokens || 0) + tokens;
   }
-  
+
   // Track latency metrics if available
   if (latency && typeof latency === 'number') {
     if (!analytics.usage.latency) {
@@ -164,12 +164,12 @@ function trackLLMRequest(event) {
     analytics.usage.latency.count += 1;
     analytics.usage.latency.avg = analytics.usage.latency.total / analytics.usage.latency.count;
   }
-  
+
   analytics.requests.push({
     ...event,
-    type: 'llm_request'
+    type: 'llm_request',
   });
-  
+
   // Keep only last 10000 requests in memory
   if (analytics.requests.length > 10000) {
     analytics.requests.shift();
@@ -179,9 +179,9 @@ function trackLLMRequest(event) {
 function trackError(event) {
   analytics.errors.push({
     ...event,
-    type: 'error'
+    type: 'error',
   });
-  
+
   // Keep only last 1000 errors in memory
   if (analytics.errors.length > 1000) {
     analytics.errors.shift();
@@ -197,9 +197,9 @@ function calculateAverageLatency() {
   const recentRequests = analytics.requests
     .filter(req => req.type === 'llm_request' && req.data?.latency)
     .slice(-100);
-  
+
   if (recentRequests.length === 0) return 0;
-  
+
   const totalLatency = recentRequests.reduce((sum, req) => sum + req.data.latency, 0);
   return Math.round(totalLatency / recentRequests.length);
 }
@@ -209,11 +209,11 @@ function calculateUsageByPeriod(period) {
   const periodMs = {
     hour: 60 * 60 * 1000,
     day: 24 * 60 * 60 * 1000,
-    week: 7 * 24 * 60 * 60 * 1000
+    week: 7 * 24 * 60 * 60 * 1000,
   }[period] || 60 * 60 * 1000;
-  
+
   const cutoff = new Date(now - periodMs);
-  
+
   return analytics.requests
     .filter(req => new Date(req.timestamp) > cutoff)
     .reduce((acc, req) => {

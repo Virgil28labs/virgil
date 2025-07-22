@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react'
-import type { SavedPhoto } from '../../types/camera.types'
-import { CameraUtils } from './utils/cameraUtils'
-import { PhotoExport } from './utils/photoExport'
+import React, { useState, useCallback } from 'react';
+import type { SavedPhoto } from '../../types/camera.types';
+import { CameraUtils } from './utils/cameraUtils';
+import { PhotoExport } from './utils/photoExport';
 
 interface PhotoActionsProps {
   photo: SavedPhoto
@@ -16,53 +16,53 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
   onFavoriteToggle,
   onDelete,
   onClose,
-  className = ''
+  className = '',
 }) => {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleFavoriteToggle = useCallback(() => {
-    onFavoriteToggle(photo.id)
-  }, [onFavoriteToggle, photo.id])
+    onFavoriteToggle(photo.id);
+  }, [onFavoriteToggle, photo.id]);
 
   const handleDownload = useCallback(async () => {
     try {
-      setIsProcessing(true)
-      const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp)
-      await CameraUtils.downloadPhoto(photo.dataUrl, filename)
+      setIsProcessing(true);
+      const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
+      await CameraUtils.downloadPhoto(photo.dataUrl, filename);
     } catch (error) {
-      console.error('Error downloading photo:', error)
+      console.error('Error downloading photo:', error);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }, [photo])
+  }, [photo]);
 
   const handleShare = useCallback(async () => {
     try {
-      setIsProcessing(true)
-      await PhotoExport.shareSinglePhoto(photo)
+      setIsProcessing(true);
+      await PhotoExport.shareSinglePhoto(photo);
     } catch (error) {
-      console.error('Error sharing photo:', error)
+      console.error('Error sharing photo:', error);
       // Fallback to download if share is not supported
-      handleDownload()
+      handleDownload();
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }, [photo, handleDownload])
+  }, [photo, handleDownload]);
 
   const handleDeleteClick = useCallback(() => {
-    setShowDeleteConfirm(true)
-  }, [])
+    setShowDeleteConfirm(true);
+  }, []);
 
   const handleDeleteConfirm = useCallback(() => {
-    onDelete(photo.id)
-    setShowDeleteConfirm(false)
-    onClose?.()
-  }, [onDelete, photo.id, onClose])
+    onDelete(photo.id);
+    setShowDeleteConfirm(false);
+    onClose?.();
+  }, [onDelete, photo.id, onClose]);
 
   const handleDeleteCancel = useCallback(() => {
-    setShowDeleteConfirm(false)
-  }, [])
+    setShowDeleteConfirm(false);
+  }, []);
 
   if (showDeleteConfirm) {
     return (
@@ -87,7 +87,7 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -199,5 +199,5 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,7 +1,7 @@
 import type { 
   NasaApodResponse,
   ApodImage,
-  NasaApodParams
+  NasaApodParams,
 } from '../types/nasa.types';
 import { retryWithBackoff } from './retryUtils';
 
@@ -9,14 +9,13 @@ import { retryWithBackoff } from './retryUtils';
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const NASA_APOD_BASE = import.meta.env.VITE_NASA_APOD_URL || 'https://api.nasa.gov/planetary/apod';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-const REQUEST_TIMEOUT = 15000; // 15 seconds
 const FIRST_APOD_DATE = '1995-06-16'; // First APOD date
 
 class NasaApodService {
   private cache: Map<string, { data: ApodImage; timestamp: number }> = new Map();
   private defaultParams = {
     api_key: NASA_API_KEY,
-    hd: true // Always request HD URLs when available
+    hd: true, // Always request HD URLs when available
   };
 
   constructor() {
@@ -49,7 +48,7 @@ class NasaApodService {
       copyright: response.copyright,
       concepts: response.concepts,
       isHD: !!response.hdurl,
-      aspectRatio
+      aspectRatio,
     };
   }
 
@@ -62,7 +61,7 @@ class NasaApodService {
     // Add API key and merge with default params
     const allParams = {
       ...this.defaultParams,
-      ...params
+      ...params,
     };
 
     // Add parameters to URL
@@ -79,8 +78,8 @@ class NasaApodService {
             method: 'GET',
             headers: {
               'Accept': 'application/json',
-              'User-Agent': 'Virgil-App/1.0'
-            }
+              'User-Agent': 'Virgil-App/1.0',
+            },
           });
 
           if (!res.ok) {
@@ -102,8 +101,8 @@ class NasaApodService {
           initialDelay: 1000,
           onRetry: (attempt, error) => {
             console.warn(`NASA APOD API retry ${attempt}:`, error.message);
-          }
-        }
+          },
+        },
       );
 
       return response;
@@ -153,7 +152,7 @@ class NasaApodService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: apodImage,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return apodImage;
@@ -257,7 +256,7 @@ class NasaApodService {
     return {
       title: apod.title,
       text: `${apod.title} - NASA Astronomy Picture of the Day for ${apod.date}`,
-      url: `https://apod.nasa.gov/apod/ap${apod.date.replace(/-/g, '').slice(2)}.html`
+      url: `https://apod.nasa.gov/apod/ap${apod.date.replace(/-/g, '').slice(2)}.html`,
     };
   }
 
@@ -345,7 +344,7 @@ class NasaApodService {
   getCacheStats(): { size: number; entries: string[] } {
     return {
       size: this.cache.size,
-      entries: Array.from(this.cache.keys())
+      entries: Array.from(this.cache.keys()),
     };
   }
 

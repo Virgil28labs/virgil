@@ -27,44 +27,15 @@ const validateApiKey = (req, res, next) => {
   const apiKey = process.env.OPENWEATHER_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: 'Weather service is not properly configured'
+      error: 'Weather service is not properly configured',
     });
   }
   req.apiKey = apiKey;
   next();
 };
 
-// Middleware to validate coordinates
-const validateCoordinates = (req, res, next) => {
-  const { lat, lon } = req.query;
-  
-  if (!lat || !lon) {
-    return res.status(400).json({
-      error: 'Latitude and longitude are required'
-    });
-  }
-  
-  const latitude = parseFloat(lat);
-  const longitude = parseFloat(lon);
-  
-  if (isNaN(latitude) || isNaN(longitude)) {
-    return res.status(400).json({
-      error: 'Invalid coordinates provided'
-    });
-  }
-  
-  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    return res.status(400).json({
-      error: 'Coordinates out of valid range'
-    });
-  }
-  
-  req.coordinates = { latitude, longitude };
-  next();
-};
-
 // Utility function to transform OpenWeatherMap data to our format
-const transformWeatherData = (data) => ({
+const transformWeatherData = data => ({
   temperature: Math.round(data.main.temp),
   feelsLike: Math.round(data.main.feels_like),
   tempMin: Math.round(data.main.temp_min),
@@ -79,18 +50,18 @@ const transformWeatherData = (data) => ({
     id: data.weather[0].id,
     main: data.weather[0].main,
     description: data.weather[0].description,
-    icon: data.weather[0].icon
+    icon: data.weather[0].icon,
   },
   sunrise: data.sys.sunrise * 1000,
   sunset: data.sys.sunset * 1000,
   timezone: data.timezone,
   cityName: data.name,
   country: data.sys.country,
-  timestamp: Date.now()
+  timestamp: Date.now(),
 });
 
 // Utility function to check cache
-const checkCache = (key) => {
+const checkCache = key => {
   const cached = weatherCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;
@@ -102,34 +73,34 @@ const checkCache = (key) => {
 const updateCache = (key, data) => {
   weatherCache.set(key, {
     data,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   });
 };
 
 // Utility function to make OpenWeatherMap API request
-const fetchWeatherData = async (url) => {
+const fetchWeatherData = async url => {
   const response = await fetch(url);
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw {
       status: response.status,
-      message: errorData.message || 'Failed to fetch weather data'
+      message: errorData.message || 'Failed to fetch weather data',
     };
   }
-  
+
   return response.json();
 };
 
 // Process 3-hour forecast data into daily summaries
-const processForecastData = (data) => {
+const processForecastData = data => {
   const dailyData = {};
-  
+
   // Group forecast data by day
   data.list.forEach(item => {
     const date = new Date(item.dt * 1000);
     const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
-    
+
     if (!dailyData[dayKey]) {
       dailyData[dayKey] = {
         date: dayKey,
@@ -138,10 +109,10 @@ const processForecastData = (data) => {
         icons: [],
         descriptions: [],
         humidity: [],
-        windSpeed: []
+        windSpeed: [],
       };
     }
-    
+
     const day = dailyData[dayKey];
     day.temps.push(item.main.temp);
     day.conditions.push(item.weather[0].main);
@@ -150,13 +121,13 @@ const processForecastData = (data) => {
     day.humidity.push(item.main.humidity);
     day.windSpeed.push(item.wind.speed);
   });
-  
+
   // Convert to array and calculate daily summaries
   const forecasts = Object.values(dailyData).map(day => {
     // Find min/max temperatures
     const tempMin = Math.round(Math.min(...day.temps));
     const tempMax = Math.round(Math.max(...day.temps));
-    
+
     // Find most common weather condition
     const conditionCounts = {};
     day.conditions.forEach(condition => {
@@ -164,20 +135,20 @@ const processForecastData = (data) => {
     });
     const mainCondition = Object.entries(conditionCounts)
       .sort((a, b) => b[1] - a[1])[0][0];
-    
+
     // Find corresponding icon for main condition
     const conditionIndex = day.conditions.findIndex(c => c === mainCondition);
     const icon = day.icons[conditionIndex];
     const description = day.descriptions[conditionIndex];
-    
+
     // Calculate averages
     const avgHumidity = Math.round(
-      day.humidity.reduce((a, b) => a + b) / day.humidity.length
+      day.humidity.reduce((a, b) => a + b) / day.humidity.length,
     );
     const avgWindSpeed = Math.round(
-      day.windSpeed.reduce((a, b) => a + b) / day.windSpeed.length
+      day.windSpeed.reduce((a, b) => a + b) / day.windSpeed.length,
     );
-    
+
     return {
       date: day.date,
       tempMin,
@@ -185,18 +156,18 @@ const processForecastData = (data) => {
       condition: {
         main: mainCondition,
         description,
-        icon: icon.replace('n', 'd') // Always use day icons for consistency
+        icon: icon.replace('n', 'd'), // Always use day icons for consistency
       },
       humidity: avgHumidity,
-      windSpeed: avgWindSpeed
+      windSpeed: avgWindSpeed,
     };
   });
-  
+
   // Return only next 5 days
   return {
     cityName: data.city.name,
     country: data.city.country,
-    forecasts: forecasts.slice(0, 5)
+    forecasts: forecasts.slice(0, 5),
   };
 };
 
@@ -208,22 +179,22 @@ const processForecastData = (data) => {
 router.get('/', validateApiKey, async (req, res) => {
   try {
     const { lat, lon, city, country } = req.query;
-    
+
     // Determine request type and build cache key
     let apiUrl;
     let cacheKey;
-    
+
     if (lat && lon) {
       // Coordinates-based request
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
-      
+
       if (isNaN(latitude) || isNaN(longitude)) {
         return res.status(400).json({
-          error: 'Invalid coordinates provided'
+          error: 'Invalid coordinates provided',
         });
       }
-      
+
       cacheKey = `weather-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
       apiUrl = `${API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${req.apiKey}&units=imperial`;
     } else if (city) {
@@ -233,43 +204,43 @@ router.get('/', validateApiKey, async (req, res) => {
       apiUrl = `${API_BASE_URL}/weather?q=${encodeURIComponent(location)}&appid=${req.apiKey}&units=imperial`;
     } else {
       return res.status(400).json({
-        error: 'Either coordinates (lat, lon) or city name is required'
+        error: 'Either coordinates (lat, lon) or city name is required',
       });
     }
-    
+
     // Check cache
     const cachedData = checkCache(cacheKey);
     if (cachedData) {
       return res.json({
         success: true,
         data: cachedData,
-        cached: true
+        cached: true,
       });
     }
-    
+
     // Fetch from OpenWeatherMap
     const data = await fetchWeatherData(apiUrl);
     const weatherData = transformWeatherData(data);
-    
+
     // Update cache
     updateCache(cacheKey, weatherData);
-    
+
     res.json({
       success: true,
       data: weatherData,
-      cached: false
+      cached: false,
     });
-    
+
   } catch (error) {
     if (error.status) {
       res.status(error.status).json({
         error: error.message,
-        status: error.status
+        status: error.status,
       });
     } else {
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Failed to process weather request'
+        message: 'Failed to process weather request',
       });
     }
   }
@@ -283,22 +254,22 @@ router.get('/', validateApiKey, async (req, res) => {
 router.get('/forecast', validateApiKey, async (req, res) => {
   try {
     const { lat, lon, city, country } = req.query;
-    
+
     // Determine request type and build cache key
     let apiUrl;
     let cacheKey;
-    
+
     if (lat && lon) {
       // Coordinates-based request
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
-      
+
       if (isNaN(latitude) || isNaN(longitude)) {
         return res.status(400).json({
-          error: 'Invalid coordinates provided'
+          error: 'Invalid coordinates provided',
         });
       }
-      
+
       cacheKey = `forecast-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
       apiUrl = `${API_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}&appid=${req.apiKey}&units=imperial`;
     } else if (city) {
@@ -308,43 +279,43 @@ router.get('/forecast', validateApiKey, async (req, res) => {
       apiUrl = `${API_BASE_URL}/forecast?q=${encodeURIComponent(location)}&appid=${req.apiKey}&units=imperial`;
     } else {
       return res.status(400).json({
-        error: 'Either coordinates (lat, lon) or city name is required'
+        error: 'Either coordinates (lat, lon) or city name is required',
       });
     }
-    
+
     // Check cache
     const cachedData = checkCache(cacheKey);
     if (cachedData) {
       return res.json({
         success: true,
         data: cachedData,
-        cached: true
+        cached: true,
       });
     }
-    
+
     // Fetch from OpenWeatherMap
     const data = await fetchWeatherData(apiUrl);
     const forecastData = processForecastData(data);
-    
+
     // Update cache
     updateCache(cacheKey, forecastData);
-    
+
     res.json({
       success: true,
       data: forecastData,
-      cached: false
+      cached: false,
     });
-    
+
   } catch (error) {
     if (error.status) {
       res.status(error.status).json({
         error: error.message,
-        status: error.status
+        status: error.status,
       });
     } else {
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Failed to process forecast request'
+        message: 'Failed to process forecast request',
       });
     }
   }
@@ -356,13 +327,13 @@ router.get('/forecast', validateApiKey, async (req, res) => {
  */
 router.get('/health', (req, res) => {
   const hasApiKey = !!process.env.OPENWEATHER_API_KEY;
-  
+
   res.json({
     status: hasApiKey ? 'healthy' : 'unhealthy',
     service: 'weather',
     configured: hasApiKey,
     cacheSize: weatherCache.size,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

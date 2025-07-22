@@ -17,12 +17,12 @@ export const ProgressIndicator = memo(function ProgressIndicator({
   label,
   showPercentage = false,
   indeterminate = false,
-  color = 'var(--brand-accent-purple)'
+  color = 'var(--brand-accent-purple)',
 }: ProgressIndicatorProps) {
   const sizeMap = {
     small: { width: '24px', height: '24px', strokeWidth: 2 },
     medium: { width: '40px', height: '40px', strokeWidth: 3 },
-    large: { width: '60px', height: '60px', strokeWidth: 4 }
+    large: { width: '60px', height: '60px', strokeWidth: 4 },
   };
 
   const dimensions = sizeMap[size];
@@ -39,8 +39,9 @@ export const ProgressIndicator = memo(function ProgressIndicator({
             justifyContent: 'space-between', 
             marginBottom: '8px',
             fontSize: '0.875rem',
-            color: 'var(--brand-light-gray)'
-          }}>
+            color: 'var(--brand-light-gray)',
+          }}
+          >
             <span>{label}</span>
             {showPercentage && <span>{Math.round(progress)}%</span>}
           </div>
@@ -51,7 +52,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
             height: '8px',
             backgroundColor: 'var(--brand-dark-purple)',
             borderRadius: '4px',
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}
           role="progressbar"
           aria-valuenow={indeterminate ? undefined : progress}
@@ -66,7 +67,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
               backgroundColor: color,
               borderRadius: '4px',
               transition: indeterminate ? 'none' : 'width 0.3s ease',
-              animation: indeterminate ? 'progress-slide 2s infinite' : 'none'
+              animation: indeterminate ? 'progress-slide 2s infinite' : 'none',
             }}
           />
         </div>
@@ -81,8 +82,9 @@ export const ProgressIndicator = memo(function ProgressIndicator({
           <div style={{ 
             marginBottom: '16px',
             fontSize: '0.875rem',
-            color: 'var(--brand-light-gray)'
-          }}>
+            color: 'var(--brand-light-gray)',
+          }}
+          >
             {label}
           </div>
         )}
@@ -90,7 +92,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
           style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: '8px'
+            gap: '8px',
           }}
           role="progressbar"
           aria-label={label || 'Loading'}
@@ -103,7 +105,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
                 height: '8px',
                 borderRadius: '50%',
                 backgroundColor: color,
-                animation: `progress-dot 1.4s ease-in-out ${index * 0.16}s infinite both`
+                animation: `progress-dot 1.4s ease-in-out ${index * 0.16}s infinite both`,
               }}
             />
           ))}
@@ -119,8 +121,9 @@ export const ProgressIndicator = memo(function ProgressIndicator({
         <div style={{ 
           marginBottom: '16px',
           fontSize: '0.875rem',
-          color: 'var(--brand-light-gray)'
-        }}>
+          color: 'var(--brand-light-gray)',
+        }}
+        >
           {label}
         </div>
       )}
@@ -157,7 +160,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
             strokeDashoffset={strokeDashoffset}
             style={{
               transition: indeterminate ? 'none' : 'stroke-dashoffset 0.3s ease',
-              animation: indeterminate ? 'progress-spin 2s linear infinite' : 'none'
+              animation: indeterminate ? 'progress-spin 2s linear infinite' : 'none',
             }}
           />
         </svg>
@@ -170,7 +173,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
               transform: 'translate(-50%, -50%)',
               fontSize: size === 'small' ? '10px' : size === 'medium' ? '12px' : '14px',
               color: 'var(--brand-light-gray)',
-              fontWeight: 600
+              fontWeight: 600,
             }}
           >
             {Math.round(progress)}%

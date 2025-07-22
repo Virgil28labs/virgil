@@ -22,7 +22,7 @@ beforeAll(() => {
     }
     originalError.call(console, ...args);
   };
-  
+
   console.warn = (...args) => {
     // Filter out expected warnings
     if (

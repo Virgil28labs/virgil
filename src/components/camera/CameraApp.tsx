@@ -1,113 +1,113 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import { PhotoGallery } from './PhotoGallery'
-import { PhotoModal } from './PhotoModal'
-import { usePhotoGallery } from './hooks/usePhotoGallery'
-import { useToast } from '../../hooks/useToast'
-import type { CameraModalProps, SavedPhoto } from '../../types/camera.types'
-import './Camera.css'
+import React, { useState, useCallback, useEffect } from 'react';
+import { PhotoGallery } from './PhotoGallery';
+import { PhotoModal } from './PhotoModal';
+import { usePhotoGallery } from './hooks/usePhotoGallery';
+import { useToast } from '../../hooks/useToast';
+import type { CameraModalProps, SavedPhoto } from '../../types/camera.types';
+import './Camera.css';
 
 export const CameraApp: React.FC<CameraModalProps> = ({ isOpen, onClose }) => {
-  const { addToast } = useToast()
-  const [selectedPhoto, setSelectedPhoto] = useState<SavedPhoto | null>(null)
-  const [showPhotoModal, setShowPhotoModal] = useState(false)
+  const { addToast } = useToast();
+  const [selectedPhoto, setSelectedPhoto] = useState<SavedPhoto | null>(null);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   const {
     galleryState,
     getCurrentPhotos,
     handleFavoriteToggle,
     handlePhotoDelete,
-    navigatePhoto
-  } = usePhotoGallery()
+    navigatePhoto,
+  } = usePhotoGallery();
 
   // Handle keyboard shortcuts
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !showPhotoModal) {
-        onClose()
+        onClose();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [isOpen, showPhotoModal, onClose])
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isOpen, showPhotoModal, onClose]);
 
   const handleError = useCallback((error: string) => {
     addToast({
       type: 'error',
       message: error,
-      duration: 5000
-    })
-  }, [addToast])
+      duration: 5000,
+    });
+  }, [addToast]);
 
   const handlePhotoSelect = useCallback((photo: SavedPhoto) => {
-    setSelectedPhoto(photo)
-    setShowPhotoModal(true)
-  }, [])
+    setSelectedPhoto(photo);
+    setShowPhotoModal(true);
+  }, []);
 
   const handlePhotoModalClose = useCallback(() => {
-    setShowPhotoModal(false)
-    setSelectedPhoto(null)
-  }, [])
+    setShowPhotoModal(false);
+    setSelectedPhoto(null);
+  }, []);
 
   const handlePhotoModalNext = useCallback(() => {
-    navigatePhoto('next')
-    const currentPhotos = getCurrentPhotos()
+    navigatePhoto('next');
+    const currentPhotos = getCurrentPhotos();
     const currentIndex = selectedPhoto ? 
-      currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1
+      currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1;
     
     if (currentIndex !== -1) {
-      const nextIndex = (currentIndex + 1) % currentPhotos.length
-      setSelectedPhoto(currentPhotos[nextIndex])
+      const nextIndex = (currentIndex + 1) % currentPhotos.length;
+      setSelectedPhoto(currentPhotos[nextIndex]);
     }
-  }, [navigatePhoto, getCurrentPhotos, selectedPhoto])
+  }, [navigatePhoto, getCurrentPhotos, selectedPhoto]);
 
   const handlePhotoModalPrevious = useCallback(() => {
-    navigatePhoto('previous')
-    const currentPhotos = getCurrentPhotos()
+    navigatePhoto('previous');
+    const currentPhotos = getCurrentPhotos();
     const currentIndex = selectedPhoto ? 
-      currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1
+      currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1;
     
     if (currentIndex !== -1) {
       const prevIndex = currentIndex === 0 ? 
-        currentPhotos.length - 1 : currentIndex - 1
-      setSelectedPhoto(currentPhotos[prevIndex])
+        currentPhotos.length - 1 : currentIndex - 1;
+      setSelectedPhoto(currentPhotos[prevIndex]);
     }
-  }, [navigatePhoto, getCurrentPhotos, selectedPhoto])
+  }, [navigatePhoto, getCurrentPhotos, selectedPhoto]);
 
   const handleFavoriteToggleModal = useCallback(async (photoId: string) => {
-    const success = await handleFavoriteToggle(photoId)
+    const success = await handleFavoriteToggle(photoId);
     if (success) {
       // Update the selected photo if it's the same one
       if (selectedPhoto?.id === photoId) {
-        setSelectedPhoto(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null)
+        setSelectedPhoto(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
       }
       addToast({
         type: 'success',
         message: success ? 'Added to favorites' : 'Removed from favorites',
-        duration: 2000
-      })
+        duration: 2000,
+      });
     }
-  }, [handleFavoriteToggle, selectedPhoto, addToast])
+  }, [handleFavoriteToggle, selectedPhoto, addToast]);
 
   const handleDeleteModal = useCallback(async (photoId: string) => {
-    const success = await handlePhotoDelete(photoId)
+    const success = await handlePhotoDelete(photoId);
     if (success) {
       addToast({
         type: 'success',
         message: 'Photo deleted',
-        duration: 2000
-      })
-      handlePhotoModalClose()
+        duration: 2000,
+      });
+      handlePhotoModalClose();
     } else {
       addToast({
         type: 'error',
         message: 'Failed to delete photo',
-        duration: 3000
-      })
+        duration: 3000,
+      });
     }
-  }, [handlePhotoDelete, handlePhotoModalClose, addToast])
+  }, [handlePhotoDelete, handlePhotoModalClose, addToast]);
 
   const handleShareModal = useCallback(async (_photoId: string) => {
     // Share functionality would be implemented here
@@ -115,22 +115,22 @@ export const CameraApp: React.FC<CameraModalProps> = ({ isOpen, onClose }) => {
     addToast({
       type: 'info',
       message: 'Share functionality not yet implemented',
-      duration: 3000
-    })
-  }, [addToast])
+      duration: 3000,
+    });
+  }, [addToast]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !showPhotoModal) {
-      onClose()
+      onClose();
     }
-  }, [onClose, showPhotoModal])
+  }, [onClose, showPhotoModal]);
 
   if (!isOpen) {
-    return null
+    return null;
   }
 
-  const currentPhotos = getCurrentPhotos()
-  const hasNavigation = currentPhotos.length > 1
+  const currentPhotos = getCurrentPhotos();
+  const hasNavigation = currentPhotos.length > 1;
 
   return (
     <>
@@ -192,5 +192,5 @@ export const CameraApp: React.FC<CameraModalProps> = ({ isOpen, onClose }) => {
         onShare={handleShareModal}
       />
     </>
-  )
-}
+  );
+};

@@ -1,5 +1,5 @@
-import { memo } from 'react'
-import type { MouseEvent } from 'react'
+import { memo } from 'react';
+import type { MouseEvent } from 'react';
 
 interface DogFavoriteOverlayProps {
   isFavorited: boolean
@@ -8,7 +8,7 @@ interface DogFavoriteOverlayProps {
 
 export const DogFavoriteOverlay = memo(function DogFavoriteOverlay({
   isFavorited,
-  onFavoriteToggle
+  onFavoriteToggle,
 }: DogFavoriteOverlayProps) {
   return (
     <button
@@ -19,5 +19,5 @@ export const DogFavoriteOverlay = memo(function DogFavoriteOverlay({
     >
       {isFavorited ? '❤️' : '🤍'}
     </button>
-  )
-})
+  );
+});

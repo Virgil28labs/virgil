@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { Camera } from 'react-camera-pro'
-import type { CameraControlsProps } from '../../types/camera.types'
-import { useCamera } from './hooks/useCamera'
+import React, { useEffect, useState, useCallback } from 'react';
+import { Camera } from 'react-camera-pro';
+import type { CameraControlsProps } from '../../types/camera.types';
+import { useCamera } from './hooks/useCamera';
 
 interface CameraInterfaceProps {
   onPhotoCapture: (dataUrl: string) => Promise<void>
@@ -16,41 +16,41 @@ const CameraControls: React.FC<CameraControlsProps> = ({
   onToggleGrid,
   onSetTimer,
   cameraState,
-  disabled = false
+  disabled = false,
 }) => {
-  const timerOptions = [null, 3, 5, 10]
-  const [isCountingDown, setIsCountingDown] = useState(false)
-  const [countdown, setCountdown] = useState(0)
+  const timerOptions = [null, 3, 5, 10];
+  const [isCountingDown, setIsCountingDown] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const handleCapture = useCallback(async () => {
-    if (disabled || isCountingDown) return
+    if (disabled || isCountingDown) return;
 
     if (cameraState.timer) {
-      setIsCountingDown(true)
-      setCountdown(cameraState.timer)
+      setIsCountingDown(true);
+      setCountdown(cameraState.timer);
       
       // Start countdown
       const interval = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
-            clearInterval(interval)
-            setIsCountingDown(false)
-            onCapture()
-            return 0
+            clearInterval(interval);
+            setIsCountingDown(false);
+            onCapture();
+            return 0;
           }
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
     } else {
-      onCapture()
+      onCapture();
     }
-  }, [disabled, isCountingDown, cameraState.timer, onCapture])
+  }, [disabled, isCountingDown, cameraState.timer, onCapture]);
 
   const handleTimerClick = useCallback(() => {
-    const currentIndex = timerOptions.indexOf(cameraState.timer)
-    const nextIndex = (currentIndex + 1) % timerOptions.length
-    onSetTimer(timerOptions[nextIndex])
-  }, [cameraState.timer, onSetTimer])
+    const currentIndex = timerOptions.indexOf(cameraState.timer);
+    const nextIndex = (currentIndex + 1) % timerOptions.length;
+    onSetTimer(timerOptions[nextIndex]);
+  }, [cameraState.timer, onSetTimer]);
 
   return (
     <div className="camera-controls">
@@ -74,7 +74,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
         >
           <span className="camera-control-icon">
             {cameraState.flashMode === 'off' ? '🔦' : 
-             cameraState.flashMode === 'on' ? '⚡' : '🔄'}
+              cameraState.flashMode === 'on' ? '⚡' : '🔄'}
           </span>
         </button>
 
@@ -130,13 +130,13 @@ const CameraControls: React.FC<CameraControlsProps> = ({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const CameraInterface: React.FC<CameraInterfaceProps> = ({
   onPhotoCapture,
   onError,
-  className = ''
+  className = '',
 }) => {
   const {
     cameraRef,
@@ -147,51 +147,51 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
     toggleFlash,
     toggleGrid,
     setTimer,
-    retryCamera
-  } = useCamera()
+    retryCamera,
+  } = useCamera();
 
-  const [isInitialized, setIsInitialized] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize camera on mount
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
     
     const init = async () => {
-      await initializeCamera()
+      await initializeCamera();
       if (isMounted) {
-        setIsInitialized(true)
+        setIsInitialized(true);
       }
-    }
+    };
     
-    init()
+    init();
     
     return () => {
-      isMounted = false
-    }
-  }, [initializeCamera])
+      isMounted = false;
+    };
+  }, [initializeCamera]);
 
   // Handle camera errors
   useEffect(() => {
     if (cameraState.error) {
-      onError(cameraState.error || 'Unknown camera error')
+      onError(cameraState.error || 'Unknown camera error');
     }
-  }, [cameraState.error, onError])
+  }, [cameraState.error, onError]);
 
   const handleCapture = useCallback(async () => {
     try {
-      const dataUrl = await capturePhoto()
+      const dataUrl = await capturePhoto();
       if (dataUrl) {
-        await onPhotoCapture(dataUrl)
+        await onPhotoCapture(dataUrl);
       }
-    } catch (error) {
-      onError('Failed to capture photo')
+    } catch (_error) {
+      onError('Failed to capture photo');
     }
-  }, [capturePhoto, onPhotoCapture, onError])
+  }, [capturePhoto, onPhotoCapture, onError]);
 
   const handleNumberOfCameras = useCallback((_numberOfCameras: number) => {
     // This callback is called by react-camera-pro
     // We don't need to do anything here as the camera state is managed by useCamera
-  }, [])
+  }, []);
 
   if (!isInitialized) {
     return (
@@ -201,7 +201,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
           <p>Initializing camera...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (cameraState.error) {
@@ -219,7 +219,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (!cameraState.hasPermission) {
@@ -237,7 +237,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -252,7 +252,7 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
             noCameraAccessible: 'No camera found. Please connect a camera.',
             permissionDenied: 'Camera permission denied. Please allow camera access.',
             switchCamera: 'Cannot switch camera. Only one camera available.',
-            canvas: 'Canvas not supported in this browser.'
+            canvas: 'Canvas not supported in this browser.',
           }}
         />
         
@@ -277,5 +277,5 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
         disabled={cameraState.isCapturing}
       />
     </div>
-  )
-}
+  );
+};

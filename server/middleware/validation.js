@@ -4,7 +4,7 @@ const validateRequest = (req, res, next) => {
   // Validate messages
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({
-      error: 'Messages array is required and must not be empty'
+      error: 'Messages array is required and must not be empty',
     });
   }
 
@@ -12,19 +12,19 @@ const validateRequest = (req, res, next) => {
   for (const message of messages) {
     if (!message.role || !message.content) {
       return res.status(400).json({
-        error: 'Each message must have role and content properties'
+        error: 'Each message must have role and content properties',
       });
     }
 
     if (!['system', 'user', 'assistant'].includes(message.role)) {
       return res.status(400).json({
-        error: 'Message role must be system, user, or assistant'
+        error: 'Message role must be system, user, or assistant',
       });
     }
 
     if (typeof message.content !== 'string') {
       return res.status(400).json({
-        error: 'Message content must be a string'
+        error: 'Message content must be a string',
       });
     }
   }
@@ -33,7 +33,7 @@ const validateRequest = (req, res, next) => {
   if (temperature !== undefined) {
     if (typeof temperature !== 'number' || temperature < 0 || temperature > 2) {
       return res.status(400).json({
-        error: 'Temperature must be a number between 0 and 2'
+        error: 'Temperature must be a number between 0 and 2',
       });
     }
   }
@@ -42,7 +42,7 @@ const validateRequest = (req, res, next) => {
   if (maxTokens !== undefined) {
     if (typeof maxTokens !== 'number' || maxTokens < 1 || maxTokens > 4096) {
       return res.status(400).json({
-        error: 'Max tokens must be a number between 1 and 4096'
+        error: 'Max tokens must be a number between 1 and 4096',
       });
     }
   }
@@ -59,12 +59,12 @@ const validateRequest = (req, res, next) => {
       'claude-3-opus',
       'llama2',
       'mistral',
-      'codellama'
+      'codellama',
     ];
 
     if (!validModels.includes(model)) {
       return res.status(400).json({
-        error: `Invalid model. Valid models are: ${validModels.join(', ')}`
+        error: `Invalid model. Valid models are: ${validModels.join(', ')}`,
       });
     }
   }
@@ -77,19 +77,19 @@ const validateBatchRequest = (req, res, next) => {
 
   if (!requests || !Array.isArray(requests)) {
     return res.status(400).json({
-      error: 'Requests must be an array'
+      error: 'Requests must be an array',
     });
   }
 
   if (requests.length === 0) {
     return res.status(400).json({
-      error: 'Requests array must not be empty'
+      error: 'Requests array must not be empty',
     });
   }
 
   if (requests.length > 10) {
     return res.status(400).json({
-      error: 'Batch size cannot exceed 10 requests'
+      error: 'Batch size cannot exceed 10 requests',
     });
   }
 
@@ -97,10 +97,10 @@ const validateBatchRequest = (req, res, next) => {
   for (let i = 0; i < requests.length; i++) {
     const request = requests[i];
     const validation = validateSingleRequest(request);
-    
+
     if (validation.error) {
       return res.status(400).json({
-        error: `Request ${i}: ${validation.error}`
+        error: `Request ${i}: ${validation.error}`,
       });
     }
   }
@@ -124,5 +124,5 @@ function validateSingleRequest(request) {
 
 module.exports = {
   validateRequest,
-  validateBatchRequest
+  validateBatchRequest,
 };

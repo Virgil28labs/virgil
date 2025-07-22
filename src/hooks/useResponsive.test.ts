@@ -11,12 +11,12 @@ describe('useResponsive', () => {
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
       configurable: true,
-      value: width
+      value: width,
     });
     Object.defineProperty(window, 'innerHeight', {
       writable: true,
       configurable: true,
-      value: height
+      value: height,
     });
   };
 
@@ -121,7 +121,7 @@ describe('useResponsive', () => {
         mobile: 600,
         tablet: 900,
         desktop: 1200,
-        wide: 1600
+        wide: 1600,
       };
       
       setWindowSize(500, 800);
@@ -189,7 +189,7 @@ describe('useResponsive', () => {
       Object.defineProperty(window, 'ontouchstart', {
         writable: true,
         configurable: true,
-        value: () => {}
+        value: () => {},
       });
       
       const { result } = renderHook(() => useResponsive());
@@ -205,7 +205,7 @@ describe('useResponsive', () => {
       Object.defineProperty(navigator, 'maxTouchPoints', {
         writable: true,
         configurable: true,
-        value: 5
+        value: 5,
       });
       
       const { result } = renderHook(() => useResponsive());
@@ -216,7 +216,7 @@ describe('useResponsive', () => {
       Object.defineProperty(navigator, 'maxTouchPoints', {
         writable: true,
         configurable: true,
-        value: 0
+        value: 0,
       });
     });
   });
@@ -242,7 +242,7 @@ describe('useMediaQuery', () => {
       }),
       dispatchEvent: (event: MediaQueryListEvent) => {
         listeners.forEach(listener => listener(event));
-      }
+      },
     };
     
     return jest.fn().mockReturnValue(mediaQueryList);
@@ -302,7 +302,7 @@ describe('useMediaQuery', () => {
     
     const { result, rerender } = renderHook(
       ({ query }) => useMediaQuery(query),
-      { initialProps: { query: '(min-width: 768px)' } }
+      { initialProps: { query: '(min-width: 768px)' } },
     );
     
     expect(result.current).toBe(true);
@@ -323,12 +323,12 @@ describe('useViewport', () => {
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
       configurable: true,
-      value: originalInnerWidth
+      value: originalInnerWidth,
     });
     Object.defineProperty(window, 'innerHeight', {
       writable: true,
       configurable: true,
-      value: originalInnerHeight
+      value: originalInnerHeight,
     });
   });
 
@@ -365,8 +365,8 @@ describe('useViewport', () => {
       value: {
         height: 400,
         addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
-      }
+        removeEventListener: jest.fn(),
+      },
     });
     
     Object.defineProperty(window, 'innerHeight', { value: 600, writable: true });
@@ -391,8 +391,8 @@ describe('useViewport', () => {
           if (!listeners[event]) listeners[event] = [];
           listeners[event].push(handler);
         }),
-        removeEventListener: jest.fn()
-      }
+        removeEventListener: jest.fn(),
+      },
     });
     
     const { result } = renderHook(() => useViewport());
@@ -422,8 +422,8 @@ describe('useViewport', () => {
       value: {
         height: 600,
         addEventListener: jest.fn(),
-        removeEventListener: visualViewportRemoveEventListenerSpy
-      }
+        removeEventListener: visualViewportRemoveEventListenerSpy,
+      },
     });
     
     const { unmount } = renderHook(() => useViewport());

@@ -20,7 +20,7 @@ interface ToastNotificationProps {
 
 export const ToastNotification = memo(function ToastNotification({ 
   toast, 
-  onDismiss 
+  onDismiss, 
 }: ToastNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -31,23 +31,23 @@ export const ToastNotification = memo(function ToastNotification({
     success: {
       backgroundColor: '#10b981',
       borderColor: '#059669',
-      icon: '✓'
+      icon: '✓',
     },
     error: {
       backgroundColor: '#ef4444',
       borderColor: '#dc2626',
-      icon: '✕'
+      icon: '✕',
     },
     warning: {
       backgroundColor: '#f59e0b',
       borderColor: '#d97706',
-      icon: '⚠'
+      icon: '⚠',
     },
     info: {
       backgroundColor: 'var(--brand-accent-purple)',
       borderColor: 'var(--brand-light-purple)',
-      icon: 'ℹ'
-    }
+      icon: 'ℹ',
+    },
   };
 
   const currentStyle = typeStyles[type];
@@ -90,7 +90,7 @@ export const ToastNotification = memo(function ToastNotification({
         opacity: isVisible && !isLeaving ? 1 : 0,
         transition: 'all 0.3s ease-in-out',
         position: 'relative',
-        color: 'white'
+        color: 'white',
       }}
       role="alert"
       aria-live="polite"
@@ -101,7 +101,7 @@ export const ToastNotification = memo(function ToastNotification({
           style={{
             fontSize: '18px',
             lineHeight: 1,
-            marginTop: '2px'
+            marginTop: '2px',
           }}
           aria-hidden="true"
         >
@@ -114,7 +114,7 @@ export const ToastNotification = memo(function ToastNotification({
               style={{
                 fontWeight: 600,
                 fontSize: '14px',
-                marginBottom: '4px'
+                marginBottom: '4px',
               }}
             >
               {title}
@@ -123,7 +123,7 @@ export const ToastNotification = memo(function ToastNotification({
           <div
             style={{
               fontSize: '14px',
-              lineHeight: 1.4
+              lineHeight: 1.4,
             }}
           >
             {message}
@@ -141,7 +141,7 @@ export const ToastNotification = memo(function ToastNotification({
                 padding: '4px 8px',
                 marginTop: '8px',
                 cursor: 'pointer',
-                fontWeight: 500
+                fontWeight: 500,
               }}
               aria-label={action.label}
             >
@@ -160,7 +160,7 @@ export const ToastNotification = memo(function ToastNotification({
             fontSize: '16px',
             padding: '0',
             lineHeight: 1,
-            marginLeft: '8px'
+            marginLeft: '8px',
           }}
           aria-label="Dismiss notification"
         >
@@ -176,7 +176,7 @@ export const ToastNotification = memo(function ToastNotification({
             left: 0,
             height: '2px',
             backgroundColor: 'rgba(255, 255, 255, 0.3)',
-            animation: `toast-progress ${duration}ms linear forwards`
+            animation: `toast-progress ${duration}ms linear forwards`,
           }}
         />
       )}
@@ -193,7 +193,7 @@ interface ToastContainerProps {
 export const ToastContainer = memo(function ToastContainer({
   toasts,
   onDismiss,
-  position = 'top-right'
+  position = 'top-right',
 }: ToastContainerProps) {
   const positionStyles = {
     'top-right': { top: '20px', right: '20px' },
@@ -201,7 +201,7 @@ export const ToastContainer = memo(function ToastContainer({
     'bottom-right': { bottom: '20px', right: '20px' },
     'bottom-left': { bottom: '20px', left: '20px' },
     'top-center': { top: '20px', left: '50%', transform: 'translateX(-50%)' },
-    'bottom-center': { bottom: '20px', left: '50%', transform: 'translateX(-50%)' }
+    'bottom-center': { bottom: '20px', left: '50%', transform: 'translateX(-50%)' },
   };
 
   if (toasts.length === 0) return null;
@@ -212,7 +212,7 @@ export const ToastContainer = memo(function ToastContainer({
         position: 'fixed',
         ...positionStyles[position],
         zIndex: 9999,
-        pointerEvents: 'none'
+        pointerEvents: 'none',
       }}
       aria-live="polite"
       aria-label="Notifications"

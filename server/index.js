@@ -21,12 +21,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
+  origin: process.env.NODE_ENV === 'production'
     ? process.env.ALLOWED_ORIGINS?.split(',') || []
     : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // Global rate limiting
@@ -72,42 +72,42 @@ const PORT = process.env.LLM_SERVER_PORT || 5002;
 // Pre-startup checks
 async function performStartupChecks() {
   logger.log('🔍 Performing startup checks...');
-  
+
   // Check required environment variables
   const requiredEnvVars = ['NODE_ENV'];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
+
   if (missingVars.length > 0) {
     logger.warn(`⚠️  Missing optional environment variables: ${missingVars.join(', ')}`);
   }
-  
+
   // Initialize services
   try {
     // Initialize cache
-    const cache = require('./middleware/cache').cache;
+    const { cache } = require('./middleware/cache');
     if (cache) {
       /* eslint-disable-next-line no-console */
       console.log('✅ Cache service initialized');
     } else {
-      /* eslint-disable-next-line no-console */
+
       console.warn('⚠️  Cache service not available');
     }
-    
+
     // Initialize queue
     const { RequestQueue } = require('./services/queue');
     if (RequestQueue) {
       /* eslint-disable-next-line no-console */
       console.log('✅ Queue service initialized');
     } else {
-      /* eslint-disable-next-line no-console */
+
       console.warn('⚠️  Queue service not available');
     }
-    
+
   } catch (error) {
-    /* eslint-disable-next-line no-console */
+
     console.warn('⚠️  Service initialization warnings:', error.message);
   }
-  
+
   /* eslint-disable-next-line no-console */
   console.log('✅ Startup checks completed');
 }
@@ -116,7 +116,7 @@ async function performStartupChecks() {
 async function startServer() {
   try {
     await performStartupChecks();
-    
+
     const server = app.listen(PORT, () => {
       /* eslint-disable no-console */
       console.log(`🚀 Virgil LLM Server running on port ${PORT}`);
@@ -124,22 +124,22 @@ async function startServer() {
       console.log(`🏥 Health check: http://localhost:${PORT}/api/v1/health`);
       console.log(`⚡ Ready check: http://localhost:${PORT}/api/v1/health/ready`);
       console.log('📋 Available endpoints:');
-      console.log(`  POST /api/v1/llm/complete - Text completion`);
-      console.log(`  POST /api/v1/llm/stream - Streaming completion`);
-      console.log(`  POST /api/v1/chat - Secure chat endpoint`);
-      console.log(`  GET /api/v1/health - Health check`);
-      console.log(`  POST /api/v1/analytics/track - Analytics tracking`);
-      console.log(`  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates`);
-      console.log(`  GET /api/v1/weather/city/:city - Weather by city`);
-      console.log(`  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates`);
-      console.log(`  POST /api/v1/rhythm/generate - AI-powered rhythm generation`);
+      console.log('  POST /api/v1/llm/complete - Text completion');
+      console.log('  POST /api/v1/llm/stream - Streaming completion');
+      console.log('  POST /api/v1/chat - Secure chat endpoint');
+      console.log('  GET /api/v1/health - Health check');
+      console.log('  POST /api/v1/analytics/track - Analytics tracking');
+      console.log('  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates');
+      console.log('  GET /api/v1/weather/city/:city - Weather by city');
+      console.log('  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates');
+      console.log('  POST /api/v1/rhythm/generate - AI-powered rhythm generation');
       console.log('🎯 Server ready to accept connections');
       /* eslint-enable no-console */
     });
-    
+
     return server;
   } catch (error) {
-    /* eslint-disable-next-line no-console */
+
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
@@ -150,7 +150,7 @@ let server;
 startServer().then(srv => {
   server = srv;
 }).catch(error => {
-  /* eslint-disable-next-line no-console */
+
   console.error('❌ Fatal startup error:', error);
   process.exit(1);
 });
@@ -159,13 +159,13 @@ startServer().then(srv => {
 const gracefulShutdown = () => {
   /* eslint-disable no-console */
   console.log('🛑 Received shutdown signal, closing server gracefully...');
-  
+
   if (server) {
     server.close(() => {
       console.log('✅ Server closed');
       process.exit(0);
     });
-    
+
     // Force close after 10 seconds
     setTimeout(() => {
       console.error('❌ Could not close connections in time, forcefully shutting down');

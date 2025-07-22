@@ -5,20 +5,20 @@ export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((
-    toast: Omit<Toast, 'id'> | string
+    toast: Omit<Toast, 'id'> | string,
   ) => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
     
     const newToast: Toast = typeof toast === 'string' 
       ? {
-          id,
-          type: 'info',
-          message: toast
-        }
+        id,
+        type: 'info',
+        message: toast,
+      }
       : {
-          id,
-          ...toast
-        };
+        id,
+        ...toast,
+      };
 
     setToasts(prev => [...prev, newToast]);
     return id;
@@ -37,7 +37,7 @@ export function useToast() {
     return addToast({
       type: 'success',
       message,
-      ...options
+      ...options,
     });
   }, [addToast]);
 
@@ -46,7 +46,7 @@ export function useToast() {
       type: 'error',
       message,
       duration: 7000, // Errors stay longer by default
-      ...options
+      ...options,
     });
   }, [addToast]);
 
@@ -54,7 +54,7 @@ export function useToast() {
     return addToast({
       type: 'warning',
       message,
-      ...options
+      ...options,
     });
   }, [addToast]);
 
@@ -62,7 +62,7 @@ export function useToast() {
     return addToast({
       type: 'info',
       message,
-      ...options
+      ...options,
     });
   }, [addToast]);
 
@@ -74,6 +74,6 @@ export function useToast() {
     success,
     error,
     warning,
-    info
+    info,
   };
 }

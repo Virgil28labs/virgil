@@ -7,8 +7,8 @@ import type { LLMResponse } from '../types/llm.types';
 jest.mock('../services/llm', () => ({
   llmService: {
     complete: jest.fn(),
-    completeStream: jest.fn()
-  }
+    completeStream: jest.fn(),
+  },
 }));
 
 // Mock data
@@ -19,13 +19,13 @@ const mockResponse: LLMResponse = {
   usage: {
     promptTokens: 100,
     completionTokens: 50,
-    totalTokens: 150
-  }
+    totalTokens: 150,
+  },
 };
 
 const mockStreamChunks = [
   { id: '1', content: 'Hello ', delta: { content: 'Hello ' } },
-  { id: '2', content: 'world!', delta: { content: 'world!' } }
+  { id: '2', content: 'world!', delta: { content: 'world!' } },
 ];
 
 describe('useLLM', () => {
@@ -39,7 +39,7 @@ describe('useLLM', () => {
         for (const chunk of mockStreamChunks) {
           yield chunk;
         }
-      }
+      },
     });
   });
 
@@ -66,7 +66,7 @@ describe('useLLM', () => {
       });
       
       expect(llmService.complete).toHaveBeenCalledWith(
-        expect.objectContaining(config)
+        expect.objectContaining(config),
       );
     });
   });
@@ -79,13 +79,13 @@ describe('useLLM', () => {
       
       await act(async () => {
         response = await result.current.complete({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         });
       });
       
       expect(response).toEqual(mockResponse);
       expect(llmService.complete).toHaveBeenCalledWith({
-        messages: [{ role: 'user', content: 'Hello' }]
+        messages: [{ role: 'user', content: 'Hello' }],
       });
     });
 
@@ -186,14 +186,14 @@ describe('useLLM', () => {
       await act(async () => {
         await result.current.complete({
           messages: [],
-          temperature: 0.5 // Override config
+          temperature: 0.5, // Override config
         });
       });
       
       expect(llmService.complete).toHaveBeenCalledWith({
         model: 'gpt-4',
         temperature: 0.5, // Request option overrides config
-        messages: []
+        messages: [],
       });
     });
 
@@ -234,7 +234,7 @@ describe('useLLM', () => {
       
       await act(async () => {
         const stream = result.current.completeStream({
-          messages: [{ role: 'user', content: 'Hello' }]
+          messages: [{ role: 'user', content: 'Hello' }],
         });
         
         for await (const chunk of stream) {
@@ -244,7 +244,7 @@ describe('useLLM', () => {
       
       expect(chunks).toEqual(mockStreamChunks);
       expect(llmService.completeStream).toHaveBeenCalledWith({
-        messages: [{ role: 'user', content: 'Hello' }]
+        messages: [{ role: 'user', content: 'Hello' }],
       });
     });
 
@@ -258,7 +258,7 @@ describe('useLLM', () => {
           // Wait for external control
           await streamPromise;
           yield mockStreamChunks[1];
-        }
+        },
       };
       
       // Create the promise before using it
@@ -309,7 +309,7 @@ describe('useLLM', () => {
         [Symbol.asyncIterator]: async function* () {
           yield mockStreamChunks[0];
           throw error;
-        }
+        },
       });
       
       const { result } = renderHook(() => useLLM());
@@ -350,7 +350,7 @@ describe('useLLM', () => {
           yield { content: 'Start' };
           await new Promise(resolve => setTimeout(resolve, 100));
           yield { content: 'End' };
-        }
+        },
       });
       
       // Start first stream but don't await
@@ -391,7 +391,7 @@ describe('useLLM', () => {
       await act(async () => {
         const stream = result.current.completeStream({
           messages: [],
-          temperature: 0.5
+          temperature: 0.5,
         });
         
         for await (const chunk of stream) {
@@ -403,7 +403,7 @@ describe('useLLM', () => {
         model: 'gpt-4',
         stream: true,
         temperature: 0.5,
-        messages: []
+        messages: [],
       });
     });
   });
@@ -413,7 +413,7 @@ describe('useLLM', () => {
       const mockAbort = jest.fn();
       global.AbortController = jest.fn().mockImplementation(() => ({
         abort: mockAbort,
-        signal: {}
+        signal: {},
       }));
       
       const { result } = renderHook(() => useLLM());
@@ -522,7 +522,7 @@ describe('useLLM', () => {
           // Wait for external control
           await streamPromise;
           yield mockStreamChunks[1];
-        }
+        },
       };
       
       // Create the promise before using it

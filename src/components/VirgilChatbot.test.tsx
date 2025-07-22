@@ -3,38 +3,37 @@ import userEvent from '@testing-library/user-event';
 
 // Mock all dependencies before importing the component
 jest.mock('../lib/requestDeduplication', () => ({
-  dedupeFetch: jest.fn()
+  dedupeFetch: jest.fn(),
 }));
 
 jest.mock('../hooks/useFocusManagement', () => ({
-  useFocusManagement: () => ({ containerRef: { current: null } })
+  useFocusManagement: () => ({ containerRef: { current: null } }),
 }));
 
 jest.mock('../hooks/useKeyboardNavigation', () => ({
-  useKeyboardNavigation: () => ({ containerRef: { current: null } })
+  useKeyboardNavigation: () => ({ containerRef: { current: null } }),
 }));
 
 jest.mock('../hooks/useResponsive', () => ({
   useResponsive: () => ({ isMobile: false, isTouchDevice: false }),
-  useViewport: () => ({ isKeyboardOpen: false })
+  useViewport: () => ({ isKeyboardOpen: false }),
 }));
 
 jest.mock('../contexts/AuthContext', () => ({
-  useAuth: jest.fn()
+  useAuth: jest.fn(),
 }));
 
 jest.mock('../contexts/LocationContext', () => ({
-  useLocation: jest.fn()
+  useLocation: jest.fn(),
 }));
 
 jest.mock('../contexts/WeatherContext', () => ({
-  useWeather: jest.fn()
+  useWeather: jest.fn(),
 }));
 
 // Import after mocks
 import { VirgilChatbot } from './VirgilChatbot';
 import { dedupeFetch } from '../lib/requestDeduplication';
-import { searchService } from '../lib/searchService';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
 import { useWeather } from '../contexts/WeatherContext';
@@ -44,7 +43,7 @@ const mockUser = {
   id: 'test-id',
   email: 'test@example.com',
   created_at: '2024-01-01T00:00:00Z',
-  user_metadata: { name: 'Test User' }
+  user_metadata: { name: 'Test User' },
 } as any;
 
 
@@ -55,7 +54,7 @@ describe('VirgilChatbot', () => {
     // Mock DOM methods
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       value: jest.fn(),
-      writable: true
+      writable: true,
     });
     
     // Default mock implementations
@@ -63,7 +62,7 @@ describe('VirgilChatbot', () => {
       user: null,
       session: null,
       loading: false,
-      error: null
+      error: null,
     });
     
     (useLocation as jest.Mock).mockReturnValue({
@@ -74,7 +73,7 @@ describe('VirgilChatbot', () => {
       error: null,
       permissionStatus: 'unknown',
       hasLocation: false,
-      hasGPSLocation: false
+      hasGPSLocation: false,
     });
     
     (useWeather as jest.Mock).mockReturnValue({
@@ -82,7 +81,7 @@ describe('VirgilChatbot', () => {
       loading: false,
       error: null,
       lastFetch: null,
-      unit: 'fahrenheit'
+      unit: 'fahrenheit',
     });
     
     // Mock localStorage
@@ -96,8 +95,8 @@ describe('VirgilChatbot', () => {
       ok: true,
       json: async () => ({
         success: true,
-        message: { content: 'Hello! I am Virgil, your helpful assistant.' }
-      })
+        message: { content: 'Hello! I am Virgil, your helpful assistant.' },
+      }),
     });
   });
 
@@ -159,7 +158,7 @@ describe('VirgilChatbot', () => {
         user: mockUser,
         session: null,
         loading: false,
-        error: null
+        error: null,
       });
       
       render(<VirgilChatbot />);
@@ -268,9 +267,9 @@ describe('VirgilChatbot', () => {
           ok: true,
           json: async () => ({
             success: true,
-            message: { content: 'Hello! I am Virgil, your helpful assistant.' }
-          })
-        }), 100))
+            message: { content: 'Hello! I am Virgil, your helpful assistant.' },
+          }),
+        }), 100)),
       );
       
       render(<VirgilChatbot />);
@@ -380,7 +379,7 @@ describe('VirgilChatbot', () => {
       // Click the specific GPT-4o option (not the mini version)
       const gpt4Options = screen.getAllByText('GPT-4o');
       const gpt4OptionInDropdown = gpt4Options.find(option => 
-        option.closest('.model-option') !== null
+        option.closest('.model-option') !== null,
       )!;
       await user.click(gpt4OptionInDropdown);
       
@@ -413,7 +412,7 @@ describe('VirgilChatbot', () => {
       (dedupeFetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 500,
-        json: async () => ({ error: 'Internal server error' })
+        json: async () => ({ error: 'Internal server error' }),
       });
       
       render(<VirgilChatbot />);
@@ -450,9 +449,9 @@ describe('VirgilChatbot', () => {
           ok: true,
           json: async () => ({
             success: true,
-            message: { content: 'Response message' }
-          })
-        }), 100))
+            message: { content: 'Response message' },
+          }),
+        }), 100)),
       );
       
       render(<VirgilChatbot />);
@@ -473,31 +472,4 @@ describe('VirgilChatbot', () => {
     });
   });
 
-  describe('Web Search Integration', () => {
-    it('shows search indicator when searching', async () => {
-      const user = userEvent.setup();
-      (searchService.detectSearchIntent as jest.Mock).mockReturnValue(true);
-      (searchService.extractSearchQuery as jest.Mock).mockReturnValue('latest news');
-      (searchService.search as jest.Mock).mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve({
-          query: 'latest news',
-          answer: 'Here are the latest news...',
-          results: []
-        }), 100))
-      );
-      
-      render(<VirgilChatbot />);
-      
-      await user.click(screen.getByRole('button', { name: /open chat/i }));
-      
-      const input = screen.getByRole('textbox', { name: /Type your message to Virgil/i });
-      await user.type(input, 'Search for latest news{Enter}');
-      
-      expect(screen.getByText('🔍 Searching the web...')).toBeInTheDocument();
-      
-      await waitFor(() => {
-        expect(screen.queryByText('🔍 Searching the web...')).not.toBeInTheDocument();
-      });
-    });
-  });
 });

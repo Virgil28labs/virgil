@@ -1,6 +1,6 @@
-import { memo } from 'react'
-import { GiphyCard } from './GiphyCard'
-import type { GiphyGridProps } from '../../types/giphy.types'
+import { memo } from 'react';
+import { GiphyCard } from './GiphyCard';
+import type { GiphyGridProps } from '../../types/giphy.types';
 
 export const GiphyGrid = memo(function GiphyGrid({
   gifs,
@@ -8,7 +8,7 @@ export const GiphyGrid = memo(function GiphyGrid({
   error,
   onImageClick,
   onFavoriteToggle,
-  isFavorited
+  isFavorited,
 }: GiphyGridProps) {
   // Show loading state
   if (loading && gifs.length === 0) {
@@ -17,12 +17,12 @@ export const GiphyGrid = memo(function GiphyGrid({
         <div className="giphy-loading-spinner" />
         <div className="giphy-loading-text">Loading GIFs...</div>
       </div>
-    )
+    );
   }
 
   // Show error state if no gifs to display
   if (error && gifs.length === 0) {
-    return null // Error is handled by parent component
+    return null; // Error is handled by parent component
   }
 
   return (
@@ -45,5 +45,5 @@ export const GiphyGrid = memo(function GiphyGrid({
         </div>
       )}
     </div>
-  )
-})
+  );
+});

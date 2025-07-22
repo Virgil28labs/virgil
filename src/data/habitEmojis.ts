@@ -1,4 +1,4 @@
-import type { EmojiSuggestion } from '../types/habit.types'
+import type { EmojiSuggestion } from '../types/habit.types';
 
 // Comprehensive emoji database for habit suggestions
 export const EMOJI_DATABASE: EmojiSuggestion[] = [
@@ -96,8 +96,8 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '🏆', keywords: ['win', 'trophy', 'achieve', 'champion'] },
   { emoji: '🌈', keywords: ['rainbow', 'colorful', 'happy', 'positive'] },
   { emoji: '🚀', keywords: ['launch', 'start', 'go', 'fast'] },
-  { emoji: '💎', keywords: ['diamond', 'valuable', 'precious', 'quality'] }
-]
+  { emoji: '💎', keywords: ['diamond', 'valuable', 'precious', 'quality'] },
+];
 
 // Popular emojis for quick selection
-export const POPULAR_EMOJIS = ['🔥', '🎯', '💪', '📚', '💧', '🧘', '✏️', '🏃', '💊', '☕', '😴', '🥗', '💻', '🎨', '🎵', '🧹', '🌱', '💰', '📱', '❤️']
+export const POPULAR_EMOJIS = ['🔥', '🎯', '💪', '📚', '💧', '🧘', '✏️', '🏃', '💊', '☕', '😴', '🥗', '💻', '🎨', '🎵', '🧹', '🌱', '💰', '📱', '❤️'];

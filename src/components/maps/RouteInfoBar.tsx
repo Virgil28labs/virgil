@@ -1,6 +1,6 @@
-import React from 'react'
-import { DepartureTimeSelector } from './DepartureTimeSelector'
-import './RouteInfoBar.css'
+import React from 'react';
+import { DepartureTimeSelector } from './DepartureTimeSelector';
+import './RouteInfoBar.css';
 
 interface RouteInfoBarProps {
   route: google.maps.DirectionsRoute | null
@@ -23,55 +23,55 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
   onToggleExpand,
   onClose,
   departureTime = 'now',
-  onDepartureTimeChange
+  onDepartureTimeChange,
 }) => {
-  if (!route) return null
+  if (!route) return null;
 
-  const leg = route.legs[0]
-  if (!leg) return null
+  const leg = route.legs[0];
+  if (!leg) return null;
 
   // Get traffic-aware duration if available
-  const duration = leg.duration_in_traffic || leg.duration
-  const distance = leg.distance
+  const duration = leg.duration_in_traffic || leg.duration;
+  const distance = leg.distance;
   
   // Calculate traffic severity (comparing normal duration to traffic duration)
   const getTrafficSeverity = () => {
-    if (!leg.duration || !leg.duration_in_traffic) return 'normal'
+    if (!leg.duration || !leg.duration_in_traffic) return 'normal';
     
-    const normalTime = leg.duration.value
-    const trafficTime = leg.duration_in_traffic.value
-    const ratio = trafficTime / normalTime
+    const normalTime = leg.duration.value;
+    const trafficTime = leg.duration_in_traffic.value;
+    const ratio = trafficTime / normalTime;
     
-    if (ratio > 1.5) return 'heavy'
-    if (ratio > 1.2) return 'moderate'
-    return 'light'
-  }
+    if (ratio > 1.5) return 'heavy';
+    if (ratio > 1.2) return 'moderate';
+    return 'light';
+  };
   
-  const trafficSeverity = getTrafficSeverity()
+  const trafficSeverity = getTrafficSeverity();
   
   // Format duration for display
   const formatDuration = (dur: google.maps.Duration | undefined) => {
-    if (!dur) return '--'
+    if (!dur) return '--';
     
-    const totalMinutes = Math.round(dur.value / 60)
+    const totalMinutes = Math.round(dur.value / 60);
     if (totalMinutes < 60) {
-      return `${totalMinutes} min`
+      return `${totalMinutes} min`;
     }
     
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = totalMinutes % 60
-    return `${hours} hr ${minutes} min`
-  }
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours} hr ${minutes} min`;
+  };
   
   // Get traffic color based on severity
   const getTrafficColor = (severity: string) => {
     switch (severity) {
-      case 'heavy': return '#EA4335'
-      case 'moderate': return '#FBBC04'
-      case 'light': return '#34A853'
-      default: return '#4285F4'
+      case 'heavy': return '#EA4335';
+      case 'moderate': return '#FBBC04';
+      case 'light': return '#34A853';
+      default: return '#4285F4';
     }
-  }
+  };
 
   return (
     <div className={`route-info-bar ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -117,8 +117,8 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
           {isExpanded && (
             <span className="traffic-label">
               {trafficSeverity === 'heavy' ? 'Heavy traffic' : 
-               trafficSeverity === 'moderate' ? 'Moderate traffic' : 
-               'Light traffic'}
+                trafficSeverity === 'moderate' ? 'Moderate traffic' : 
+                  'Light traffic'}
             </span>
           )}
         </div>
@@ -133,7 +133,7 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path
-                  d={isExpanded ? "M4 6L8 10L12 6" : "M4 10L8 6L12 10"}
+                  d={isExpanded ? 'M4 6L8 10L12 6' : 'M4 10L8 6L12 10'}
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
@@ -166,8 +166,8 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
           <div className="routes-header">Routes</div>
           <div className="routes-list">
             {[route, ...alternativeRoutes].slice(0, 3).map((r, index) => {
-              const routeLeg = r.legs[0]
-              const routeDuration = routeLeg.duration_in_traffic || routeLeg.duration
+              const routeLeg = r.legs[0];
+              const routeDuration = routeLeg.duration_in_traffic || routeLeg.duration;
               
               return (
                 <button
@@ -179,7 +179,7 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
                   <div className="route-time">{formatDuration(routeDuration)}</div>
                   {index === 0 && <span className="fastest-badge">Fastest</span>}
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -189,5 +189,5 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
         via {route.summary}
       </div>
     </div>
-  )
-}
+  );
+};

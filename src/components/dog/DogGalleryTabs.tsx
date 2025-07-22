@@ -1,5 +1,5 @@
-import { memo } from 'react'
-import type { TabType } from '../../types'
+import { memo } from 'react';
+import type { TabType } from '../../types';
 
 interface DogGalleryTabsProps {
   activeTab: TabType
@@ -10,7 +10,7 @@ interface DogGalleryTabsProps {
 export const DogGalleryTabs = memo(function DogGalleryTabs({
   activeTab,
   favoritesCount,
-  onTabChange
+  onTabChange,
 }: DogGalleryTabsProps) {
   return (
     <div className="doggo-sanctuary-tabs" role="tablist">
@@ -37,5 +37,5 @@ export const DogGalleryTabs = memo(function DogGalleryTabs({
         </span>
       </button>
     </div>
-  )
-})
+  );
+});

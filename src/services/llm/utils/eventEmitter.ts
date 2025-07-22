@@ -22,7 +22,7 @@ export class EventEmitter {
     if (!this.events[event]) return;
     
     this.events[event] = this.events[event].filter(
-      listener => listener !== listenerToRemove
+      listener => listener !== listenerToRemove,
     );
   }
 

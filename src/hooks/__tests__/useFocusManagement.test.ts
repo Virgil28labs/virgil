@@ -75,7 +75,7 @@ describe('useFocusManagement', () => {
         'select1',
         'textarea1',
         'link1',
-        'div1'
+        'div1',
       ]);
     });
 
@@ -130,7 +130,7 @@ describe('useFocusManagement', () => {
 
     it('should focus element matching initial selector', () => {
       const { result } = renderHook(() => 
-        useFocusManagement(false, { initialFocusSelector: 'button' })
+        useFocusManagement(false, { initialFocusSelector: 'button' }),
       );
 
       act(() => {
@@ -229,7 +229,7 @@ describe('useFocusManagement', () => {
     it('should auto-focus first element when active', async () => {
       const { result, rerender } = renderHook(
         ({ isActive }) => useFocusManagement(isActive, { autoFocus: true }),
-        { initialProps: { isActive: false } }
+        { initialProps: { isActive: false } },
       );
 
       act(() => {
@@ -253,7 +253,7 @@ describe('useFocusManagement', () => {
 
       const { result, rerender } = renderHook(
         ({ isActive }) => useFocusManagement(isActive, { autoFocus: false }),
-        { initialProps: { isActive: false } }
+        { initialProps: { isActive: false } },
       );
 
       act(() => {
@@ -278,9 +278,9 @@ describe('useFocusManagement', () => {
       const { rerender } = renderHook(
         ({ isActive }) => useFocusManagement(isActive, { 
           restoreFocus: true,
-          autoFocus: false 
+          autoFocus: false, 
         }),
-        { initialProps: { isActive: false } }
+        { initialProps: { isActive: false } },
       );
 
       // Activate
@@ -303,9 +303,9 @@ describe('useFocusManagement', () => {
       const { rerender } = renderHook(
         ({ isActive }) => useFocusManagement(isActive, { 
           restoreFocus: false,
-          autoFocus: false 
+          autoFocus: false, 
         }),
-        { initialProps: { isActive: false } }
+        { initialProps: { isActive: false } },
       );
 
       rerender({ isActive: true });
@@ -319,7 +319,7 @@ describe('useFocusManagement', () => {
   describe('trapFocus behavior', () => {
     it('should trap focus within container on Tab', () => {
       const { result } = renderHook(() => 
-        useFocusManagement(true, { trapFocus: true })
+        useFocusManagement(true, { trapFocus: true }),
       );
 
       act(() => {
@@ -333,7 +333,7 @@ describe('useFocusManagement', () => {
       // Press Tab
       const tabEvent = new KeyboardEvent('keydown', {
         key: 'Tab',
-        bubbles: true
+        bubbles: true,
       });
 
       act(() => {
@@ -346,7 +346,7 @@ describe('useFocusManagement', () => {
 
     it('should trap focus within container on Shift+Tab', () => {
       const { result } = renderHook(() => 
-        useFocusManagement(true, { trapFocus: true })
+        useFocusManagement(true, { trapFocus: true }),
       );
 
       act(() => {
@@ -361,7 +361,7 @@ describe('useFocusManagement', () => {
       const shiftTabEvent = new KeyboardEvent('keydown', {
         key: 'Tab',
         shiftKey: true,
-        bubbles: true
+        bubbles: true,
       });
 
       act(() => {
@@ -374,7 +374,7 @@ describe('useFocusManagement', () => {
 
     it('should not trap focus when trapFocus is false', () => {
       const { result } = renderHook(() => 
-        useFocusManagement(true, { trapFocus: false })
+        useFocusManagement(true, { trapFocus: false }),
       );
 
       act(() => {
@@ -386,7 +386,7 @@ describe('useFocusManagement', () => {
 
       const tabEvent = new KeyboardEvent('keydown', {
         key: 'Tab',
-        bubbles: true
+        bubbles: true,
       });
 
       act(() => {
@@ -404,8 +404,8 @@ describe('useFocusManagement', () => {
         useFocusManagement(true, { 
           trapFocus: true,
           restoreFocus: true,
-          autoFocus: false
-        })
+          autoFocus: false,
+        }),
       );
 
       act(() => {
@@ -418,7 +418,7 @@ describe('useFocusManagement', () => {
       // Press Escape
       const escapeEvent = new KeyboardEvent('keydown', {
         key: 'Escape',
-        bubbles: true
+        bubbles: true,
       });
 
       act(() => {
@@ -436,7 +436,7 @@ describe('useFocusManagement', () => {
 
       const { rerender } = renderHook(
         ({ isActive }) => useFocusManagement(isActive, { trapFocus: true }),
-        { initialProps: { isActive: true } }
+        { initialProps: { isActive: true } },
       );
 
       // Deactivate
@@ -452,7 +452,7 @@ describe('useFocusManagement', () => {
       const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
 
       const { unmount } = renderHook(() => 
-        useFocusManagement(true, { autoFocus: true })
+        useFocusManagement(true, { autoFocus: true }),
       );
 
       unmount();

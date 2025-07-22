@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo } from 'react';
 
 interface FetchControlsProps {
   selectedBreed: string
@@ -10,7 +10,7 @@ interface FetchControlsProps {
   onFetch: () => void
 }
 
-const FETCH_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const
+const FETCH_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 export const FetchControls = memo(function FetchControls({
   selectedBreed,
@@ -19,7 +19,7 @@ export const FetchControls = memo(function FetchControls({
   loading,
   onBreedChange,
   onCountChange,
-  onFetch
+  onFetch,
 }: FetchControlsProps) {
   return (
     <div className="doggo-fetch-controls">
@@ -66,5 +66,5 @@ export const FetchControls = memo(function FetchControls({
         {loading ? 'Fetching...' : 'Fetch'}
       </button>
     </div>
-  )
-})
+  );
+});

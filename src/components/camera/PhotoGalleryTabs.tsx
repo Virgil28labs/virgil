@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 interface PhotoGalleryTabsProps {
   activeTab: 'camera' | 'gallery' | 'favorites'
@@ -11,28 +11,28 @@ export const PhotoGalleryTabs: React.FC<PhotoGalleryTabsProps> = ({
   activeTab,
   onTabChange,
   photoCount,
-  favoriteCount
+  favoriteCount,
 }) => {
   const tabs = [
     {
       id: 'camera' as const,
       label: 'Camera',
       icon: '📸',
-      count: null
+      count: null,
     },
     {
       id: 'gallery' as const,
       label: 'Gallery',
       icon: '🖼️',
-      count: photoCount
+      count: photoCount,
     },
     {
       id: 'favorites' as const,
       label: 'Favorites',
       icon: '❤️',
-      count: favoriteCount
-    }
-  ]
+      count: favoriteCount,
+    },
+  ];
 
   return (
     <div className="photo-gallery-tabs">
@@ -51,5 +51,5 @@ export const PhotoGalleryTabs: React.FC<PhotoGalleryTabsProps> = ({
         </button>
       ))}
     </div>
-  )
-}
+  );
+};

@@ -20,7 +20,7 @@
         description: 'Complete your first check-in',
         icon: '✨',
         progress: 0,
-        requirement: { type: 'total-checkins', value: 1 }
+        requirement: { type: 'total-checkins', value: 1 },
       },
       {
         id: 'week-warrior',
@@ -28,7 +28,7 @@
         description: 'Maintain a 7-day streak',
         icon: '🔥',
         progress: 0,
-        requirement: { type: 'streak', value: 7 }
+        requirement: { type: 'streak', value: 7 },
       },
       {
         id: 'monthly-master',
@@ -36,7 +36,7 @@
         description: 'Maintain a 30-day streak',
         icon: '👑',
         progress: 0,
-        requirement: { type: 'streak', value: 30 }
+        requirement: { type: 'streak', value: 30 },
       },
       {
         id: 'perfect-week',
@@ -44,7 +44,7 @@
         description: 'Complete all habits for 7 days',
         icon: '🌟',
         progress: 0,
-        requirement: { type: 'perfect-week', value: 7 }
+        requirement: { type: 'perfect-week', value: 7 },
       },
       {
         id: 'habit-collector',
@@ -52,17 +52,17 @@
         description: 'Create 5 habits',
         icon: '🎯',
         progress: 0,
-        requirement: { type: 'all-habits', value: 5 }
-      }
+        requirement: { type: 'all-habits', value: 5 },
+      },
     ],
     settings: {
-      soundEnabled: true
+      soundEnabled: true,
     },
     stats: {
       totalCheckIns: 0,
       currentStreak: 0,
-      perfectDays: []
-    }
+      perfectDays: [],
+    },
   };
   
   // Save fresh data

@@ -1,5 +1,6 @@
-import { useState, memo, FormEvent, ChangeEvent } from 'react'
-import { supabase } from '../lib/supabase'
+import type { FormEvent, ChangeEvent } from 'react';
+import { useState, memo } from 'react';
+import { supabase } from '../lib/supabase';
 
 interface SignUpFormProps {
   onSuccess?: () => void;
@@ -15,44 +16,44 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    password: ''
-  })
-  const [loading, setLoading] = useState<boolean>(false)
-  const [message, setMessage] = useState<string>('')
+    password: '',
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
 
     // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      setMessage('Please fill in all fields')
-      setLoading(false)
-      return
+      setMessage('Please fill in all fields');
+      setLoading(false);
+      return;
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage('Please enter a valid email address')
-      setLoading(false)
-      return
+      setMessage('Please enter a valid email address');
+      setLoading(false);
+      return;
     }
 
     // Password validation
     if (formData.password.length < 6) {
-      setMessage('Password must be at least 6 characters')
-      setLoading(false)
-      return
+      setMessage('Password must be at least 6 characters');
+      setLoading(false);
+      return;
     }
 
     try {
@@ -61,24 +62,24 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
         password: formData.password,
         options: {
           data: {
-            name: formData.name.trim()
-          }
-        }
-      })
+            name: formData.name.trim(),
+          },
+        },
+      });
 
       if (error) {
-        setMessage(error.message)
+        setMessage(error.message);
       } else {
-        setMessage('Sign up successful! Please check your email to confirm your account.')
-        setFormData({ name: '', email: '', password: '' })
-        if (onSuccess) onSuccess()
+        setMessage('Sign up successful! Please check your email to confirm your account.');
+        setFormData({ name: '', email: '', password: '' });
+        if (onSuccess) onSuccess();
       }
     } catch {
-      setMessage('Network error. Please try again.')
+      setMessage('Network error. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="signup-form" role="form" aria-labelledby="signup-title">
@@ -95,7 +96,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             placeholder="Enter your full name"
             disabled={loading}
             required
-            aria-describedby={message ? "signup-message" : undefined}
+            aria-describedby={message ? 'signup-message' : undefined}
             autoComplete="name"
           />
         </div>
@@ -111,7 +112,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             placeholder="Enter your email address"
             disabled={loading}
             required
-            aria-describedby={message ? "signup-message" : "password-help"}
+            aria-describedby={message ? 'signup-message' : 'password-help'}
             autoComplete="email"
           />
         </div>
@@ -155,5 +156,5 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
         </div>
       )}
     </div>
-  )
-})
+  );
+});

@@ -1,5 +1,7 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { PhysicsEngine, PhysicsBody, PhysicsConfig } from '../lib/physics';
+import type React from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import type { PhysicsBody, PhysicsConfig } from '../lib/physics';
+import { PhysicsEngine } from '../lib/physics';
 
 interface RaccoonPhysicsState {
   x: number;
@@ -25,7 +27,7 @@ export function useRaccoonPhysics({
   raccoonSize = { width: 120, height: 120 },
   physicsConfig = {},
   onBounce,
-  onThrow
+  onThrow,
 }: UseRaccoonPhysicsOptions) {
   const [state, setState] = useState<RaccoonPhysicsState>({
     x: initialPosition.x,
@@ -33,7 +35,7 @@ export function useRaccoonPhysics({
     angle: 0,
     isDragging: false,
     isAnimating: false,
-    expression: 'idle'
+    expression: 'idle',
   });
 
   const physicsEngine = useRef(new PhysicsEngine(physicsConfig));
@@ -43,7 +45,7 @@ export function useRaccoonPhysics({
     vx: 0,
     vy: 0,
     angle: 0,
-    angularVelocity: 0
+    angularVelocity: 0,
   });
 
   const animationFrameRef = useRef<number>();
@@ -63,7 +65,7 @@ export function useRaccoonPhysics({
     const result = physicsEngine.current.step(
       physicsBody.current,
       { width: container.width, height: container.height },
-      raccoonSize
+      raccoonSize,
     );
 
     if (result.bounced && onBounce) {
@@ -78,7 +80,7 @@ export function useRaccoonPhysics({
       y: physicsBody.current.y,
       angle: physicsBody.current.angle,
       isAnimating: !isAtRest,
-      expression: result.bounced ? 'dizzy' : (isAtRest ? 'idle' : prev.expression)
+      expression: result.bounced ? 'dizzy' : (isAtRest ? 'idle' : prev.expression),
     }));
 
     if (!isAtRest) {
@@ -133,7 +135,7 @@ export function useRaccoonPhysics({
       ...prev,
       x: newX,
       y: newY,
-      angle: 0
+      angle: 0,
     }));
   }, [containerRef]);
 
@@ -192,7 +194,7 @@ export function useRaccoonPhysics({
       onDragMove: handleDragMove,
       onDragEnd: handleDragEnd,
       toss,
-      pet
-    }
+      pet,
+    },
   };
 }

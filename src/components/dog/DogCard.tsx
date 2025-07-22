@@ -1,18 +1,18 @@
-import { memo, useState } from 'react'
-import type { DogCardProps } from '../../types'
-import { DogFavoriteOverlay } from './DogFavoriteOverlay'
-import { DogCardActions } from './DogCardActions'
-import { DogImageSkeleton, DogImageError } from './DogImageStates'
+import { memo, useState } from 'react';
+import type { DogCardProps } from '../../types';
+import { DogFavoriteOverlay } from './DogFavoriteOverlay';
+import { DogCardActions } from './DogCardActions';
+import { DogImageSkeleton, DogImageError } from './DogImageStates';
 
 export const DogCard = memo(function DogCard({ 
   dog, 
   index, 
   isFavorited, 
   onImageClick, 
-  onFavoriteToggle 
+  onFavoriteToggle, 
 }: DogCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div
@@ -44,5 +44,5 @@ export const DogCard = memo(function DogCard({
       
       <DogCardActions dog={dog} />
     </div>
-  )
-})
+  );
+});

@@ -3,15 +3,15 @@ import { AuthPage } from './AuthPage';
 
 // Mock the child components
 jest.mock('./SignUpForm', () => ({
-  SignUpForm: () => <div data-testid="signup-form">Sign Up Form</div>
+  SignUpForm: () => <div data-testid="signup-form">Sign Up Form</div>,
 }));
 
 jest.mock('./LoginForm', () => ({
-  LoginForm: () => <div data-testid="login-form">Login Form</div>
+  LoginForm: () => <div data-testid="login-form">Login Form</div>,
 }));
 
 jest.mock('./RaccoonMascot', () => ({
-  RaccoonMascot: () => <div data-testid="raccoon-mascot">Raccoon Mascot</div>
+  RaccoonMascot: () => <div data-testid="raccoon-mascot">Raccoon Mascot</div>,
 }));
 
 describe('AuthPage', () => {

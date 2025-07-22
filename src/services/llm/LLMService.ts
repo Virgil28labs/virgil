@@ -6,7 +6,7 @@ import type {
   LLMResponse,
   LLMConfig,
   LLMServiceStats,
-  LLMMessage
+  LLMMessage,
 } from '../../types/llm.types';
 
 export class LLMService extends EventEmitter {
@@ -25,7 +25,7 @@ export class LLMService extends EventEmitter {
       cacheTTL: parseInt(import.meta.env.VITE_CACHE_TTL || '3600'),
       maxRetries: 3,
       retryDelay: 1000,
-      ...config
+      ...config,
     };
     
     this.cache = new ResponseCache({ ttl: this.config.cacheTTL });
@@ -43,7 +43,7 @@ export class LLMService extends EventEmitter {
       systemPrompt = undefined,
       context = {},
       cacheKey = undefined,
-      provider = 'openai'
+      provider = 'openai',
     } = options;
 
     // Check rate limit
@@ -71,7 +71,7 @@ export class LLMService extends EventEmitter {
       temperature,
       maxTokens,
       context,
-      provider
+      provider,
     };
 
     try {
@@ -83,7 +83,7 @@ export class LLMService extends EventEmitter {
       const response = await this.makeRequestWithRetry(
         stream ? '/llm/stream' : '/llm/complete',
         requestBody,
-        stream
+        stream,
       );
 
       // Cache successful response
@@ -92,23 +92,25 @@ export class LLMService extends EventEmitter {
       }
 
       // Track completion
-      const duration = Date.now() - this.activeRequests.get(requestId).startTime;
+      const requestInfo = this.activeRequests.get(requestId);
+      const duration = requestInfo ? Date.now() - requestInfo.startTime : 0;
       this.emit('request-complete', {
         requestId,
         model,
         provider,
         duration,
-        tokens: response.usage?.total_tokens
+        tokens: response.usage?.total_tokens,
       });
 
       return response;
 
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.emit('request-error', {
         requestId,
-        error: error.message,
+        error: errorMessage,
         model,
-        provider
+        provider,
       });
       throw error;
     } finally {
@@ -157,17 +159,17 @@ export class LLMService extends EventEmitter {
     endpoint: string, 
     body: any, 
     isStream: boolean = false, 
-    attempt: number = 1
+    attempt: number = 1,
   ): Promise<any> {
     try {
       const response = await fetch(`${this.config.apiUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
         },
         body: JSON.stringify(body),
-        ...(isStream && { signal: this.createAbortSignal() })
+        ...(isStream && { signal: this.createAbortSignal() }),
       });
 
       if (!response.ok) {
@@ -209,7 +211,7 @@ export class LLMService extends EventEmitter {
     // Prepend system prompt
     return [
       { role: 'system', content: systemPrompt },
-      ...messages
+      ...messages,
     ];
   }
 
@@ -250,7 +252,7 @@ export class LLMService extends EventEmitter {
       const response = await fetch(`${this.config.apiUrl}/llm/tokenize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, model })
+        body: JSON.stringify({ text, model }),
       });
 
       if (!response.ok) throw new Error('Failed to count tokens');
@@ -267,7 +269,7 @@ export class LLMService extends EventEmitter {
     return {
       activeRequests: this.activeRequests.size,
       cacheStats: this.cache.getStats(),
-      rateLimitStats: this.rateLimiter.getStats()
+      rateLimitStats: this.rateLimiter.getStats(),
     };
   }
 
