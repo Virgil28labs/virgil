@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virgil Memory System Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🧠 Virgil Memory System Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <script type="module">
+        const results = document.getElementById('test-results');
+        
+        function addResult(type, message) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        addResult('info', '🚀 Starting Virgil Memory System Tests...');
+        
+        // Test IndexedDB support
+        if ('indexedDB' in window) {
+            addResult('success', '✅ IndexedDB is supported');
+        } else {
+            addResult('error', '❌ IndexedDB is not supported');
+        }
+        
+        // Test MemoryService
+        try {
+            // Import the MemoryService (this would need to be adapted for actual module import)
+            addResult('info', '🔧 Testing MemoryService initialization...');
+            
+            // Since we can't directly import ES modules here, let's check if the app loads
+            const iframe = document.createElement('iframe');
+            iframe.src = 'http://localhost:3001';
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = '1px solid #ccc';
+            iframe.style.marginTop = '20px';
+            
+            iframe.onload = () => {
+                addResult('success', '✅ Virgil app loaded successfully');
+                addResult('info', '📱 You can now test the memory system in the iframe below:');
+                addResult('info', '1. Open the Virgil chatbot by clicking the bubble');
+                addResult('info', '2. Send a message to Virgil');
+                addResult('info', '3. Hover over messages to see the 💡 "Remember this" button');
+                addResult('info', '4. Click the 💡 button to mark messages as important');
+                addResult('info', '5. Look for the 🧠 "Memory Active" indicator');
+                addResult('info', '6. Click the memory indicator to view stored memories');
+                addResult('info', '7. Close and reopen the chat to test welcome back greeting');
+            };
+            
+            iframe.onerror = () => {
+                addResult('error', '❌ Failed to load Virgil app');
+            };
+            
+            document.body.appendChild(iframe);
+            
+        } catch (error) {
+            addResult('error', `❌ Error testing MemoryService: ${error.message}`);
+        }
+    </script>
+</body>
+</html>

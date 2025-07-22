@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, Suspense, useRef } from 'react';
+import React, { memo, useCallback, useState, Suspense, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
 import { VirgilTextLogo } from './VirgilTextLogo';
@@ -19,6 +19,10 @@ import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { GoogleMapsModal } from './maps/GoogleMapsModal';
 import { SectionErrorBoundary } from './common/SectionErrorBoundary';
 import { PositionedIPHoverCard } from './location/IPHoverCard';
+import { dashboardAppService } from '../services/DashboardAppService';
+import { NotesAdapter } from '../services/adapters/NotesAdapter';
+import { PomodoroAdapter } from '../services/adapters/PomodoroAdapter';
+import { StreakAdapter } from '../services/adapters/StreakAdapter';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
@@ -71,6 +75,25 @@ export const Dashboard = memo(function Dashboard() {
       (document.activeElement as HTMLElement)?.blur();
     },
   });
+
+  // Initialize dashboard app adapters
+  useEffect(() => {
+    // Register app adapters with the dashboard service
+    const notesAdapter = new NotesAdapter();
+    const pomodoroAdapter = new PomodoroAdapter();
+    const streakAdapter = new StreakAdapter();
+
+    dashboardAppService.registerAdapter(notesAdapter);
+    dashboardAppService.registerAdapter(pomodoroAdapter);
+    dashboardAppService.registerAdapter(streakAdapter);
+
+    // Cleanup on unmount
+    return () => {
+      dashboardAppService.unregisterAdapter('notes');
+      dashboardAppService.unregisterAdapter('pomodoro');
+      dashboardAppService.unregisterAdapter('streaks');
+    };
+  }, []);
 
   return (
     <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">

@@ -8,6 +8,10 @@ import { SkeletonLoader } from './SkeletonLoader';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { memoryService, MemoryService, type StoredConversation, type MarkedMemory } from '../services/MemoryService';
+import { dashboardContextService, type DashboardContext, type ContextualSuggestion } from '../services/DashboardContextService';
+import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
+import { dashboardAppService } from '../services/DashboardAppService';
 import './VirgilChatbot.css';
 
 const VirgilChatbot = memo(function VirgilChatbot() {
@@ -28,6 +32,17 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       return '';
     }
   });
+  
+  // Memory-related state
+  const [lastConversation, setLastConversation] = useState<StoredConversation | null>(null);
+  const [markedMemories, setMarkedMemories] = useState<MarkedMemory[]>([]);
+  const [showMemoryIndicator, setShowMemoryIndicator] = useState<boolean>(false);
+  const [memoryContext, setMemoryContext] = useState<string>('');
+  const [showMemoryModal, setShowMemoryModal] = useState<boolean>(false);
+  const [recentConversations, setRecentConversations] = useState<StoredConversation[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [dashboardContext, setDashboardContext] = useState<DashboardContext | null>(null);
+  const [contextualSuggestions, setContextualSuggestions] = useState<ContextualSuggestion[]>([]);
   
   const { user } = useAuth();
   const { address, ipLocation, hasGPSLocation, coordinates } = useLocation();
@@ -79,6 +94,98 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     }
   }, []);
 
+  // Initialize memory service and load memory data
+  useEffect(() => {
+    const initMemory = async () => {
+      try {
+        await memoryService.init();
+        
+        // Load last conversation
+        const lastConv = await memoryService.getLastConversation();
+        setLastConversation(lastConv);
+        
+        // Load marked memories
+        const memories = await memoryService.getMarkedMemories();
+        setMarkedMemories(memories);
+        
+        // Load recent conversations
+        const conversations = await memoryService.getRecentConversations(10);
+        setRecentConversations(conversations);
+        
+        // Get context for prompt
+        const context = await memoryService.getContextForPrompt();
+        setMemoryContext(context);
+        
+        // Show indicator if we have memory context
+        setShowMemoryIndicator(!!context);
+      } catch (error) {
+        console.error('Failed to initialize memory service:', error);
+      }
+    };
+    
+    initMemory();
+  }, []);
+
+  // Initialize dashboard context service
+  useEffect(() => {
+    // Subscribe to context updates
+    const unsubscribe = dashboardContextService.subscribe((context) => {
+      setDashboardContext(context);
+      const suggestions = dashboardContextService.generateSuggestions();
+      setContextualSuggestions(suggestions);
+    });
+
+    // Get initial context
+    setDashboardContext(dashboardContextService.getContext());
+    setContextualSuggestions(dashboardContextService.generateSuggestions());
+
+    return unsubscribe;
+  }, []);
+
+  // Update context service with external data
+  useEffect(() => {
+    dashboardContextService.updateLocationContext({
+      address,
+      ipLocation,
+      hasGPSLocation,
+      coordinates,
+      loading: false,
+      error: null,
+      permissionStatus: 'granted',
+      hasLocation: !!(coordinates || ipLocation),
+      hasIPLocation: !!ipLocation,
+      initialized: true,
+      lastUpdated: Date.now(),
+      fetchLocationData: () => Promise.resolve(),
+      requestLocationPermission: () => Promise.resolve(),
+      clearError: () => {},
+    });
+  }, [address, ipLocation, hasGPSLocation, coordinates]);
+
+  useEffect(() => {
+    dashboardContextService.updateWeatherContext({
+      data: weatherData,
+      unit: weatherUnit,
+      loading: false,
+      error: null,
+      fetchWeather: () => Promise.resolve(),
+      toggleUnit: () => {},
+      clearError: () => {},
+      hasWeather: !!weatherData,
+      forecast: null,
+      lastUpdated: weatherData ? Date.now() : null,
+    });
+  }, [weatherData, weatherUnit]);
+
+  useEffect(() => {
+    dashboardContextService.updateUserContext({
+      user,
+      loading: false,
+      signOut: () => Promise.resolve({ error: undefined }),
+      refreshUser: () => Promise.resolve(),
+    });
+  }, [user]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -92,6 +199,23 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  // Save conversation when chat is closed
+  useEffect(() => {
+    if (!isOpen && messages.length > 0) {
+      const saveConversation = async () => {
+        try {
+          await memoryService.saveConversation(messages);
+          // Clear messages after saving
+          setMessages([]);
+        } catch (error) {
+          console.error('Failed to save conversation:', error);
+        }
+      };
+      
+      saveConversation();
+    }
+  }, [isOpen, messages]);
 
   // System prompt is now managed directly in this component
 
@@ -163,45 +287,48 @@ Provide contextual help based on what the user is currently experiencing.`;
     return { basePrompt, staticUserContext };
   }, [user, hasGPSLocation, address, ipLocation, coordinates, weatherData, weatherUnit, customSystemPrompt]);
 
-  const createSystemPrompt = useCallback(() => {
-    // Get current real-time data (only time-sensitive parts)
-    const now = new Date();
-    const currentTime = now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    const currentDate = now.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-    const currentDay = now.toLocaleDateString('en-US', {
-      weekday: 'long',
-    }).toLowerCase();
+  const createSystemPrompt = useCallback((userQuery?: string) => {
+    // Base prompt and static context
+    const basePrompt = customSystemPrompt || 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
+    
+    // Start with basic prompt structure
+    let systemPrompt = basePrompt + ' ' + staticPromptParts.staticUserContext;
 
-    // Combine static and dynamic parts
-    const dynamicTimeContext = `
-- Current time: ${currentTime}
-- Current date: ${currentDate}
-- Current day: ${currentDay}`;
+    // Add memory context if available
+    if (memoryContext) {
+      systemPrompt += `\n\nMEMORY CONTEXT:${memoryContext}`;
+    }
 
+    // Add smart contextual awareness using DynamicContextBuilder
+    if (userQuery && dashboardContext) {
+      const enhancedPrompt = DynamicContextBuilder.buildEnhancedPrompt(
+        systemPrompt,
+        userQuery,
+        dashboardContext,
+        contextualSuggestions
+      );
+      systemPrompt = enhancedPrompt.enhancedPrompt;
+
+      // Log activity for context service
+      dashboardContextService.logActivity(`Asked: "${userQuery.slice(0, 50)}..."`, 'virgil-chat');
+    }
+
+    // Add response rules
     const responseRules = `
+
 RESPONSE RULES:
 - Keep responses extremely short and to the point
-- For time queries, respond with current time: "${currentTime}"
-- For date queries, respond with current date: "${currentDate}"
-- For day queries, respond with current day: "${currentDay}"
-- For weather queries, provide current conditions and temperature
-- For location queries, provide specific requested data only
-- For feature questions, explain controls concisely
-- When you have web search results, use them to provide accurate, current information
-- Include relevant links from search results when appropriate
-- No explanations unless specifically requested
-- Be direct and concise`;
+- Use the contextual awareness to provide relevant, personalized responses
+- For time queries, provide current time with context
+- For weather queries, be specific about current conditions
+- For location queries, use available location data
+- When you have contextual information, use it naturally in responses
+- For dashboard app queries (notes, habits, pomodoro), use the provided app data to give specific answers
+- Be conversational but concise
+- No explanations unless specifically requested`;
     
-    return `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext.replace('- Current page: Dashboard', `- Current page: Dashboard${dynamicTimeContext}`)} ${responseRules}`;
-  }, [staticPromptParts]);
+    return systemPrompt + responseRules;
+  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions, customSystemPrompt]);
 
   const handleModelChange = useCallback((modelId: string) => {
     setSelectedModel(modelId);
@@ -234,11 +361,26 @@ RESPONSE RULES:
     try {
       setIsTyping(true);
 
+      // Check if any dashboard apps can directly answer this query
+      const appResponse = await dashboardAppService.getResponseForQuery(messageText);
+      if (appResponse) {
+        // Add app-specific response
+        const appMessage: ChatMessage = {
+          id: Date.now() + '-assistant',
+          role: 'assistant',
+          content: appResponse.response,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, appMessage]);
+        setIsTyping(false);
+        return;
+      }
+
       // Use our secure backend API instead of calling OpenAI directly
       const chatApiUrl = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
       
-      // Prepare messages
-      const systemPrompt = createSystemPrompt();
+      // Prepare messages with contextual awareness
+      const systemPrompt = createSystemPrompt(messageText);
 
       const response = await dedupeFetch(`${chatApiUrl}/chat`, {
         method: 'POST',
@@ -314,11 +456,64 @@ RESPONSE RULES:
     sendMessage(action);
   }, [sendMessage]);
 
-  const quickActions = useMemo(() => [
-    'Tell me about Virgil',
-    'How do I use this app?',
-    'What can you do?',
-  ], []);
+  const quickActions = useMemo(() => {
+    const baseActions = [
+      'Tell me about Virgil',
+      'How do I use this app?',
+      'What can you do?',
+    ];
+
+    // Add contextual quick actions based on current state
+    const contextualActions: string[] = [];
+    
+    if (dashboardContext) {
+      // Add time-based quick actions
+      if (dashboardContext.timeOfDay === 'morning') {
+        contextualActions.push('What\'s the plan for today?');
+      } else if (dashboardContext.timeOfDay === 'evening') {
+        contextualActions.push('How was my day?');
+      }
+
+      // Add weather-based quick actions
+      if (dashboardContext.weather.hasData) {
+        contextualActions.push('What\'s the weather like?');
+      }
+
+      // Add location-based quick actions
+      if (dashboardContext.location.hasGPS) {
+        contextualActions.push('What\'s nearby?');
+      }
+    }
+
+    // Combine and limit to 4 total actions
+    return [...contextualActions.slice(0, 2), ...baseActions].slice(0, 4);
+  }, [dashboardContext]);
+
+  // Function to mark a message as important
+  const markAsImportant = useCallback(async (message: ChatMessage) => {
+    try {
+      // Create rich context for the memory
+      let context = `From conversation on ${new Date().toLocaleDateString()}`;
+      if (dashboardContext) {
+        context = DynamicContextBuilder.createContextSummary(dashboardContext);
+      }
+      await memoryService.markAsImportant(message.id, message.content, context);
+      
+      // Reload marked memories
+      const memories = await memoryService.getMarkedMemories();
+      setMarkedMemories(memories);
+      
+      // Update memory context
+      const newContext = await memoryService.getContextForPrompt();
+      setMemoryContext(newContext);
+      setShowMemoryIndicator(true);
+      
+      // Show feedback (could add a toast notification here)
+      console.log('Message marked as important');
+    } catch (error) {
+      console.error('Failed to mark message as important:', error);
+    }
+  }, [dashboardContext]);
 
   if (!isOpen) {
     return (
@@ -390,6 +585,23 @@ RESPONSE RULES:
               </div>
             )}
           </div>
+          {showMemoryIndicator && (
+            <button 
+              className="memory-indicator clickable"
+              onClick={() => setShowMemoryModal(true)}
+              title="View memories and conversations"
+            >
+              🧠 Memory Active
+            </button>
+          )}
+          {dashboardContext && (
+            <div 
+              className="context-indicator"
+              title={`Smart context active: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`}
+            >
+              🎯 Context Aware
+            </div>
+          )}
           <div className="model-selector">
             <button 
               className="model-dropdown-btn"
@@ -547,7 +759,16 @@ RESPONSE RULES:
               <span className="chatbot-avatar-v">V</span>
             </div>
             <div className="welcome-message-bubble" role="status">
-              Good afternoon, {user?.user_metadata?.name || 'there'}!
+              {lastConversation ? (
+                <>
+                  Welcome back, {user?.user_metadata?.name || 'there'}! 
+                  {lastConversation.timestamp && (Date.now() - lastConversation.timestamp) < 24 * 60 * 60 * 1000 && (
+                    <> I remember our chat about "{lastConversation.firstMessage}"</>
+                  )}
+                </>
+              ) : (
+                <>Good afternoon, {user?.user_metadata?.name || 'there'}!</>
+              )}
             </div>
           </div>
         )}
@@ -566,6 +787,14 @@ RESPONSE RULES:
             )}
             <div className="msg-content" role="text">
               {message.content}
+              <button
+                className="remember-btn"
+                onClick={() => markAsImportant(message)}
+                title="Remember this message"
+                aria-label="Mark this message as important"
+              >
+                💡
+              </button>
             </div>
           </div>
         ))}
@@ -642,6 +871,148 @@ RESPONSE RULES:
           </button>
         </div>
       </form>
+
+      {/* Memory Modal */}
+      {showMemoryModal && (
+        <div className="memory-modal-backdrop" onClick={() => setShowMemoryModal(false)}>
+          <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="memory-modal-header">
+              <h3>🧠 Memory & Conversations</h3>
+              <button 
+                className="close-btn"
+                onClick={() => setShowMemoryModal(false)}
+                title="Close memory viewer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="memory-modal-content">
+              <div className="memory-search">
+                <input
+                  type="text"
+                  placeholder="Search memories and conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="memory-search-input"
+                />
+              </div>
+
+              <div className="memory-tabs">
+                <div className="memory-tab active">
+                  <h4>📌 Marked Memories ({markedMemories.length})</h4>
+                  <div className="memory-list">
+                    {markedMemories.length === 0 ? (
+                      <div className="memory-empty">
+                        No marked memories yet. Click the 💡 button on messages to remember them.
+                      </div>
+                    ) : (
+                      markedMemories
+                        .filter(memory => 
+                          !searchQuery || 
+                          memory.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          memory.context.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .map(memory => (
+                          <div key={memory.id} className="memory-item">
+                            <div className="memory-content">{memory.content}</div>
+                            <div className="memory-meta">
+                              <span className="memory-context">{memory.context}</span>
+                              <span className="memory-time">
+                                {MemoryService.timeAgo(memory.timestamp)}
+                              </span>
+                              <button
+                                className="memory-delete"
+                                onClick={async () => {
+                                  await memoryService.forgetMemory(memory.id);
+                                  const updatedMemories = await memoryService.getMarkedMemories();
+                                  setMarkedMemories(updatedMemories);
+                                  const newContext = await memoryService.getContextForPrompt();
+                                  setMemoryContext(newContext);
+                                  setShowMemoryIndicator(!!newContext);
+                                }}
+                                title="Forget this memory"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="memory-tab">
+                  <h4>💬 Recent Conversations ({recentConversations.length})</h4>
+                  <div className="conversation-list">
+                    {recentConversations.length === 0 ? (
+                      <div className="memory-empty">
+                        No conversations yet.
+                      </div>
+                    ) : (
+                      recentConversations
+                        .filter(conv => 
+                          !searchQuery || 
+                          conv.firstMessage.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .map(conv => (
+                          <div key={conv.id} className="conversation-item">
+                            <div className="conversation-preview">
+                              <div className="conversation-first">"{conv.firstMessage}"</div>
+                              <div className="conversation-last">"{conv.lastMessage}"</div>
+                            </div>
+                            <div className="conversation-meta">
+                              <span className="conversation-count">{conv.messageCount} messages</span>
+                              <span className="conversation-time">
+                                {MemoryService.timeAgo(conv.timestamp)}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="memory-modal-actions">
+                <button
+                  className="memory-action-btn export"
+                  onClick={async () => {
+                    const data = await memoryService.exportAllData();
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `virgil-memory-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  💾 Export All Data
+                </button>
+                
+                <button
+                  className="memory-action-btn clear"
+                  onClick={async () => {
+                    if (confirm('Clear all memories and conversations? This cannot be undone.')) {
+                      await memoryService.clearAllData();
+                      setMarkedMemories([]);
+                      setRecentConversations([]);
+                      setLastConversation(null);
+                      setMemoryContext('');
+                      setShowMemoryIndicator(false);
+                      setShowMemoryModal(false);
+                    }
+                  }}
+                >
+                  🗑️ Clear All Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
