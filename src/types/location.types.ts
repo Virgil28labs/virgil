@@ -30,6 +30,21 @@ export interface IPLocation {
   lat?: number;
   lon?: number;
   timezone?: string;
+  // Extended fields for hover card
+  flag?: string; // Emoji flag
+  isp?: string; // Internet Service Provider
+  org?: string; // Organization name
+  type?: string; // Connection type (residential/hosting/vpn)
+  postal?: string; // Postal code
+  connection?: {
+    asn?: number; // Autonomous System Number
+    domain?: string; // Associated domain
+  };
+  timezone_details?: {
+    current_time?: string; // Current time at IP location
+    offset?: number; // UTC offset in seconds
+    is_dst?: boolean; // Daylight saving time
+  };
 }
 
 export interface LocationData {

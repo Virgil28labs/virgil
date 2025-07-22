@@ -2303,6 +2303,211 @@ a:focus-visible,
 }
 
 
+/* IP Hover Card */
+.ip-hover-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.ip-hover-card-wrapper {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2100;
+  transition: opacity 200ms ease-in-out;
+}
+
+.ip-hover-card {
+  background: rgba(57, 41, 62, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(178, 165, 193, 0.15);
+  border-radius: var(--radius-medium);
+  padding: 1.25rem;
+  font-family: 'Montserrat', sans-serif;
+  min-width: 280px;
+  max-width: 340px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(178, 165, 193, 0.1);
+  pointer-events: auto;
+}
+
+/* Animation based on placement */
+.ip-hover-card-wrapper.bottom .ip-hover-card {
+  animation: slideUpFade 0.2s ease-out;
+}
+
+.ip-hover-card-wrapper.top .ip-hover-card {
+  animation: slideDownFade 0.2s ease-out;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Minimal card for limited data */
+.ip-hover-card-minimal {
+  padding: 1rem;
+  min-width: 240px;
+}
+
+.ip-minimal-content {
+  text-align: center;
+}
+
+.ip-address-header {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(178, 165, 193, 0.08);
+}
+
+.ip-address-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ip-version-badge {
+  background: rgba(178, 165, 193, 0.2);
+  color: var(--brand-light-purple);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-small);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ip-address-text {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: var(--brand-light-gray);
+  word-break: break-all;
+}
+
+.ip-status-message {
+  font-size: 0.8rem;
+  color: var(--brand-medium-gray);
+  opacity: 0.8;
+}
+
+/* Compact header */
+.ip-header {
+  margin-bottom: 0.75rem;
+}
+
+.ip-location-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ip-flag {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ip-location-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--brand-light-gray);
+  letter-spacing: -0.02em;
+}
+
+/* Info group */
+.ip-info-group {
+  margin-bottom: 0.75rem;
+}
+
+.ip-isp-line {
+  font-size: 0.875rem;
+  color: var(--brand-light-gray);
+  margin-bottom: 0.25rem;
+}
+
+.ip-connection-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.ip-connection-type {
+  color: var(--brand-medium-gray);
+}
+
+.ip-vpn-indicator {
+  color: var(--brand-accent-pink);
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  background: rgba(239, 176, 194, 0.1);
+  border-radius: var(--radius-small);
+}
+
+.ip-asn {
+  font-size: 0.7rem;
+  color: var(--brand-medium-gray);
+  opacity: 0.7;
+}
+
+/* Details group */
+.ip-details-group {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(178, 165, 193, 0.08);
+}
+
+.ip-time-line {
+  font-size: 0.8rem;
+  color: var(--brand-medium-gray);
+  margin-bottom: 0.25rem;
+}
+
+.ip-postal {
+  font-size: 0.75rem;
+  color: var(--brand-medium-gray);
+  opacity: 0.8;
+}
+
+/* IP Hover Arrow */
+.ip-hover-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  pointer-events: none;
+}
+
+.ip-hover-card-wrapper.top .ip-hover-arrow {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-color: rgba(57, 41, 62, 0.95) transparent transparent transparent;
+}
+
+.ip-hover-card-wrapper.bottom .ip-hover-arrow {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent rgba(57, 41, 62, 0.95) transparent;
+}
+
 
 /* Timezone Modal */
 .timezone-modal-overlay {
@@ -2787,6 +2992,59 @@ a:focus-visible,
     padding: 0.5rem 2rem 0.5rem 2rem;
   }
   
+}
+
+/* IP Hover Card Mobile Styles */
+@media (max-width: 768px) {
+  .ip-hover-card {
+    min-width: 260px;
+    max-width: 280px;
+    padding: 0.75rem;
+  }
+  
+  .ip-hover-section {
+    padding: 0.375rem 0;
+  }
+  
+  .ip-flag {
+    font-size: 1.25rem;
+  }
+  
+  .ip-city {
+    font-size: 0.875rem;
+  }
+  
+  .ip-country {
+    font-size: 0.8rem;
+  }
+  
+  .ip-isp {
+    font-size: 0.85rem;
+  }
+  
+  .ip-connection-type {
+    font-size: 0.75rem;
+  }
+  
+  .ip-detail-row {
+    font-size: 0.8rem;
+  }
+  
+  .ip-coordinates {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* On very small screens, show IP hover on tap instead */
+  .ip-hover-container {
+    cursor: pointer;
+  }
+  
+  .ip-hover-card {
+    min-width: 240px;
+    max-width: 260px;
+  }
 }
 
 /* Editable Profile Fields */

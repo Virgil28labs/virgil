@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, Suspense } from 'react';
+import React, { memo, useCallback, useState, Suspense, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
 import { VirgilTextLogo } from './VirgilTextLogo';
@@ -18,6 +18,7 @@ import { SkeletonLoader } from './SkeletonLoader';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { GoogleMapsModal } from './maps/GoogleMapsModal';
 import { SectionErrorBoundary } from './common/SectionErrorBoundary';
+import { PositionedIPHoverCard } from './location/IPHoverCard';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
@@ -25,6 +26,8 @@ export const Dashboard = memo(function Dashboard() {
   const [showProfileViewer, setShowProfileViewer] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showMapsModal, setShowMapsModal] = useState(false);
+  const [showIPHover, setShowIPHover] = useState(false);
+  const ipRef = useRef<HTMLDivElement>(null);
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
     try {
       const saved = localStorage.getItem('elevationUnit');
@@ -139,7 +142,19 @@ export const Dashboard = memo(function Dashboard() {
           
           <div className="ip-info">
             {ipLocation ? (
-              <p className="ip-address">{ipLocation.ip}</p>
+              <div 
+                ref={ipRef}
+                className="ip-hover-container"
+                onMouseEnter={() => setShowIPHover(true)}
+                onMouseLeave={() => setShowIPHover(false)}
+              >
+                <p className="ip-address">{ipLocation.ip}</p>
+                <PositionedIPHoverCard
+                  ipLocation={ipLocation}
+                  isVisible={showIPHover}
+                  triggerRef={ipRef}
+                />
+              </div>
             ) : locationLoading ? (
               <SkeletonLoader width="120px" height="16px" />
             ) : (

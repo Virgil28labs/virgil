@@ -11,14 +11,40 @@ interface IpWhoResponse {
   success: boolean;
   message?: string;
   ip: string;
+  type?: string; // IPv4 or IPv6
+  continent?: string;
+  continent_code?: string;
   country?: string;
+  country_code?: string;
   region?: string;
+  region_code?: string;
   city?: string;
   latitude?: number;
   longitude?: number;
+  is_eu?: boolean;
+  postal?: string;
+  calling_code?: string;
+  capital?: string;
+  borders?: string;
+  flag?: {
+    img?: string;
+    emoji?: string;
+    emoji_unicode?: string;
+  };
+  connection?: {
+    asn?: number;
+    org?: string;
+    isp?: string;
+    domain?: string;
+  };
   timezone?: {
-    id: string;
-  } | string;
+    id?: string;
+    abbr?: string;
+    is_dst?: boolean;
+    offset?: number;
+    utc?: string;
+    current_time?: string;
+  };
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
@@ -106,30 +132,13 @@ export const locationService = {
     }
   },
 
-  async getIPAddress(): Promise<string> {
-    return retryWithBackoff(
-      async () => {
-        const response = await fetch('https://api.ipify.org?format=json');
-        if (!response.ok) {
-          throw new Error('Failed to fetch IP address');
-        }
-        const data: { ip: string } = await response.json();
-        return data.ip;
-      },
-      {
-        maxRetries: 2,
-        initialDelay: 500,
-        onRetry: (_attempt, _error) => {
-          // Retry silently
-        },
-      },
-    );
-  },
 
-  async getIPLocation(ip: string): Promise<IPLocation> {
+  async getIPLocation(ip?: string): Promise<IPLocation> {
     return retryWithBackoff(
       async () => {
-        const response = await fetch(`https://ipwho.is/${ip}`);
+        // If no IP provided, ipwho.is returns info about the caller's IP
+        const url = ip ? `https://ipwho.is/${ip}` : 'https://ipwho.is/';
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Failed to fetch IP location');
         }
@@ -139,15 +148,41 @@ export const locationService = {
           throw new Error(data.message || 'Failed to get location from IP');
         }
         
-        return {
+        // Extract all available fields for the hover card
+        const ipLocation: IPLocation = {
           ip: data.ip,
           country: data.country,
           region: data.region,
           city: data.city,
           lat: data.latitude,
           lon: data.longitude,
-          timezone: typeof data.timezone === 'object' ? data.timezone.id : data.timezone,
+          timezone: typeof data.timezone === 'object' ? data.timezone?.id : data.timezone,
+          // Extended fields
+          flag: data.flag?.emoji,
+          type: data.type,
+          postal: data.postal,
         };
+
+        // Add ISP and connection info if available
+        if (data.connection) {
+          ipLocation.isp = data.connection.isp;
+          ipLocation.org = data.connection.org;
+          ipLocation.connection = {
+            asn: data.connection.asn,
+            domain: data.connection.domain,
+          };
+        }
+
+        // Add detailed timezone info if available
+        if (typeof data.timezone === 'object' && data.timezone) {
+          ipLocation.timezone_details = {
+            current_time: data.timezone.current_time,
+            offset: data.timezone.offset,
+            is_dst: data.timezone.is_dst,
+          };
+        }
+        
+        return ipLocation;
       },
       {
         maxRetries: 2,
@@ -209,8 +244,8 @@ export const locationService = {
     };
 
     try {
-      const ip = await this.getIPAddress();
-      const ipLocation = await this.getIPLocation(ip);
+      // Get IP location in one call
+      const ipLocation = await this.getIPLocation();
       locationData.ipLocation = ipLocation;
       
       // Create basic address from IP data
@@ -262,19 +297,10 @@ export const locationService = {
 
   async fetchIPLocationData(): Promise<IPLocation | undefined> {
     try {
-      const ip = await this.getIPAddress();
-      return await this.getIPLocation(ip);
+      // Call without IP parameter to get caller's location
+      return await this.getIPLocation();
     } catch (_error) {
-      // Try to at least get the IP
-      try {
-        const ip = await this.getIPAddress();
-        if (ip) {
-          return { ip };
-        }
-        return undefined;
-      } catch (_ipError) {
-        return undefined;
-      }
+      return undefined;
     }
   },
 
