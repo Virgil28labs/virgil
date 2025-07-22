@@ -23,6 +23,12 @@ import { dashboardAppService } from '../services/DashboardAppService';
 import { NotesAdapter } from '../services/adapters/NotesAdapter';
 import { PomodoroAdapter } from '../services/adapters/PomodoroAdapter';
 import { StreakAdapter } from '../services/adapters/StreakAdapter';
+import { CameraAdapter } from '../services/adapters/CameraAdapter';
+import { DogGalleryAdapter } from '../services/adapters/DogGalleryAdapter';
+import { NasaApodAdapter } from '../services/adapters/NasaApodAdapter';
+import { GiphyAdapter } from '../services/adapters/GiphyAdapter';
+import { RhythmMachineAdapter } from '../services/adapters/RhythmMachineAdapter';
+import { CircleGameAdapter } from '../services/adapters/CircleGameAdapter';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
@@ -82,16 +88,34 @@ export const Dashboard = memo(function Dashboard() {
     const notesAdapter = new NotesAdapter();
     const pomodoroAdapter = new PomodoroAdapter();
     const streakAdapter = new StreakAdapter();
+    const cameraAdapter = new CameraAdapter();
+    const dogGalleryAdapter = new DogGalleryAdapter();
+    const nasaApodAdapter = new NasaApodAdapter();
+    const giphyAdapter = new GiphyAdapter();
+    const rhythmMachineAdapter = new RhythmMachineAdapter();
+    const circleGameAdapter = new CircleGameAdapter();
 
     dashboardAppService.registerAdapter(notesAdapter);
     dashboardAppService.registerAdapter(pomodoroAdapter);
     dashboardAppService.registerAdapter(streakAdapter);
+    dashboardAppService.registerAdapter(cameraAdapter);
+    dashboardAppService.registerAdapter(dogGalleryAdapter);
+    dashboardAppService.registerAdapter(nasaApodAdapter);
+    dashboardAppService.registerAdapter(giphyAdapter);
+    dashboardAppService.registerAdapter(rhythmMachineAdapter);
+    dashboardAppService.registerAdapter(circleGameAdapter);
 
     // Cleanup on unmount
     return () => {
       dashboardAppService.unregisterAdapter('notes');
       dashboardAppService.unregisterAdapter('pomodoro');
       dashboardAppService.unregisterAdapter('streaks');
+      dashboardAppService.unregisterAdapter('camera');
+      dashboardAppService.unregisterAdapter('dog');
+      dashboardAppService.unregisterAdapter('nasa');
+      dashboardAppService.unregisterAdapter('giphy');
+      dashboardAppService.unregisterAdapter('rhythm');
+      dashboardAppService.unregisterAdapter('circle');
     };
   }, []);
 
