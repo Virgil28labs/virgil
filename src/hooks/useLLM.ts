@@ -23,6 +23,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
 
   const complete = useCallback(async (options: Partial<LLMRequest>): Promise<LLMResponse | null> => {
     if (loading) {
+      console.warn('Request already in progress');
       return null;
     }
 
@@ -42,6 +43,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
 
     } catch (err: any) {
       if (err.name === 'AbortError') {
+        console.log('Request was cancelled');
         return null;
       }
       
@@ -55,6 +57,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
 
   const completeStream = useCallback(async function* (options: Partial<LLMRequest>): AsyncGenerator<any, void, unknown> {
     if (streaming) {
+      console.warn('Stream already in progress');
       return;
     }
 
