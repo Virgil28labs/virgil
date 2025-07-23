@@ -258,67 +258,41 @@ const VirgilChatbot = memo(function VirgilChatbot() {
 
   // Memoized static parts of system prompt (performance optimization)
   const staticPromptParts = useMemo(() => {
-    const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString() : null;
-    
-    const staticUserContext = user ? `
-CURRENT USER CONTEXT:
-- Authentication status: Logged in
-- Current page: Dashboard
-- User name: ${user.user_metadata?.name || 'Unknown'}
-- Email: ${user.email}
-${memberSince ? `- Member since: ${memberSince}` : ''}
+    // Generate minimal, efficient context
+    const getTimeOfDay = () => {
+      const hour = new Date().getHours();
+      if (hour < 12) return 'morning';
+      if (hour < 17) return 'afternoon';
+      return 'evening';
+    };
 
-LOCATION DATA:
-- GPS Status: ${hasGPSLocation ? 'Available' : 'Not available'}
-${coordinates ? `- Coordinates: ${coordinates.latitude.toFixed(6)}, ${coordinates.longitude.toFixed(6)}` : ''}
-${coordinates ? `- GPS Accuracy: ${coordinates.accuracy.toFixed(0)} meters` : ''}
-${address ? `
-- Full Address: ${address.formatted}
-- Street: ${address.street}
-- House Number: ${address.house_number}
-- City: ${address.city}
-- Postcode: ${address.postcode}
-- Country: ${address.country}` : ''}
-${ipLocation ? `
-- IP Address: ${ipLocation.ip}
-- IP Location: ${ipLocation.city}${ipLocation.region ? `, ${ipLocation.region}` : ''}${ipLocation.country ? `, ${ipLocation.country}` : ''}
-- Timezone: ${ipLocation.timezone || 'Unknown'}` : ''}
-${weatherData ? `
-WEATHER DATA:
-- Temperature: ${weatherData.temperature}°${weatherUnit === 'fahrenheit' ? 'F' : 'C'} (feels like ${weatherData.feelsLike}°${weatherUnit === 'fahrenheit' ? 'F' : 'C'})
-- Conditions: ${weatherData.condition.description}
-- Humidity: ${weatherData.humidity}%
-- Wind: ${weatherData.windSpeed} mph
-- Location: ${weatherData.cityName}${weatherData.country ? `, ${weatherData.country}` : ''}` : ''}
+    const getLocationContext = () => {
+      if (address?.city) {
+        return `${address.city}${address.country ? `, ${address.country}` : ''}`;
+      }
+      if (ipLocation?.city) {
+        return `${ipLocation.city}${ipLocation.country ? `, ${ipLocation.country}` : ''}`;
+      }
+      return null;
+    };
 
-Provide contextual help based on what the user is currently experiencing.` : `
-CURRENT USER CONTEXT:
-- Authentication status: Not logged in
-- Current page: Authentication page
-- Location: Authentication flow
+    // Minimal context - only essential information
+    const staticUserContext = user ? 
+      `User: ${user.user_metadata?.name || 'User'}${getLocationContext() ? ` • Location: ${getLocationContext()}` : ''} • Time: ${getTimeOfDay()}` :
+      `Location: ${getLocationContext() || 'Unknown'} • Time: ${getTimeOfDay()}`;
 
-AVAILABLE ACTIONS:
-- Sign up with name, email, and password
-- Log in with existing credentials
-- Toggle between login and signup forms
-
-Provide contextual help based on what the user is currently experiencing.`;
-
-    const basePrompt = customSystemPrompt || 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
+    const basePrompt = customSystemPrompt || 'You are Virgil, a contextual AI assistant.';
     
     return { basePrompt, staticUserContext };
-  }, [user, hasGPSLocation, address, ipLocation, coordinates, weatherData, weatherUnit, customSystemPrompt]);
+  }, [user, address, ipLocation, customSystemPrompt]);
 
   const createSystemPrompt = useCallback((userQuery?: string) => {
-    // Base prompt and static context
-    const basePrompt = customSystemPrompt || 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
-    
-    // Start with basic prompt structure
-    let systemPrompt = basePrompt + ' ' + staticPromptParts.staticUserContext;
+    // Start with optimized base prompt and minimal context
+    let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
 
     // Add memory context if available
     if (memoryContext) {
-      systemPrompt += `\n\nMEMORY CONTEXT:${memoryContext}`;
+      systemPrompt += `\n\nMemory:${memoryContext}`;
     }
 
     // Add smart contextual awareness using DynamicContextBuilder
@@ -335,22 +309,11 @@ Provide contextual help based on what the user is currently experiencing.`;
       dashboardContextService.logActivity(`Asked: "${userQuery.slice(0, 50)}..."`, 'virgil-chat');
     }
 
-    // Add response rules
-    const responseRules = `
-
-RESPONSE RULES:
-- Keep responses extremely short and to the point
-- Use the contextual awareness to provide relevant, personalized responses
-- For time queries, provide current time with context
-- For weather queries, be specific about current conditions
-- For location queries, use available location data
-- When you have contextual information, use it naturally in responses
-- For dashboard app queries (notes, habits, pomodoro), use the provided app data to give specific answers
-- Be conversational but concise
-- No explanations unless specifically requested`;
+    // Condensed response rules - essential behavior only
+    const responseRules = `\n\nBe conversational, concise, and use available context naturally.`;
     
     return systemPrompt + responseRules;
-  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions, customSystemPrompt]);
+  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
 
   // Event handlers
   const handleModelChange = useCallback((modelId: string) => {

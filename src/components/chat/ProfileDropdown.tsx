@@ -28,7 +28,7 @@ const ProfileDropdown = memo(function ProfileDropdown({
 
   // Handle reset to default
   const handleReset = useCallback(() => {
-    const defaultPrompt = 'You are Virgil, a helpful assistant that provides contextual help and can search the web for current information.';
+    const defaultPrompt = 'You are Virgil, a contextual AI assistant.';
     onSystemPromptChange(defaultPrompt);
   }, [onSystemPromptChange]);
 
