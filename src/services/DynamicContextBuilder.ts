@@ -33,7 +33,8 @@ export class DynamicContextBuilder {
 
   private static readonly LOCATION_KEYWORDS = [
     'where', 'location', 'here', 'near', 'nearby', 'local', 'around', 'area',
-    'city', 'place', 'address', 'map', 'directions', 'distance', 'travel', 'go'
+    'city', 'place', 'address', 'map', 'directions', 'distance', 'travel', 'go',
+    'ip', 'ip address', 'internet', 'isp', 'provider', 'postal', 'zip', 'postcode'
   ];
 
   private static readonly WEATHER_KEYWORDS = [
@@ -48,7 +49,9 @@ export class DynamicContextBuilder {
 
   private static readonly USER_KEYWORDS = [
     'my', 'me', 'I', 'personal', 'profile', 'account', 'settings', 'preferences',
-    'name', 'remember', 'save', 'history', 'past', 'before'
+    'name', 'remember', 'save', 'history', 'past', 'before', 'email', 'phone',
+    'birthday', 'birth', 'age', 'old', 'gender', 'marital', 'married', 'address',
+    'contact', 'info', 'information', 'details', 'who am i', 'about me', 'identity'
   ];
 
   /**
@@ -110,10 +113,12 @@ export class DynamicContextBuilder {
       contextUsed.push('time');
     }
 
-    // Location context
-    if (relevanceScores.locationContext > 0.2 && context.location.hasGPS) {
-      contextSections.push(this.buildLocationContext(context));
-      contextUsed.push('location');
+    // Location context - always include for direct queries or when relevant
+    if (relevanceScores.locationContext > 0.1 || this.isLocationQuery(userQuery)) {
+      if (context.location.hasGPS || context.location.ipAddress) {
+        contextSections.push(this.buildLocationContext(context));
+        contextUsed.push('location');
+      }
     }
 
     // Weather context  
@@ -122,10 +127,12 @@ export class DynamicContextBuilder {
       contextUsed.push('weather');
     }
 
-    // User context
-    if (relevanceScores.userContext > 0.2 && context.user.isAuthenticated) {
-      contextSections.push(this.buildUserContext(context));
-      contextUsed.push('user');
+    // User context - always include for direct queries or when relevant
+    if (relevanceScores.userContext > 0.1 || this.isUserQuery(userQuery)) {
+      if (context.user.isAuthenticated) {
+        contextSections.push(this.buildUserContext(context));
+        contextUsed.push('user');
+      }
     }
 
     // Activity context
@@ -169,6 +176,25 @@ export class DynamicContextBuilder {
     return timeQueries.some(timeQuery => query.toLowerCase().includes(timeQuery));
   }
 
+  private static isLocationQuery(query: string): boolean {
+    const locationQueries = [
+      'where am i', 'my location', 'my address', 'where do i live',
+      'what\'s my ip', 'my ip address', 'what is my ip', 'my isp',
+      'my zip', 'my postal', 'my city', 'my country'
+    ];
+    return locationQueries.some(locQuery => query.toLowerCase().includes(locQuery));
+  }
+
+  private static isUserQuery(query: string): boolean {
+    const userQueries = [
+      'who am i', 'my name', 'what\'s my name', 'what is my name',
+      'my email', 'my phone', 'my birthday', 'my age', 'how old am i',
+      'my address', 'my contact', 'my info', 'my profile', 'about me',
+      'my gender', 'am i married', 'my marital'
+    ];
+    return userQueries.some(userQuery => query.toLowerCase().includes(userQuery));
+  }
+
   private static buildTimeContext(context: DashboardContext): string {
     let timeContext = `Time: ${context.currentTime} on ${context.currentDate} (${context.dayOfWeek})`;
     timeContext += `\nTime of day: ${context.timeOfDay}`;
@@ -187,6 +213,21 @@ export class DynamicContextBuilder {
       locationContext += `Location: ${context.location.city}`;
       if (context.location.region) locationContext += `, ${context.location.region}`;
       if (context.location.country) locationContext += `, ${context.location.country}`;
+    }
+    
+    if (context.location.address) {
+      locationContext += `\nAddress: ${context.location.address}`;
+    }
+    
+    if (context.location.ipAddress) {
+      locationContext += `\nIP Address: ${context.location.ipAddress}`;
+      if (context.location.isp) {
+        locationContext += ` (${context.location.isp})`;
+      }
+    }
+    
+    if (context.location.postal) {
+      locationContext += `\nPostal Code: ${context.location.postal}`;
     }
     
     if (context.location.coordinates) {
@@ -227,8 +268,48 @@ export class DynamicContextBuilder {
     const user = context.user;
     let userContext = '';
     
-    if (user.name) {
-      userContext += `User: ${user.name}`;
+    // Name
+    if (user.profile?.fullName || user.profile?.nickname || user.name) {
+      const displayName = user.profile?.nickname || user.profile?.fullName || user.name;
+      userContext += `User: ${displayName}`;
+      if (user.profile?.uniqueId) {
+        userContext += ` (ID: ${user.profile.uniqueId})`;
+      }
+    }
+    
+    // Contact info
+    if (user.profile?.email || user.email) {
+      userContext += `\nEmail: ${user.profile?.email || user.email}`;
+    }
+    
+    if (user.profile?.phone) {
+      userContext += `\nPhone: ${user.profile.phone}`;
+    }
+    
+    // Personal info
+    if (user.profile?.dateOfBirth) {
+      const birthDate = new Date(user.profile.dateOfBirth);
+      const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      userContext += `\nAge: ${age} years old`;
+    }
+    
+    if (user.profile?.gender) {
+      userContext += `\nGender: ${user.profile.gender}`;
+    }
+    
+    if (user.profile?.maritalStatus) {
+      userContext += `\nMarital Status: ${user.profile.maritalStatus}`;
+    }
+    
+    // Address
+    if (user.profile?.address && (user.profile.address.street || user.profile.address.city)) {
+      const addr = user.profile.address;
+      if (addr.street && addr.city && addr.state && addr.zip) {
+        userContext += `\nHome Address: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
+      } else if (addr.city) {
+        userContext += `\nLives in: ${addr.city}`;
+        if (addr.state) userContext += `, ${addr.state}`;
+      }
     }
     
     if (user.memberSince) {

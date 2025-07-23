@@ -7,6 +7,7 @@ import type { ChatMessage, ModelOption } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useUserProfile } from '../hooks/useUserProfile';
 import { memoryService } from '../services/MemoryService';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
@@ -35,6 +36,7 @@ function VirgilChatbotInner() {
   const { user } = useAuth();
   const { address, ipLocation, hasGPSLocation, coordinates } = useLocation();
   const { data: weatherData, unit: weatherUnit } = useWeather();
+  const { profile: userProfile } = useUserProfile();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus management for chatbot modal
@@ -153,8 +155,8 @@ function VirgilChatbotInner() {
       loading: false,
       signOut: () => Promise.resolve({ error: undefined }),
       refreshUser: () => Promise.resolve(),
-    });
-  }, [user]);
+    }, userProfile);
+  }, [user, userProfile]);
 
   // Save conversation when chat is closed
   useEffect(() => {

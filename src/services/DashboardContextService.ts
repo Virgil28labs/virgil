@@ -8,7 +8,9 @@
 import type { LocationContextValue } from '../types/location.types';
 import type { WeatherContextType } from '../types/weather.types';
 import type { AuthContextValue } from '../types/auth.types';
+import type { UserProfile } from '../hooks/useUserProfile';
 import { dashboardAppService, type DashboardAppData } from './DashboardAppService';
+import { userProfileAdapter } from './adapters/UserProfileAdapter';
 
 export interface DashboardContext {
   // Time context
@@ -26,6 +28,9 @@ export interface DashboardContext {
     coordinates?: { latitude: number; longitude: number; accuracy: number };
     timezone?: string;
     address?: string;
+    ipAddress?: string;
+    isp?: string;
+    postal?: string;
   };
   
   // Weather context
@@ -47,6 +52,7 @@ export interface DashboardContext {
     email?: string;
     memberSince?: string;
     preferences?: Record<string, any>;
+    profile?: UserProfile;
   };
   
   // Activity context
@@ -178,6 +184,9 @@ export class DashboardContextService {
       } : undefined,
       timezone: locationData.ipLocation?.timezone,
       address: locationData.address?.formatted,
+      ipAddress: locationData.ipLocation?.ip,
+      isp: locationData.ipLocation?.isp || locationData.ipLocation?.org,
+      postal: locationData.ipLocation?.postal || locationData.address?.postcode,
     };
     this.notifyListeners();
   }
@@ -203,13 +212,24 @@ export class DashboardContextService {
     this.notifyListeners();
   }
 
-  updateUserContext(userData: AuthContextValue): void {
+  updateUserContext(userData: AuthContextValue, userProfile?: UserProfile): void {
     this.context.user = {
       isAuthenticated: !!userData.user,
       name: userData.user?.user_metadata?.name,
       email: userData.user?.email,
       memberSince: userData.user?.created_at ? new Date(userData.user.created_at).toLocaleDateString() : undefined,
+      profile: userProfile,
     };
+    
+    // Update the user profile adapter
+    if (userProfile) {
+      userProfileAdapter.updateProfile(userProfile, userData);
+      // Register adapter if not already registered
+      if (!dashboardAppService.getAppData('userProfile')) {
+        dashboardAppService.registerAdapter(userProfileAdapter);
+      }
+    }
+    
     this.notifyListeners();
   }
 
@@ -278,7 +298,7 @@ export class DashboardContextService {
     contextString += `- Time of day: ${ctx.timeOfDay}\n`;
 
     // Location context
-    if (ctx.location.hasGPS) {
+    if (ctx.location.hasGPS || ctx.location.ipAddress) {
       contextString += `\nLOCATION:\n`;
       if (ctx.location.city) {
         contextString += `- Current location: ${ctx.location.city}`;
@@ -286,8 +306,17 @@ export class DashboardContextService {
         if (ctx.location.country) contextString += `, ${ctx.location.country}`;
         contextString += '\n';
       }
+      if (ctx.location.address) {
+        contextString += `- Address: ${ctx.location.address}\n`;
+      }
       if (ctx.location.timezone) {
         contextString += `- Timezone: ${ctx.location.timezone}\n`;
+      }
+      if (ctx.location.ipAddress) {
+        contextString += `- IP Address: ${ctx.location.ipAddress}\n`;
+        if (ctx.location.isp) {
+          contextString += `- ISP: ${ctx.location.isp}\n`;
+        }
       }
     }
 
@@ -310,8 +339,44 @@ export class DashboardContextService {
     // User context
     if (ctx.user.isAuthenticated) {
       contextString += `\nUSER:\n`;
-      if (ctx.user.name) {
-        contextString += `- Name: ${ctx.user.name}\n`;
+      if (ctx.user.profile?.fullName || ctx.user.profile?.nickname || ctx.user.name) {
+        const displayName = ctx.user.profile?.nickname || ctx.user.profile?.fullName || ctx.user.name;
+        contextString += `- Name: ${displayName}\n`;
+        if (ctx.user.profile?.fullName && ctx.user.profile?.nickname && ctx.user.profile.fullName !== ctx.user.profile.nickname) {
+          contextString += `- Full name: ${ctx.user.profile.fullName}\n`;
+        }
+      }
+      if (ctx.user.profile?.uniqueId) {
+        contextString += `- Unique ID: ${ctx.user.profile.uniqueId}\n`;
+      }
+      if (ctx.user.email || ctx.user.profile?.email) {
+        contextString += `- Email: ${ctx.user.profile?.email || ctx.user.email}\n`;
+      }
+      if (ctx.user.profile?.phone) {
+        contextString += `- Phone: ${ctx.user.profile.phone}\n`;
+      }
+      if (ctx.user.profile?.dateOfBirth) {
+        const birthDate = new Date(ctx.user.profile.dateOfBirth);
+        const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+        contextString += `- Age: ${age} years old (born ${birthDate.toLocaleDateString()})\n`;
+      }
+      if (ctx.user.profile?.gender) {
+        contextString += `- Gender: ${ctx.user.profile.gender}\n`;
+      }
+      if (ctx.user.profile?.maritalStatus) {
+        contextString += `- Marital status: ${ctx.user.profile.maritalStatus}\n`;
+      }
+      if (ctx.user.profile?.address && (ctx.user.profile.address.street || ctx.user.profile.address.city)) {
+        const addr = ctx.user.profile.address;
+        if (addr.street && addr.city && addr.state && addr.zip) {
+          contextString += `- Home address: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
+          if (addr.country) contextString += `, ${addr.country}`;
+          contextString += '\n';
+        } else if (addr.city) {
+          contextString += `- Lives in: ${addr.city}`;
+          if (addr.state) contextString += `, ${addr.state}`;
+          contextString += '\n';
+        }
       }
       if (ctx.user.memberSince) {
         contextString += `- Member since: ${ctx.user.memberSince}\n`;
