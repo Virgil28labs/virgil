@@ -8,10 +8,6 @@ export { ModelSelector } from './ModelSelector';
 export { ProfileDropdown } from './ProfileDropdown';
 export { MemoryModal } from './MemoryModal';
 
-// Context and State Management
-export { ChatProvider, useChatContext } from './ChatContext';
-export type { ChatState, ChatAction } from './chatTypes';
-
 // Re-export default components for convenience
 export { default as ChatHeaderDefault } from './ChatHeader';
 export { default as ChatMessagesDefault } from './ChatMessages';

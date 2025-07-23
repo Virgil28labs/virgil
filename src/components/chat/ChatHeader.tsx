@@ -1,5 +1,6 @@
 import { memo, useState, useCallback, useMemo } from 'react';
 import { ModelOption } from '../../types/chat.types';
+import { useAuth } from '../../contexts/AuthContext';
 import { DashboardContext } from '../../services/DashboardContextService';
 import { StoredConversation, MarkedMemory } from '../../services/MemoryService';
 import { StatusPills } from './StatusPills';
@@ -69,6 +70,7 @@ const ChatHeader = memo(function ChatHeader({
   createSystemPrompt,
 }: ChatHeaderProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const { user } = useAuth();
 
   // Memoized system prompt info for tooltip
   const systemPromptInfo = useMemo(() => {

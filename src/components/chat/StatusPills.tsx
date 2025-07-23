@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { DashboardContext } from '../../services/DashboardContextService';
 import './StatusPills.css';
 
@@ -21,17 +21,11 @@ const StatusPills = memo(function StatusPills({
     return null;
   }
 
-  const contextTitle = useMemo(() => {
-    if (!dashboardContext) return '';
-    const parts: string[] = [dashboardContext.timeOfDay];
-    if (dashboardContext.weather.hasData) parts.push('weather');
-    if (dashboardContext.location.hasGPS) parts.push('location');
-    return `Context Aware: ${parts.join(', ')}`;
-  }, [dashboardContext]);
+  const contextTitle = dashboardContext 
+    ? `Context Aware: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`
+    : '';
 
-  const memoryTitle = useMemo(() => 
-    `Memory Active - View conversations (${markedMemoriesCount} memories, ${recentConversationsCount} conversations)`
-  , [markedMemoriesCount, recentConversationsCount]);
+  const memoryTitle = `Memory Active - View conversations (${markedMemoriesCount} memories, ${recentConversationsCount} conversations)`;
 
   return (
     <div className="status-cluster">
