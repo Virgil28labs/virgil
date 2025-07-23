@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
@@ -7,8 +7,8 @@ import type { ChatMessage, ModelOption } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
-import { memoryService, type StoredConversation, type MarkedMemory } from '../services/MemoryService';
-import { dashboardContextService, type DashboardContext, type ContextualSuggestion } from '../services/DashboardContextService';
+import { memoryService } from '../services/MemoryService';
+import { dashboardContextService } from '../services/DashboardContextService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { dashboardAppService } from '../services/DashboardAppService';
 import {
@@ -16,44 +16,21 @@ import {
   ChatMessages,
   ChatInput,
   MemoryModal,
+  ChatProvider,
+  useChatContext,
 } from './chat';
 import './VirgilChatbot.css';
 
-const VirgilChatbot = memo(function VirgilChatbot() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState<string>('');
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string>('gpt-4.1-mini');
-  const [customSystemPrompt, setCustomSystemPrompt] = useState<string>(() => {
-    // Load from localStorage on component mount
-    try {
-      return localStorage.getItem('virgil-custom-system-prompt') || '';
-    } catch {
-      return '';
-    }
-  });
-  
-  // Memory-related state
-  const [lastConversation, setLastConversation] = useState<StoredConversation | null>(null);
-  const [markedMemories, setMarkedMemories] = useState<MarkedMemory[]>([]);
-  const [showMemoryIndicator, setShowMemoryIndicator] = useState<boolean>(false);
-  const [memoryContext, setMemoryContext] = useState<string>('');
-  const [showMemoryModal, setShowMemoryModal] = useState<boolean>(false);
-  const [recentConversations, setRecentConversations] = useState<StoredConversation[]>([]);
-  const [dashboardContext, setDashboardContext] = useState<DashboardContext | null>(null);
-  const [contextualSuggestions, setContextualSuggestions] = useState<ContextualSuggestion[]>([]);
-  
-  // Window control state
-  const [windowSize, setWindowSize] = useState<'normal' | 'large' | 'fullscreen'>(() => {
-    try {
-      const saved = localStorage.getItem('virgil-window-size') as 'normal' | 'large' | 'fullscreen';
-      return saved || 'normal';
-    } catch {
-      return 'normal';
-    }
-  });
+// Available models - defined at module level for reuse
+const AVAILABLE_MODELS: ModelOption[] = [
+  { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', description: 'Fast and efficient' },
+  { id: 'gpt-4.1', name: 'GPT-4.1', description: 'Most capable model' },
+  { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' },
+];
+
+// Inner component that uses the context
+function VirgilChatbotInner() {
+  const { state, dispatch, setOpen, setWindowSize, addMessage, setInput, setTyping, setError, clearMessages, newChat } = useChatContext();
   
   const { user } = useAuth();
   const { address, ipLocation, hasGPSLocation, coordinates } = useLocation();
@@ -61,7 +38,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Focus management for chatbot modal
-  const { containerRef: chatContainerRef } = useFocusManagement(isOpen, {
+  const { containerRef: chatContainerRef } = useFocusManagement(state.isOpen, {
     autoFocus: true,
     restoreFocus: true,
     trapFocus: true,
@@ -70,8 +47,8 @@ const VirgilChatbot = memo(function VirgilChatbot() {
 
   // Keyboard navigation for quick actions and model dropdown
   const { containerRef: keyboardNavRef } = useKeyboardNavigation({
-    enabled: isOpen,
-    onEscape: () => setIsOpen(false),
+    enabled: state.isOpen,
+    onEscape: () => setOpen(false),
     onEnter: (element) => {
       if (element.classList.contains('quick-btn')) {
         element.click();
@@ -81,24 +58,6 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     },
   });
 
-  // Available models - memoized to prevent recreation on every render
-  const models = useMemo<ModelOption[]>(() => [
-    { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', description: 'Fast and efficient' },
-    { id: 'gpt-4.1', name: 'GPT-4.1', description: 'Most capable model' },
-    { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' },
-  ], []);
-
-  // Load saved model from localStorage
-  useEffect(() => {
-    try {
-      const savedModel = localStorage.getItem('virgil-selected-model');
-      if (savedModel && models.find(m => m.id === savedModel)) {
-        setSelectedModel(savedModel);
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, [models]);
 
   // Initialize memory service and load memory data
   useEffect(() => {
@@ -106,47 +65,52 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       try {
         await memoryService.init();
         
-        // Load last conversation
-        const lastConv = await memoryService.getLastConversation();
-        setLastConversation(lastConv);
+        // Load all memory data
+        const [lastConv, memories, conversations, context] = await Promise.all([
+          memoryService.getLastConversation(),
+          memoryService.getMarkedMemories(),
+          memoryService.getRecentConversations(10),
+          memoryService.getContextForPrompt(),
+        ]);
         
-        // Load marked memories
-        const memories = await memoryService.getMarkedMemories();
-        setMarkedMemories(memories);
-        
-        // Load recent conversations
-        const conversations = await memoryService.getRecentConversations(10);
-        setRecentConversations(conversations);
-        
-        // Get context for prompt
-        const context = await memoryService.getContextForPrompt();
-        setMemoryContext(context);
-        
-        // Show indicator if we have memory context
-        setShowMemoryIndicator(!!context);
+        dispatch({
+          type: 'SET_MEMORY_DATA',
+          payload: {
+            lastConversation: lastConv,
+            markedMemories: memories,
+            recentConversations: conversations,
+            memoryContext: context,
+            showMemoryIndicator: !!context,
+          },
+        });
       } catch (error) {
         // Failed to initialize memory service
       }
     };
     
     initMemory();
-  }, []);
+  }, [dispatch]);
 
   // Initialize dashboard context service
   useEffect(() => {
-    // Subscribe to context updates
     const unsubscribe = dashboardContextService.subscribe((context) => {
-      setDashboardContext(context);
       const suggestions = dashboardContextService.generateSuggestions();
-      setContextualSuggestions(suggestions);
+      dispatch({
+        type: 'SET_DASHBOARD_CONTEXT',
+        payload: { context, suggestions },
+      });
     });
 
     // Get initial context
-    setDashboardContext(dashboardContextService.getContext());
-    setContextualSuggestions(dashboardContextService.generateSuggestions());
+    const initialContext = dashboardContextService.getContext();
+    const initialSuggestions = dashboardContextService.generateSuggestions();
+    dispatch({
+      type: 'SET_DASHBOARD_CONTEXT',
+      payload: { context: initialContext, suggestions: initialSuggestions },
+    });
 
     return unsubscribe;
-  }, []);
+  }, [dispatch]);
 
   // Update context service with external data
   useEffect(() => {
@@ -192,13 +156,12 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     });
   }, [user]);
 
-  // Save conversation when chat is closed (but keep messages for persistence)
+  // Save conversation when chat is closed
   useEffect(() => {
-    if (!isOpen && messages.length > 0) {
+    if (!state.isOpen && state.messages.length > 0) {
       const saveConversation = async () => {
         try {
-          await memoryService.saveConversation(messages);
-          // Keep messages in state for persistence - don't clear them
+          await memoryService.saveConversation(state.messages);
         } catch (error) {
           // Failed to save conversation
         }
@@ -206,32 +169,30 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       
       saveConversation();
     }
-  }, [isOpen, messages]);
+  }, [state.isOpen, state.messages]);
 
   // Persist active conversation to localStorage
   useEffect(() => {
-    if (messages.length > 0) {
+    if (state.messages.length > 0) {
       try {
-        localStorage.setItem('virgil-active-conversation', JSON.stringify(messages));
+        localStorage.setItem('virgil-active-conversation', JSON.stringify(state.messages));
       } catch (error) {
         // Failed to save active conversation
       }
     } else {
-      // Clear localStorage when no messages
       localStorage.removeItem('virgil-active-conversation');
     }
-  }, [messages]);
+  }, [state.messages]);
 
   // Load persisted conversation on mount
   useEffect(() => {
     const loadPersistedConversation = async () => {
       try {
-        // Priority: localStorage active session > memory service > empty
         const savedMessages = localStorage.getItem('virgil-active-conversation');
         if (savedMessages) {
           const parsedMessages = JSON.parse(savedMessages);
           if (parsedMessages.length > 0) {
-            setMessages(parsedMessages);
+            dispatch({ type: 'SET_MESSAGES', payload: parsedMessages });
             return;
           }
         }
@@ -239,10 +200,9 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         // Fallback to memory service if no active session
         const lastConv = await memoryService.getLastConversation();
         if (lastConv && lastConv.messages && lastConv.messages.length > 0) {
-          // Only load if conversation is recent (within 24 hours)
           const isRecent = lastConv.timestamp && (Date.now() - lastConv.timestamp) < 24 * 60 * 60 * 1000;
           if (isRecent) {
-            setMessages(lastConv.messages);
+            dispatch({ type: 'SET_MESSAGES', payload: lastConv.messages });
           }
         }
       } catch (error) {
@@ -250,133 +210,106 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       }
     };
 
-    // Only load on initial mount
-    if (messages.length === 0) {
+    if (state.messages.length === 0) {
       loadPersistedConversation();
     }
-  }, []); // Empty dependency array for mount-only execution
+  }, []); // Only on mount
 
-  // Memoized static parts of system prompt (performance optimization)
+  // Memoized time of day calculation
+  const timeOfDay = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'morning';
+    if (hour < 17) return 'afternoon';
+    return 'evening';
+  }, []); // Empty deps since we want this to be stable during the session
+
+  // Memoized location context
+  const locationContext = useMemo(() => {
+    if (address?.city) {
+      return `${address.city}${address.country ? `, ${address.country}` : ''}`;
+    }
+    if (ipLocation?.city) {
+      return `${ipLocation.city}${ipLocation.country ? `, ${ipLocation.country}` : ''}`;
+    }
+    return null;
+  }, [address?.city, address?.country, ipLocation?.city, ipLocation?.country]);
+
+  // Memoized static parts of system prompt
   const staticPromptParts = useMemo(() => {
-    // Generate minimal, efficient context
-    const getTimeOfDay = () => {
-      const hour = new Date().getHours();
-      if (hour < 12) return 'morning';
-      if (hour < 17) return 'afternoon';
-      return 'evening';
-    };
-
-    const getLocationContext = () => {
-      if (address?.city) {
-        return `${address.city}${address.country ? `, ${address.country}` : ''}`;
-      }
-      if (ipLocation?.city) {
-        return `${ipLocation.city}${ipLocation.country ? `, ${ipLocation.country}` : ''}`;
-      }
-      return null;
-    };
-
-    // Minimal context - only essential information
     const staticUserContext = user ? 
-      `User: ${user.user_metadata?.name || 'User'}${getLocationContext() ? ` • Location: ${getLocationContext()}` : ''} • Time: ${getTimeOfDay()}` :
-      `Location: ${getLocationContext() || 'Unknown'} • Time: ${getTimeOfDay()}`;
+      `User: ${user.user_metadata?.name || 'User'}${locationContext ? ` • Location: ${locationContext}` : ''} • Time: ${timeOfDay}` :
+      `Location: ${locationContext || 'Unknown'} • Time: ${timeOfDay}`;
 
-    const basePrompt = customSystemPrompt || 'You are Virgil, a contextual AI assistant.';
+    const basePrompt = state.customSystemPrompt || 'You are Virgil, a contextual AI assistant.';
     
     return { basePrompt, staticUserContext };
-  }, [user, address, ipLocation, customSystemPrompt]);
+  }, [user, locationContext, timeOfDay, state.customSystemPrompt]);
 
   const createSystemPrompt = useCallback((userQuery?: string) => {
-    // Start with optimized base prompt and minimal context
     let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
 
-    // Add memory context if available
-    if (memoryContext) {
-      systemPrompt += `\n\nMemory:${memoryContext}`;
+    if (state.memoryContext) {
+      systemPrompt += `\n\nMemory:${state.memoryContext}`;
     }
 
-    // Add smart contextual awareness using DynamicContextBuilder
-    if (userQuery && dashboardContext) {
+    if (userQuery && state.dashboardContext) {
       const enhancedPrompt = DynamicContextBuilder.buildEnhancedPrompt(
         systemPrompt,
         userQuery,
-        dashboardContext,
-        contextualSuggestions
+        state.dashboardContext,
+        state.contextualSuggestions
       );
       systemPrompt = enhancedPrompt.enhancedPrompt;
-
-      // Log activity for context service
       dashboardContextService.logActivity(`Asked: "${userQuery.slice(0, 50)}..."`, 'virgil-chat');
     }
 
-    // Condensed response rules - essential behavior only
     const responseRules = `\n\nBe conversational, concise, and use available context naturally.`;
     
     return systemPrompt + responseRules;
-  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
+  }, [staticPromptParts, state.memoryContext, state.dashboardContext, state.contextualSuggestions]);
 
   // Event handlers
   const handleModelChange = useCallback((modelId: string) => {
-    setSelectedModel(modelId);
+    dispatch({ type: 'SET_MODEL', payload: modelId });
     try {
       localStorage.setItem('virgil-selected-model', modelId);
     } catch {
       // Ignore localStorage errors
     }
-  }, []);
-
-  // Window control handlers
-  const handleMinimize = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+  }, [dispatch]);
 
   const handleSizeToggle = useCallback(() => {
     const sizes: ('normal' | 'large' | 'fullscreen')[] = ['normal', 'large', 'fullscreen'];
-    const currentIndex = sizes.indexOf(windowSize);
+    const currentIndex = sizes.indexOf(state.windowSize);
     const nextSize = sizes[(currentIndex + 1) % sizes.length];
     setWindowSize(nextSize);
-    try {
-      localStorage.setItem('virgil-window-size', nextSize);
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, [windowSize]);
+  }, [state.windowSize, setWindowSize]);
 
   const handleNewChat = useCallback(async () => {
-    if (messages.length > 0) {
+    if (state.messages.length > 0) {
       try {
-        // Save current conversation to memory before clearing
-        await memoryService.saveConversation(messages);
+        await memoryService.saveConversation(state.messages);
       } catch (error) {
         // Failed to save conversation before starting new chat
       }
     }
-    
-    // Clear current conversation
-    setMessages([]);
-    localStorage.removeItem('virgil-active-conversation');
-  }, [messages]);
+    newChat();
+  }, [state.messages, newChat]);
 
-  // System prompt handlers
   const handleSystemPromptSave = useCallback(() => {
     try {
-      localStorage.setItem('virgil-custom-system-prompt', customSystemPrompt);
+      localStorage.setItem('virgil-custom-system-prompt', state.customSystemPrompt);
     } catch {
       // Ignore localStorage errors
     }
-  }, [customSystemPrompt]);
-
-  // Message handlers
-  const handleClearMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
+  }, [state.customSystemPrompt]);
 
   const handleExportMessages = useCallback(() => {
     const chatData = {
       exportedAt: new Date().toISOString(),
       user: user?.user_metadata?.name || 'Unknown',
-      messages: messages,
-      totalMessages: messages.length,
+      messages: state.messages,
+      totalMessages: state.messages.length,
     };
     const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -385,7 +318,12 @@ const VirgilChatbot = memo(function VirgilChatbot() {
     a.download = `virgil-chat-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [user, messages]);
+  }, [user, state.messages]);
+
+  // Memoized message mapping for API calls
+  const apiMessages = useMemo(() => 
+    state.messages.map((msg: ChatMessage) => ({ role: msg.role, content: msg.content }))
+  , [state.messages]);
 
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
@@ -397,37 +335,31 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    addMessage(userMessage);
     setInput('');
     setError(null);
     
-    // Refocus the input field after sending message
     setTimeout(() => inputRef.current?.focus(), 0);
 
     try {
-      setIsTyping(true);
+      setTyping(true);
 
       // Check if any dashboard apps can directly answer this query
       const appResponse = await dashboardAppService.getResponseForQuery(messageText);
       if (appResponse) {
-        // Add app-specific response
         const appMessage: ChatMessage = {
           id: Date.now() + '-assistant',
           role: 'assistant',
           content: appResponse.response,
           timestamp: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, appMessage]);
-        setIsTyping(false);
-        // Refocus input after app response
+        addMessage(appMessage);
+        setTyping(false);
         setTimeout(() => inputRef.current?.focus(), 0);
         return;
       }
 
-      // Use our secure backend API instead of calling OpenAI directly
       const chatApiUrl = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
-      
-      // Prepare messages with contextual awareness
       const systemPrompt = createSystemPrompt(messageText);
 
       const response = await dedupeFetch(`${chatApiUrl}/chat`, {
@@ -436,10 +368,10 @@ const VirgilChatbot = memo(function VirgilChatbot() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: selectedModel,
+          model: state.selectedModel,
           messages: [
             { role: 'system', content: systemPrompt },
-            ...messages.map(msg => ({ role: msg.role, content: msg.content })),
+            ...apiMessages,
             { role: 'user', content: messageText },
           ],
           max_tokens: 200,
@@ -465,11 +397,10 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         timestamp: new Date().toISOString(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      addMessage(assistantMessage);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       
-      // Add fallback message
       const fallbackMessage: ChatMessage = {
         id: Date.now() + '-fallback',
         role: 'assistant',
@@ -477,67 +408,80 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         timestamp: new Date().toISOString(),
       };
       
-      setMessages(prev => [...prev, fallbackMessage]);
+      addMessage(fallbackMessage);
     } finally {
-      setIsTyping(false);
-      // Refocus input after response is complete
+      setTyping(false);
       setTimeout(() => inputRef.current?.focus(), 0);
     }
-  }, [selectedModel, createSystemPrompt, messages]);
+  }, [state.selectedModel, createSystemPrompt, apiMessages, addMessage, setInput, setError, setTyping]);
 
   const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (input.trim() && !isTyping) {
-      sendMessage(input);
+    if (state.input.trim() && !state.isTyping) {
+      sendMessage(state.input);
     }
-  }, [input, sendMessage, isTyping]);
+  }, [state.input, state.isTyping, sendMessage]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isTyping && input.trim()) {
+    if (e.key === 'Enter' && !e.shiftKey && !state.isTyping && state.input.trim()) {
       e.preventDefault();
-      sendMessage(input);
+      sendMessage(state.input);
     }
-  }, [input, sendMessage, isTyping]);
+  }, [state.input, state.isTyping, sendMessage]);
 
   const handleQuickAction = useCallback((action: string) => {
     sendMessage(action);
   }, [sendMessage]);
 
-  // Function to mark a message as important
   const markAsImportant = useCallback(async (message: ChatMessage) => {
     try {
-      // Create rich context for the memory
       let context = `From conversation on ${new Date().toLocaleDateString()}`;
-      if (dashboardContext) {
-        context = DynamicContextBuilder.createContextSummary(dashboardContext);
+      if (state.dashboardContext) {
+        context = DynamicContextBuilder.createContextSummary(state.dashboardContext);
       }
       await memoryService.markAsImportant(message.id, message.content, context);
       
-      // Reload marked memories
       const memories = await memoryService.getMarkedMemories();
-      setMarkedMemories(memories);
-      
-      // Update memory context
       const newContext = await memoryService.getContextForPrompt();
-      setMemoryContext(newContext);
-      setShowMemoryIndicator(true);
       
-      // Show feedback (could add a toast notification here)
+      dispatch({
+        type: 'SET_MEMORY_DATA',
+        payload: {
+          markedMemories: memories,
+          memoryContext: newContext,
+          showMemoryIndicator: true,
+        },
+      });
     } catch (error) {
       // Failed to mark message as important
     }
-  }, [dashboardContext]);
+  }, [state.dashboardContext, dispatch]);
 
-  // Error handling
+  const handleMinimize = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
   const handleErrorDismiss = useCallback(() => {
     setError(null);
-  }, []);
+  }, [setError]);
 
-  if (!isOpen) {
+  const handleMemoryModalOpen = useCallback(() => {
+    dispatch({ type: 'SET_MEMORY_MODAL', payload: true });
+  }, [dispatch]);
+
+  const handleMemoryModalClose = useCallback(() => {
+    dispatch({ type: 'SET_MEMORY_MODAL', payload: false });
+  }, [dispatch]);
+
+  const handleSystemPromptChange = useCallback((prompt: string) => {
+    dispatch({ type: 'SET_SYSTEM_PROMPT', payload: prompt });
+  }, [dispatch]);
+
+  if (!state.isOpen) {
     return (
       <button
         className="virgil-chatbot-bubble"
-        onClick={() => setIsOpen(true)}
+        onClick={() => setOpen(true)}
         title="Chat with Virgil AI Assistant"
         aria-label="Open chat with Virgil AI Assistant"
         aria-expanded="false"
@@ -558,71 +502,76 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         if (chatContainerRef) chatContainerRef.current = el;
         if (keyboardNavRef) keyboardNavRef.current = el;
       }}
-      className={`virgil-chatbot-container ${windowSize}`}
+      className={`virgil-chatbot-container ${state.windowSize}`}
       role="dialog"
       aria-label="Virgil AI Assistant"
       aria-modal="true"
     >
-      {/* Header */}
       <ChatHeader
-        windowSize={windowSize}
+        windowSize={state.windowSize}
         onSizeToggle={handleSizeToggle}
         onMinimize={handleMinimize}
-        selectedModel={selectedModel}
+        selectedModel={state.selectedModel}
         onModelChange={handleModelChange}
-        models={models}
-        showMemoryIndicator={showMemoryIndicator}
-        markedMemories={markedMemories}
-        recentConversations={recentConversations}
-        onMemoryModalOpen={() => setShowMemoryModal(true)}
-        dashboardContext={dashboardContext}
-        customSystemPrompt={customSystemPrompt}
-        onSystemPromptChange={setCustomSystemPrompt}
+        models={AVAILABLE_MODELS}
+        showMemoryIndicator={state.showMemoryIndicator}
+        markedMemories={state.markedMemories}
+        recentConversations={state.recentConversations}
+        onMemoryModalOpen={handleMemoryModalOpen}
+        dashboardContext={state.dashboardContext}
+        customSystemPrompt={state.customSystemPrompt}
+        onSystemPromptChange={handleSystemPromptChange}
         onSystemPromptSave={handleSystemPromptSave}
         onNewChat={handleNewChat}
-        messageCount={messages.length}
-        onClearMessages={handleClearMessages}
+        messageCount={state.messages.length}
+        onClearMessages={clearMessages}
         onExportMessages={handleExportMessages}
         createSystemPrompt={createSystemPrompt}
       />
 
-      {/* Messages */}
       <ChatMessages
-        messages={messages}
-        isTyping={isTyping}
-        error={error}
+        messages={state.messages}
+        isTyping={state.isTyping}
+        error={state.error}
         onErrorDismiss={handleErrorDismiss}
         onMarkAsImportant={markAsImportant}
         user={user}
-        lastConversation={lastConversation}
+        lastConversation={state.lastConversation}
       />
 
-      {/* Input */}
       <ChatInput
-        input={input}
+        input={state.input}
         onInputChange={setInput}
         onSubmit={handleSubmit}
         onKeyDown={handleKeyDown}
-        isTyping={isTyping}
-        error={error}
+        isTyping={state.isTyping}
+        error={state.error}
         onQuickAction={handleQuickAction}
-        showQuickActions={messages.length === 0}
-        dashboardContext={dashboardContext}
-        shouldFocus={isOpen}
+        showQuickActions={state.messages.length === 0}
+        dashboardContext={state.dashboardContext}
+        shouldFocus={state.isOpen}
       />
 
-      {/* Memory Modal */}
       <MemoryModal
-        isOpen={showMemoryModal}
-        onClose={() => setShowMemoryModal(false)}
-        markedMemories={markedMemories}
-        recentConversations={recentConversations}
-        onMemoriesUpdate={setMarkedMemories}
-        onConversationsUpdate={setRecentConversations}
-        onMemoryContextUpdate={setMemoryContext}
-        onMemoryIndicatorUpdate={setShowMemoryIndicator}
+        isOpen={state.showMemoryModal}
+        onClose={handleMemoryModalClose}
+        markedMemories={state.markedMemories}
+        recentConversations={state.recentConversations}
+        onMemoriesUpdate={(memories) => dispatch({ type: 'SET_MEMORY_DATA', payload: { markedMemories: memories } })}
+        onConversationsUpdate={(conversations) => dispatch({ type: 'SET_MEMORY_DATA', payload: { recentConversations: conversations } })}
+        onMemoryContextUpdate={(context) => dispatch({ type: 'SET_MEMORY_DATA', payload: { memoryContext: context } })}
+        onMemoryIndicatorUpdate={(show) => dispatch({ type: 'SET_MEMORY_DATA', payload: { showMemoryIndicator: show } })}
       />
     </div>
+  );
+}
+
+// Wrapper component that provides the context - wrapped with memo for performance
+const VirgilChatbot = memo(function VirgilChatbot() {
+  return (
+    <ChatProvider>
+      <VirgilChatbotInner />
+    </ChatProvider>
   );
 });
 
