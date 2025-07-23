@@ -64,13 +64,6 @@
   --input: 251 28% 35%;
   --ring: 251 34% 67%;
   --radius: 0.5rem;
-  
-  /* Virgil brand colors */
-  --brand-dark-purple: #2D2640;
-  --brand-light-purple: #5B518B;
-  --brand-accent-purple: #8A7FBE;
-  --brand-soft-purple: #B9B3DB;
-  --brand-pale-purple: #E8E5F5;
 }
 
 /* Basic reset for Virgil application */

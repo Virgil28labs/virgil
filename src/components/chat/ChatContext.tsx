@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, useCallback, ReactNode } from 'r
 import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
+import type { ChatMessage } from '../../types/chat.types';
 
 interface ChatContextValue {
   state: ChatState;
@@ -105,6 +106,3 @@ export function useChatContext() {
   }
   return context;
 }
-
-// Fix import
-import type { ChatMessage } from '../../types/chat.types';

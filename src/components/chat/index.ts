@@ -7,6 +7,7 @@ export { StatusPills } from './StatusPills';
 export { ModelSelector } from './ModelSelector';
 export { ProfileDropdown } from './ProfileDropdown';
 export { MemoryModal } from './MemoryModal';
+export { ChatProvider, useChatContext } from './ChatContext';
 
 // Re-export default components for convenience
 export { default as ChatHeaderDefault } from './ChatHeader';

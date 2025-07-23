@@ -85,14 +85,11 @@ export function LocationProvider({ children }: LocationProviderProps) {
     dispatch({ type: 'CLEAR_ERROR' });
 
     try {
-      console.log('Starting location fetch...');
       // First, get quick IP location for immediate weather display
       const quickLocation = await locationService.getQuickLocation();
       if (quickLocation.ipLocation) {
-        console.log('Quick IP location obtained:', quickLocation.ipLocation.city);
         dispatch({ type: 'SET_LOCATION_DATA', payload: quickLocation });
       } else {
-        console.warn('No quick location available');
         // If no quick location, still set loading to false
         dispatch({ type: 'SET_LOADING', payload: false });
       }
@@ -104,11 +101,6 @@ export function LocationProvider({ children }: LocationProviderProps) {
         
         // Pass the existing IP location to avoid duplicate fetching
         locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
-          console.log('Full location data received:', {
-            hasCoordinates: !!fullLocationData.coordinates,
-            hasElevation: !!(fullLocationData.coordinates?.elevation),
-            hasStreetAddress: !!(fullLocationData.address?.street),
-          });
           // Only update if we got GPS coordinates or better address
           if (fullLocationData.coordinates || 
               (fullLocationData.address?.street && !state.address?.street)) {

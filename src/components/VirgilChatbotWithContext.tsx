@@ -322,7 +322,7 @@ function VirgilChatbotInner() {
 
   // Memoized message mapping for API calls
   const apiMessages = useMemo(() => 
-    state.messages.map(msg => ({ role: msg.role, content: msg.content }))
+    state.messages.map((msg: ChatMessage) => ({ role: msg.role, content: msg.content }))
   , [state.messages]);
 
   const sendMessage = useCallback(async (messageText: string) => {
