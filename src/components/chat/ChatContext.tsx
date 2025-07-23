@@ -1,0 +1,110 @@
+import { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import type { ChatState, ChatAction } from './chatTypes';
+import { chatReducer } from './chatReducer';
+import { initialChatState } from './chatTypes';
+
+interface ChatContextValue {
+  state: ChatState;
+  dispatch: React.Dispatch<ChatAction>;
+  
+  // Convenience methods
+  setOpen: (isOpen: boolean) => void;
+  setWindowSize: (size: 'normal' | 'large' | 'fullscreen') => void;
+  addMessage: (message: ChatMessage) => void;
+  setInput: (input: string) => void;
+  setTyping: (isTyping: boolean) => void;
+  setError: (error: string | null) => void;
+  clearMessages: () => void;
+  newChat: () => void;
+}
+
+const ChatContext = createContext<ChatContextValue | undefined>(undefined);
+
+interface ChatProviderProps {
+  children: ReactNode;
+}
+
+export function ChatProvider({ children }: ChatProviderProps) {
+  // Initialize state with localStorage values
+  const [state, dispatch] = useReducer(chatReducer, initialChatState, (initial) => {
+    try {
+      const windowSize = localStorage.getItem('virgil-window-size') as 'normal' | 'large' | 'fullscreen';
+      const customSystemPrompt = localStorage.getItem('virgil-custom-system-prompt') || '';
+      const selectedModel = localStorage.getItem('virgil-selected-model') || 'gpt-4.1-mini';
+      
+      return {
+        ...initial,
+        windowSize: windowSize || initial.windowSize,
+        customSystemPrompt,
+        selectedModel,
+      };
+    } catch {
+      return initial;
+    }
+  });
+  
+  // Convenience methods
+  const setOpen = useCallback((isOpen: boolean) => {
+    dispatch({ type: 'SET_OPEN', payload: isOpen });
+  }, []);
+  
+  const setWindowSize = useCallback((size: 'normal' | 'large' | 'fullscreen') => {
+    dispatch({ type: 'SET_WINDOW_SIZE', payload: size });
+    try {
+      localStorage.setItem('virgil-window-size', size);
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, []);
+  
+  const addMessage = useCallback((message: ChatMessage) => {
+    dispatch({ type: 'ADD_MESSAGE', payload: message });
+  }, []);
+  
+  const setInput = useCallback((input: string) => {
+    dispatch({ type: 'SET_INPUT', payload: input });
+  }, []);
+  
+  const setTyping = useCallback((isTyping: boolean) => {
+    dispatch({ type: 'SET_TYPING', payload: isTyping });
+  }, []);
+  
+  const setError = useCallback((error: string | null) => {
+    dispatch({ type: 'SET_ERROR', payload: error });
+  }, []);
+  
+  const clearMessages = useCallback(() => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+  }, []);
+  
+  const newChat = useCallback(() => {
+    dispatch({ type: 'NEW_CHAT' });
+    localStorage.removeItem('virgil-active-conversation');
+  }, []);
+  
+  const value: ChatContextValue = {
+    state,
+    dispatch,
+    setOpen,
+    setWindowSize,
+    addMessage,
+    setInput,
+    setTyping,
+    setError,
+    clearMessages,
+    newChat,
+  };
+  
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+}
+
+export function useChatContext() {
+  const context = useContext(ChatContext);
+  if (!context) {
+    throw new Error('useChatContext must be used within a ChatProvider');
+  }
+  return context;
+}
+
+// Fix import
+import type { ChatMessage } from '../../types/chat.types';
