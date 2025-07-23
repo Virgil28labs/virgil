@@ -125,7 +125,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         // Show indicator if we have memory context
         setShowMemoryIndicator(!!context);
       } catch (error) {
-        console.error('Failed to initialize memory service:', error);
+        // Failed to initialize memory service
       }
     };
     
@@ -200,7 +200,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
           await memoryService.saveConversation(messages);
           // Keep messages in state for persistence - don't clear them
         } catch (error) {
-          console.error('Failed to save conversation:', error);
+          // Failed to save conversation
         }
       };
       
@@ -214,7 +214,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       try {
         localStorage.setItem('virgil-active-conversation', JSON.stringify(messages));
       } catch (error) {
-        console.error('Failed to save active conversation:', error);
+        // Failed to save active conversation
       }
     } else {
       // Clear localStorage when no messages
@@ -246,7 +246,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
           }
         }
       } catch (error) {
-        console.error('Failed to load persisted conversation:', error);
+        // Failed to load persisted conversation
       }
     };
 
@@ -348,7 +348,7 @@ const VirgilChatbot = memo(function VirgilChatbot() {
         // Save current conversation to memory before clearing
         await memoryService.saveConversation(messages);
       } catch (error) {
-        console.error('Failed to save conversation before starting new chat:', error);
+        // Failed to save conversation before starting new chat
       }
     }
     
@@ -467,9 +467,6 @@ const VirgilChatbot = memo(function VirgilChatbot() {
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Chat error:', err);
-      }
       setError(err instanceof Error ? err.message : 'An error occurred');
       
       // Add fallback message
@@ -526,9 +523,8 @@ const VirgilChatbot = memo(function VirgilChatbot() {
       setShowMemoryIndicator(true);
       
       // Show feedback (could add a toast notification here)
-      console.log('Message marked as important');
     } catch (error) {
-      console.error('Failed to mark message as important:', error);
+      // Failed to mark message as important
     }
   }, [dashboardContext]);
 

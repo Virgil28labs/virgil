@@ -21,7 +21,6 @@ export interface Address {
   formatted: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface IPLocation {
   ip: string;
   country?: string;
