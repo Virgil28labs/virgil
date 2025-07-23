@@ -8,6 +8,7 @@ import type {
   GiphyImage,
 } from '../../types';
 import { logger } from '../../lib/logger';
+import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
 
 // Initial state
 const initialState: GiphyState = {
@@ -92,35 +93,14 @@ function giphyGalleryReducer(state: GiphyState, action: GiphyAction): GiphyState
   }
 }
 
-// Favorites localStorage key
-const FAVORITES_STORAGE_KEY = 'giphy-favorites';
-
-// Helper function to load favorites from localStorage
+// Helper function to load favorites from StorageService
 function loadFavoritesFromStorage(): GiphyImage[] {
-  try {
-    const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    logger.warn('Failed to load Giphy favorites from localStorage', {
-      component: 'GiphyGalleryProvider',
-      action: 'loadFavorites',
-      metadata: { error }
-    });
-    return [];
-  }
+  return StorageService.get<GiphyImage[]>(STORAGE_KEYS.GIPHY_FAVORITES, []);
 }
 
-// Helper function to save favorites to localStorage
+// Helper function to save favorites to StorageService
 function saveFavoritesToStorage(favorites: GiphyImage[]): void {
-  try {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-  } catch (error) {
-    logger.warn('Failed to save Giphy favorites to localStorage', {
-      component: 'GiphyGalleryProvider',
-      action: 'saveFavorites',
-      metadata: { error }
-    });
-  }
+  StorageService.set(STORAGE_KEYS.GIPHY_FAVORITES, favorites);
 }
 
 // Create the context

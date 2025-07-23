@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
 import { logger } from '../../../lib/logger';
-
-const STORAGE_KEY_FAVORITES = 'virgil_nasa_favorites';
+import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
 
 // Simplified APOD for storage (reduce localStorage usage)
 interface StoredApod {
@@ -39,34 +38,16 @@ const storedToApod = (stored: StoredApod): ApodImage => ({
 });
 
 export const useNasaFavorites = () => {
-  // Initialize state with localStorage value immediately
+  // Initialize state with StorageService value
   const [favorites, setFavorites] = useState<StoredApod[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_FAVORITES);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Sort by savedAt timestamp (newest first)
-        return parsed.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
-      }
-    } catch (e) {
-      logger.error('Failed to parse NASA favorites from localStorage', e as Error, {
-        component: 'useNasaFavorites',
-        action: 'loadFavorites'
-      });
-    }
-    return [];
+    const storedFavorites = StorageService.get<StoredApod[]>(STORAGE_KEYS.NASA_FAVORITES, []);
+    // Sort by savedAt timestamp (newest first)
+    return storedFavorites.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
   });
 
   // Save to localStorage whenever favorites change
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(favorites));
-    } catch (e) {
-      logger.error('Failed to save NASA favorites to localStorage', e as Error, {
-        component: 'useNasaFavorites',
-        action: 'saveFavorites'
-      });
-    }
+    StorageService.set(STORAGE_KEYS.NASA_FAVORITES, favorites);
   }, [favorites]);
 
   // Check if APOD is favorited

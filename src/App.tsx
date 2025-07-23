@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import './App.css';
 import { StyleSheetManager } from 'styled-components';
 import isPropValid from '@emotion/is-prop-valid';
@@ -13,6 +13,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonLoader } from './components/SkeletonLoader';
 import { ToastContainer } from './components/ToastNotification';
 import { useToast } from './hooks/useToast';
+import { StorageMigration } from './services/StorageMigration';
 
 // Configure styled-components to filter out problematic props
 const shouldForwardProp = (propName: string) => {
@@ -78,6 +79,13 @@ function AppContent(): React.ReactElement {
 
 function App(): React.ReactElement {
   const { toasts, removeToast } = useToast();
+
+  // Run storage migrations on app startup
+  useEffect(() => {
+    StorageMigration.runMigrations().catch(error => {
+      console.error('Storage migration failed:', error);
+    });
+  }, []);
 
   return (
     <StyleSheetManager shouldForwardProp={shouldForwardProp}>

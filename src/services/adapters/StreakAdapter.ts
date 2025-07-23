@@ -8,6 +8,7 @@
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import type { UserHabitsData } from '../../types/habit.types';
 import { logger } from '../../lib/logger';
+import { StorageService, STORAGE_KEYS } from '../StorageService';
 
 interface StreakData {
   habits: {
@@ -44,7 +45,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
   private listeners: ((data: StreakData) => void)[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
-  private readonly STORAGE_KEY = 'virgil_habits';
+  private readonly STORAGE_KEY = STORAGE_KEYS.VIRGIL_HABITS;
 
   constructor() {
     this.loadUserData();
@@ -52,9 +53,18 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private loadUserData(): void {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (stored) {
-        this.userData = JSON.parse(stored) as UserHabitsData;
+      const defaultData: UserHabitsData = {
+        habits: [],
+        achievements: [],
+        settings: { soundEnabled: true },
+        stats: {
+          totalCheckIns: 0,
+          currentStreak: 0,
+          perfectDays: []
+        }
+      };
+      this.userData = StorageService.get<UserHabitsData>(this.STORAGE_KEY, defaultData);
+      if (this.userData && this.userData.habits.length > 0) {
         this.lastFetchTime = Date.now();
       }
     } catch (error) {

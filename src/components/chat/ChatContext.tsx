@@ -3,6 +3,7 @@ import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
 import type { ChatMessage } from '../../types/chat.types';
+import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
 
 interface ChatContextValue {
   state: ChatState;
@@ -29,13 +30,22 @@ export function ChatProvider({ children }: ChatProviderProps) {
   // Initialize state with localStorage values
   const [state, dispatch] = useReducer(chatReducer, initialChatState, (initial) => {
     try {
-      const windowSize = localStorage.getItem('virgil-window-size') as 'normal' | 'large' | 'fullscreen';
-      const customSystemPrompt = localStorage.getItem('virgil-custom-system-prompt') || '';
-      const selectedModel = localStorage.getItem('virgil-selected-model') || 'gpt-4.1-mini';
+      const windowSize = StorageService.get<'normal' | 'large' | 'fullscreen'>(
+        STORAGE_KEYS.WINDOW_SIZE, 
+        initial.windowSize
+      );
+      const customSystemPrompt = StorageService.get<string>(
+        STORAGE_KEYS.CUSTOM_SYSTEM_PROMPT, 
+        ''
+      );
+      const selectedModel = StorageService.get<string>(
+        STORAGE_KEYS.SELECTED_MODEL, 
+        'gpt-4.1-mini'
+      );
       
       return {
         ...initial,
-        windowSize: windowSize || initial.windowSize,
+        windowSize,
         customSystemPrompt,
         selectedModel,
       };
@@ -51,11 +61,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   
   const setWindowSize = useCallback((size: 'normal' | 'large' | 'fullscreen') => {
     dispatch({ type: 'SET_WINDOW_SIZE', payload: size });
-    try {
-      localStorage.setItem('virgil-window-size', size);
-    } catch {
-      // Ignore localStorage errors
-    }
+    StorageService.set(STORAGE_KEYS.WINDOW_SIZE, size);
   }, []);
   
   const addMessage = useCallback((message: ChatMessage) => {
@@ -80,7 +86,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   
   const newChat = useCallback(() => {
     dispatch({ type: 'NEW_CHAT' });
-    localStorage.removeItem('virgil-active-conversation');
+    StorageService.remove(STORAGE_KEYS.ACTIVE_CONVERSATION);
   }, []);
   
   const value: ChatContextValue = {

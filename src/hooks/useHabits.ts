@@ -4,8 +4,9 @@ import type {
   UserHabitsData, 
   Achievement,
 } from '../types/habit.types';
+import { StorageService, STORAGE_KEYS } from '../services/StorageService';
 
-const STORAGE_KEY = 'virgil_habits';
+const STORAGE_KEY = STORAGE_KEYS.VIRGIL_HABITS;
 const MAX_HABITS = 10;
 
 // Default achievements
@@ -106,22 +107,7 @@ const calculateStreak = (checkIns: string[]): number => {
 
 export const useHabits = () => {
   const [userData, setUserData] = useState<UserHabitsData>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const data = JSON.parse(stored) as UserHabitsData;
-        // Update streak values based on current time
-        data.habits = data.habits.map(habit => ({
-          ...habit,
-          streak: calculateStreak(habit.checkIns),
-        }));
-        return data;
-      }
-    } catch (e) {
-      console.error('Failed to load habit data:', e);
-    }
-    
-    return {
+    const defaultData: UserHabitsData = {
       habits: [],
       achievements: DEFAULT_ACHIEVEMENTS,
       settings: {
@@ -133,15 +119,23 @@ export const useHabits = () => {
         perfectDays: [],
       },
     };
+
+    const data = StorageService.get<UserHabitsData>(STORAGE_KEY, defaultData);
+    
+    // Update streak values based on current time
+    if (data.habits) {
+      data.habits = data.habits.map(habit => ({
+        ...habit,
+        streak: calculateStreak(habit.checkIns),
+      }));
+    }
+    
+    return data;
   });
   
   // Save to localStorage whenever data changes
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    } catch (e) {
-      console.error('Failed to save habit data:', e);
-    }
+    StorageService.set(STORAGE_KEY, userData);
   }, [userData]);
   
   // Add a new habit

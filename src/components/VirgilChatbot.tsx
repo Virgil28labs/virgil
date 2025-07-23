@@ -1,17 +1,16 @@
 import { useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useLocation } from '../contexts/LocationContext';
-import { useWeather } from '../contexts/WeatherContext';
 import type { ChatMessage, ModelOption } from '../types/chat.types';
-import { dedupeFetch } from '../lib/requestDeduplication';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
-import { useUserProfile } from '../hooks/useUserProfile';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useChatApi } from '../hooks/useChatApi';
+import { useContextSync } from '../hooks/useContextSync';
 import { memoryService } from '../services/MemoryService';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
-import { dashboardAppService } from '../services/DashboardAppService';
+import { chatService } from '../services/ChatService';
 import {
   ChatHeader,
   ChatMessages,
@@ -34,10 +33,10 @@ function VirgilChatbotInner() {
   const { state, dispatch, setOpen, setWindowSize, addMessage, setInput, setTyping, setError, clearMessages, newChat } = useChatContext();
   
   const { user } = useAuth();
-  const { address, ipLocation, hasGPSLocation, coordinates } = useLocation();
-  const { data: weatherData, unit: weatherUnit } = useWeather();
-  const { profile: userProfile } = useUserProfile();
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Use custom hooks for cleaner code
+  useContextSync();
 
   // Focus management for chatbot modal
   const { containerRef: chatContainerRef } = useFocusManagement(state.isOpen, {
@@ -86,7 +85,7 @@ function VirgilChatbotInner() {
           },
         });
       } catch (error) {
-        // Failed to initialize memory service
+        console.error('Failed to initialize memory service:', error);
       }
     };
     
@@ -114,92 +113,37 @@ function VirgilChatbotInner() {
     return unsubscribe;
   }, [dispatch]);
 
-  // Update context service with external data
-  useEffect(() => {
-    dashboardContextService.updateLocationContext({
-      address,
-      ipLocation,
-      hasGPSLocation,
-      coordinates,
-      loading: false,
-      error: null,
-      permissionStatus: 'granted',
-      hasLocation: !!(coordinates || ipLocation),
-      hasIPLocation: !!ipLocation,
-      initialized: true,
-      lastUpdated: Date.now(),
-      fetchLocationData: () => Promise.resolve(),
-      requestLocationPermission: () => Promise.resolve(),
-      clearError: () => {},
-    });
-  }, [address, ipLocation, hasGPSLocation, coordinates]);
-
-  useEffect(() => {
-    dashboardContextService.updateWeatherContext({
-      data: weatherData,
-      unit: weatherUnit,
-      loading: false,
-      error: null,
-      fetchWeather: () => Promise.resolve(),
-      toggleUnit: () => {},
-      clearError: () => {},
-      hasWeather: !!weatherData,
-      forecast: null,
-      lastUpdated: weatherData ? Date.now() : null,
-    });
-  }, [weatherData, weatherUnit]);
-
-  useEffect(() => {
-    dashboardContextService.updateUserContext({
-      user,
-      loading: false,
-      signOut: () => Promise.resolve({ error: undefined }),
-      refreshUser: () => Promise.resolve(),
-    }, userProfile);
-  }, [user, userProfile]);
+  // Custom hooks handle context syncing
 
   // Save conversation when chat is closed
   useEffect(() => {
     if (!state.isOpen && state.messages.length > 0) {
-      const saveConversation = async () => {
-        try {
-          await memoryService.saveConversation(state.messages);
-        } catch (error) {
-          // Failed to save conversation
-        }
-      };
-      
-      saveConversation();
+      memoryService.saveConversation(state.messages).catch((error) => {
+        console.error('Failed to save conversation:', error);
+      });
     }
   }, [state.isOpen, state.messages]);
 
-  // Persist active conversation to localStorage
+  // Use localStorage hook for persisting conversation
+  const [savedMessages, setSavedMessages] = useLocalStorage<ChatMessage[]>('virgil-active-conversation', []);
+  
+  // Save messages to localStorage when they change
   useEffect(() => {
     if (state.messages.length > 0) {
-      try {
-        localStorage.setItem('virgil-active-conversation', JSON.stringify(state.messages));
-      } catch (error) {
-        // Failed to save active conversation
-      }
-    } else {
-      localStorage.removeItem('virgil-active-conversation');
+      setSavedMessages(state.messages);
     }
-  }, [state.messages]);
+  }, [state.messages, setSavedMessages]);
 
   // Load persisted conversation on mount
   useEffect(() => {
     const loadPersistedConversation = async () => {
+      if (savedMessages.length > 0) {
+        dispatch({ type: 'SET_MESSAGES', payload: savedMessages });
+        return;
+      }
+      
+      // Fallback to memory service if no active session
       try {
-        const savedMessages = localStorage.getItem('virgil-active-conversation');
-        if (savedMessages) {
-          const parsedMessages = JSON.parse(savedMessages);
-          if (parsedMessages.length > 0) {
-            dispatch({ type: 'SET_MESSAGES', payload: parsedMessages });
-            return;
-          }
-        }
-        
-        // Fallback to memory service if no active session
         const lastConv = await memoryService.getLastConversation();
         if (lastConv && lastConv.messages && lastConv.messages.length > 0) {
           const isRecent = lastConv.timestamp && (Date.now() - lastConv.timestamp) < 24 * 60 * 60 * 1000;
@@ -208,7 +152,7 @@ function VirgilChatbotInner() {
           }
         }
       } catch (error) {
-        // Failed to load persisted conversation
+        console.error('Failed to load last conversation:', error);
       }
     };
 
@@ -225,16 +169,14 @@ function VirgilChatbotInner() {
     return 'evening';
   }, []); // Empty deps since we want this to be stable during the session
 
-  // Memoized location context
+  // Memoized location context from dashboard
   const locationContext = useMemo(() => {
-    if (address?.city) {
-      return `${address.city}${address.country ? `, ${address.country}` : ''}`;
-    }
-    if (ipLocation?.city) {
-      return `${ipLocation.city}${ipLocation.country ? `, ${ipLocation.country}` : ''}`;
+    const ctx = dashboardContextService.getContext();
+    if (ctx.location.city) {
+      return `${ctx.location.city}${ctx.location.country ? `, ${ctx.location.country}` : ''}`;
     }
     return null;
-  }, [address?.city, address?.country, ipLocation?.city, ipLocation?.country]);
+  }, [state.dashboardContext]); // Re-compute when dashboard context changes
 
   // Memoized static parts of system prompt
   const staticPromptParts = useMemo(() => {
@@ -271,14 +213,13 @@ function VirgilChatbotInner() {
   }, [staticPromptParts, state.memoryContext, state.dashboardContext, state.contextualSuggestions]);
 
   // Event handlers
+  // Use localStorage hook for selected model
+  const [, setStoredModel] = useLocalStorage('virgil-selected-model', 'gpt-4.1-mini');
+  
   const handleModelChange = useCallback((modelId: string) => {
     dispatch({ type: 'SET_MODEL', payload: modelId });
-    try {
-      localStorage.setItem('virgil-selected-model', modelId);
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, [dispatch]);
+    setStoredModel(modelId);
+  }, [dispatch, setStoredModel]);
 
   const handleSizeToggle = useCallback(() => {
     const sizes: ('normal' | 'large' | 'fullscreen')[] = ['normal', 'large', 'fullscreen'];
@@ -292,19 +233,18 @@ function VirgilChatbotInner() {
       try {
         await memoryService.saveConversation(state.messages);
       } catch (error) {
-        // Failed to save conversation before starting new chat
+        console.error('Failed to save conversation before new chat:', error);
       }
     }
     newChat();
   }, [state.messages, newChat]);
 
+  // Use localStorage hook for system prompt
+  const [, setStoredSystemPrompt] = useLocalStorage('virgil-custom-system-prompt', '');
+  
   const handleSystemPromptSave = useCallback(() => {
-    try {
-      localStorage.setItem('virgil-custom-system-prompt', state.customSystemPrompt);
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, [state.customSystemPrompt]);
+    setStoredSystemPrompt(state.customSystemPrompt);
+  }, [state.customSystemPrompt, setStoredSystemPrompt]);
 
   const handleExportMessages = useCallback(() => {
     const chatData = {
@@ -322,100 +262,33 @@ function VirgilChatbotInner() {
     URL.revokeObjectURL(url);
   }, [user, state.messages]);
 
-  // Memoized message mapping for API calls
-  const apiMessages = useMemo(() => 
-    state.messages.map((msg: ChatMessage) => ({ role: msg.role, content: msg.content }))
-  , [state.messages]);
+  // Removed - no longer needed with ChatService
+
+  // Use chat API hook
+  const { sendMessage: sendChatMessage } = useChatApi({
+    onSuccess: (message) => {
+      addMessage(message);
+      setTimeout(() => inputRef.current?.focus(), 0);
+    },
+    onError: (error) => {
+      setError(error);
+    },
+    onTypingChange: setTyping,
+  });
 
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
 
-    const userMessage: ChatMessage = {
-      id: Date.now() + '-user',
-      role: 'user',
-      content: messageText,
-      timestamp: new Date().toISOString(),
-    };
-
+    const userMessage = chatService.createUserMessage(messageText);
     addMessage(userMessage);
     setInput('');
     setError(null);
     
     setTimeout(() => inputRef.current?.focus(), 0);
 
-    try {
-      setTyping(true);
-
-      // Check if any dashboard apps can directly answer this query
-      const appResponse = await dashboardAppService.getResponseForQuery(messageText);
-      if (appResponse) {
-        const appMessage: ChatMessage = {
-          id: Date.now() + '-assistant',
-          role: 'assistant',
-          content: appResponse.response,
-          timestamp: new Date().toISOString(),
-        };
-        addMessage(appMessage);
-        setTyping(false);
-        setTimeout(() => inputRef.current?.focus(), 0);
-        return;
-      }
-
-      const chatApiUrl = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
-      const systemPrompt = createSystemPrompt(messageText);
-
-      const response = await dedupeFetch(`${chatApiUrl}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: state.selectedModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...apiMessages,
-            { role: 'user', content: messageText },
-          ],
-          max_tokens: 200,
-          temperature: 0.7,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Chat service error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (!data.success || !data.message) {
-        throw new Error('Invalid response from chat service');
-      }
-
-      const assistantMessage: ChatMessage = {
-        id: Date.now() + '-assistant',
-        role: 'assistant', 
-        content: data.message.content,
-        timestamp: new Date().toISOString(),
-      };
-
-      addMessage(assistantMessage);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      
-      const fallbackMessage: ChatMessage = {
-        id: Date.now() + '-fallback',
-        role: 'assistant',
-        content: "I'm having trouble connecting right now. Please try again in a moment!",
-        timestamp: new Date().toISOString(),
-      };
-      
-      addMessage(fallbackMessage);
-    } finally {
-      setTyping(false);
-      setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  }, [state.selectedModel, createSystemPrompt, apiMessages, addMessage, setInput, setError, setTyping]);
+    const systemPrompt = createSystemPrompt(messageText);
+    await sendChatMessage(messageText, systemPrompt, state.messages, state.selectedModel);
+  }, [state.selectedModel, state.messages, createSystemPrompt, addMessage, setInput, setError, sendChatMessage]);
 
   const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -455,9 +328,10 @@ function VirgilChatbotInner() {
         },
       });
     } catch (error) {
-      // Failed to mark message as important
+      console.error('Failed to mark message as important:', error);
+      setError('Unable to save memory. Please try again.');
     }
-  }, [state.dashboardContext, dispatch]);
+  }, [state.dashboardContext, dispatch, setError]);
 
   const handleMinimize = useCallback(() => {
     setOpen(false);

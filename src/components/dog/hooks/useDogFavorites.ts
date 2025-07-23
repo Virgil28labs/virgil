@@ -1,30 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DogImage } from './useDogApi';
-
-const STORAGE_KEY_FAVORITES = 'virgil_dog_favorites';
+import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
 
 export const useDogFavorites = () => {
-  // Initialize state with localStorage value immediately
+  // Initialize state with StorageService value
   const [favorites, setFavorites] = useState<DogImage[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_FAVORITES);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed;
-      }
-    } catch (e) {
-      console.error('Failed to parse favorites from localStorage:', e);
-    }
-    return [];
+    return StorageService.get<DogImage[]>(STORAGE_KEYS.DOG_FAVORITES, []);
   });
 
   // Save to localStorage whenever favorites change
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(favorites));
-    } catch (e) {
-      console.error('Failed to save favorites to localStorage:', e);
-    }
+    StorageService.set(STORAGE_KEYS.DOG_FAVORITES, favorites);
   }, [favorites]);
 
   // Check if image is favorited
