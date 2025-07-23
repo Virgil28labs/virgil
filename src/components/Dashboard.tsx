@@ -16,10 +16,12 @@ import { NotesEmojiButton } from './notes/NotesEmojiButton';
 import { LoadingFallback } from './LoadingFallback';
 import { SkeletonLoader } from './SkeletonLoader';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { GoogleMapsModal } from './maps/GoogleMapsModal';
 import { SectionErrorBoundary } from './common/SectionErrorBoundary';
 import { PositionedIPHoverCard } from './location/IPHoverCard';
 import { dashboardAppService } from '../services/DashboardAppService';
+import { dashboardContextService } from '../services/DashboardContextService';
 import { NotesAdapter } from '../services/adapters/NotesAdapter';
 import { PomodoroAdapter } from '../services/adapters/PomodoroAdapter';
 import { StreakAdapter } from '../services/adapters/StreakAdapter';
@@ -34,6 +36,7 @@ import { logger } from '../lib/logger';
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
   const { address, ipLocation, coordinates, loading: locationLoading } = useLocation();
+  const { deviceInfo } = useDeviceInfo(ipLocation || undefined);
   const [showProfileViewer, setShowProfileViewer] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showMapsModal, setShowMapsModal] = useState(false);
@@ -126,6 +129,13 @@ export const Dashboard = memo(function Dashboard() {
       dashboardAppService.unregisterAdapter('circle');
     };
   }, []);
+
+  // Update dashboard context service with device info
+  useEffect(() => {
+    if (deviceInfo) {
+      dashboardContextService.updateDeviceContext(deviceInfo);
+    }
+  }, [deviceInfo]);
 
   return (
     <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">

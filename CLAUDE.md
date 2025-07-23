@@ -70,6 +70,7 @@ server/           # Express backend
 - Share performance data
 - Highlight patterns used
 - Make Ben proud of the code
+- Explain technical terms to help Ben read code
 
 ## Never Do This
 ❌ Untested code

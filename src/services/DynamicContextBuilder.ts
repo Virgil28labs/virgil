@@ -14,6 +14,7 @@ export interface ContextRelevance {
   weatherContext: number;   // 0-1 relevance score
   userContext: number;      // 0-1 relevance score
   activityContext: number;  // 0-1 relevance score
+  deviceContext: number;    // 0-1 relevance score
 }
 
 export interface EnhancedPrompt {
@@ -54,6 +55,14 @@ export class DynamicContextBuilder {
     'contact', 'info', 'information', 'details', 'who am i', 'about me', 'identity'
   ];
 
+  private static readonly DEVICE_KEYWORDS = [
+    'device', 'computer', 'laptop', 'phone', 'browser', 'chrome', 'safari', 'firefox',
+    'os', 'operating system', 'mac', 'windows', 'linux', 'system', 'hardware',
+    'cpu', 'processor', 'memory', 'ram', 'screen', 'resolution', 'display',
+    'network', 'connection', 'speed', 'battery', 'storage', 'specs', 'specifications',
+    'using', 'running', 'what device', 'what browser', 'what computer', 'what system'
+  ];
+
   /**
    * Analyzes a user query and calculates relevance scores for different context types
    */
@@ -66,6 +75,7 @@ export class DynamicContextBuilder {
     const weatherScore = this.calculateKeywordRelevance(words, this.WEATHER_KEYWORDS);
     const userScore = this.calculateKeywordRelevance(words, this.USER_KEYWORDS);
     const activityScore = this.calculateKeywordRelevance(words, this.ACTIVITY_KEYWORDS);
+    const deviceScore = this.calculateKeywordRelevance(words, this.DEVICE_KEYWORDS);
 
     return {
       timeContext: timeScore,
@@ -73,6 +83,7 @@ export class DynamicContextBuilder {
       weatherContext: weatherScore,
       userContext: userScore,
       activityContext: activityScore,
+      deviceContext: deviceScore,
     };
   }
 
@@ -141,6 +152,12 @@ export class DynamicContextBuilder {
       contextUsed.push('activity');
     }
 
+    // Device context - always include for direct queries or when relevant
+    if ((relevanceScores.deviceContext > 0.1 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
+      contextSections.push(this.buildDeviceContext(context));
+      contextUsed.push('device');
+    }
+
     // Add context sections to prompt
     if (contextSections.length > 0) {
       const contextString = '\n\nCONTEXTUAL AWARENESS:\n' + contextSections.join('\n');
@@ -193,6 +210,17 @@ export class DynamicContextBuilder {
       'my gender', 'am i married', 'my marital'
     ];
     return userQueries.some(userQuery => query.toLowerCase().includes(userQuery));
+  }
+
+  private static isDeviceQuery(query: string): boolean {
+    const deviceQueries = [
+      'what device', 'what computer', 'what browser', 'which browser',
+      'what os', 'what operating system', 'my device', 'my computer',
+      'my browser', 'my system', 'specs', 'specifications', 'hardware',
+      'how much ram', 'how much memory', 'cpu', 'processor', 'screen resolution',
+      'what am i using', 'what am i running'
+    ];
+    return deviceQueries.some(deviceQuery => query.toLowerCase().includes(deviceQuery));
   }
 
   private static buildTimeContext(context: DashboardContext): string {
@@ -338,6 +366,54 @@ export class DynamicContextBuilder {
     return activityContext;
   }
 
+  private static buildDeviceContext(context: DashboardContext): string {
+    const device = context.device;
+    let deviceContext = '';
+    
+    if (device.browser) {
+      deviceContext += `Browser: ${device.browser}`;
+    }
+    
+    if (device.os) {
+      deviceContext += `\nOperating System: ${device.os}`;
+    }
+    
+    if (device.device) {
+      deviceContext += `\nDevice: ${device.device}`;
+    }
+    
+    if (device.screen) {
+      deviceContext += `\nScreen Resolution: ${device.screen}`;
+      if (device.pixelRatio && device.pixelRatio > 1) {
+        deviceContext += ` @${device.pixelRatio}x`;
+      }
+    }
+    
+    if (device.cpu) {
+      deviceContext += `\nCPU: ${device.cpu}${typeof device.cpu === 'number' ? ' cores' : ''}`;
+    }
+    
+    if (device.memory) {
+      deviceContext += `\nMemory: ${device.memory}`;
+    }
+    
+    if (device.networkType) {
+      deviceContext += `\nNetwork: ${device.networkType}`;
+      if (device.downlink) {
+        deviceContext += ` (${device.downlink})`;
+      }
+    }
+    
+    if (device.batteryLevel !== null && device.batteryLevel !== undefined) {
+      deviceContext += `\nBattery: ${device.batteryLevel}%`;
+      if (device.batteryCharging !== null) {
+        deviceContext += device.batteryCharging ? ' (charging)' : ' (not charging)';
+      }
+    }
+    
+    return deviceContext;
+  }
+
   private static filterRelevantSuggestions(
     suggestions: ContextualSuggestion[],
     relevanceScores: ContextRelevance
@@ -350,6 +426,7 @@ export class DynamicContextBuilder {
         if (trigger.startsWith('weather:') && relevanceScores.weatherContext > 0.2) return true;
         if (trigger.startsWith('user:') && relevanceScores.userContext > 0.2) return true;
         if (trigger.startsWith('activity:') && relevanceScores.activityContext > 0.2) return true;
+        if (trigger.startsWith('device:') && relevanceScores.deviceContext > 0.2) return true;
         return false;
       });
       

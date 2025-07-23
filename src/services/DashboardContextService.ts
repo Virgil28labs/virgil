@@ -71,6 +71,35 @@ export interface DashboardContext {
     language: string;
   };
   
+  // Device context (from useDeviceInfo)
+  device: {
+    hasData: boolean;
+    // Hardware & System
+    os?: string;
+    browser?: string;
+    device?: string;
+    cpu?: number | string;
+    memory?: string;
+    screen?: string;
+    pixelRatio?: number;
+    windowSize?: string;
+    // Network
+    networkType?: string;
+    downlink?: string;
+    rtt?: string;
+    // Battery
+    batteryLevel?: number | null;
+    batteryCharging?: boolean | null;
+    // Storage
+    storageQuota?: string;
+    // Features
+    cookiesEnabled?: boolean;
+    doNotTrack?: string | null;
+    // Session
+    tabVisible?: boolean;
+    sessionDuration?: number;
+  };
+  
   // Dashboard apps context
   apps?: DashboardAppData;
 }
@@ -125,6 +154,9 @@ export class DashboardContextService {
         deviceType: this.detectDeviceType(),
         prefersDarkMode: this.prefersDarkMode(),
         language: navigator.language || 'en-US',
+      },
+      device: {
+        hasData: false,
       },
     };
   }
@@ -230,6 +262,41 @@ export class DashboardContextService {
       }
     }
     
+    this.notifyListeners();
+  }
+
+  updateDeviceContext(deviceInfo: any): void {
+    if (!deviceInfo) {
+      this.context.device = { hasData: false };
+    } else {
+      this.context.device = {
+        hasData: true,
+        // Hardware & System
+        os: deviceInfo.os,
+        browser: deviceInfo.browser,
+        device: deviceInfo.device,
+        cpu: deviceInfo.cpu,
+        memory: deviceInfo.memory,
+        screen: deviceInfo.screen,
+        pixelRatio: deviceInfo.pixelRatio,
+        windowSize: deviceInfo.windowSize,
+        // Network
+        networkType: deviceInfo.networkType,
+        downlink: deviceInfo.downlink,
+        rtt: deviceInfo.rtt,
+        // Battery
+        batteryLevel: deviceInfo.batteryLevel,
+        batteryCharging: deviceInfo.batteryCharging,
+        // Storage
+        storageQuota: deviceInfo.storageQuota,
+        // Features
+        cookiesEnabled: deviceInfo.cookiesEnabled,
+        doNotTrack: deviceInfo.doNotTrack,
+        // Session
+        tabVisible: deviceInfo.tabVisible,
+        sessionDuration: deviceInfo.sessionDuration,
+      };
+    }
     this.notifyListeners();
   }
 
@@ -393,6 +460,30 @@ export class DashboardContextService {
     contextString += `\nENVIRONMENT:\n`;
     contextString += `- Device: ${ctx.environment.deviceType}\n`;
     contextString += `- Time in session: ${Math.floor(ctx.activity.timeSpentInSession / 1000 / 60)} minutes\n`;
+
+    // Device context
+    if (ctx.device.hasData) {
+      contextString += `\nDEVICE INFO:\n`;
+      if (ctx.device.browser) contextString += `- Browser: ${ctx.device.browser}\n`;
+      if (ctx.device.os) contextString += `- Operating System: ${ctx.device.os}\n`;
+      if (ctx.device.device) contextString += `- Device Type: ${ctx.device.device}\n`;
+      if (ctx.device.screen) contextString += `- Screen Resolution: ${ctx.device.screen}`;
+      if (ctx.device.pixelRatio && ctx.device.pixelRatio > 1) contextString += ` @${ctx.device.pixelRatio}x`;
+      if (ctx.device.screen) contextString += '\n';
+      if (ctx.device.windowSize) contextString += `- Window Size: ${ctx.device.windowSize}\n`;
+      if (ctx.device.cpu) contextString += `- CPU: ${ctx.device.cpu}${typeof ctx.device.cpu === 'number' ? ' cores' : ''}\n`;
+      if (ctx.device.memory) contextString += `- Memory: ${ctx.device.memory}\n`;
+      if (ctx.device.networkType) contextString += `- Network Type: ${ctx.device.networkType}\n`;
+      if (ctx.device.downlink) contextString += `- Network Speed: ${ctx.device.downlink}\n`;
+      if (ctx.device.batteryLevel !== null && ctx.device.batteryLevel !== undefined) {
+        contextString += `- Battery: ${ctx.device.batteryLevel}%`;
+        if (ctx.device.batteryCharging !== null) {
+          contextString += ` (${ctx.device.batteryCharging ? 'charging' : 'not charging'})`;
+        }
+        contextString += '\n';
+      }
+      if (ctx.device.storageQuota) contextString += `- Storage Quota: ${ctx.device.storageQuota}\n`;
+    }
 
     // Dashboard apps context
     if (ctx.apps) {

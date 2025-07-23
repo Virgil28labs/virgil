@@ -5,7 +5,14 @@ export class PhotoStorage {
   private static readonly PHOTOS_KEY = 'virgil_camera_photos';
   private static readonly SETTINGS_KEY = 'virgil_camera_settings';
   private static readonly VERSION_KEY = 'virgil_camera_version';
-  private static readonly CURRENT_VERSION = '1.0.0';
+  private static readonly CURRENT_VERSION = '2.0.0'; // Bumped for IndexedDB migration
+  
+  // IndexedDB configuration
+  private static readonly DB_NAME = 'VirgilCameraDB';
+  private static readonly DB_VERSION = 1;
+  private static readonly STORE_NAME = 'photos';
+  private static db: IDBDatabase | null = null;
+  private static initPromise: Promise<void> | null = null;
 
   private static readonly DEFAULT_OPTIONS: PhotoStorageOptions = {
     maxStorage: 50, // 50MB
@@ -16,11 +23,56 @@ export class PhotoStorage {
 
   static async initialize(): Promise<void> {
     try {
+      await this.initDB();
       await this.migrateData();
       await this.cleanupOldPhotos();
     } catch (error) {
       console.error('Error initializing photo storage:', error);
     }
+  }
+
+  private static async initDB(): Promise<void> {
+    if (this.db) return;
+    
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+
+    this.initPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+
+      request.onerror = () => {
+        console.error('Failed to open database:', request.error);
+        reject(request.error);
+      };
+
+      request.onsuccess = () => {
+        this.db = request.result;
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        
+        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+          const store = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('isFavorite', 'isFavorite', { unique: false });
+        }
+      };
+    });
+
+    return this.initPromise;
+  }
+
+  private static async ensureDB(): Promise<IDBDatabase> {
+    if (!this.db) {
+      await this.initDB();
+    }
+    if (!this.db) {
+      throw new Error('Database not available');
+    }
+    return this.db;
   }
 
   static async savePhoto(photo: Omit<SavedPhoto, 'id'>): Promise<SavedPhoto> {
@@ -38,12 +90,19 @@ export class PhotoStorage {
 
       await this.checkStorageQuota();
       
-      const photos = await this.getAllPhotos();
-      photos.push(savedPhoto);
+      const db = await this.ensureDB();
       
-      await this.savePhotos(photos);
-      
-      return savedPhoto;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.add(savedPhoto);
+
+        request.onsuccess = () => resolve(savedPhoto);
+        request.onerror = () => {
+          console.error('Error saving photo:', request.error);
+          reject(new Error('Failed to save photo'));
+        };
+      });
     } catch (error) {
       console.error('Error saving photo:', error);
       throw new Error('Failed to save photo');
@@ -52,11 +111,23 @@ export class PhotoStorage {
 
   static async getAllPhotos(): Promise<SavedPhoto[]> {
     try {
-      const data = localStorage.getItem(this.PHOTOS_KEY);
-      if (!data) return [];
+      const db = await this.ensureDB();
       
-      const photos = JSON.parse(data) as SavedPhoto[];
-      return photos.sort((a, b) => b.timestamp - a.timestamp);
+      return new Promise((resolve) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readonly');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          const photos = request.result as SavedPhoto[];
+          resolve(photos.sort((a, b) => b.timestamp - a.timestamp));
+        };
+        
+        request.onerror = () => {
+          console.error('Error loading photos:', request.error);
+          resolve([]); // Return empty array on error
+        };
+      });
     } catch (error) {
       console.error('Error loading photos:', error);
       return [];
@@ -75,15 +146,25 @@ export class PhotoStorage {
 
   static async updatePhoto(id: string, updates: Partial<SavedPhoto>): Promise<SavedPhoto | null> {
     try {
-      const photos = await this.getAllPhotos();
-      const index = photos.findIndex(photo => photo.id === id);
+      const db = await this.ensureDB();
       
-      if (index === -1) return null;
+      // First get the existing photo
+      const existingPhoto = await this.getPhotoById(id);
+      if (!existingPhoto) return null;
       
-      photos[index] = { ...photos[index], ...updates };
-      await this.savePhotos(photos);
+      const updatedPhoto = { ...existingPhoto, ...updates };
       
-      return photos[index];
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.put(updatedPhoto);
+
+        request.onsuccess = () => resolve(updatedPhoto);
+        request.onerror = () => {
+          console.error('Error updating photo:', request.error);
+          reject(new Error('Failed to update photo'));
+        };
+      });
     } catch (error) {
       console.error('Error updating photo:', error);
       throw new Error('Failed to update photo');
@@ -92,15 +173,22 @@ export class PhotoStorage {
 
   static async deletePhoto(id: string): Promise<boolean> {
     try {
-      const photos = await this.getAllPhotos();
-      const filteredPhotos = photos.filter(photo => photo.id !== id);
+      const db = await this.ensureDB();
       
-      if (filteredPhotos.length === photos.length) {
-        return false; // Photo not found
-      }
-      
-      await this.savePhotos(filteredPhotos);
-      return true;
+      return new Promise((resolve) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.delete(id);
+
+        request.onsuccess = () => {
+          resolve(true);
+        };
+        
+        request.onerror = () => {
+          console.error('Error deleting photo:', request.error);
+          resolve(false);
+        };
+      });
     } catch (error) {
       console.error('Error deleting photo:', error);
       throw new Error('Failed to delete photo');
@@ -109,16 +197,29 @@ export class PhotoStorage {
 
   static async deletePhotos(ids: string[]): Promise<number> {
     try {
-      const photos = await this.getAllPhotos();
-      const filteredPhotos = photos.filter(photo => !ids.includes(photo.id));
+      const db = await this.ensureDB();
+      let deletedCount = 0;
       
-      const deletedCount = photos.length - filteredPhotos.length;
-      
-      if (deletedCount > 0) {
-        await this.savePhotos(filteredPhotos);
-      }
-      
-      return deletedCount;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        
+        ids.forEach(id => {
+          const request = store.delete(id);
+          request.onsuccess = () => {
+            deletedCount++;
+          };
+        });
+        
+        transaction.oncomplete = () => {
+          resolve(deletedCount);
+        };
+        
+        transaction.onerror = () => {
+          console.error('Error deleting photos:', transaction.error);
+          reject(new Error('Failed to delete photos'));
+        };
+      });
     } catch (error) {
       console.error('Error deleting photos:', error);
       throw new Error('Failed to delete photos');
@@ -127,15 +228,13 @@ export class PhotoStorage {
 
   static async toggleFavorite(id: string): Promise<boolean> {
     try {
-      const photos = await this.getAllPhotos();
-      const photo = photos.find(p => p.id === id);
+      const photo = await this.getPhotoById(id);
       
       if (!photo) return false;
       
-      photo.isFavorite = !photo.isFavorite;
-      await this.savePhotos(photos);
+      const updatedPhoto = await this.updatePhoto(id, { isFavorite: !photo.isFavorite });
       
-      return photo.isFavorite;
+      return updatedPhoto?.isFavorite || false;
     } catch (error) {
       console.error('Error toggling favorite:', error);
       throw new Error('Failed to toggle favorite');
@@ -179,7 +278,19 @@ export class PhotoStorage {
 
   static async clearAllPhotos(): Promise<void> {
     try {
-      localStorage.removeItem(this.PHOTOS_KEY);
+      const db = await this.ensureDB();
+      
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.clear();
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => {
+          console.error('Error clearing photos:', request.error);
+          reject(new Error('Failed to clear photos'));
+        };
+      });
     } catch (error) {
       console.error('Error clearing photos:', error);
       throw new Error('Failed to clear photos');
@@ -222,10 +333,29 @@ export class PhotoStorage {
         return 0;
       }
       
-      const allPhotos = [...existingPhotos, ...newPhotos];
-      await this.savePhotos(allPhotos);
+      const db = await this.ensureDB();
       
-      return newPhotos.length;
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        let addedCount = 0;
+        
+        newPhotos.forEach((photo: SavedPhoto) => {
+          const request = store.add(photo);
+          request.onsuccess = () => {
+            addedCount++;
+          };
+        });
+        
+        transaction.oncomplete = () => {
+          resolve(addedCount);
+        };
+        
+        transaction.onerror = () => {
+          console.error('Error importing photos:', transaction.error);
+          reject(new Error('Failed to import photos'));
+        };
+      });
     } catch (error) {
       console.error('Error importing photos:', error);
       throw new Error('Failed to import photos');
@@ -255,17 +385,6 @@ export class PhotoStorage {
     }
   }
 
-  private static async savePhotos(photos: SavedPhoto[]): Promise<void> {
-    try {
-      const data = JSON.stringify(photos);
-      localStorage.setItem(this.PHOTOS_KEY, data);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'QuotaExceededError') {
-        throw new Error('Storage quota exceeded. Please delete some photos.');
-      }
-      throw error;
-    }
-  }
 
   private static async checkStorageQuota(): Promise<void> {
     const storageInfo = await this.getStorageInfo();
@@ -284,12 +403,13 @@ export class PhotoStorage {
       const photos = await this.getAllPhotos();
       const cutoffTime = Date.now() - (options.cleanupAfterDays * 24 * 60 * 60 * 1000);
       
-      const photosToKeep = photos.filter(photo => 
-        photo.timestamp > cutoffTime || photo.isFavorite,
+      const photosToDelete = photos.filter(photo => 
+        photo.timestamp <= cutoffTime && !photo.isFavorite,
       );
       
-      if (photosToKeep.length < photos.length) {
-        await this.savePhotos(photosToKeep);
+      if (photosToDelete.length > 0) {
+        const idsToDelete = photosToDelete.map(photo => photo.id);
+        await this.deletePhotos(idsToDelete);
       }
     } catch (_error) {
     }
@@ -303,9 +423,54 @@ export class PhotoStorage {
         return;
       }
       
-      // Perform migrations here if needed
+      // Migrate photos from localStorage to IndexedDB
+      const localStoragePhotos = localStorage.getItem(this.PHOTOS_KEY);
+      if (localStoragePhotos) {
+        try {
+          const photos = JSON.parse(localStoragePhotos) as SavedPhoto[];
+          if (photos.length > 0) {
+            console.log(`Migrating ${photos.length} photos from localStorage to IndexedDB...`);
+            
+            const db = await this.ensureDB();
+            
+            // Add all photos to IndexedDB
+            await new Promise<void>((resolve, reject) => {
+              const transaction = db.transaction([this.STORE_NAME], 'readwrite');
+              const store = transaction.objectStore(this.STORE_NAME);
+              let migratedCount = 0;
+              
+              photos.forEach(photo => {
+                const request = store.add(photo);
+                request.onsuccess = () => {
+                  migratedCount++;
+                };
+                request.onerror = () => {
+                  console.warn(`Failed to migrate photo ${photo.id}:`, request.error);
+                };
+              });
+              
+              transaction.oncomplete = () => {
+                console.log(`Successfully migrated ${migratedCount} photos to IndexedDB`);
+                // Remove photos from localStorage after successful migration
+                localStorage.removeItem(this.PHOTOS_KEY);
+                resolve();
+              };
+              
+              transaction.onerror = () => {
+                console.error('Migration transaction failed:', transaction.error);
+                reject(transaction.error);
+              };
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing photos from localStorage:', error);
+        }
+      }
+      
+      // Update version
       localStorage.setItem(this.VERSION_KEY, this.CURRENT_VERSION);
-    } catch (_error) {
+    } catch (error) {
+      console.error('Error during migration:', error);
     }
   }
 }
