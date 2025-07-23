@@ -196,12 +196,14 @@ router.get('/', validateApiKey, async (req, res) => {
       }
 
       cacheKey = `weather-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
-      apiUrl = `${API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&appid=${req.apiKey}&units=imperial`;
+      apiUrl = `${API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}` +
+        `&appid=${req.apiKey}&units=imperial`;
     } else if (city) {
       // City-based request
       const location = country ? `${city},${country}` : city;
       cacheKey = `weather-city-${location.toLowerCase()}`;
-      apiUrl = `${API_BASE_URL}/weather?q=${encodeURIComponent(location)}&appid=${req.apiKey}&units=imperial`;
+      apiUrl = `${API_BASE_URL}/weather?q=${encodeURIComponent(location)}` +
+        `&appid=${req.apiKey}&units=imperial`;
     } else {
       return res.status(400).json({
         error: 'Either coordinates (lat, lon) or city name is required',
@@ -271,12 +273,14 @@ router.get('/forecast', validateApiKey, async (req, res) => {
       }
 
       cacheKey = `forecast-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
-      apiUrl = `${API_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}&appid=${req.apiKey}&units=imperial`;
+      apiUrl = `${API_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}` +
+        `&appid=${req.apiKey}&units=imperial`;
     } else if (city) {
       // City-based request
       const location = country ? `${city},${country}` : city;
       cacheKey = `forecast-city-${location.toLowerCase()}`;
-      apiUrl = `${API_BASE_URL}/forecast?q=${encodeURIComponent(location)}&appid=${req.apiKey}&units=imperial`;
+      apiUrl = `${API_BASE_URL}/forecast?q=${encodeURIComponent(location)}` +
+        `&appid=${req.apiKey}&units=imperial`;
     } else {
       return res.status(400).json({
         error: 'Either coordinates (lat, lon) or city name is required',

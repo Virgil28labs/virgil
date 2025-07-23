@@ -13,7 +13,7 @@ export default [
   js.configs.recommended,
   // Server files (Node.js)
   {
-    files: ['server/**/*.js', 'scripts/**/*.js'],
+    files: ['server/**/*.js'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -58,6 +58,26 @@ export default [
       'arrow-parens': ['error', 'as-needed'],
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-duplicate-imports': 'error',
+    },
+  },
+  // Script files (Node.js ESM)
+  {
+    files: ['scripts/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+      },
+      sourceType: 'module',
+    },
+    rules: {
+      'comma-dangle': ['error', 'always-multiline'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+      'indent': ['error', 2],
+      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
+      'no-console': 'off', // Scripts can use console
     },
   },
   {
@@ -193,8 +213,42 @@ export default [
       },
     },
   },
+  // Server TypeScript files
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['server/**/*.ts'],
+    languageOptions: {
+      parser: parser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './server/tsconfig.json',
+      },
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+        NodeJS: 'readonly',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'comma-dangle': ['error', 'always-multiline'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}', 'vite.config.ts', 'jest.setup.ts'],
     languageOptions: {
       parser: parser,
       parserOptions: {

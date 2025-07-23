@@ -75,7 +75,9 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
     // Simple classification prompt - matching original behavior
     const systemPrompt = 'You are a music genre classifier. Classify drum beat descriptions into one of these categories: techno, house, trap, breakbeat, or minimal.';
 
-    const userPrompt = `Given this drum beat description: "${description}", classify it into one of these categories: techno, house, trap, breakbeat, or minimal. Respond with ONLY the category name in lowercase, nothing else.`;
+    const userPrompt = `Given this drum beat description: "${description}", ` +
+      'classify it into one of these categories: techno, house, trap, breakbeat, or minimal. ' +
+      'Respond with ONLY the category name in lowercase, nothing else.';
 
     // Generate pattern using LLM
     const result = await requestQueue.add(async () => llmProxy.complete({

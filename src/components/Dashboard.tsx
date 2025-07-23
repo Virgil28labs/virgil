@@ -58,7 +58,7 @@ export const Dashboard = memo(function Dashboard() {
         logger.warn('Failed to save elevation unit preference', {
           component: 'Dashboard',
           action: 'handleUnitChange',
-          metadata: { error: e }
+          metadata: { error: e },
         });
       }
       return newUnit;
@@ -73,7 +73,7 @@ export const Dashboard = memo(function Dashboard() {
     if (error) {
       logger.error('Sign out error', error as Error, {
         component: 'Dashboard',
-        action: 'handleSignOut'
+        action: 'handleSignOut',
       });
     }
     setIsSigningOut(false);

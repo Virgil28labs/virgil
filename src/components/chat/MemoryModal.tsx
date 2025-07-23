@@ -47,7 +47,7 @@ const MemoryModal = memo(function MemoryModal({
       logger.error('Failed to delete memory', error as Error, {
         component: 'MemoryModal',
         action: 'handleDeleteMemory',
-        metadata: { memoryId: memory.id }
+        metadata: { memoryId }
       });
     }
   }, [onMemoriesUpdate, onMemoryContextUpdate, onMemoryIndicatorUpdate]);

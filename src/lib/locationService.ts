@@ -83,7 +83,7 @@ export const locationService = {
         },
         {
           enableHighAccuracy: true,
-          timeout: 5000, // Increased to 5s for better reliability
+          timeout: 10000, // Increased to 10s for better reliability on first load
           maximumAge: 300000,
         },
       );
@@ -91,41 +91,53 @@ export const locationService = {
   },
 
   async getAddressFromCoordinates(latitude: number, longitude: number): Promise<Address> {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch address');
-      }
-      
-      const data = await response.json();
-      const address = data.address || {};
-      
-      // Handle various street name fields from OpenStreetMap
-      const streetName = address.road || 
-                        address.pedestrian || 
-                        address.footway || 
-                        address.path || 
-                        address.cycleway || 
-                        address.residential || 
-                        address.avenue ||
-                        address.street ||
-                        address.way ||
-                        '';
-      
-      return {
-        street: streetName,
-        house_number: address.house_number || '',
-        city: address.city || address.town || address.village || '',
-        postcode: address.postcode || '',
-        country: address.country || '',
-        formatted: data.display_name || '',
-      };
-    } catch (_error) {
-      throw new Error('Failed to get address from coordinates');
-    }
+    return retryWithBackoff(
+      async () => {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'Virgil-App/1.0', // OpenStreetMap requires User-Agent
+            },
+          },
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch address: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const address = data.address || {};
+        
+        // Handle various street name fields from OpenStreetMap
+        const streetName = address.road || 
+                          address.pedestrian || 
+                          address.footway || 
+                          address.path || 
+                          address.cycleway || 
+                          address.residential || 
+                          address.avenue ||
+                          address.street ||
+                          address.way ||
+                          '';
+        
+        return {
+          street: streetName,
+          house_number: address.house_number || '',
+          city: address.city || address.town || address.village || '',
+          postcode: address.postcode || '',
+          country: address.country || '',
+          formatted: data.display_name || '',
+        };
+      },
+      {
+        maxRetries: 3,
+        initialDelay: 1000,
+        onRetry: (attempt, error) => {
+          console.log(`Retrying reverse geocoding (attempt ${attempt}):`, error.message);
+        },
+      },
+    );
   },
 
 

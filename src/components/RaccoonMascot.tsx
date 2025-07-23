@@ -125,7 +125,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         return currentPos;
       });
     }, 10000);
-  }, []); // Remove all state dependencies
+  }, [PHYSICS.GROUND_Y]); // startSleepingAnimation excluded to avoid circular dependency
 
   /**
    * Starts the sleeping animation with floating zzz emojis
@@ -408,7 +408,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   };
 
   // Handle drag move
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
 
     setPosition({
@@ -419,12 +419,12 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     setJumpsUsed(0);
     setIsOnWall(false);
     setWallSide(null);
-  };
+  }, [isDragging, dragOffset.x, dragOffset.y]);
 
   // Handle drag end
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-  };
+  }, []);
 
   // Add global mouse event listeners for dragging
   useEffect(() => {
@@ -438,7 +438,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       };
     }
     return undefined;
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, handleMouseMove, handleMouseUp]);
 
   // Update UI elements with optimized caching
   useEffect(() => {
