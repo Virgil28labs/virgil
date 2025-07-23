@@ -6,7 +6,8 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import type { Habit, UserHabitsData } from '../../types/habit.types';
+import type { UserHabitsData } from '../../types/habit.types';
+import { logger } from '../../lib/logger';
 
 interface StreakData {
   habits: {
@@ -57,7 +58,10 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
         this.lastFetchTime = Date.now();
       }
     } catch (error) {
-      console.error('Failed to load habit data:', error);
+      logger.error('Failed to load habit data', error as Error, {
+        component: 'StreakAdapter',
+        action: 'loadUserData'
+      });
     }
   }
 
@@ -288,7 +292,6 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
     const completed = data.stats.habitsCompletedToday;
     const total = data.stats.totalHabits;
-    const remaining = total - completed;
 
     if (completed === 0) {
       return `You haven't checked in any habits today. You have ${total} habit${total > 1 ? 's' : ''} to complete: ${data.habits.map(h => `${h.emoji} ${h.name}`).join(', ')}`;

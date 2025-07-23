@@ -1,6 +1,7 @@
 import { memo, useEffect, useCallback, useState } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyModalProps } from '../../types/giphy.types';
+import { logger } from '../../lib/logger';
 
 export const GiphyModal = memo(function GiphyModal({ 
   gifs, 
@@ -40,7 +41,11 @@ export const GiphyModal = memo(function GiphyModal({
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download GIF:', error);
+      logger.error('Failed to download GIF', error as Error, {
+        component: 'GiphyModal',
+        action: 'handleDownload',
+        metadata: { gifTitle: currentGif.title }
+      });
     }
   }, [currentGif]);
 
@@ -55,7 +60,11 @@ export const GiphyModal = memo(function GiphyModal({
         setTimeout(() => setShowCopied(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to copy GIF URL:', error);
+      logger.error('Failed to copy GIF URL', error as Error, {
+        component: 'GiphyModal',
+        action: 'handleCopyLink',
+        metadata: { gifTitle: currentGif.title }
+      });
     }
   }, [currentGif]);
 

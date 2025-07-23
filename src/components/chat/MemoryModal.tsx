@@ -1,6 +1,7 @@
 import { memo, useState, useCallback } from 'react';
 import { StoredConversation, MarkedMemory, MemoryService, memoryService } from '../../services/MemoryService';
 import './MemoryModal.css';
+import { logger } from '../../lib/logger';
 
 interface MemoryModalProps {
   isOpen: boolean;
@@ -43,7 +44,11 @@ const MemoryModal = memo(function MemoryModal({
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(!!newContext);
     } catch (error) {
-      console.error('Failed to delete memory:', error);
+      logger.error('Failed to delete memory', error as Error, {
+        component: 'MemoryModal',
+        action: 'handleDeleteMemory',
+        metadata: { memoryId: memory.id }
+      });
     }
   }, [onMemoriesUpdate, onMemoryContextUpdate, onMemoryIndicatorUpdate]);
 
@@ -59,7 +64,10 @@ const MemoryModal = memo(function MemoryModal({
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data', error as Error, {
+        component: 'MemoryModal',
+        action: 'handleExport'
+      });
     }
   }, []);
 
@@ -74,7 +82,10 @@ const MemoryModal = memo(function MemoryModal({
         onMemoryIndicatorUpdate(false);
         onClose();
       } catch (error) {
-        console.error('Failed to clear all data:', error);
+        logger.error('Failed to clear all data', error as Error, {
+          component: 'MemoryModal',
+          action: 'handleClearAll'
+        });
       }
     }
   }, [onMemoriesUpdate, onConversationsUpdate, onMemoryContextUpdate, onMemoryIndicatorUpdate, onClose]);

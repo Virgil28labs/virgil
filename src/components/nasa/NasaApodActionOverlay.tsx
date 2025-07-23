@@ -6,6 +6,7 @@ import {
   copyApodToClipboard, 
   shareApod, 
 } from './utils/nasaImageUtils';
+import { logger } from '../../lib/logger';
 
 interface NasaApodActionOverlayProps {
   apod: ApodImage
@@ -27,7 +28,11 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download APOD:', error);
+      logger.error('Failed to download APOD', error as Error, {
+        component: 'NasaApodActionOverlay',
+        action: 'handleDownload',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [apod]);
 
@@ -47,7 +52,11 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
       setShowCopied(true);
       setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy APOD:', error);
+      logger.error('Failed to copy APOD', error as Error, {
+        component: 'NasaApodActionOverlay',
+        action: 'handleCopy',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [apod]);
 
@@ -61,7 +70,11 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
         setTimeout(() => setShowShared(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to share APOD:', error);
+      logger.error('Failed to share APOD', error as Error, {
+        component: 'NasaApodActionOverlay',
+        action: 'handleShare',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [apod]);
 

@@ -7,6 +7,7 @@ import type {
   GiphyAction, 
   GiphyImage,
 } from '../../types';
+import { logger } from '../../lib/logger';
 
 // Initial state
 const initialState: GiphyState = {
@@ -100,7 +101,11 @@ function loadFavoritesFromStorage(): GiphyImage[] {
     const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.warn('Failed to load Giphy favorites from localStorage:', error);
+    logger.warn('Failed to load Giphy favorites from localStorage', {
+      component: 'GiphyGalleryProvider',
+      action: 'loadFavorites',
+      metadata: { error }
+    });
     return [];
   }
 }
@@ -110,7 +115,11 @@ function saveFavoritesToStorage(favorites: GiphyImage[]): void {
   try {
     localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
   } catch (error) {
-    console.warn('Failed to save Giphy favorites to localStorage:', error);
+    logger.warn('Failed to save Giphy favorites to localStorage', {
+      component: 'GiphyGalleryProvider',
+      action: 'saveFavorites',
+      metadata: { error }
+    });
   }
 }
 

@@ -68,19 +68,15 @@ export const locationService = {
         },
         (error: GeolocationPositionError) => {
           let errorMessage = 'Unable to retrieve your location';
-          let _errorDetails = '';
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = 'Location access denied by user';
-              _errorDetails = 'Please enable location permissions in your browser settings';
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = 'Location information is unavailable';
-              _errorDetails = 'GPS signal unavailable. Using IP-based location instead';
               break;
             case error.TIMEOUT:
               errorMessage = 'Location request timed out';
-              _errorDetails = 'GPS took too long to respond. Using IP-based location instead';
               break;
           }
           reject(new Error(errorMessage));

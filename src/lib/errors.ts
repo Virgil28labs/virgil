@@ -1,5 +1,7 @@
 // Unified error handling utilities
 
+import { logger } from './logger';
+
 export class AppError extends Error {
   constructor(
     message: string,
@@ -95,16 +97,20 @@ export function getErrorMessage(error: unknown): string {
 }
 
 // Error logging utility
-export function logError(error: unknown, context?: string): void {
-  if (process.env.NODE_ENV === 'development') {
-    const errorObj = handleError(error);
-    const contextPrefix = context ? `[${context}] ` : '';
-    
-    // In development, we can use console.error for debugging
-    console.error(`${contextPrefix}${errorObj.name}: ${errorObj.message}`, {
-      code: errorObj.code,
-      details: errorObj.details,
-      stack: errorObj.stack,
-    });
-  }
+export function logError(error: unknown, component: string, action?: string): void {
+  const errorObj = handleError(error);
+  
+  logger.error(
+    `${errorObj.name}: ${errorObj.message}`,
+    errorObj,
+    {
+      component,
+      action: action || 'unknown',
+      metadata: {
+        code: errorObj.code,
+        statusCode: errorObj.statusCode,
+        details: errorObj.details,
+      },
+    }
+  );
 }

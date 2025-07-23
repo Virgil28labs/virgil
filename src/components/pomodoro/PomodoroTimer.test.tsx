@@ -53,7 +53,12 @@ describe('PomodoroTimer', () => {
         },
       },
       loading: false,
-      updateProfile: jest.fn(),
+      saving: false,
+      saveSuccess: false,
+      validationErrors: {},
+      updateField: jest.fn(),
+      updateAddress: jest.fn(),
+      saveProfile: jest.fn(),
     });
   });
 

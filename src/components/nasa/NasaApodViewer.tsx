@@ -7,6 +7,7 @@ import { NasaApodGallery } from './NasaApodGallery';
 import { NasaApodImageView } from './NasaApodImageView';
 import { NasaApodModal } from './NasaApodModal';
 import './NasaApodViewer.css';
+import { logger } from '../../lib/logger';
 
 export const NasaApodViewer = memo(function NasaApodViewer({ 
   isOpen, 
@@ -48,7 +49,10 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load APOD';
       setError(errorMessage);
-      console.error('Failed to load APOD:', err);
+      logger.error('Failed to load APOD', err as Error, {
+        component: 'NasaApodViewer',
+        action: 'loadDailyApod'
+      });
     } finally {
       setLoading(false);
     }

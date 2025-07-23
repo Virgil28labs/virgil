@@ -1,6 +1,7 @@
 import { memo, useState, useCallback } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyCardProps } from '../../types';
+import { logger } from '../../lib/logger';
 
 export const GiphyCard = memo(function GiphyCard({ 
   gif, 
@@ -26,7 +27,11 @@ export const GiphyCard = memo(function GiphyCard({
         setTimeout(() => setShowCopied(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to copy GIF URL:', error);
+      logger.error('Failed to copy GIF URL', error as Error, {
+        component: 'GiphyCard',
+        action: 'handleCopyUrl',
+        metadata: { gifTitle: gif.title }
+      });
     }
   }, [gif]);
 
@@ -39,7 +44,11 @@ export const GiphyCard = memo(function GiphyCard({
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download GIF:', error);
+      logger.error('Failed to download GIF', error as Error, {
+        component: 'GiphyCard',
+        action: 'handleDownload',
+        metadata: { gifTitle: gif.title }
+      });
     }
   }, [gif]);
 

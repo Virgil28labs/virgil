@@ -119,10 +119,21 @@ export class LLMService extends EventEmitter {
   }
 
   async *completeStream(options: Partial<LLMRequest>): AsyncGenerator<any, void, unknown> {
-    const streamOptions = { ...options, stream: true };
+    const { messages = [], model = this.config.defaultModel, temperature, maxTokens = 256, context = {}, provider = 'openai' } = options;
     
     try {
-      const response = await this.complete(streamOptions);
+      const response = await this.makeRequestWithRetry(
+        '/llm/stream',
+        {
+          messages: this.formatMessages(messages, options.systemPrompt),
+          model,
+          temperature,
+          maxTokens,
+          context,
+          provider,
+        },
+        true
+      );
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -150,7 +161,8 @@ export class LLMService extends EventEmitter {
         }
       }
     } catch (error) {
-      this.emit('stream-error', { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.emit('stream-error', { error: errorMessage });
       throw error;
     }
   }
@@ -188,8 +200,10 @@ export class LLMService extends EventEmitter {
 
     } catch (error) {
       // Retry logic
-      if (attempt < this.config.maxRetries && this.isRetryableError(error)) {
-        const delay = this.config.retryDelay * Math.pow(2, attempt - 1);
+      const maxRetries = this.config?.maxRetries ?? 3;
+      const retryDelay = this.config?.retryDelay ?? 1000;
+      if (error instanceof Error && attempt < maxRetries && this.isRetryableError(error)) {
+        const delay = retryDelay * Math.pow(2, attempt - 1);
         this.emit('retry', { attempt, delay, error: error.message });
         
         await new Promise(resolve => setTimeout(resolve, delay));
@@ -269,12 +283,12 @@ export class LLMService extends EventEmitter {
     return {
       activeRequests: this.activeRequests.size,
       cacheStats: this.cache.getStats(),
-      rateLimitStats: this.rateLimiter.getStats(),
+      rateLimitStats: { remaining: 0, reset: 0 },
     };
   }
 
-  clearCache(): Promise<void> {
-    return this.cache.clear();
+  async clearCache(): Promise<void> {
+    await this.cache.clear();
   }
 
   destroy(): void {

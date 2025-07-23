@@ -6,6 +6,8 @@
  * Camera, and other dashboard applications.
  */
 
+import { logger } from '../lib/logger';
+
 export interface AppContextData<T = any> {
   appName: string;
   displayName: string;
@@ -147,7 +149,11 @@ export class DashboardAppService {
             activeApps.push(appName);
           }
         } catch (error) {
-          console.error(`Error getting data from ${appName}:`, error);
+          logger.error(`Error getting data from ${appName}`, error as Error, {
+            component: 'DashboardAppService',
+            action: 'getCompleteContext',
+            metadata: { appName }
+          });
         }
       }
     }
@@ -458,7 +464,11 @@ export class DashboardAppService {
               return { appName: app.appName, response };
             }
           } catch (error) {
-            console.error(`Error getting response from ${app.appName}:`, error);
+            logger.error(`Error getting response from ${app.appName}`, error as Error, {
+              component: 'DashboardAppService',
+              action: 'handleAppAction',
+              metadata: { appName: app.appName }
+            });
           }
         }
       }
@@ -472,7 +482,11 @@ export class DashboardAppService {
               return { appName: app.appName, response };
             }
           } catch (error) {
-            console.error(`Error getting response from ${app.appName}:`, error);
+            logger.error(`Error getting response from ${app.appName}`, error as Error, {
+              component: 'DashboardAppService',
+              action: 'handleAppAction',
+              metadata: { appName: app.appName }
+            });
           }
         }
       }
@@ -498,7 +512,11 @@ export class DashboardAppService {
             });
           }
         } catch (error) {
-          console.error(`Error searching ${adapter.appName}:`, error);
+          logger.error(`Error searching ${adapter.appName}`, error as Error, {
+            component: 'DashboardAppService',
+            action: 'searchAllApps',
+            metadata: { appName: adapter.appName, query }
+          });
         }
       }
     }
@@ -513,7 +531,7 @@ export class DashboardAppService {
     const appData = this.getAllAppData();
     const summaries: string[] = [];
     
-    for (const [appName, data] of appData.apps) {
+    for (const [_appName, data] of appData.apps) {
       if (data.isActive || data.summary) {
         summaries.push(`${data.displayName}: ${data.summary}`);
       }

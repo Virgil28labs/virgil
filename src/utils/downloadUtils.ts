@@ -2,6 +2,8 @@
  * Shared utility functions for downloading images across different components
  */
 
+import { logger } from '../lib/logger';
+
 export interface DownloadableImage {
   url: string;
   title?: string;
@@ -42,7 +44,11 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
     // Cleanup
     URL.revokeObjectURL(blobUrl);
   } catch (error) {
-    console.error('Failed to download image:', error);
+    logger.error('Failed to download image', error as Error, {
+      component: 'downloadUtils',
+      action: 'downloadImage',
+      metadata: { imageUrl: image.url, title: image.title }
+    });
     throw new Error('Failed to download image. Please try again.');
   }
 }

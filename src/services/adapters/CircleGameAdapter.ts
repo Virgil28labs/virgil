@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface CircleGameData {
   scores: {
@@ -77,7 +78,10 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch circle game data:', error);
+      logger.error('Failed to fetch circle game data', error as Error, {
+        component: 'CircleGameAdapter',
+        action: 'fetchData'
+      });
       this.bestScore = 0;
       this.attempts = 0;
       this.scoreHistory = [];

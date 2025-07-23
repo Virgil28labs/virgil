@@ -153,7 +153,7 @@ describe('weatherService', () => {
         status: 500,
         json: async () => { throw new Error('Not JSON'); },
         text: async () => 'Internal Server Error',
-      } as Response);
+      } as unknown as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
         .rejects.toThrow('Failed to fetch weather data');
@@ -165,7 +165,7 @@ describe('weatherService', () => {
         status: 500,
         json: async () => { throw new Error('Not JSON'); },
         text: async () => { throw new Error('Not text'); },
-      } as Response);
+      } as unknown as Response);
 
       await expect(weatherService.getWeatherByCoordinates(40.7128, -74.0060))
         .rejects.toThrow('Failed to fetch weather data');

@@ -86,7 +86,7 @@ describe('LLMService', () => {
 
     it('makes a successful completion request', async () => {
       const options = {
-        messages: [{ role: 'user', content: 'Hello' }],
+        messages: [{ role: 'user' as const, content: 'Hello' }],
         model: 'gpt-3.5-turbo',
         temperature: 0.7,
       };

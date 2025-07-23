@@ -29,6 +29,7 @@ import { NasaApodAdapter } from '../services/adapters/NasaApodAdapter';
 import { GiphyAdapter } from '../services/adapters/GiphyAdapter';
 import { RhythmMachineAdapter } from '../services/adapters/RhythmMachineAdapter';
 import { CircleGameAdapter } from '../services/adapters/CircleGameAdapter';
+import { logger } from '../lib/logger';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
@@ -37,7 +38,7 @@ export const Dashboard = memo(function Dashboard() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showMapsModal, setShowMapsModal] = useState(false);
   const [showIPHover, setShowIPHover] = useState(false);
-  const ipRef = useRef<HTMLDivElement>(null);
+  const ipRef = useRef<HTMLDivElement | null>(null);
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
     try {
       const saved = localStorage.getItem('elevationUnit');
@@ -54,7 +55,11 @@ export const Dashboard = memo(function Dashboard() {
       try {
         localStorage.setItem('elevationUnit', newUnit);
       } catch (e) {
-        console.warn('Failed to save elevation unit preference:', e);
+        logger.warn('Failed to save elevation unit preference', {
+          component: 'Dashboard',
+          action: 'handleUnitChange',
+          metadata: { error: e }
+        });
       }
       return newUnit;
     });
@@ -66,7 +71,10 @@ export const Dashboard = memo(function Dashboard() {
     setIsSigningOut(true);
     const { error } = await signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error', error as Error, {
+        component: 'Dashboard',
+        action: 'handleSignOut'
+      });
     }
     setIsSigningOut(false);
   }, [signOut, isSigningOut]);

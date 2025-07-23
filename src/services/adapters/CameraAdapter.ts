@@ -8,6 +8,7 @@
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { PhotoStorage } from '../../components/camera/utils/photoStorage';
 import type { SavedPhoto } from '../../types/camera.types';
+import { logger } from '../../lib/logger';
 
 interface CameraData {
   photos: {
@@ -56,7 +57,10 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch camera photos:', error);
+      logger.error('Failed to fetch camera photos', error as Error, {
+        component: 'CameraAdapter',
+        action: 'fetchData'
+      });
       this.photos = [];
     }
   }

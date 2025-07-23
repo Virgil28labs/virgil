@@ -6,6 +6,7 @@ import {
   copyApodToClipboard, 
   shareApod, 
 } from './utils/nasaImageUtils';
+import { logger } from '../../lib/logger';
 
 interface NasaApodModalProps {
   favorites: ApodImage[]
@@ -58,7 +59,11 @@ export const NasaApodModal = memo(function NasaApodModal({
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download APOD:', error);
+      logger.error('Failed to download APOD', error as Error, {
+        component: 'NasaApodModal',
+        action: 'handleDownload',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [currentApod]);
 
@@ -82,7 +87,11 @@ export const NasaApodModal = memo(function NasaApodModal({
       setShowCopied(true);
       setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy APOD:', error);
+      logger.error('Failed to copy APOD', error as Error, {
+        component: 'NasaApodModal',
+        action: 'handleCopy',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [currentApod]);
 
@@ -97,7 +106,11 @@ export const NasaApodModal = memo(function NasaApodModal({
         setTimeout(() => setShowShared(false), 2000);
       }
     } catch (error) {
-      console.error('Failed to share APOD:', error);
+      logger.error('Failed to share APOD', error as Error, {
+        component: 'NasaApodModal',
+        action: 'handleShare',
+        metadata: { apodTitle: apod.title }
+      });
     }
   }, [currentApod]);
 

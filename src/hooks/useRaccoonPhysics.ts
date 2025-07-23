@@ -48,7 +48,7 @@ export function useRaccoonPhysics({
     angularVelocity: 0,
   });
 
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const dragStartRef = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null);
   const lastPositionsRef = useRef<Array<{ x: number; y: number; time: number }>>([]);
 

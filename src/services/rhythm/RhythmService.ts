@@ -1,3 +1,4 @@
+import { logger } from '../../lib/logger';
 
 export interface RhythmPattern {
   pattern: boolean[][]; // 5 drums x N steps
@@ -62,7 +63,10 @@ export class RhythmService {
       return result.data;
 
     } catch (error) {
-      console.error('RhythmService: Pattern generation failed:', error);
+      logger.error('Pattern generation failed', error as Error, {
+        component: 'RhythmService',
+        action: 'generateRhythmPattern'
+      });
       
       // Fallback to local algorithmic generation
       return this.generateFallbackPattern(options);
@@ -153,7 +157,10 @@ export class RhythmService {
       }
       return await response.json();
     } catch (error) {
-      console.error('RhythmService: Failed to fetch stats:', error);
+      logger.error('Failed to fetch stats', error as Error, {
+        component: 'RhythmService',
+        action: 'getPatternStats'
+      });
       return {
         totalGenerations: 0,
         successRate: 0,

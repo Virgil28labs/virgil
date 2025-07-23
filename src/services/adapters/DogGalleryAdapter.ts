@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface DogImage {
   url: string;
@@ -59,7 +60,10 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch dog favorites:', error);
+      logger.error('Failed to fetch dog favorites', error as Error, {
+        component: 'DogGalleryAdapter',
+        action: 'fetchData'
+      });
       this.favorites = [];
     }
   }

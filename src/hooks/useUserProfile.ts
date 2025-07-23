@@ -62,7 +62,7 @@ export const useUserProfile = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Partial<Record<keyof UserProfile, string>>>({});
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const skipNextLoadRef = useRef(false);
 
   // Generate unique ID based on name and date of birth

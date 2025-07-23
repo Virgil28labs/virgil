@@ -1,20 +1,11 @@
 import { EventEmitter } from '../utils/eventEmitter';
 
 export class LLMService extends EventEmitter {
-  private _config: any;
   private activeRequests: Map<string, { startTime: number }>;
 
-  constructor(config: any = {}) {
+  constructor(_config: any = {}) {
     super();
-    this._config = {
-      apiUrl: 'http://localhost:5002/api/v1',
-      defaultModel: 'gpt-4o-mini',
-      enableCache: false,
-      cacheTTL: 3600,
-      maxRetries: 3,
-      retryDelay: 1000,
-      ...config,
-    };
+    // Config is used for initialization only
     this.activeRequests = new Map();
   }
 

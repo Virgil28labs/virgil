@@ -6,6 +6,7 @@ import type {
   LocationState, 
   LocationAction,
 } from '../types/location.types';
+import { logger } from '../lib/logger';
 
 /**
  * LocationContext - Location Services State Management
@@ -106,7 +107,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
               (fullLocationData.address?.street && !state.address?.street)) {
             dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData });
           }
-        }).catch((error) => {
+        }).catch(() => {
           // Silently ignore GPS errors since we already have IP location
           // This is expected behavior when location services are unavailable
         }).finally(() => {
@@ -114,7 +115,10 @@ export function LocationProvider({ children }: LocationProviderProps) {
         });
       }
     } catch (error: any) {
-      console.error('Location fetch error:', error);
+      logger.error('Location fetch error', error as Error, {
+        component: 'LocationContext',
+        action: 'updateLocationDataFromIP'
+      });
       dispatch({ type: 'SET_ERROR', payload: error.message });
     }
   }, []);

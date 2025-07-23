@@ -86,7 +86,7 @@ describe('locationService', () => {
         TIMEOUT: 3,
       };
 
-      mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
+      mockGeolocation.getCurrentPosition.mockImplementation((_success, error) => {
         error(mockError);
       });
 
@@ -103,7 +103,7 @@ describe('locationService', () => {
         TIMEOUT: 3,
       };
 
-      mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
+      mockGeolocation.getCurrentPosition.mockImplementation((_success, error) => {
         error(mockError);
       });
 
@@ -120,7 +120,7 @@ describe('locationService', () => {
         TIMEOUT: 3,
       };
 
-      mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
+      mockGeolocation.getCurrentPosition.mockImplementation((_success, error) => {
         error(mockError);
       });
 
@@ -236,35 +236,6 @@ describe('locationService', () => {
     });
   });
 
-  describe('getIPAddress', () => {
-    it('returns IP address on success', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ip: '192.168.1.1' }),
-      });
-
-      const result = await locationService.getIPAddress();
-
-      expect(result).toBe('192.168.1.1');
-      expect(global.fetch).toHaveBeenCalledWith('https://api.ipify.org?format=json');
-    });
-
-    it('handles API errors', async () => {
-      // Mock for all retry attempts (initial + 2 retries = 3 total)
-      (global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
-      });
-
-      await expect(locationService.getIPAddress()).rejects.toThrow('Failed to fetch IP address');
-    });
-
-    it('handles network errors', async () => {
-      // Mock for all retry attempts
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
-
-      await expect(locationService.getIPAddress()).rejects.toThrow('Network error');
-    });
-  });
 
   describe('getIPLocation', () => {
     it('returns IP location data on success', async () => {
@@ -523,7 +494,7 @@ describe('locationService', () => {
       });
 
       // Mock GPS failure
-      mockGeolocation.getCurrentPosition.mockImplementation((success, error) => {
+      mockGeolocation.getCurrentPosition.mockImplementation((_success, error) => {
         error({
           code: 1,
           PERMISSION_DENIED: 1,

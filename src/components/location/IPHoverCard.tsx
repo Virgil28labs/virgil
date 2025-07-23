@@ -158,7 +158,7 @@ const IPHoverCard = memo(function IPHoverCard({
  * Handles smart positioning relative to the trigger element
  */
 interface PositionedIPHoverCardProps extends IPHoverCardProps {
-  triggerRef?: React.RefObject<HTMLDivElement>;
+  triggerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
@@ -185,7 +185,6 @@ export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
       const offset = 12; // Space between trigger and card
       
       // Determine vertical placement - prefer bottom for better UX
-      const spaceAbove = rect.top;
       const spaceBelow = viewportHeight - rect.bottom;
       const placement = spaceBelow > cardHeight + offset ? 'bottom' : 'top';
       

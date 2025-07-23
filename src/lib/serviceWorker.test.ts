@@ -250,7 +250,7 @@ describe('ServiceWorker', () => {
         configurable: true,
       });
       mockServiceWorker.register.mockResolvedValue(mockRegistration);
-      mockServiceWorker.controller = {}; // Simulate existing controller
+      mockServiceWorker.controller = null; // Simulate existing controller
 
       const config: ServiceWorkerConfig = {
         onUpdate: jest.fn(),

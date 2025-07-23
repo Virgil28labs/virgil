@@ -16,6 +16,7 @@ import { RouteInputBar } from './RouteInputBar';
 import { RouteInfoBar } from './RouteInfoBar';
 import { TrafficIndicator } from './TrafficIndicator';
 import './GoogleMapsModal.css';
+import { logger } from '../../lib/logger';
 
 export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   isOpen,
@@ -113,7 +114,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       
       return result[0]?.formatted_address || '';
     } catch (error) {
-      console.error('Geocoding error:', error);
+      logger.error('Geocoding error', error as Error, {
+        component: 'GoogleMapsModal',
+        action: 'geocodeLocation',
+        metadata: { location }
+      });
       return '';
     }
   }, []);
@@ -205,7 +210,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         }
       }
     } catch (error) {
-      console.error('Directions error:', error);
+      logger.error('Directions error', error as Error, {
+        component: 'GoogleMapsModal',
+        action: 'calculateRoute',
+        metadata: { origin, destination }
+      });
       setError('Unable to calculate route. Please try again.');
     }
   }, [departureTime]);
@@ -471,7 +480,10 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         setError(null);
         
       } catch (err) {
-        console.error('Error initializing map:', err);
+        logger.error('Error initializing map', err as Error, {
+          component: 'GoogleMapsModal',
+          action: 'initializeMap'
+        });
         if (mounted) {
           setError('Failed to load Google Maps. Please try again.');
           setIsLoading(false);
@@ -495,7 +507,10 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         const places = JSON.parse(stored) as SavedPlace[];
         setSavedPlaces(places);
       } catch (error) {
-        console.error('Error loading saved places:', error);
+        logger.error('Error loading saved places', error as Error, {
+          component: 'GoogleMapsModal',
+          action: 'loadSavedPlaces'
+        });
       }
     }
   }, []);

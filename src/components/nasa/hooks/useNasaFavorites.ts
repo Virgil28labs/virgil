@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
+import { logger } from '../../../lib/logger';
 
 const STORAGE_KEY_FAVORITES = 'virgil_nasa_favorites';
 
@@ -48,7 +49,10 @@ export const useNasaFavorites = () => {
         return parsed.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
       }
     } catch (e) {
-      console.error('Failed to parse NASA favorites from localStorage:', e);
+      logger.error('Failed to parse NASA favorites from localStorage', e as Error, {
+        component: 'useNasaFavorites',
+        action: 'loadFavorites'
+      });
     }
     return [];
   });
@@ -58,7 +62,10 @@ export const useNasaFavorites = () => {
     try {
       localStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(favorites));
     } catch (e) {
-      console.error('Failed to save NASA favorites to localStorage:', e);
+      logger.error('Failed to save NASA favorites to localStorage', e as Error, {
+        component: 'useNasaFavorites',
+        action: 'saveFavorites'
+      });
     }
   }, [favorites]);
 

@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface GiphyImage {
   id: string;
@@ -73,7 +74,10 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch Giphy favorites:', error);
+      logger.error('Failed to fetch Giphy favorites', error as Error, {
+        component: 'GiphyAdapter',
+        action: 'fetchData'
+      });
       this.favorites = [];
     }
   }

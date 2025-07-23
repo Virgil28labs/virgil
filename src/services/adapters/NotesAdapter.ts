@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 import type { Entry, TagType, ActionType } from '../../components/notes/types';
 import { notesStorage } from '../../components/notes/storage';
 
@@ -50,7 +51,10 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch notes data:', error);
+      logger.error('Failed to fetch notes data', error as Error, {
+        component: 'NotesAdapter',
+        action: 'fetchData'
+      });
       this.entries = [];
     }
   }
@@ -272,7 +276,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     return `You have ${data.totalNotes} notes with ${data.taskCount.total} tasks (${data.taskCount.pending} pending).`;
   }
 
-  private getTaskResponse(query: string): string {
+  private getTaskResponse(_query: string): string {
     const taskStats = this.calculateTaskStats();
     
     if (taskStats.total === 0) {

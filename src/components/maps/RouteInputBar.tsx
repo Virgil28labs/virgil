@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { SavedPlace } from '../../types/maps.types';
 import './RouteInputBar.css';
+import { logger } from '../../lib/logger';
 
 interface RouteInputBarProps {
   currentLocation: google.maps.LatLngLiteral | null
@@ -100,7 +101,11 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
           localStorage.setItem('virgil_last_destination', destinationText);
         } catch (error) {
           // localStorage might be full or disabled
-          console.warn('Failed to save destination to localStorage:', error);
+          logger.warn('Failed to save destination to localStorage', {
+        component: 'RouteInputBar',
+        action: 'saveDestination',
+        metadata: { error }
+      });
         }
         
         if (onDestinationSelect) {
@@ -194,7 +199,11 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       localStorage.setItem('virgil_last_destination', place.name);
     } catch (error) {
       // localStorage might be full or disabled
-      console.warn('Failed to save destination to localStorage:', error);
+      logger.warn('Failed to save destination to localStorage', {
+        component: 'RouteInputBar',
+        action: 'saveDestination',
+        metadata: { error }
+      });
     }
     
     // Create a PlaceResult-like object for routing

@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface StoredApod {
   id: string;
@@ -69,7 +70,10 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch NASA favorites:', error);
+      logger.error('Failed to fetch NASA favorites', error as Error, {
+        component: 'NasaApodAdapter',
+        action: 'fetchData'
+      });
       this.favorites = [];
     }
   }

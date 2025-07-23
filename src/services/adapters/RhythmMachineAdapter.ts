@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface SavedPattern {
   pattern: boolean[][];
@@ -69,7 +70,10 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
       this.lastFetchTime = Date.now();
       this.notifyListeners();
     } catch (error) {
-      console.error('Failed to fetch rhythm patterns:', error);
+      logger.error('Failed to fetch rhythm patterns', error as Error, {
+        component: 'RhythmMachineAdapter',
+        action: 'fetchData'
+      });
       this.saveSlots = [null, null, null, null, null];
     }
   }

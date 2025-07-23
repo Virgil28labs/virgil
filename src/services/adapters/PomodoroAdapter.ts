@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { logger } from '../../lib/logger';
 
 interface PomodoroData {
   isActive: boolean;
@@ -58,7 +59,10 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
         };
       }
     } catch (error) {
-      console.error('Failed to load Pomodoro stats:', error);
+      logger.error('Failed to load Pomodoro stats', error as Error, {
+        component: 'PomodoroAdapter',
+        action: 'loadStats'
+      });
     }
   }
 
@@ -67,7 +71,10 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       const statsKey = `pomodoro-stats-${new Date().toDateString()}`;
       localStorage.setItem(statsKey, JSON.stringify(this.currentData.todayStats));
     } catch (error) {
-      console.error('Failed to save Pomodoro stats:', error);
+      logger.error('Failed to save Pomodoro stats', error as Error, {
+        component: 'PomodoroAdapter',
+        action: 'saveStats'
+      });
     }
   }
 
@@ -207,7 +214,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
 
   private getFocusRecommendation(): string {
     const hour = new Date().getHours();
-    const { sessionsCompleted, lastSessionTime } = this.currentData.todayStats;
+    const { sessionsCompleted } = this.currentData.todayStats;
 
     // Morning recommendation
     if (hour >= 6 && hour < 12) {
@@ -251,7 +258,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     return "Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?";
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(_query: string): Promise<any[]> {
     // Pomodoro doesn't have searchable content, return empty
     return [];
   }

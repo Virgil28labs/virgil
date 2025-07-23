@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from './LocationContext';
+import { logger } from '../lib/logger';
 import type { 
   WeatherContextType, 
   WeatherState, 
@@ -101,7 +102,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           const fallbackForecastData = await weatherService.getForecastByCoordinates(37.7749, -122.4194);
           dispatch({ type: 'SET_FORECAST_DATA', payload: fallbackForecastData });
         } catch (forecastError) {
-          console.error('Failed to fetch fallback forecast:', forecastError);
+          logger.error('Failed to fetch fallback forecast', forecastError as Error, {
+            component: 'WeatherContext',
+            action: 'fetchWeatherAndForecast',
+            metadata: { fallback: true }
+          });
         }
         
         return;
@@ -133,7 +138,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
         } catch (forecastError) {
           // Log but don't fail if forecast fails
-          console.error('Failed to fetch forecast:', forecastError);
+          logger.error('Failed to fetch forecast', forecastError as Error, {
+            component: 'WeatherContext',
+            action: 'fetchWeatherAndForecast',
+            metadata: { locationSource: 'coordinates' }
+          });
         }
       } else if (ipLocation?.city) {
         weatherData = await weatherService.getWeatherByCity(
@@ -150,7 +159,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
         } catch (forecastError) {
           // Log but don't fail if forecast fails
-          console.error('Failed to fetch forecast:', forecastError);
+          logger.error('Failed to fetch forecast', forecastError as Error, {
+            component: 'WeatherContext',
+            action: 'fetchWeatherAndForecast',
+            metadata: { locationSource: 'ipLocation' }
+          });
         }
       } else {
         throw new Error('No location available');

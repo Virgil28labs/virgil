@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { AuthContextValue } from '../types/auth.types';
+import { logger } from '../lib/logger';
 
 /**
  * Authentication Context for Virgil
@@ -33,7 +34,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
       } catch (error: any) {
         if (process.env.NODE_ENV === 'development') {
-          console.error('Auth session error:', error);
+          logger.error('Auth session error', error as Error, {
+            component: 'AuthContext',
+            action: 'authStateChange'
+          });
         }
         setUser(null);
       } finally {
@@ -60,7 +64,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (error) throw error;
       return {};
     } catch (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error', error as Error, {
+        component: 'AuthContext',
+        action: 'signOut'
+      });
       return { error: error as Error };
     }
   };
@@ -70,7 +77,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const { data: { user: refreshedUser } } = await supabase.auth.getUser();
       setUser(refreshedUser);
     } catch (error) {
-      console.error('Error refreshing user:', error);
+      logger.error('Error refreshing user', error as Error, {
+        component: 'AuthContext',
+        action: 'refreshUser'
+      });
     }
   };
 

@@ -234,7 +234,7 @@ describe('useMediaQuery', () => {
           listeners.push(handler);
         }
       }),
-      removeEventListener: jest.fn((event: string, handler: (event: MediaQueryListEvent) => void) => {
+      removeEventListener: jest.fn((_event: string, handler: (event: MediaQueryListEvent) => void) => {
         const index = listeners.indexOf(handler);
         if (index > -1) {
           listeners.splice(index, 1);
@@ -401,7 +401,7 @@ describe('useViewport', () => {
     
     act(() => {
       // Simulate visual viewport resize
-      window.visualViewport!.height = 400;
+      (window.visualViewport as any).height = 400;
       listeners.resize.forEach(handler => handler());
     });
     

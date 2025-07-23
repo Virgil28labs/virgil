@@ -90,7 +90,6 @@ describe('LocationContext', () => {
     });
     mockLocationService.getCurrentPosition.mockResolvedValue(mockCoordinates);
     mockLocationService.getAddressFromCoordinates.mockResolvedValue(mockAddress);
-    mockLocationService.getIPAddress.mockResolvedValue('127.0.0.1');
     mockLocationService.getIPLocation.mockResolvedValue(mockIPLocation);
   });
 

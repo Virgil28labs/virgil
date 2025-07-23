@@ -1,3 +1,5 @@
+import { logger } from '../../../lib/logger';
+
 type EventListener<T = any> = (data: T) => void;
 type UnsubscribeFunction = () => void;
 
@@ -33,7 +35,11 @@ export class EventEmitter {
       try {
         listener(data);
       } catch (error: any) {
-        console.error(`Error in event listener for ${event}:`, error);
+        logger.error(`Error in event listener for ${event}`, error as Error, {
+          component: 'EventEmitter',
+          action: 'emit',
+          metadata: { event }
+        });
       }
     });
   }

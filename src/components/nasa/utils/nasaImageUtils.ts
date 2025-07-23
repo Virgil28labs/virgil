@@ -1,5 +1,6 @@
 import type { ApodImage } from '../../../types/nasa.types';
 import { downloadImage } from '../../../utils/downloadUtils';
+import { logger } from '../../../lib/logger';
 
 // Common event handler for stopping propagation
 export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
@@ -105,7 +106,11 @@ export const shareApod = async (apod: ApodImage): Promise<boolean> => {
     }
   } catch (error) {
     // User cancelled or error occurred
-    console.error('Share failed:', error);
+    logger.error('Share failed', error as Error, {
+      component: 'nasaImageUtils',
+      action: 'shareApod',
+      metadata: { apodTitle: apod.title }
+    });
   }
 
   // Fallback: copy share text to clipboard

@@ -6,6 +6,7 @@ import {
   shareApod,
   stopEvent, 
 } from './utils/nasaImageUtils';
+import { logger } from '../../lib/logger';
 
 interface NasaApodGalleryProps {
   favorites: ApodImage[]
@@ -28,7 +29,11 @@ export const NasaApodGallery = memo(function NasaApodGallery({
     try {
       await downloadApodImage(apod, apod.hdImageUrl ? 'hd' : 'standard');
     } catch (error) {
-      console.error('Failed to download APOD:', error);
+      logger.error('Failed to download APOD', error as Error, {
+        component: 'NasaApodGallery',
+        action: 'handleDownload',
+        metadata: { apodTitle: apod.title }
+      });
     } finally {
       setDownloadingId(null);
     }
@@ -41,7 +46,11 @@ export const NasaApodGallery = memo(function NasaApodGallery({
       await copyApodToClipboard(apod);
       setTimeout(() => setCopyingId(null), 2000);
     } catch (error) {
-      console.error('Failed to copy APOD:', error);
+      logger.error('Failed to copy APOD', error as Error, {
+        component: 'NasaApodGallery',
+        action: 'handleCopy',
+        metadata: { apodTitle: apod.title }
+      });
       setCopyingId(null);
     }
   }, []);
@@ -53,7 +62,11 @@ export const NasaApodGallery = memo(function NasaApodGallery({
       await shareApod(apod);
       setTimeout(() => setSharingId(null), 2000);
     } catch (error) {
-      console.error('Failed to share APOD:', error);
+      logger.error('Failed to share APOD', error as Error, {
+        component: 'NasaApodGallery',
+        action: 'handleShare',
+        metadata: { apodTitle: apod.title }
+      });
       setSharingId(null);
     }
   }, []);

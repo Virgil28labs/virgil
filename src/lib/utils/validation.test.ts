@@ -10,7 +10,6 @@ import {
   isValidCreditCard,
   isInRange,
   isNotEmpty,
-  PasswordStrength,
 } from './validation';
 
 describe('Validation Functions', () => {

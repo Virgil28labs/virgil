@@ -5,6 +5,7 @@ import { WeatherProvider, useWeather } from './WeatherContext';
 import { LocationContext } from './LocationContext';
 import { weatherService } from '../lib/weatherService';
 import type { WeatherData } from '../types/weather.types';
+import type { LocationContextValue } from '../types/location.types';
 
 // Mock the weather service completely
 jest.mock('../lib/weatherService', () => ({
@@ -48,15 +49,19 @@ const mockWeatherData: WeatherData = {
 };
 
 const mockLocationContext: LocationContextValue = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060 },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
   address: null,
-  ipLocation: { city: 'New York', region: 'NY', country: 'US', timezone: 'America/New_York' },
+  ipLocation: { ip: '127.0.0.1', city: 'New York', region: 'NY', country: 'US', timezone: 'America/New_York' },
   loading: false,
   error: null,
   permissionStatus: 'granted',
   lastUpdated: Date.now(),
   hasLocation: true,
-  refresh: jest.fn(),
+  hasGPSLocation: true,
+  hasIPLocation: true,
+  initialized: true,
+  fetchLocationData: jest.fn(),
+  requestLocationPermission: jest.fn(),
   clearError: jest.fn(),
 };
 
@@ -108,6 +113,8 @@ describe('WeatherContext', () => {
       coordinates: null,
       ipLocation: null,
       hasLocation: false,
+      hasGPSLocation: false,
+      hasIPLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {
@@ -142,6 +149,8 @@ describe('WeatherContext', () => {
       coordinates: null,
       ipLocation: null,
       hasLocation: false,
+      hasGPSLocation: false,
+      hasIPLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {

@@ -557,7 +557,7 @@ describe('useChat', () => {
       
       const exportData = {
         messages: [
-          { id: '1', role: 'user', content: 'Loaded message', timestamp: new Date().toISOString() },
+          { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: new Date().toISOString() },
         ],
         systemPrompt: 'Test prompt',
         exportedAt: new Date().toISOString(),

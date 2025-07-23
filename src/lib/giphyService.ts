@@ -12,7 +12,6 @@ import { retryWithBackoff } from './retryUtils';
 const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 const GIPHY_API_BASE = import.meta.env.VITE_GIPHY_API_URL || 'https://api.giphy.com/v1';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const REQUEST_TIMEOUT = 10000; // 10 seconds
 
 class GiphyService {
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
