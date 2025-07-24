@@ -1,11 +1,10 @@
-import { memo, useRef, useEffect, useState } from 'react';
+import { memo, useRef, useEffect, useState, useCallback } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import type { StoredConversation } from '../../services/MemoryService';
 import { Skeleton } from '../ui/skeleton';
 import type { User } from '../../types/auth.types';
 import { FormattedText } from '../../utils/textFormatter';
-import { TypingIndicator } from './TypingIndicator';
-import { MessageLoadingState } from './MessageLoadingState';
+import { LoadingStates } from './LoadingStates';
 import './chat-interface.css';
 
 interface ChatMessagesProps {
@@ -70,7 +69,7 @@ const ChatMessages = memo(function ChatMessages({
     return () => clearTimeout(timer);
   }, [loadingState]);
 
-  const renderWelcomeMessage = () => (
+  const renderWelcomeMessage = useCallback(() => (
     <div className="welcome-msg">
       <div className="msg-avatar" aria-hidden="true">
         <span className="chatbot-avatar-v">V</span>
@@ -88,9 +87,9 @@ const ChatMessages = memo(function ChatMessages({
         )}
       </div>
     </div>
-  );
+  ), [lastConversation, user]);
 
-  const renderMessage = (message: ChatMessage) => (
+  const renderMessage = useCallback((message: ChatMessage) => (
     <div
       key={message.id}
       className={`message ${message.role === 'user' ? 'user-msg' : 'assistant-msg'}`}
@@ -114,15 +113,15 @@ const ChatMessages = memo(function ChatMessages({
         </button>
       </div>
     </div>
-  );
+  ), [onMarkAsImportant]);
 
 
-  const renderError = () => (
+  const renderError = useCallback(() => (
     <div className="error-msg">
       <span>⚠️ {error}</span>
       <button onClick={onErrorDismiss} aria-label="Dismiss error">✕</button>
     </div>
-  );
+  ), [error, onErrorDismiss]);
 
   return (
     <div 
@@ -140,15 +139,20 @@ const ChatMessages = memo(function ChatMessages({
 
       {/* Enhanced loading states */}
       {showLoadingState && loadingState && (
-        <MessageLoadingState 
+        <LoadingStates 
+          variant="message"
           type={loadingState.type}
           progress={loadingState.progress}
+          isVisible={true}
         />
       )}
       
       {/* Simple typing indicator for basic loading */}
       {showTypingIndicator && !loadingState && (
-        <TypingIndicator isVisible={true} />
+        <LoadingStates 
+          variant="typing"
+          isVisible={true}
+        />
       )}
       
       {/* Fallback skeleton for very fast responses */}

@@ -1,16 +1,30 @@
 import { memo } from 'react';
 import './message-components.css';
 
-interface MessageLoadingStateProps {
-  type: 'generating' | 'processing' | 'thinking' | 'searching';
+interface LoadingStatesProps {
+  variant: 'typing' | 'message';
+  type?: 'generating' | 'processing' | 'thinking' | 'searching';
   progress?: number; // 0-100 for progress indication
+  message?: string;
+  isVisible?: boolean;
 }
 
-const MessageLoadingState = memo(function MessageLoadingState({
-  type,
+const LoadingStates = memo(function LoadingStates({
+  variant,
+  type = 'processing',
   progress,
-}: MessageLoadingStateProps) {
+  message,
+  isVisible = true,
+}: LoadingStatesProps) {
+  if (!isVisible) return null;
+
   const getLoadingText = () => {
+    if (message) return message;
+    
+    if (variant === 'typing') {
+      return 'Virgil is thinking...';
+    }
+    
     switch (type) {
       case 'generating':
         return 'Generating response...';
@@ -40,6 +54,28 @@ const MessageLoadingState = memo(function MessageLoadingState({
     }
   };
 
+  // Typing indicator variant
+  if (variant === 'typing') {
+    return (
+      <div className="typing-indicator" role="status" aria-live="polite">
+        <div className="typing-message">
+          <div className="message-avatar">
+            <span className="chatbot-avatar-v">V</span>
+          </div>
+          <div className="typing-content">
+            <div className="typing-text">{getLoadingText()}</div>
+            <div className="typing-dots">
+              <span className="dot dot-1"></span>
+              <span className="dot dot-2"></span>
+              <span className="dot dot-3"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Message loading state variant
   return (
     <div className="message-loading-state" role="status" aria-live="polite">
       <div className="loading-message">
@@ -75,5 +111,5 @@ const MessageLoadingState = memo(function MessageLoadingState({
   );
 });
 
-export { MessageLoadingState };
-export default MessageLoadingState;
+export { LoadingStates };
+export default LoadingStates;

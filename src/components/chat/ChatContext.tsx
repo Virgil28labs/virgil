@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
 import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
@@ -90,18 +90,32 @@ export function ChatProvider({ children }: ChatProviderProps) {
     StorageService.remove(STORAGE_KEYS.ACTIVE_CONVERSATION);
   }, []);
   
-  const value: ChatContextValue = {
-    state,
-    dispatch,
-    setOpen,
-    setWindowSize,
-    addMessage,
-    setInput,
-    setTyping,
-    setError,
-    clearMessages,
-    newChat,
-  };
+  const value: ChatContextValue = useMemo(
+    () => ({
+      state,
+      dispatch,
+      setOpen,
+      setWindowSize,
+      addMessage,
+      setInput,
+      setTyping,
+      setError,
+      clearMessages,
+      newChat,
+    }),
+    [
+      state,
+      dispatch,
+      setOpen,
+      setWindowSize,
+      addMessage,
+      setInput,
+      setTyping,
+      setError,
+      clearMessages,
+      newChat,
+    ]
+  );
   
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }

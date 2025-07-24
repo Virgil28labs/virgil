@@ -1,7 +1,7 @@
 import { memo, useState, useCallback, useEffect } from 'react';
 import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
 import { MemoryService, memoryService } from '../../services/MemoryService';
-import { ConversationDetail } from './ConversationDetail';
+import { ConversationView } from './ConversationView';
 import { AdvancedMemorySearch } from './AdvancedMemorySearch';
 import type { ChatMessage } from '../../types/chat.types';
 import './memory-modals.css';
@@ -155,7 +155,7 @@ const MemoryModal = memo(function MemoryModal({
     return (
       <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
         <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
-          <ConversationDetail
+          <ConversationView
             conversation={selectedConversation}
             onBack={handleBackToList}
             onMarkAsImportant={handleMarkAsImportantFromDetail}
