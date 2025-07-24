@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Modal } from '../common/Modal';
 import { 
   loadGoogleMaps, 
@@ -7,14 +7,11 @@ import {
 } from '../../utils/googleMaps';
 import type { 
   GoogleMapsModalProps,
-  SavedPlace,
-} from '../../types/maps.types';
-import { 
-  VIRGIL_MAP_STYLES,
 } from '../../types/maps.types';
 import { RouteInputBar } from './RouteInputBar';
 import { RouteInfoBar } from './RouteInfoBar';
 import { TrafficIndicator } from './TrafficIndicator';
+import { useRouteState } from '../../hooks/useRouteState';
 import './GoogleMapsModal.css';
 import { logger } from '../../lib/logger';
 
@@ -29,7 +26,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   
   // Map instance refs
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerInstanceRef = useRef<google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null>(null);
+  const markerInstanceRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null);
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
   const alternativeRenderersRef = useRef<google.maps.DirectionsRenderer[]>([]);
@@ -41,33 +38,50 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapsLoaded, setMapsLoaded] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<string>('');
+  const [currentAddress, setCurrentAddress] = useState<string>('Current Location');
   
-  // Route state
-  const [currentRoute, setCurrentRoute] = useState<google.maps.DirectionsRoute | null>(null);
-  const [alternativeRoutes, setAlternativeRoutes] = useState<google.maps.DirectionsRoute[]>([]);
-  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  // Consolidated route state
+  const {
+    currentRoute,
+    alternativeRoutes,
+    selectedRouteIndex,
+    hasActiveRoute,
+    showRouteOptions,
+    routeInfoVisible,
+    setCurrentRoute,
+    setAlternativeRoutes,
+    setSelectedRouteIndex,
+    setHasActiveRoute,
+    setShowRouteOptions,
+    setRouteInfoVisible,
+    clearRoute: clearRouteState,
+    setRouteData,
+  } = useRouteState();
   
-  // Saved places state
-  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
+  // Other state
   const [currentDestinationPlace, setCurrentDestinationPlace] = useState<google.maps.places.PlaceResult | null>(null);
-  
-  // Traffic state
   const [showTraffic, setShowTraffic] = useState(true);
-  const [hasActiveRoute, setHasActiveRoute] = useState(false);
-  const [showRouteOptions, setShowRouteOptions] = useState(false);
-  const [routeInfoVisible, setRouteInfoVisible] = useState(true);
   const [departureTime, setDepartureTime] = useState<Date | 'now'>('now');
+
+  // Memoized values to prevent unnecessary re-renders
+  const currentLocation = useMemo(() => 
+    coordinates ? {
+      lat: coordinates.latitude,
+      lng: coordinates.longitude,
+    } : null,
+    [coordinates]
+  );
+
+  const currentAddressDisplay = useMemo(() => 
+    currentAddress || address?.formatted || 'Current Location',
+    [currentAddress, address?.formatted]
+  );
 
   // Cleanup function
   const cleanupMaps = useCallback(() => {
     if (markerInstanceRef.current) {
-      // Handle both AdvancedMarkerElement and classic Marker cleanup
-      if ('map' in markerInstanceRef.current) {
-        markerInstanceRef.current.map = null;
-      } else {
-        markerInstanceRef.current.setMap(null);
-      }
+      // Cleanup AdvancedMarkerElement
+      markerInstanceRef.current.map = null;
       markerInstanceRef.current = null;
     }
     
@@ -102,28 +116,36 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     }
   }, []);
 
-  // Get address for current location
+  // Get address for current location with timeout for performance
   const geocodeLocation = useCallback(async (latLng: google.maps.LatLngLiteral) => {
     if (!geocoderRef.current) return '';
     
     try {
-      const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-        geocoderRef.current!.geocode({ location: latLng }, (results, status) => {
-          if (status === 'OK' && results) {
-            resolve(results);
-          } else {
-            reject(new Error(status));
-          }
-        });
-      });
+      const result = await Promise.race([
+        new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
+          geocoderRef.current!.geocode({ location: latLng }, (results, status) => {
+            if (status === 'OK' && results) {
+              resolve(results);
+            } else {
+              reject(new Error(status));
+            }
+          });
+        }),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Geocoding timeout')), 3000)
+        )
+      ]);
       
       return result[0]?.formatted_address || '';
     } catch (error) {
-      logger.error('Geocoding error', error as Error, {
-        component: 'GoogleMapsModal',
-        action: 'geocodeLocation',
-        metadata: { location },
-      });
+      // Don't log timeout errors as they're expected for performance
+      if (!(error as Error).message.includes('timeout')) {
+        logger.error('Geocoding error', error as Error, {
+          component: 'GoogleMapsModal',
+          action: 'geocodeLocation',
+          metadata: { location: latLng },
+        });
+      }
       return '';
     }
   }, []);
@@ -158,12 +180,8 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       });
       
       if (result.routes.length > 0) {
-        setCurrentRoute(result.routes[0]);
-        setAlternativeRoutes(result.routes.slice(1));
-        setSelectedRouteIndex(0);
-        setHasActiveRoute(true);
-        setShowRouteOptions(true);
-        setRouteInfoVisible(true);
+        // Use consolidated route state setter for better performance
+        setRouteData(result.routes);
         
         // Clear previous alternative renderers
         alternativeRenderersRef.current.forEach(renderer => {
@@ -333,13 +351,8 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     });
     alternativeRenderersRef.current = [];
     
-    // Clear state
-    setCurrentRoute(null);
-    setAlternativeRoutes([]);
-    setSelectedRouteIndex(0);
-    setHasActiveRoute(false);
-    setShowRouteOptions(false);
-    setRouteInfoVisible(true);
+    // Clear consolidated route state
+    clearRouteState();
     
     // Clear any auto-collapse timer
     if (autoCollapseTimerRef.current) {
@@ -348,14 +361,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     }
     
     // Reset map view to current location
-    if (mapInstanceRef.current && coordinates) {
-      mapInstanceRef.current.setCenter({
-        lat: coordinates.latitude,
-        lng: coordinates.longitude,
-      });
+    if (mapInstanceRef.current && currentLocation) {
+      mapInstanceRef.current.setCenter(currentLocation);
       mapInstanceRef.current.setZoom(14);
     }
-  }, [coordinates]);
+  }, [currentLocation]);
 
   // Handle toggle expand/collapse
   const handleToggleExpand = useCallback(() => {
@@ -433,15 +443,14 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           return;
         }
         
-        // Create map instance
+        // Create map instance with optimized configuration
         const map = new google.maps.Map(mapRef.current, {
           center: {
             lat: coordinates.latitude,
             lng: coordinates.longitude,
           },
           zoom: 14,
-          // Removed mapId to allow custom VIRGIL_MAP_STYLES
-          styles: VIRGIL_MAP_STYLES,
+          mapId: "VIRGIL_TRAFFIC_MAP",
           disableDefaultUI: true,
           zoomControl: true,
           zoomControlOptions: {
@@ -483,16 +492,30 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           lng: coordinates.longitude,
         }, map);
         
-        // Get address for current location
-        const addr = await geocodeLocation({
-          lat: coordinates.latitude,
-          lng: coordinates.longitude,
-        });
-        setCurrentAddress(addr);
-        
+        // Set map as loaded immediately for fast UI response
         setMapsLoaded(true);
         setIsLoading(false);
         setError(null);
+        
+        // Get address for current location asynchronously (non-blocking)
+        geocodeLocation({
+          lat: coordinates.latitude,
+          lng: coordinates.longitude,
+        }).then(addr => {
+          if (mounted) {
+            setCurrentAddress(addr);
+          }
+        }).catch(error => {
+          // Address loading failed, but don't break the map
+          logger.warn('Address geocoding failed', {
+            component: 'GoogleMapsModal',
+            action: 'geocodeLocation',
+            metadata: { error },
+          });
+          if (mounted) {
+            setCurrentAddress('Current Location'); // Fallback
+          }
+        });
         
       } catch (err) {
         logger.error('Error initializing map', err as Error, {
@@ -514,72 +537,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     };
   }, [isOpen, coordinates, cleanupMaps, geocodeLocation]);
 
-  // Load saved places from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('virgil_saved_places');
-    if (stored) {
-      try {
-        const places = JSON.parse(stored) as SavedPlace[];
-        setSavedPlaces(places);
-      } catch (error) {
-        logger.error('Error loading saved places', error as Error, {
-          component: 'GoogleMapsModal',
-          action: 'loadSavedPlaces',
-        });
-      }
-    }
-  }, []);
 
-  // Save place handler
-  const handleSavePlace = useCallback((place: google.maps.places.PlaceResult, isHome?: boolean) => {
-    if (!place.name && !place.formatted_address) return;
-    
-    const newPlace: SavedPlace = {
-      id: Date.now().toString(),
-      name: place.name || place.formatted_address || 'Saved Place',
-      address: place.formatted_address || '',
-      placeId: place.place_id,
-      isHome,
-      timestamp: Date.now(),
-    };
-    
-    setSavedPlaces(prev => {
-      // Remove existing home if setting new home
-      let updated = isHome ? prev.filter(p => !p.isHome) : prev;
-      
-      // Check if place already exists
-      const existingIndex = updated.findIndex(p => p.placeId === place.place_id);
-      if (existingIndex >= 0) {
-        updated = updated.filter((_, i) => i !== existingIndex);
-      }
-      
-      // Add new place
-      updated = [newPlace, ...updated];
-      
-      // Limit to 10 saved places (excluding home)
-      const nonHomePlaces = updated.filter(p => !p.isHome);
-      const homePlaces = updated.filter(p => p.isHome);
-      if (nonHomePlaces.length > 10) {
-        updated = [...homePlaces, ...nonHomePlaces.slice(0, 10)];
-      }
-      
-      // Save to localStorage
-      localStorage.setItem('virgil_saved_places', JSON.stringify(updated));
-      
-      return updated;
-    });
-  }, []);
-
-  // Remove saved place handler
-  const handleRemoveSavedPlace = useCallback((placeId?: string) => {
-    if (!placeId) return;
-    
-    setSavedPlaces(prev => {
-      const updated = prev.filter(p => p.placeId !== placeId);
-      localStorage.setItem('virgil_saved_places', JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
 
   return (
     <Modal
@@ -613,17 +571,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         {mapsLoaded && !isLoading && (
           <>
             <RouteInputBar
-              currentLocation={coordinates ? {
-                lat: coordinates.latitude,
-                lng: coordinates.longitude,
-              } : null}
-              currentAddress={currentAddress || address?.formatted || 'Current Location'}
+              currentLocation={currentLocation}
+              currentAddress={currentAddressDisplay}
               onRouteRequest={handleRouteRequest}
               onDestinationSelect={setCurrentDestinationPlace}
-              savedPlaces={savedPlaces}
               currentDestinationPlace={currentDestinationPlace}
-              onSavePlace={handleSavePlace}
-              onRemoveSavedPlace={handleRemoveSavedPlace}
               hasRoute={hasActiveRoute}
               onClearRoute={handleClearRoute}
             />

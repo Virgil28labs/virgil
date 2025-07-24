@@ -20,15 +20,6 @@ export interface GoogleMapsModalProps {
 
 // Simplified types for traffic checking use case
 
-export interface SavedPlace {
-  id: string
-  name: string
-  address: string
-  placeId?: string
-  isHome?: boolean
-  timestamp: number
-}
-
 // Custom map styles for Virgil theme
 export const VIRGIL_MAP_STYLES: google.maps.MapTypeStyle[] = [
   {

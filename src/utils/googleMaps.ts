@@ -90,64 +90,45 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
 }
 
 /**
- * Creates a custom marker for the user's location
+ * Creates a custom marker for the user's location using AdvancedMarkerElement
  * @param position - The position for the marker
  * @param map - The map instance
- * @returns Google Maps AdvancedMarkerElement or classic Marker instance
+ * @returns Google Maps AdvancedMarkerElement instance
  */
 export async function createLocationMarker(
   position: google.maps.LatLngLiteral,
   map: google.maps.Map,
-): Promise<google.maps.marker.AdvancedMarkerElement | google.maps.Marker> {
-  try {
-    // Try AdvancedMarkerElement first
-    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
-    
-    // Create custom pin element
-    const pinElement = new PinElement({
-      background: '#6c3baa',
-      borderColor: '#b2a5c1',
-      glyphColor: '#ffffff',
-      scale: 1.2,
-    });
-    
-    // Create and return the advanced marker
-    return new AdvancedMarkerElement({
-      position,
-      map,
-      title: 'Your Location',
-      content: pinElement.element,
-    });
-  } catch (error) {
-    console.warn('AdvancedMarkerElement failed, falling back to classic Marker:', error);
-    
-    // Fallback to classic Marker with custom styling
-    return new google.maps.Marker({
-      position,
-      map,
-      title: 'Your Location',
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#6c3baa',
-        fillOpacity: 1,
-        strokeColor: '#b2a5c1',
-        strokeWeight: 3,
-        scale: 12,
-      },
-    });
-  }
+): Promise<google.maps.marker.AdvancedMarkerElement> {
+  // Import AdvancedMarkerElement library
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
+  
+  // Create custom pin element with Virgil brand colors
+  const pinElement = new PinElement({
+    background: '#6c3baa',
+    borderColor: '#b2a5c1',
+    glyphColor: '#ffffff',
+    scale: 1.2,
+  });
+  
+  // Create and return the advanced marker
+  return new AdvancedMarkerElement({
+    position,
+    map,
+    title: 'Your Location',
+    content: pinElement.element,
+  });
 }
 
 /**
  * Creates an info window for the location marker
  * @param content - HTML content for the info window
- * @param marker - The marker to attach the info window to
+ * @param marker - The AdvancedMarkerElement to attach the info window to
  * @param map - The map instance
  * @returns Google Maps InfoWindow instance
  */
 export function createInfoWindow(
   content: string,
-  marker: google.maps.marker.AdvancedMarkerElement | google.maps.Marker,
+  marker: google.maps.marker.AdvancedMarkerElement,
   map: google.maps.Map,
 ): google.maps.InfoWindow {
   const infoWindow = new google.maps.InfoWindow({
@@ -156,16 +137,10 @@ export function createInfoWindow(
   });
 
   marker.addListener('click', () => {
-    if ('anchor' in marker) {
-      // AdvancedMarkerElement
-      infoWindow.open({
-        anchor: marker,
-        map,
-      });
-    } else {
-      // Classic Marker
-      infoWindow.open(map, marker);
-    }
+    infoWindow.open({
+      anchor: marker,
+      map,
+    });
   });
 
   return infoWindow;

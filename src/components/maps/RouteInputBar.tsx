@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { SavedPlace } from '../../types/maps.types';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import './RouteInputBar.css';
 import { logger } from '../../lib/logger';
 import { useGooglePlacesAutocomplete } from '../../hooks/useGooglePlacesAutocomplete';
@@ -10,10 +9,7 @@ interface RouteInputBarProps {
   onRouteRequest: (origin: string, destination: string) => void
   onOriginSelect?: (place: google.maps.places.PlaceResult) => void
   onDestinationSelect?: (place: google.maps.places.PlaceResult) => void
-  savedPlaces?: SavedPlace[]
   currentDestinationPlace?: google.maps.places.PlaceResult | null
-  onSavePlace?: (place: google.maps.places.PlaceResult, isHome?: boolean) => void
-  onRemoveSavedPlace?: (placeId?: string) => void
   hasRoute?: boolean
   onClearRoute?: () => void
 }
@@ -24,32 +20,34 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   onRouteRequest,
   onOriginSelect,
   onDestinationSelect,
-  savedPlaces = [],
   currentDestinationPlace,
-  onSavePlace,
-  onRemoveSavedPlace,
   hasRoute = false,
   onClearRoute,
 }) => {
-  // Load last destination from localStorage
-  const getLastDestination = () => {
+  // Memoize last destination to avoid localStorage calls on every render
+  const initialDestination = useMemo(() => {
     try {
       return localStorage.getItem('virgil_last_destination') || '';
     } catch {
       return '';
     }
-  };
+  }, []);
   
   const [origin, setOrigin] = useState(currentAddress || 'Current Location');
-  const [destination, setDestination] = useState(getLastDestination());
+  const [destination, setDestination] = useState(initialDestination);
   const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true);
-  const [showSavedPlaces, setShowSavedPlaces] = useState(false);
   
   const originInputRef = useRef<HTMLInputElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
   const [activeInput, setActiveInput] = useState<'origin' | 'destination' | null>(null);
   const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
+
+  // Memoized autocomplete options to prevent re-creation
+  const autocompleteOptions = useMemo(() => ({
+    types: ['geocode', 'establishment'],
+    fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+  }), []);
 
   // Origin autocomplete hook
   const {
@@ -59,10 +57,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     selectPlace: selectOriginPlace,
   } = useGooglePlacesAutocomplete(
     originInputRef,
-    {
-      types: ['geocode', 'establishment'],
-      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-    },
+    autocompleteOptions,
     (place) => {
       if (place && place.geometry) {
         setOrigin(place.name || place.formatted_address || '');
@@ -87,10 +82,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     selectPlace: selectDestinationPlace,
   } = useGooglePlacesAutocomplete(
     destinationInputRef,
-    {
-      types: ['geocode', 'establishment'],
-      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
-    },
+    autocompleteOptions,
     (place) => {
       if (place && place.geometry) {
         const destinationText = place.name || place.formatted_address || '';
@@ -141,10 +133,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
 
   const handleDestinationChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setDestination(e.target.value);
-    // Hide saved places dropdown when typing
-    if (e.target.value) {
-      setShowSavedPlaces(false);
-    }
     setShowDestinationSuggestions(true);
   }, []);
 
@@ -168,62 +156,13 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     }
   }, [currentAddress, destination, onRouteRequest]);
 
-  // Check if current destination is saved
-  const isDestinationSaved = useCallback(() => {
-    if (!currentDestinationPlace?.place_id) return false;
-    return savedPlaces.some(p => p.placeId === currentDestinationPlace.place_id);
-  }, [currentDestinationPlace, savedPlaces]);
-
-  // Handle save/unsave destination
-  const handleToggleSaveDestination = useCallback(() => {
-    if (!currentDestinationPlace || !onSavePlace || !onRemoveSavedPlace) return;
-    
-    if (isDestinationSaved()) {
-      onRemoveSavedPlace(currentDestinationPlace.place_id);
-    } else {
-      onSavePlace(currentDestinationPlace);
-    }
-  }, [currentDestinationPlace, isDestinationSaved, onSavePlace, onRemoveSavedPlace]);
-
-  // Handle saved place selection
-  const handleSelectSavedPlace = useCallback((place: SavedPlace) => {
-    setDestination(place.name);
-    setShowSavedPlaces(false);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('virgil_last_destination', place.name);
-    } catch (error) {
-      // localStorage might be full or disabled
-      logger.warn('Failed to save destination to localStorage', {
-        component: 'RouteInputBar',
-        action: 'saveDestination',
-        metadata: { error },
-      });
-    }
-    
-    // Create a PlaceResult-like object for routing
-    if (place.placeId) {
-      // Use place ID for routing
-      onRouteRequest(origin, place.name);
-    } else {
-      // Fallback to address
-      onRouteRequest(origin, place.address || place.name);
-    }
-  }, [origin, onRouteRequest]);
-
-  // Show/hide saved places dropdown
   const handleDestinationClick = useCallback(() => {
-    if (!destination && savedPlaces.length > 0) {
-      setShowSavedPlaces(true);
-    }
     setActiveInput('destination');
-  }, [destination, savedPlaces]);
+  }, []);
 
   const handleDestinationBlur = useCallback(() => {
     // Delay to allow click on dropdown items
     setTimeout(() => {
-      setShowSavedPlaces(false);
       setShowDestinationSuggestions(false);
     }, 200);
   }, []);
@@ -323,23 +262,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
             placeholder="To"
             className="route-input"
           />
-          {destination && currentDestinationPlace && (
-            <button
-              className={`save-destination-btn ${isDestinationSaved() ? 'saved' : ''}`}
-              onClick={handleToggleSaveDestination}
-              title={isDestinationSaved() ? 'Remove from saved places' : 'Save this place'}
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M8 1.5l2.14 4.33 4.86.71-3.5 3.41.82 4.82L8 12.5l-4.32 2.27.82-4.82-3.5-3.41 4.86-.71L8 1.5z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill={isDestinationSaved() ? 'currentColor' : 'none'}
-                />
-              </svg>
-            </button>
-          )}
           {hasRoute && onClearRoute && (
             <button
               className="clear-route-btn"
@@ -359,7 +281,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
           )}
           
           {/* Destination autocomplete suggestions */}
-          {showDestinationSuggestions && destinationSuggestions.length > 0 && !showSavedPlaces && (
+          {showDestinationSuggestions && destinationSuggestions.length > 0 && (
             <div className="autocomplete-dropdown">
               {destinationSuggestions.map((suggestion, index) => (
                 <button
@@ -370,30 +292,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
                 >
                   <div className="autocomplete-main">{suggestion.suggestion.mainText}</div>
                   <div className="autocomplete-secondary">{suggestion.suggestion.secondaryText}</div>
-                </button>
-              ))}
-            </div>
-          )}
-          
-          {/* Saved places dropdown */}
-          {showSavedPlaces && savedPlaces.length > 0 && (
-            <div className="saved-places-dropdown">
-              {savedPlaces.map(place => (
-                <button
-                  key={place.id}
-                  className="saved-place-item"
-                  onClick={() => handleSelectSavedPlace(place)}
-                  type="button"
-                >
-                  <div className="place-icon">
-                    {place.isHome ? '🏠' : '📍'}
-                  </div>
-                  <div className="place-info">
-                    <div className="place-name">{place.name}</div>
-                    {place.address && (
-                      <div className="place-address">{place.address}</div>
-                    )}
-                  </div>
                 </button>
               ))}
             </div>
