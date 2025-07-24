@@ -93,30 +93,49 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
  * Creates a custom marker for the user's location
  * @param position - The position for the marker
  * @param map - The map instance
- * @returns Google Maps AdvancedMarkerElement instance
+ * @returns Google Maps AdvancedMarkerElement or classic Marker instance
  */
 export async function createLocationMarker(
   position: google.maps.LatLngLiteral,
   map: google.maps.Map,
-): Promise<google.maps.marker.AdvancedMarkerElement> {
-  // Import marker library if not already loaded
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
-  
-  // Create custom pin element
-  const pinElement = new PinElement({
-    background: '#6c3baa',
-    borderColor: '#b2a5c1',
-    glyphColor: '#ffffff',
-    scale: 1.2,
-  });
-  
-  // Create and return the advanced marker
-  return new AdvancedMarkerElement({
-    position,
-    map,
-    title: 'Your Location',
-    content: pinElement.element,
-  });
+): Promise<google.maps.marker.AdvancedMarkerElement | google.maps.Marker> {
+  try {
+    // Try AdvancedMarkerElement first
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+    
+    // Create custom pin element
+    const pinElement = new PinElement({
+      background: '#6c3baa',
+      borderColor: '#b2a5c1',
+      glyphColor: '#ffffff',
+      scale: 1.2,
+    });
+    
+    // Create and return the advanced marker
+    return new AdvancedMarkerElement({
+      position,
+      map,
+      title: 'Your Location',
+      content: pinElement.element,
+    });
+  } catch (error) {
+    console.warn('AdvancedMarkerElement failed, falling back to classic Marker:', error);
+    
+    // Fallback to classic Marker with custom styling
+    return new google.maps.Marker({
+      position,
+      map,
+      title: 'Your Location',
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#6c3baa',
+        fillOpacity: 1,
+        strokeColor: '#b2a5c1',
+        strokeWeight: 3,
+        scale: 12,
+      },
+    });
+  }
 }
 
 /**
@@ -128,7 +147,7 @@ export async function createLocationMarker(
  */
 export function createInfoWindow(
   content: string,
-  marker: google.maps.marker.AdvancedMarkerElement,
+  marker: google.maps.marker.AdvancedMarkerElement | google.maps.Marker,
   map: google.maps.Map,
 ): google.maps.InfoWindow {
   const infoWindow = new google.maps.InfoWindow({
@@ -137,10 +156,16 @@ export function createInfoWindow(
   });
 
   marker.addListener('click', () => {
-    infoWindow.open({
-      anchor: marker,
-      map,
-    });
+    if ('anchor' in marker) {
+      // AdvancedMarkerElement
+      infoWindow.open({
+        anchor: marker,
+        map,
+      });
+    } else {
+      // Classic Marker
+      infoWindow.open(map, marker);
+    }
   });
 
   return infoWindow;

@@ -29,7 +29,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   
   // Map instance refs
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerInstanceRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const markerInstanceRef = useRef<google.maps.marker.AdvancedMarkerElement | google.maps.Marker | null>(null);
   const directionsServiceRef = useRef<google.maps.DirectionsService | null>(null);
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
   const alternativeRenderersRef = useRef<google.maps.DirectionsRenderer[]>([]);
@@ -62,7 +62,12 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
   // Cleanup function
   const cleanupMaps = useCallback(() => {
     if (markerInstanceRef.current) {
-      markerInstanceRef.current.map = null;
+      // Handle both AdvancedMarkerElement and classic Marker cleanup
+      if ('map' in markerInstanceRef.current) {
+        markerInstanceRef.current.map = null;
+      } else {
+        markerInstanceRef.current.setMap(null);
+      }
       markerInstanceRef.current = null;
     }
     
@@ -435,7 +440,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
             lng: coordinates.longitude,
           },
           zoom: 14,
-          mapId: 'DEMO_MAP_ID', // Required for AdvancedMarkerElement
+          // Removed mapId to allow custom VIRGIL_MAP_STYLES
           styles: VIRGIL_MAP_STYLES,
           disableDefaultUI: true,
           zoomControl: true,
