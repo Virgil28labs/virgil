@@ -1,5 +1,20 @@
 {
   "mcpServers": {
+    "fetch": {
+      "command": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+      "args": [
+        "-m",
+        "mcp_server_fetch"
+      ],
+      "type": "stdio"
+    },
+    "shadcn-ui": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@jpisnice/shadcn-ui-mcp-server"
+      ]
+    },
     "firecrawl": {
       "command": "/Users/bbb/.npm-global/bin/firecrawl-mcp",
       "args": [],
@@ -7,6 +22,20 @@
         "FIRECRAWL_API_KEY": "fc-49e75b8afe954817a9900724e28ca466"
       },
       "type": "stdio"
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     }
   }
 }
