@@ -137,7 +137,7 @@ const Message = memo(function Message({
   const renderConversationVariant = () => (
     <div className={messageClass}>
       <div className="message-meta">
-        <span className="message-role">{message.role}</span>
+        <span className="message-role">{message.role === 'user' ? userNickname : 'Virgil'}</span>
         {message.timestamp && (
           <span className="message-timestamp">
             {new Date(message.timestamp).toLocaleTimeString()}
