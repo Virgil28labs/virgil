@@ -1,5 +1,7 @@
 import { memo, useState, useCallback } from 'react';
 import { StoredConversation, MarkedMemory, MemoryService, memoryService } from '../../services/MemoryService';
+import { ConversationDetail } from './ConversationDetail';
+import { ChatMessage } from '../../types/chat.types';
 import './MemoryModal.css';
 import { logger } from '../../lib/logger';
 
@@ -25,6 +27,7 @@ const MemoryModal = memo(function MemoryModal({
   onMemoryIndicatorUpdate,
 }: MemoryModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedConversation, setSelectedConversation] = useState<StoredConversation | null>(null);
 
   // Handle backdrop click to close
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
@@ -80,6 +83,7 @@ const MemoryModal = memo(function MemoryModal({
         onConversationsUpdate([]);
         onMemoryContextUpdate('');
         onMemoryIndicatorUpdate(false);
+        setSelectedConversation(null); // Reset selected conversation
         onClose();
       } catch (error) {
         logger.error('Failed to clear all data', error as Error, {
@@ -89,6 +93,37 @@ const MemoryModal = memo(function MemoryModal({
       }
     }
   }, [onMemoriesUpdate, onConversationsUpdate, onMemoryContextUpdate, onMemoryIndicatorUpdate, onClose]);
+
+  // Handle conversation click
+  const handleConversationClick = useCallback((conversation: StoredConversation) => {
+    setSelectedConversation(conversation);
+  }, []);
+
+  // Handle back from conversation detail
+  const handleBackToList = useCallback(() => {
+    setSelectedConversation(null);
+  }, []);
+
+  // Handle marking message as important from conversation detail
+  const handleMarkAsImportantFromDetail = useCallback(async (message: ChatMessage) => {
+    try {
+      const context = `From conversation on ${new Date().toLocaleDateString()}`;
+      await memoryService.markAsImportant(message.id, message.content, context);
+      
+      const updatedMemories = await memoryService.getMarkedMemories();
+      onMemoriesUpdate(updatedMemories);
+      
+      const newContext = await memoryService.getContextForPrompt();
+      onMemoryContextUpdate(newContext);
+      onMemoryIndicatorUpdate(true);
+    } catch (error) {
+      logger.error('Failed to mark message as important', error as Error, {
+        component: 'MemoryModal',
+        action: 'handleMarkAsImportantFromDetail',
+        metadata: { messageId: message.id }
+      });
+    }
+  }, [onMemoriesUpdate, onMemoryContextUpdate, onMemoryIndicatorUpdate]);
 
   // Filter memories based on search
   const filteredMemories = markedMemories.filter(memory => 
@@ -105,6 +140,21 @@ const MemoryModal = memo(function MemoryModal({
   );
 
   if (!isOpen) return null;
+
+  // Show conversation detail if a conversation is selected
+  if (selectedConversation) {
+    return (
+      <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
+        <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
+          <ConversationDetail
+            conversation={selectedConversation}
+            onBack={handleBackToList}
+            onMarkAsImportant={handleMarkAsImportantFromDetail}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
@@ -179,7 +229,19 @@ const MemoryModal = memo(function MemoryModal({
                   </div>
                 ) : (
                   filteredConversations.map(conv => (
-                    <div key={conv.id} className="conversation-item">
+                    <div 
+                      key={conv.id} 
+                      className="conversation-item clickable"
+                      onClick={() => handleConversationClick(conv)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleConversationClick(conv);
+                        }
+                      }}
+                    >
                       <div className="conversation-preview">
                         <div className="conversation-first">"{conv.firstMessage}"</div>
                         <div className="conversation-last">"{conv.lastMessage}"</div>
@@ -189,6 +251,7 @@ const MemoryModal = memo(function MemoryModal({
                         <span className="conversation-time">
                           {MemoryService.timeAgo(conv.timestamp)}
                         </span>
+                        <span className="conversation-arrow">→</span>
                       </div>
                     </div>
                   ))

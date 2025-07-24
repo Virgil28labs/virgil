@@ -7,7 +7,7 @@ interface StatusPillsProps {
   onMemoryClick: () => void;
   dashboardContext: DashboardContext | null;
   markedMemoriesCount: number;
-  recentConversationsCount: number;
+  recentConversationsCount: number; // Keep for future use
 }
 
 const StatusPills = memo(function StatusPills({
@@ -15,8 +15,9 @@ const StatusPills = memo(function StatusPills({
   onMemoryClick,
   dashboardContext,
   markedMemoriesCount,
-  recentConversationsCount,
+  recentConversationsCount: _recentConversationsCount, // Not used in continuous conversation model
 }: StatusPillsProps) {
+  // Always show the status pills area if memory or context is available
   if (!showMemoryIndicator && !dashboardContext) {
     return null;
   }
@@ -25,7 +26,7 @@ const StatusPills = memo(function StatusPills({
     ? `Context Aware: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`
     : '';
 
-  const memoryTitle = `Memory Active - View conversations (${markedMemoriesCount} memories, ${recentConversationsCount} conversations)`;
+  const memoryTitle = `Memory & Conversations (${markedMemoriesCount} marked memories)`;
 
   return (
     <div className="status-cluster">

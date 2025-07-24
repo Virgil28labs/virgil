@@ -95,6 +95,10 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
         break;
 
       case 'ArrowLeft':
+        // Allow arrow keys to work normally in text inputs
+        if (currentElement && (currentElement.tagName === 'INPUT' || currentElement.tagName === 'TEXTAREA')) {
+          return; // Let the default behavior happen
+        }
         event.preventDefault();
         if (onArrowLeft) {
           onArrowLeft();
@@ -104,6 +108,10 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
         break;
 
       case 'ArrowRight':
+        // Allow arrow keys to work normally in text inputs
+        if (currentElement && (currentElement.tagName === 'INPUT' || currentElement.tagName === 'TEXTAREA')) {
+          return; // Let the default behavior happen
+        }
         event.preventDefault();
         if (onArrowRight) {
           onArrowRight();

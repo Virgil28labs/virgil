@@ -26,6 +26,13 @@
   animation: slideUp 0.3s ease-out;
 }
 
+/* Enhanced sizing for conversation detail view */
+.memory-modal:has(.conversation-detail) {
+  max-width: 900px;
+  width: 95vw;
+  max-height: 90vh;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -224,9 +231,15 @@
   transition: all 0.2s ease;
 }
 
-.conversation-item:hover {
+.conversation-item.clickable {
+  cursor: pointer;
+}
+
+.conversation-item:hover,
+.conversation-item:focus {
   border-color: var(--brand-light-purple);
   box-shadow: 0 2px 8px rgba(108, 59, 170, 0.1);
+  outline: none;
 }
 
 .conversation-preview {
@@ -252,6 +265,19 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.8rem;
+}
+
+.conversation-arrow {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: var(--brand-purple);
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.conversation-item:hover .conversation-arrow,
+.conversation-item:focus .conversation-arrow {
+  opacity: 1;
 }
 
 .conversation-count {
@@ -312,6 +338,11 @@
   .memory-modal {
     width: 95vw;
     max-height: 90vh;
+  }
+  
+  .memory-modal:has(.conversation-detail) {
+    width: 98vw;
+    max-height: 95vh;
   }
   
   .memory-modal-header {

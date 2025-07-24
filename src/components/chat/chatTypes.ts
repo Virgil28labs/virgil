@@ -66,7 +66,7 @@ export const initialChatState: ChatState = {
   customSystemPrompt: '',
   lastConversation: null,
   markedMemories: [],
-  showMemoryIndicator: false,
+  showMemoryIndicator: true, // Always show memory button
   memoryContext: '',
   showMemoryModal: false,
   recentConversations: [],

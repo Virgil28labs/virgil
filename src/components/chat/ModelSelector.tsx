@@ -42,7 +42,20 @@ const ModelSelector = memo(function ModelSelector({
 
   // Generate display name for compact view
   const getDisplayName = (model: ModelOption) => {
-    return model.name.replace('GPT-', '').replace(' Mini', '');
+    let displayName = model.name.replace('GPT-', '').replace(' Mini', '');
+    
+    // Apply shortened versions for specific models
+    if (displayName.includes('4.1') && model.name.toLowerCase().includes('mini')) {
+      displayName = displayName.replace('4.1', '4.1m');
+    }
+    if (displayName.toLowerCase().includes('o1') && model.name.toLowerCase().includes('mini')) {
+      displayName = displayName.replace(/o1/i, 'o1m');
+    }
+    if (displayName.toLowerCase().includes('o4') && model.name.toLowerCase().includes('mini')) {
+      displayName = displayName.replace(/o4/i, 'o4m');
+    }
+    
+    return displayName;
   };
 
   return (
@@ -54,8 +67,7 @@ const ModelSelector = memo(function ModelSelector({
         aria-haspopup="listbox"
         role="combobox"
       >
-        {getDisplayName(currentModel)}
-        <span className="dropdown-arrow">▼</span>
+        🤖 {getDisplayName(currentModel)}
       </button>
       
       {showDropdown && (

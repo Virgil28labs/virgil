@@ -81,7 +81,7 @@ function VirgilChatbotInner() {
             markedMemories: memories,
             recentConversations: conversations,
             memoryContext: context,
-            showMemoryIndicator: !!context,
+            showMemoryIndicator: true, // Always show memory button
           },
         });
       } catch (error) {
@@ -115,49 +115,27 @@ function VirgilChatbotInner() {
 
   // Custom hooks handle context syncing
 
-  // Save conversation when chat is closed
-  useEffect(() => {
-    if (!state.isOpen && state.messages.length > 0) {
-      memoryService.saveConversation(state.messages).catch((error) => {
-        console.error('Failed to save conversation:', error);
-      });
-    }
-  }, [state.isOpen, state.messages]);
+  // Removed auto-save on close to prevent duplicates
+  // Conversations are saved when starting a new chat
 
-  // Use localStorage hook for persisting conversation
-  const [savedMessages, setSavedMessages] = useLocalStorage<ChatMessage[]>('virgil-active-conversation', []);
-  
-  // Save messages to localStorage when they change
-  useEffect(() => {
-    if (state.messages.length > 0) {
-      setSavedMessages(state.messages);
-    }
-  }, [state.messages, setSavedMessages]);
+  // Removed localStorage for active conversation - now using continuous conversation in IndexedDB
 
-  // Load persisted conversation on mount
+  // Load recent messages from continuous conversation on mount
   useEffect(() => {
-    const loadPersistedConversation = async () => {
-      if (savedMessages.length > 0) {
-        dispatch({ type: 'SET_MESSAGES', payload: savedMessages });
-        return;
-      }
-      
-      // Fallback to memory service if no active session
+    const loadRecentMessages = async () => {
       try {
-        const lastConv = await memoryService.getLastConversation();
-        if (lastConv && lastConv.messages && lastConv.messages.length > 0) {
-          const isRecent = lastConv.timestamp && (Date.now() - lastConv.timestamp) < 24 * 60 * 60 * 1000;
-          if (isRecent) {
-            dispatch({ type: 'SET_MESSAGES', payload: lastConv.messages });
-          }
+        // Load last 20 messages from continuous conversation for UI
+        const recentMessages = await memoryService.getRecentMessages(20);
+        if (recentMessages.length > 0) {
+          dispatch({ type: 'SET_MESSAGES', payload: recentMessages });
         }
       } catch (error) {
-        console.error('Failed to load last conversation:', error);
+        console.error('Failed to load recent messages:', error);
       }
     };
 
     if (state.messages.length === 0) {
-      loadPersistedConversation();
+      loadRecentMessages();
     }
   }, []); // Only on mount
 
@@ -229,15 +207,10 @@ function VirgilChatbotInner() {
   }, [state.windowSize, setWindowSize]);
 
   const handleNewChat = useCallback(async () => {
-    if (state.messages.length > 0) {
-      try {
-        await memoryService.saveConversation(state.messages);
-      } catch (error) {
-        console.error('Failed to save conversation before new chat:', error);
-      }
-    }
+    // In continuous conversation model, we don't need to save before clearing
+    // Messages are saved in real-time as they're added
     newChat();
-  }, [state.messages, newChat]);
+  }, [newChat]);
 
   // Use localStorage hook for system prompt
   const [, setStoredSystemPrompt] = useLocalStorage('virgil-custom-system-prompt', '');
@@ -266,8 +239,16 @@ function VirgilChatbotInner() {
 
   // Use chat API hook
   const { sendMessage: sendChatMessage } = useChatApi({
-    onSuccess: (message) => {
+    onSuccess: async (message) => {
       addMessage(message);
+      
+      // Save assistant message to continuous conversation
+      try {
+        await memoryService.saveConversation([message]);
+      } catch (error) {
+        console.error('Failed to save assistant message:', error);
+      }
+      
       setTimeout(() => inputRef.current?.focus(), 0);
     },
     onError: (error) => {
@@ -283,6 +264,13 @@ function VirgilChatbotInner() {
     addMessage(userMessage);
     setInput('');
     setError(null);
+    
+    // Save user message to continuous conversation
+    try {
+      await memoryService.saveConversation([userMessage]);
+    } catch (error) {
+      console.error('Failed to save user message:', error);
+    }
     
     setTimeout(() => inputRef.current?.focus(), 0);
 
