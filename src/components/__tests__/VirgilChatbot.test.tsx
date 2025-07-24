@@ -165,7 +165,7 @@ describe('VirgilChatbot', () => {
     fireEvent.click(chatButton);
     
     // Close chat
-    fireEvent.click(screen.getByRole('button', { name: /minimize/i }));
+    fireEvent.click(screen.getByRole('button', { name: /close to floating bubble/i }));
     
     // Should trigger save (though messages are not actually in state in this test)
     // In real usage, messages would be in state

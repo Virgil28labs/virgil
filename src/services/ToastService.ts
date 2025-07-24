@@ -107,11 +107,13 @@ class ToastService {
     
     // Provide user-friendly error context
     let message = baseMessage;
-    if (error?.message.includes('quota')) {
+    const errorMessage = error?.message || '';
+    
+    if (errorMessage.includes('quota')) {
       message += ' - Storage quota exceeded. Try clearing old data.';
-    } else if (error?.message.includes('transaction')) {
+    } else if (errorMessage.includes('transaction')) {
       message += ' - Please try again in a moment.';
-    } else if (error?.message.includes('network') || error?.message.includes('fetch')) {
+    } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
       message += ' - Check your internet connection.';
     } else {
       message += ' - Please try again.';

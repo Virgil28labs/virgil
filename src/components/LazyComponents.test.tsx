@@ -38,6 +38,7 @@ jest.mock('../lib/weatherService', () => ({
   weatherService: {
     getWeatherByCoordinates: jest.fn(),
     formatTemperature: jest.fn(),
+    convertTemperature: jest.fn(),
   },
 }));
 

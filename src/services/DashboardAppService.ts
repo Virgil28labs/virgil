@@ -139,6 +139,9 @@ export class DashboardAppService {
       
       if (cachedData) {
         apps.set(appName, cachedData);
+        if (cachedData.isActive) {
+          activeApps.push(appName);
+        }
       } else {
         try {
           const data = adapter.getContextData();
