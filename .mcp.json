@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "firecrawl": {
+      "command": "/Users/bbb/.npm-global/bin/firecrawl-mcp",
+      "args": [],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-49e75b8afe954817a9900724e28ca466"
+      },
+      "type": "stdio"
+    }
+  }
+}

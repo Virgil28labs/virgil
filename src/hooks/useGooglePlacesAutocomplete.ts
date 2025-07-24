@@ -35,6 +35,7 @@ export function useGooglePlacesAutocomplete(
   const [isLoading, setIsLoading] = useState(false);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const fetchSuggestionsRef = useRef<(input: string) => Promise<void>>();
 
   // Initialize session token
   useEffect(() => {
@@ -55,30 +56,73 @@ export function useGooglePlacesAutocomplete(
       // Import the places library if not already loaded
       const placesLib = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
       
-      // Create request object
-      // @ts-ignore - TypeScript types may not be updated yet
-      const request = {
-        input,
-        sessionToken: sessionTokenRef.current!,
-        ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
-        ...(options.locationBias && { locationBias: options.locationBias }),
-        ...(options.locationRestriction && { locationRestriction: options.locationRestriction }),
-      };
+      let formattedSuggestions: PlaceSuggestion[] = [];
+      
+      // Try new API first
+      if ((google.maps.places as any).AutocompleteSuggestion) {
+        
+        try {
+          // Create request object
+          // @ts-ignore - TypeScript types may not be updated yet
+          const request = {
+            input,
+            sessionToken: sessionTokenRef.current!,
+            ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
+            ...(options.locationBias && { locationBias: options.locationBias }),
+            ...(options.locationRestriction && { locationRestriction: options.locationRestriction }),
+          };
+          
+          // Fetch suggestions using the new API
+          // @ts-ignore - TypeScript types may not be updated yet
+          const { suggestions: autocompleteSuggestions } = 
+            await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
-      // Fetch suggestions using the new API
-      // @ts-ignore - TypeScript types may not be updated yet
-      const { suggestions: autocompleteSuggestions } = 
-        await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-
-      // Transform suggestions to our format
-      const formattedSuggestions: PlaceSuggestion[] = autocompleteSuggestions.map((suggestion: any) => ({
-        placePrediction: suggestion.placePrediction,
-        suggestion: {
-          mainText: suggestion.placePrediction.mainText?.text || '',
-          secondaryText: suggestion.placePrediction.secondaryText?.text || '',
-          placeId: suggestion.placePrediction.placeId || '',
-        },
-      }));
+          // Transform suggestions to our format
+          formattedSuggestions = autocompleteSuggestions.map((suggestion: any) => ({
+            placePrediction: suggestion.placePrediction,
+            suggestion: {
+              mainText: suggestion.placePrediction.mainText?.text || '',
+              secondaryText: suggestion.placePrediction.secondaryText?.text || '',
+              placeId: suggestion.placePrediction.placeId || '',
+            },
+          }));
+        } catch (apiError) {
+          // New API failed, will use fallback
+          throw apiError;
+        }
+      } else {
+        // Fallback to classic AutocompleteService
+        
+        const service = new google.maps.places.AutocompleteService();
+        const request: google.maps.places.AutocompletionRequest = {
+          input,
+          sessionToken: sessionTokenRef.current!,
+          ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
+          ...(options.types && { types: options.types }),
+        };
+        
+        // Use promise wrapper for callback-based API
+        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, reject) => {
+          service.getPlacePredictions(request, (predictions, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+              resolve(predictions);
+            } else {
+              resolve([]);
+            }
+          });
+        });
+        
+        
+        // Transform predictions to our format
+        formattedSuggestions = predictions.map(prediction => ({
+          placePrediction: prediction as any,
+          suggestion: {
+            mainText: prediction.structured_formatting?.main_text || prediction.description || '',
+            secondaryText: prediction.structured_formatting?.secondary_text || '',
+            placeId: prediction.place_id || '',
+          },
+        }));
+      }
 
       setSuggestions(formattedSuggestions);
     } catch (error) {
@@ -92,6 +136,11 @@ export function useGooglePlacesAutocomplete(
       setIsLoading(false);
     }
   }, [options]);
+
+  // Store the fetchSuggestions function in ref to avoid circular dependencies
+  useEffect(() => {
+    fetchSuggestionsRef.current = fetchSuggestions;
+  }, [fetchSuggestions]);
 
   // Handle input changes with debouncing
   useEffect(() => {
@@ -107,7 +156,10 @@ export function useGooglePlacesAutocomplete(
 
       // Set new timer
       debounceTimerRef.current = setTimeout(() => {
-        fetchSuggestions(input);
+        // Use the ref version to avoid circular dependency
+        if (fetchSuggestionsRef.current) {
+          fetchSuggestionsRef.current(input);
+        }
       }, 300); // 300ms debounce
     };
 
@@ -120,7 +172,7 @@ export function useGooglePlacesAutocomplete(
       }
       inputElement.removeEventListener('input', handleInput);
     };
-  }, [inputRef, fetchSuggestions]);
+  }, [inputRef]); // Remove fetchSuggestions from dependencies
 
   const clearSuggestions = useCallback(() => {
     setSuggestions([]);
@@ -128,25 +180,49 @@ export function useGooglePlacesAutocomplete(
 
   const selectPlace = useCallback(async (suggestion: PlaceSuggestion): Promise<google.maps.places.PlaceResult> => {
     try {
-      // Convert prediction to place
-      // @ts-ignore - TypeScript types may not be updated yet
-      const place = suggestion.placePrediction.toPlace();
+      let placeResult: google.maps.places.PlaceResult;
       
-      // Fetch place details
-      await place.fetchFields({
-        fields: options.fields || ['place_id', 'geometry', 'name', 'formatted_address'],
-      });
+      // Check if this is a new API suggestion with toPlace method
+      if (suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
+        // Convert prediction to place
+        // @ts-ignore - TypeScript types may not be updated yet
+        const place = suggestion.placePrediction.toPlace();
+        
+        // Fetch place details
+        await place.fetchFields({
+          fields: options.fields || ['place_id', 'geometry', 'name', 'formatted_address'],
+        });
 
-      // Convert to PlaceResult format for compatibility
-      const placeResult: google.maps.places.PlaceResult = {
-        place_id: place.placeId || undefined,
-        geometry: place.location ? {
-          location: place.location,
-          viewport: place.viewport,
-        } : undefined,
-        name: place.displayName || undefined,
-        formatted_address: place.formattedAddress || undefined,
-      };
+        // Convert to PlaceResult format for compatibility
+        placeResult = {
+          place_id: place.placeId || undefined,
+          geometry: place.location ? {
+            location: place.location,
+            viewport: place.viewport,
+          } : undefined,
+          name: place.displayName || undefined,
+          formatted_address: place.formattedAddress || undefined,
+        };
+      } else {
+        // Classic API - use PlacesService to get details
+        const service = new google.maps.places.PlacesService(document.createElement('div'));
+        
+        placeResult = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
+          service.getDetails(
+            {
+              placeId: suggestion.suggestion.placeId,
+              fields: options.fields || ['place_id', 'geometry', 'name', 'formatted_address'],
+            },
+            (place, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                resolve(place);
+              } else {
+                reject(new Error(`Failed to get place details: ${status}`));
+              }
+            }
+          );
+        });
+      }
 
       // Clear suggestions after selection
       clearSuggestions();

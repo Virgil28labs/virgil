@@ -39,7 +39,7 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
       // Build URL with parameters
       const params = new URLSearchParams({
         key: options.apiKey,
-        libraries: (options.libraries || ['places', 'geometry']).join(','),
+        libraries: (options.libraries || ['places', 'geometry', 'marker']).join(','),
         loading: 'async',
         callback: '__googleMapsCallback',
         ...(options.language && { language: options.language }),
@@ -86,25 +86,29 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
  * Creates a custom marker for the user's location
  * @param position - The position for the marker
  * @param map - The map instance
- * @returns Google Maps Marker instance
+ * @returns Google Maps AdvancedMarkerElement instance
  */
-export function createLocationMarker(
+export async function createLocationMarker(
   position: google.maps.LatLngLiteral,
   map: google.maps.Map,
-): google.maps.Marker {
-  return new google.maps.Marker({
+): Promise<google.maps.marker.AdvancedMarkerElement> {
+  // Import marker library if not already loaded
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker") as google.maps.MarkerLibrary;
+  
+  // Create custom pin element
+  const pinElement = new PinElement({
+    background: '#6c3baa',
+    borderColor: '#b2a5c1',
+    glyphColor: '#ffffff',
+    scale: 1.2,
+  });
+  
+  // Create and return the advanced marker
+  return new AdvancedMarkerElement({
     position,
     map,
     title: 'Your Location',
-    animation: google.maps.Animation.DROP,
-    icon: {
-      path: google.maps.SymbolPath.CIRCLE,
-      scale: 12,
-      fillColor: '#6c3baa',
-      fillOpacity: 0.9,
-      strokeColor: '#b2a5c1',
-      strokeWeight: 3,
-    },
+    content: pinElement.element,
   });
 }
 
@@ -117,7 +121,7 @@ export function createLocationMarker(
  */
 export function createInfoWindow(
   content: string,
-  marker: google.maps.Marker,
+  marker: google.maps.marker.AdvancedMarkerElement,
   map: google.maps.Map,
 ): google.maps.InfoWindow {
   const infoWindow = new google.maps.InfoWindow({
@@ -126,7 +130,10 @@ export function createInfoWindow(
   });
 
   marker.addListener('click', () => {
-    infoWindow.open(map, marker);
+    infoWindow.open({
+      anchor: marker,
+      map,
+    });
   });
 
   return infoWindow;
