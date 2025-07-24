@@ -96,10 +96,14 @@ const fetchWeatherData = async url => {
 const processForecastData = data => {
   const dailyData = {};
 
-  // Group forecast data by day
+  // Group forecast data by day (using local timezone, not UTC)
   data.list.forEach(item => {
     const date = new Date(item.dt * 1000);
-    const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    // Use local date instead of UTC to prevent wrong day display
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const dayOfMonth = String(date.getDate()).padStart(2, '0');
+    const dayKey = `${year}-${month}-${dayOfMonth}`; // Local YYYY-MM-DD format
 
     if (!dailyData[dayKey]) {
       dailyData[dayKey] = {

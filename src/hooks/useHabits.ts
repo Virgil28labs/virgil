@@ -5,6 +5,7 @@ import type {
   Achievement,
 } from '../types/habit.types';
 import { StorageService, STORAGE_KEYS } from '../services/StorageService';
+import { dashboardContextService } from '../services/DashboardContextService';
 
 const STORAGE_KEY = STORAGE_KEYS.VIRGIL_HABITS;
 const MAX_HABITS = 10;
@@ -169,7 +170,7 @@ export const useHabits = () => {
         return prev;
       }
       
-      const today = new Date().toISOString().split('T')[0];
+      const today = dashboardContextService.getLocalDate();
       const updatedHabits = prev.habits.map(h => {
         if (h.id === habitId) {
           const newCheckIns = [...h.checkIns, today];
@@ -296,7 +297,7 @@ export const useHabits = () => {
         return prev;
       }
       
-      const today = new Date().toISOString().split('T')[0];
+      const today = dashboardContextService.getLocalDate();
       // Only allow undo for today's check-ins
       if (habit.lastCheckIn !== today) {
         return prev;

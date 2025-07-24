@@ -4,6 +4,7 @@ import { MemoryService, memoryService } from '../../services/MemoryService';
 import { ConversationView } from './ConversationView';
 import { AdvancedMemorySearch } from './AdvancedMemorySearch';
 import type { ChatMessage } from '../../types/chat.types';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import './memory-modals.css';
 
 interface MemoryModalProps {
@@ -69,7 +70,7 @@ const MemoryModal = memo(function MemoryModal({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `virgil-memory-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `virgil-memory-${dashboardContextService.getLocalDate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {

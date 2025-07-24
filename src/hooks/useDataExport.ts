@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import type { ChatMessage } from '../types/chat.types';
 import type { User } from '../types/auth.types';
+import { dashboardContextService } from '../services/DashboardContextService';
 
 interface UseDataExportProps {
   user: User | null;
@@ -13,8 +14,9 @@ interface UseDataExportReturn {
 
 export function useDataExport({ user, messages }: UseDataExportProps): UseDataExportReturn {
   const handleExportMessages = useCallback(() => {
+    const now = dashboardContextService.getCurrentDateTime();
     const chatData = {
-      exportedAt: new Date().toISOString(),
+      exportedAt: now.toISOString(),
       user: user?.user_metadata?.name || 'Unknown',
       messages: messages,
       totalMessages: messages.length,
@@ -23,7 +25,7 @@ export function useDataExport({ user, messages }: UseDataExportProps): UseDataEx
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `virgil-chat-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `virgil-chat-${dashboardContextService.getLocalDate()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }, [user, messages]);

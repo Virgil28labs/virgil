@@ -1,5 +1,6 @@
 import { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import type { MarkedMemory, StoredConversation } from '../../services/MemoryService';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import './memory-modals.css';
 
 interface SearchFilters {
@@ -78,7 +79,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
 
     // Date range filter
     if (filters.dateRange !== 'all') {
-      const now = Date.now();
+      const now = dashboardContextService.getTimestamp();
       let startTime = 0;
       
       switch (filters.dateRange) {

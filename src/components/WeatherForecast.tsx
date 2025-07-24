@@ -15,7 +15,10 @@ export const WeatherForecast = memo(function WeatherForecast({
   forecast, 
 }: WeatherForecastProps) {
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
+    // Parse date string as local date (not UTC)
+    // dateString format: "YYYY-MM-DD"
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
     // Always return 3-letter day abbreviation in uppercase
     return date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
   };

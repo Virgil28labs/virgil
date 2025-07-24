@@ -58,6 +58,11 @@ export default [
       'arrow-parens': ['error', 'as-needed'],
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-duplicate-imports': 'error',
+      // TimeService enforcement
+      'no-restricted-syntax': ['warn', {
+        selector: 'NewExpression[callee.name="Date"]',
+        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+      }],
     },
   },
   // Script files (Node.js ESM)
@@ -188,6 +193,11 @@ export default [
       'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
       'import/prefer-default-export': 'off',
       'import/extensions': 'off',
+      // TimeService enforcement
+      'no-restricted-syntax': ['warn', {
+        selector: 'NewExpression[callee.name="Date"]',
+        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+      }],
     },
   },
   // Jest environment for test files
@@ -202,6 +212,8 @@ export default [
     rules: {
       'no-console': 'off',
       'import/no-extraneous-dependencies': 'off',
+      // Allow direct Date usage in tests
+      'no-restricted-syntax': 'off',
     },
   },
   // Node.js environment for CommonJS files
@@ -367,6 +379,11 @@ export default [
       'react/require-default-props': 'off', // We use TypeScript for prop validation
       'react/prop-types': 'off', // TypeScript handles this
       'import/prefer-default-export': 'off',
+      // TimeService enforcement
+      'no-restricted-syntax': ['warn', {
+        selector: 'NewExpression[callee.name="Date"]',
+        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+      }],
     },
   },
 ];

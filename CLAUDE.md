@@ -30,6 +30,12 @@ Before code is complete:
 ✓ Fully tested (aim for 95% coverage)
 ✓ Follows all project patterns
 
+### Time & Date Handling
+- **Always use TimeService**: Never use `new Date()` directly in components
+- **Import**: `import { dashboardContextService } from '../services/DashboardContextService'`
+- **Common methods**: `getLocalDate()`, `getCurrentDateTime()`, `formatDateToLocal()`
+- **Reference**: See `src/services/TimeService.md` for complete guide
+
 ### Development Process
 1. **Plan**: Understand fully, design clean architecture
 2. **Code**: Small functions (<20 lines), descriptive names, handle errors
@@ -79,6 +85,7 @@ server/           # Express backend
 ❌ Ignore TypeScript errors
 ❌ Quick fixes over quality
 ❌ TODOs in production
+❌ Direct `new Date()` usage - use TimeService
 
 ## The Standard
 Write code that's:

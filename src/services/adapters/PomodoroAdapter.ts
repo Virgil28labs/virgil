@@ -7,6 +7,7 @@
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
+import { dashboardContextService } from '../DashboardContextService';
 
 interface PomodoroData {
   isActive: boolean;
@@ -49,7 +50,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
 
   private loadTodayStats(): void {
     try {
-      const statsKey = `pomodoro-stats-${new Date().toDateString()}`;
+      const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
       const saved = localStorage.getItem(statsKey);
       if (saved) {
         const stats = JSON.parse(saved);
@@ -68,7 +69,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
 
   private saveTodayStats(): void {
     try {
-      const statsKey = `pomodoro-stats-${new Date().toDateString()}`;
+      const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
       localStorage.setItem(statsKey, JSON.stringify(this.currentData.todayStats));
     } catch (error) {
       logger.error('Failed to save Pomodoro stats', error as Error, {

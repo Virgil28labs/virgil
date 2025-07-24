@@ -4,6 +4,7 @@ import type {
   NasaApodParams,
 } from '../types/nasa.types';
 import { retryWithBackoff } from './retryUtils';
+import { dashboardContextService } from '../services/DashboardContextService';
 
 // Environment-configurable API settings
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
@@ -225,7 +226,7 @@ class NasaApodService {
    * Get today's APOD
    */
   async getTodaysApod(): Promise<ApodImage> {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const today = dashboardContextService.getLocalDate(); // Local YYYY-MM-DD format
     return this.getApodByDate(today);
   }
 
@@ -317,7 +318,7 @@ class NasaApodService {
    */
   async getNextApod(currentDate: string): Promise<ApodImage> {
     const nextDate = this.addDays(currentDate, 1);
-    const today = new Date().toISOString().split('T')[0];
+    const today = dashboardContextService.getLocalDate();
     
     if (nextDate > today) {
       throw new ApodServiceError('No future APOD available');
@@ -339,7 +340,7 @@ class NasaApodService {
    */
   canNavigateNext(currentDate: string): boolean {
     const nextDate = this.addDays(currentDate, 1);
-    const today = new Date().toISOString().split('T')[0];
+    const today = dashboardContextService.getLocalDate();
     return nextDate <= today;
   }
 

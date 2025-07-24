@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DateTime } from 'luxon';
 import type { SelectedTimezone } from './timezoneData';
 import { getDefaultTimezones, generateTimezoneId, getTimezoneInfo } from './timezoneData';
+import { dashboardContextService } from '../../services/DashboardContextService';
 
 export interface TimezoneWithTime extends SelectedTimezone {
   currentTime: DateTime
@@ -79,23 +80,21 @@ export function useTimezones(): UseTimezonesReturn {
   const [selectedTimezones, setSelectedTimezones] = useState<SelectedTimezone[]>(() => 
     loadTimezonesFromStorage(),
   );
-  const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() => DateTime.now());
+  const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() => 
+    DateTime.fromJSDate(dashboardContextService.getCurrentDateTime())
+  );
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Update current time every 10 seconds for better performance
+  // Subscribe to TimeService for coordinated updates (1-second precision)
   useEffect(() => {
-    const updateTime = () => {
+    const unsubscribe = dashboardContextService.subscribeToTimeUpdates(({ dateObject }) => {
       setIsUpdating(true);
-      setCurrentDateTime(DateTime.now());
+      setCurrentDateTime(DateTime.fromJSDate(dateObject));
       // Use setTimeout to avoid immediate state updates
       setTimeout(() => setIsUpdating(false), 0);
-    };
+    });
 
-    // Update immediately on mount
-    updateTime();
-
-    const timer = setInterval(updateTime, UPDATE_INTERVAL);
-    return () => clearInterval(timer);
+    return unsubscribe;
   }, []);
 
   // Save to localStorage whenever selectedTimezones changes
@@ -135,9 +134,9 @@ export function useTimezones(): UseTimezonesReturn {
       return false;
     }
 
-    // Validate timezone
+    // Validate timezone using TimeService
     try {
-      const testTime = DateTime.now().setZone(timezone);
+      const testTime = DateTime.fromJSDate(dashboardContextService.getCurrentDateTime()).setZone(timezone);
       if (!testTime.isValid) {
         return false;
       }

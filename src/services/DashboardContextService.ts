@@ -11,6 +11,7 @@ import type { AuthContextValue } from '../types/auth.types';
 import type { UserProfile } from '../hooks/useUserProfile';
 import { dashboardAppService, type DashboardAppData } from './DashboardAppService';
 import { userProfileAdapter } from './adapters/UserProfileAdapter';
+import { timeService } from './TimeService';
 
 export interface DashboardContext {
   // Time context
@@ -119,7 +120,14 @@ export class DashboardContextService {
   private listeners: ((context: DashboardContext) => void)[] = [];
   private activityLog: { action: string; timestamp: number }[] = [];
   private sessionStartTime: number;
-
+  
+  // Unified timer system for periodic updates (context only, not time)
+  private mainTimer?: NodeJS.Timeout;
+  private lastMinuteUpdate: number = 0;
+  
+  // Event listener references for cleanup
+  private onlineHandler?: () => void;
+  private offlineHandler?: () => void;
   constructor() {
     this.sessionStartTime = Date.now();
     this.context = this.getInitialContext();
@@ -162,33 +170,74 @@ export class DashboardContextService {
   }
 
   private getCurrentTime(): string {
-    return new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+    return timeService.getCurrentTime();
   }
 
   private getCurrentDate(): string {
-    return new Date().toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return timeService.getCurrentDate();
   }
 
   private getDayOfWeek(): string {
-    return new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-    }).toLowerCase();
+    return timeService.getDayOfWeek();
   }
 
   private getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 17) return 'afternoon';
-    if (hour >= 17 && hour < 21) return 'evening';
-    return 'night';
+    return timeService.getTimeOfDay();
+  }
+
+  // =============================================================================
+  // TimeService Methods - Single Source of Truth for Time/Date Operations
+  // =============================================================================
+
+  /**
+   * Get current date in local YYYY-MM-DD format
+   * @returns Local date string (e.g., "2024-01-15")
+   */
+  getLocalDate(): string {
+    return timeService.getLocalDate();
+  }
+  
+  /**
+   * Format any date to local YYYY-MM-DD format
+   * @param date Date object to format
+   * @returns Local date string (e.g., "2024-01-15")
+   */
+  formatDateToLocal(date: Date): string {
+    return timeService.formatDateToLocal(date);
+  }
+
+  /**
+   * Get current Date object (local timezone)
+   * @returns Current local Date object
+   */
+  getCurrentDateTime(): Date {
+    return timeService.getCurrentDateTime();
+  }
+
+  /**
+   * Get current timestamp
+   * @returns Current timestamp in milliseconds
+   */
+  getTimestamp(): number {
+    return timeService.getTimestamp();
+  }
+
+  /**
+   * Format a date for display purposes
+   * @param date Date to format (optional, defaults to current date)
+   * @returns Formatted date string
+   */
+  formatDate(date?: Date): string {
+    return timeService.formatDate(date);
+  }
+
+  /**
+   * Subscribe to real-time time updates (1-second precision)
+   * @param callback Function called with time updates
+   * @returns Unsubscribe function
+   */
+  subscribeToTimeUpdates(callback: (time: { currentTime: string; currentDate: string; dateObject: Date }) => void): () => void {
+    return timeService.subscribeToTimeUpdates(callback);
   }
 
   private detectDeviceType(): 'mobile' | 'tablet' | 'desktop' {
@@ -301,7 +350,7 @@ export class DashboardContextService {
   }
 
   logActivity(action: string, component?: string): void {
-    const timestamp = Date.now();
+    const timestamp = this.getTimestamp();
     this.activityLog.push({ action, timestamp });
     
     // Keep only recent activities (last 10 minutes)
@@ -328,25 +377,37 @@ export class DashboardContextService {
   }
 
   private startPeriodicUpdates(): void {
-    // Update time-sensitive context every minute
-    setInterval(() => {
-      this.context.currentTime = this.getCurrentTime();
-      this.context.currentDate = this.getCurrentDate();
-      this.context.timeOfDay = this.getTimeOfDay();
-      this.context.dayOfWeek = this.getDayOfWeek();
-      this.context.activity.timeSpentInSession = Date.now() - this.sessionStartTime;
-      this.notifyListeners();
-    }, 60000);
+    // Initialize last minute update timestamp
+    this.lastMinuteUpdate = Date.now();
+    
+    // Context update timer (runs every minute)
+    this.mainTimer = setInterval(() => {
+      const now = Date.now();
+      
+      // Update dashboard context every minute
+      if (now - this.lastMinuteUpdate >= 60000) {
+        this.lastMinuteUpdate = now;
+        this.context.currentTime = this.getCurrentTime();
+        this.context.currentDate = this.getCurrentDate();
+        this.context.timeOfDay = this.getTimeOfDay();
+        this.context.dayOfWeek = this.getDayOfWeek();
+        this.context.activity.timeSpentInSession = now - this.sessionStartTime;
+        this.notifyListeners();
+      }
+    }, 60000); // Check every minute instead of every second for efficiency
 
     // Update environment context when online status changes
-    window.addEventListener('online', () => {
+    this.onlineHandler = () => {
       this.context.environment.isOnline = true;
       this.notifyListeners();
-    });
-    window.addEventListener('offline', () => {
+    };
+    this.offlineHandler = () => {
       this.context.environment.isOnline = false;
       this.notifyListeners();
-    });
+    };
+    
+    window.addEventListener('online', this.onlineHandler);
+    window.addEventListener('offline', this.offlineHandler);
   }
 
   // Context access methods
@@ -356,144 +417,146 @@ export class DashboardContextService {
 
   getContextForPrompt(): string {
     const ctx = this.context;
-    let contextString = '';
+    const contextParts: string[] = [];
 
     // Time context
-    contextString += '\n\nCURRENT CONTEXT:\n';
-    contextString += `- Current time: ${ctx.currentTime}\n`;
-    contextString += `- Current date: ${ctx.currentDate} (${ctx.dayOfWeek})\n`;
-    contextString += `- Time of day: ${ctx.timeOfDay}\n`;
+    contextParts.push('\n\nCURRENT CONTEXT:');
+    contextParts.push(`- Current time: ${ctx.currentTime}`);
+    contextParts.push(`- Current date: ${ctx.currentDate} (${ctx.dayOfWeek})`);
+    contextParts.push(`- Time of day: ${ctx.timeOfDay}`);
 
     // Location context
     if (ctx.location.hasGPS || ctx.location.ipAddress) {
-      contextString += '\nLOCATION:\n';
+      contextParts.push('\nLOCATION:');
       if (ctx.location.city) {
-        contextString += `- Current location: ${ctx.location.city}`;
-        if (ctx.location.region) contextString += `, ${ctx.location.region}`;
-        if (ctx.location.country) contextString += `, ${ctx.location.country}`;
-        contextString += '\n';
+        let locationStr = `- Current location: ${ctx.location.city}`;
+        if (ctx.location.region) locationStr += `, ${ctx.location.region}`;
+        if (ctx.location.country) locationStr += `, ${ctx.location.country}`;
+        contextParts.push(locationStr);
       }
       if (ctx.location.address) {
-        contextString += `- Address: ${ctx.location.address}\n`;
+        contextParts.push(`- Address: ${ctx.location.address}`);
       }
       if (ctx.location.timezone) {
-        contextString += `- Timezone: ${ctx.location.timezone}\n`;
+        contextParts.push(`- Timezone: ${ctx.location.timezone}`);
       }
       if (ctx.location.ipAddress) {
-        contextString += `- IP Address: ${ctx.location.ipAddress}\n`;
+        contextParts.push(`- IP Address: ${ctx.location.ipAddress}`);
         if (ctx.location.isp) {
-          contextString += `- ISP: ${ctx.location.isp}\n`;
+          contextParts.push(`- ISP: ${ctx.location.isp}`);
         }
       }
     }
 
     // Weather context
     if (ctx.weather.hasData) {
-      contextString += '\nWEATHER:\n';
-      contextString += `- Temperature: ${ctx.weather.temperature}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'}`;
+      contextParts.push('\nWEATHER:');
+      let tempStr = `- Temperature: ${ctx.weather.temperature}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'}`;
       if (ctx.weather.feelsLike) {
-        contextString += ` (feels like ${ctx.weather.feelsLike}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'})`;
+        tempStr += ` (feels like ${ctx.weather.feelsLike}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'})`;
       }
-      contextString += '\n';
+      contextParts.push(tempStr);
       if (ctx.weather.description) {
-        contextString += `- Conditions: ${ctx.weather.description}\n`;
+        contextParts.push(`- Conditions: ${ctx.weather.description}`);
       }
       if (ctx.weather.humidity) {
-        contextString += `- Humidity: ${ctx.weather.humidity}%\n`;
+        contextParts.push(`- Humidity: ${ctx.weather.humidity}%`);
       }
     }
 
     // User context
     if (ctx.user.isAuthenticated) {
-      contextString += '\nUSER:\n';
+      contextParts.push('\nUSER:');
       if (ctx.user.profile?.fullName || ctx.user.profile?.nickname || ctx.user.name) {
         const displayName = ctx.user.profile?.nickname || ctx.user.profile?.fullName || ctx.user.name;
-        contextString += `- Name: ${displayName}\n`;
+        contextParts.push(`- Name: ${displayName}`);
         if (ctx.user.profile?.fullName && ctx.user.profile?.nickname && ctx.user.profile.fullName !== ctx.user.profile.nickname) {
-          contextString += `- Full name: ${ctx.user.profile.fullName}\n`;
+          contextParts.push(`- Full name: ${ctx.user.profile.fullName}`);
         }
       }
       if (ctx.user.profile?.uniqueId) {
-        contextString += `- Unique ID: ${ctx.user.profile.uniqueId}\n`;
+        contextParts.push(`- Unique ID: ${ctx.user.profile.uniqueId}`);
       }
       if (ctx.user.email || ctx.user.profile?.email) {
-        contextString += `- Email: ${ctx.user.profile?.email || ctx.user.email}\n`;
+        contextParts.push(`- Email: ${ctx.user.profile?.email || ctx.user.email}`);
       }
       if (ctx.user.profile?.phone) {
-        contextString += `- Phone: ${ctx.user.profile.phone}\n`;
+        contextParts.push(`- Phone: ${ctx.user.profile.phone}`);
       }
       if (ctx.user.profile?.dateOfBirth) {
         const birthDate = new Date(ctx.user.profile.dateOfBirth);
-        const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-        contextString += `- Age: ${age} years old (born ${birthDate.toLocaleDateString()})\n`;
+        const age = Math.floor((this.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+        contextParts.push(`- Age: ${age} years old (born ${birthDate.toLocaleDateString()})`);
       }
       if (ctx.user.profile?.gender) {
-        contextString += `- Gender: ${ctx.user.profile.gender}\n`;
+        contextParts.push(`- Gender: ${ctx.user.profile.gender}`);
       }
       if (ctx.user.profile?.maritalStatus) {
-        contextString += `- Marital status: ${ctx.user.profile.maritalStatus}\n`;
+        contextParts.push(`- Marital status: ${ctx.user.profile.maritalStatus}`);
       }
       if (ctx.user.profile?.address && (ctx.user.profile.address.street || ctx.user.profile.address.city)) {
         const addr = ctx.user.profile.address;
         if (addr.street && addr.city && addr.state && addr.zip) {
-          contextString += `- Home address: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
-          if (addr.country) contextString += `, ${addr.country}`;
-          contextString += '\n';
+          let addressStr = `- Home address: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`;
+          if (addr.country) addressStr += `, ${addr.country}`;
+          contextParts.push(addressStr);
         } else if (addr.city) {
-          contextString += `- Lives in: ${addr.city}`;
-          if (addr.state) contextString += `, ${addr.state}`;
-          contextString += '\n';
+          let livesInStr = `- Lives in: ${addr.city}`;
+          if (addr.state) livesInStr += `, ${addr.state}`;
+          contextParts.push(livesInStr);
         }
       }
       if (ctx.user.memberSince) {
-        contextString += `- Member since: ${ctx.user.memberSince}\n`;
+        contextParts.push(`- Member since: ${ctx.user.memberSince}`);
       }
     }
 
     // Activity context
     if (ctx.activity.activeComponents.length > 0) {
-      contextString += '\nACTIVE FEATURES:\n';
-      contextString += `- Currently using: ${ctx.activity.activeComponents.join(', ')}\n`;
+      contextParts.push('\nACTIVE FEATURES:');
+      contextParts.push(`- Currently using: ${ctx.activity.activeComponents.join(', ')}`);
     }
 
     // Environment hints
-    contextString += '\nENVIRONMENT:\n';
-    contextString += `- Device: ${ctx.environment.deviceType}\n`;
-    contextString += `- Time in session: ${Math.floor(ctx.activity.timeSpentInSession / 1000 / 60)} minutes\n`;
+    contextParts.push('\nENVIRONMENT:');
+    contextParts.push(`- Device: ${ctx.environment.deviceType}`);
+    contextParts.push(`- Time in session: ${Math.floor(ctx.activity.timeSpentInSession / 1000 / 60)} minutes`);
 
     // Device context
     if (ctx.device.hasData) {
-      contextString += '\nDEVICE INFO:\n';
-      if (ctx.device.browser) contextString += `- Browser: ${ctx.device.browser}\n`;
-      if (ctx.device.os) contextString += `- Operating System: ${ctx.device.os}\n`;
-      if (ctx.device.device) contextString += `- Device Type: ${ctx.device.device}\n`;
-      if (ctx.device.screen) contextString += `- Screen Resolution: ${ctx.device.screen}`;
-      if (ctx.device.pixelRatio && ctx.device.pixelRatio > 1) contextString += ` @${ctx.device.pixelRatio}x`;
-      if (ctx.device.screen) contextString += '\n';
-      if (ctx.device.windowSize) contextString += `- Window Size: ${ctx.device.windowSize}\n`;
-      if (ctx.device.cpu) contextString += `- CPU: ${ctx.device.cpu}${typeof ctx.device.cpu === 'number' ? ' cores' : ''}\n`;
-      if (ctx.device.memory) contextString += `- Memory: ${ctx.device.memory}\n`;
-      if (ctx.device.networkType) contextString += `- Network Type: ${ctx.device.networkType}\n`;
-      if (ctx.device.downlink) contextString += `- Network Speed: ${ctx.device.downlink}\n`;
-      if (ctx.device.batteryLevel !== null && ctx.device.batteryLevel !== undefined) {
-        contextString += `- Battery: ${ctx.device.batteryLevel}%`;
-        if (ctx.device.batteryCharging !== null) {
-          contextString += ` (${ctx.device.batteryCharging ? 'charging' : 'not charging'})`;
-        }
-        contextString += '\n';
+      contextParts.push('\nDEVICE INFO:');
+      if (ctx.device.browser) contextParts.push(`- Browser: ${ctx.device.browser}`);
+      if (ctx.device.os) contextParts.push(`- Operating System: ${ctx.device.os}`);
+      if (ctx.device.device) contextParts.push(`- Device Type: ${ctx.device.device}`);
+      if (ctx.device.screen) {
+        let screenStr = `- Screen Resolution: ${ctx.device.screen}`;
+        if (ctx.device.pixelRatio && ctx.device.pixelRatio > 1) screenStr += ` @${ctx.device.pixelRatio}x`;
+        contextParts.push(screenStr);
       }
-      if (ctx.device.storageQuota) contextString += `- Storage Quota: ${ctx.device.storageQuota}\n`;
+      if (ctx.device.windowSize) contextParts.push(`- Window Size: ${ctx.device.windowSize}`);
+      if (ctx.device.cpu) contextParts.push(`- CPU: ${ctx.device.cpu}${typeof ctx.device.cpu === 'number' ? ' cores' : ''}`);
+      if (ctx.device.memory) contextParts.push(`- Memory: ${ctx.device.memory}`);
+      if (ctx.device.networkType) contextParts.push(`- Network Type: ${ctx.device.networkType}`);
+      if (ctx.device.downlink) contextParts.push(`- Network Speed: ${ctx.device.downlink}`);
+      if (ctx.device.batteryLevel !== null && ctx.device.batteryLevel !== undefined) {
+        let batteryStr = `- Battery: ${ctx.device.batteryLevel}%`;
+        if (ctx.device.batteryCharging !== null) {
+          batteryStr += ` (${ctx.device.batteryCharging ? 'charging' : 'not charging'})`;
+        }
+        contextParts.push(batteryStr);
+      }
+      if (ctx.device.storageQuota) contextParts.push(`- Storage Quota: ${ctx.device.storageQuota}`);
     }
 
     // Dashboard apps context
     if (ctx.apps) {
       const appSummary = dashboardAppService.getContextSummary();
       if (appSummary && appSummary !== 'No active dashboard apps') {
-        contextString += `\n${appSummary}\n`;
+        contextParts.push(`\n${appSummary}`);
       }
     }
 
-    return contextString;
+    return contextParts.join('\n');
   }
 
   // Generate contextual suggestions
@@ -575,7 +638,25 @@ export class DashboardContextService {
 
   // Cleanup
   destroy(): void {
+    // Clear unified timer
+    if (this.mainTimer) {
+      clearInterval(this.mainTimer);
+      this.mainTimer = undefined;
+    }
+    
+    // Remove event listeners
+    if (this.onlineHandler) {
+      window.removeEventListener('online', this.onlineHandler);
+      this.onlineHandler = undefined;
+    }
+    if (this.offlineHandler) {
+      window.removeEventListener('offline', this.offlineHandler);
+      this.offlineHandler = undefined;
+    }
+    
+    // Clear listeners
     this.listeners = [];
+    
     dashboardAppService.destroy();
   }
 }

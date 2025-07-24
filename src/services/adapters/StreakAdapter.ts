@@ -9,6 +9,7 @@ import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import type { UserHabitsData } from '../../types/habit.types';
 import { logger } from '../../lib/logger';
 import { StorageService, STORAGE_KEYS } from '../StorageService';
+import { dashboardContextService } from '../DashboardContextService';
 
 interface StreakData {
   habits: {
@@ -135,7 +136,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
       throw new Error('User data not loaded');
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = dashboardContextService.getLocalDate();
     const habits = this.userData.habits.map(habit => ({
       id: habit.id,
       name: habit.name,
@@ -239,7 +240,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private isToday(dateStr: string | null): boolean {
     if (!dateStr) return false;
-    const today = new Date().toISOString().split('T')[0];
+    const today = dashboardContextService.getLocalDate();
     return dateStr === today;
   }
 

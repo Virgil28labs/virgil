@@ -25,13 +25,10 @@ export function useSystemPrompt({
   dashboardContext,
   contextualSuggestions,
 }: UseSystemPromptProps): UseSystemPromptReturn {
-  // Memoized time of day calculation
+  // Time of day from dashboard context (automatically updates via timeOfDay field)
   const timeOfDay = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'morning';
-    if (hour < 17) return 'afternoon';
-    return 'evening';
-  }, []); // Empty deps since we want this to be stable during the session
+    return dashboardContext?.timeOfDay || 'evening';
+  }, [dashboardContext]); // Updates when dashboard context changes
 
   // Memoized location context from dashboard
   const locationContext = useMemo(() => {

@@ -3,6 +3,7 @@
  */
 
 import { logger } from '../lib/logger';
+import { dashboardContextService } from '../services/DashboardContextService';
 
 export interface DownloadableImage {
   url: string;
@@ -28,7 +29,7 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
     // Generate filename
     const extension = image.url.split('.').pop()?.split('?')[0] || 'jpg';
     const safeTitle = image.title?.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'image';
-    const dateStr = image.date || new Date().toISOString().split('T')[0];
+    const dateStr = image.date || dashboardContextService.getLocalDate();
     const filename = `${filenamePrefix}-${dateStr}-${safeTitle}.${extension}`;
     
     // Create download link

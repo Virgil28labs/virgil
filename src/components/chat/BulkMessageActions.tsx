@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { toastService } from '../../services/ToastService';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import './chat-interface.css';
 
 interface BulkMessageActionsProps {
@@ -53,14 +54,15 @@ const BulkMessageActions = memo(function BulkMessageActions({
     setIsExporting(true);
 
     try {
+      const now = dashboardContextService.getCurrentDateTime();
       const exportData = {
-        exportedAt: new Date().toISOString(),
+        exportedAt: now.toISOString(),
         messageCount: selectedMessageData.length,
         messages: selectedMessageData.map(msg => ({
           id: msg.id,
           role: msg.role,
           content: msg.content,
-          timestamp: msg.timestamp || Date.now(),
+          timestamp: msg.timestamp || dashboardContextService.getTimestamp(),
         })),
       };
 
@@ -70,7 +72,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `virgil-messages-${selectedMessageData.length}-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `virgil-messages-${selectedMessageData.length}-${dashboardContextService.getLocalDate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       

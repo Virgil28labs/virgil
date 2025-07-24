@@ -7,6 +7,7 @@
 import type { ChatMessage } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { dashboardAppService } from './DashboardAppService';
+import { dashboardContextService } from './DashboardContextService';
 
 export interface ChatApiRequest {
   model: string;
@@ -115,11 +116,12 @@ export class ChatService {
    * Create a new assistant message
    */
   private createAssistantMessage(content: string): ChatMessage {
+    const now = dashboardContextService.getCurrentDateTime();
     return {
-      id: `${Date.now()}-assistant`,
+      id: `${dashboardContextService.getTimestamp()}-assistant`,
       role: 'assistant',
       content,
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
     };
   }
 
@@ -127,11 +129,12 @@ export class ChatService {
    * Create a new user message
    */
   createUserMessage(content: string): ChatMessage {
+    const now = dashboardContextService.getCurrentDateTime();
     return {
-      id: `${Date.now()}-user`,
+      id: `${dashboardContextService.getTimestamp()}-user`,
       role: 'user',
       content,
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
     };
   }
 
@@ -139,11 +142,12 @@ export class ChatService {
    * Create a fallback error message
    */
   createFallbackMessage(): ChatMessage {
+    const now = dashboardContextService.getCurrentDateTime();
     return {
-      id: `${Date.now()}-fallback`,
+      id: `${dashboardContextService.getTimestamp()}-fallback`,
       role: 'assistant',
       content: "I'm having trouble connecting right now. Please try again in a moment!",
-      timestamp: new Date().toISOString(),
+      timestamp: now.toISOString(),
     };
   }
 

@@ -1,5 +1,6 @@
 import type { ChatMessage } from '../types/chat.types';
 import { toastService } from './ToastService';
+import { dashboardContextService } from './DashboardContextService';
 
 export interface StoredConversation {
   id: string;
@@ -92,7 +93,7 @@ export class MemoryService {
   }
 
   private isContextCacheValid(): boolean {
-    return !!this.contextCache && (Date.now() - this.contextCacheTimestamp) < this.CONTEXT_CACHE_DURATION;
+    return !!this.contextCache && (dashboardContextService.getTimestamp() - this.contextCacheTimestamp) < this.CONTEXT_CACHE_DURATION;
   }
 
   private updateRecentMessagesCache(newMessages: ChatMessage[]): void {
@@ -150,7 +151,7 @@ export class MemoryService {
         messages: allMessages,
         firstMessage: newFirstMessage,
         lastMessage: newLastMessage,
-        timestamp: Date.now(),
+        timestamp: dashboardContextService.getTimestamp(),
         messageCount: newMessageCount,
       };
 
@@ -199,11 +200,12 @@ export class MemoryService {
     if (!this.db) return;
 
     try {
+      const timestamp = dashboardContextService.getTimestamp();
       const memory: MarkedMemory = {
-        id: `mem-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `mem-${timestamp}-${Math.random().toString(36).substr(2, 9)}`,
         content: content.slice(0, 500), // Limit memory size
         context: context.slice(0, 200),
-        timestamp: Date.now(),
+        timestamp,
         tag,
       };
 
@@ -347,7 +349,7 @@ export class MemoryService {
 
     // Cache the result
     this.contextCache = context;
-    this.contextCacheTimestamp = Date.now();
+    this.contextCacheTimestamp = dashboardContextService.getTimestamp();
 
     return context;
   }
@@ -442,7 +444,7 @@ export class MemoryService {
 
   // Utility function for time ago formatting
   static timeAgo(timestamp: number): string {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    const seconds = Math.floor((dashboardContextService.getTimestamp() - timestamp) / 1000);
     
     if (seconds < 60) return 'just now';
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;

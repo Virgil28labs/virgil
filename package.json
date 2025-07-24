@@ -21,7 +21,9 @@
     "cleanup-ports": "./cleanup-ports.sh",
     "diagnose": "./diagnose.sh",
     "css:monitor": "node scripts/css-monitor.js",
-    "benchmark:storage": "npm run build && node scripts/benchmark-storage.js"
+    "benchmark:storage": "npm run build && node scripts/benchmark-storage.js",
+    "check:date-usage": "node scripts/check-date-usage.js",
+    "pre-commit": "npm run lint && npm run type-check && npm run check:date-usage"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",

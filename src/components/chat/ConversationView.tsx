@@ -3,6 +3,7 @@ import type { StoredConversation } from '../../services/MemoryService';
 import type { ChatMessage } from '../../types/chat.types';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { formatTimestamp } from '../../utils/dateFormatter';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import { Message } from './Message';
 import './memory-modals.css';
 
@@ -20,8 +21,9 @@ const ConversationView = memo(function ConversationView({
   const { profile } = useUserProfile();
 
   const handleExportConversation = useCallback(() => {
+    const now = dashboardContextService.getCurrentDateTime();
     const conversationData = {
-      exportedAt: new Date().toISOString(),
+      exportedAt: now.toISOString(),
       conversation: {
         timestamp: conversation.timestamp,
         messageCount: conversation.messageCount,
@@ -33,7 +35,10 @@ const ConversationView = memo(function ConversationView({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `conversation-${new Date(conversation.timestamp).toISOString().split('T')[0]}.json`;
+    // Format conversation timestamp as local date for filename
+    const conversationDate = new Date(conversation.timestamp);
+    const dateStr = dashboardContextService.formatDateToLocal(conversationDate);
+    a.download = `conversation-${dateStr}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }, [conversation]);

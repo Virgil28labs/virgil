@@ -29,7 +29,7 @@ export function useContextSync() {
       hasLocation: !!(coordinates || ipLocation),
       hasIPLocation: !!ipLocation,
       initialized: true,
-      lastUpdated: Date.now(),
+      lastUpdated: dashboardContextService.getTimestamp(),
       fetchLocationData: () => Promise.resolve(),
       requestLocationPermission: () => Promise.resolve(),
       clearError: () => {},
@@ -48,7 +48,7 @@ export function useContextSync() {
       clearError: () => {},
       hasWeather: !!weatherData,
       forecast: null,
-      lastUpdated: weatherData ? Date.now() : null,
+      lastUpdated: weatherData ? dashboardContextService.getTimestamp() : null,
     });
   }, [weatherData, weatherUnit]);
 

@@ -18,10 +18,3 @@ export const formatTimeAgo = (timestamp: number): string => {
   
   return new Date(timestamp).toLocaleDateString();
 };
-
-/**
- * Format date for file naming (YYYY-MM-DD)
- */
-export const formatDateForFilename = (timestamp: number): string => {
-  return new Date(timestamp).toISOString().split('T')[0];
-};

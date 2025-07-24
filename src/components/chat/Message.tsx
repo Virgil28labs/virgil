@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { FormattedText } from '../../utils/textFormatter';
 import { toastService } from '../../services/ToastService';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import './message-components.css';
 
 interface MessageProps {
@@ -54,12 +55,13 @@ const Message = memo(function Message({
   }, [message.content, handleCopyMessage]);
 
   const handleExportMessage = useCallback(() => {
+    const now = dashboardContextService.getCurrentDateTime();
     const messageData = {
       id: message.id,
       role: message.role,
       content: message.content,
-      timestamp: message.timestamp || Date.now(),
-      exportedAt: new Date().toISOString(),
+      timestamp: message.timestamp || dashboardContextService.getTimestamp(),
+      exportedAt: now.toISOString(),
     };
 
     const blob = new Blob([JSON.stringify(messageData, null, 2)], { 
@@ -68,7 +70,7 @@ const Message = memo(function Message({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `message-${message.id}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `message-${message.id}-${dashboardContextService.getLocalDate()}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
