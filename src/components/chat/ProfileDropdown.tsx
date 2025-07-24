@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import './ProfileDropdown.css';
+import './chat-interface.css';
 
 interface ProfileDropdownProps {
   customSystemPrompt: string;

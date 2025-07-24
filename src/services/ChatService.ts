@@ -45,7 +45,7 @@ export class ChatService {
     userMessage: string,
     systemPrompt: string,
     previousMessages: ChatMessage[],
-    model: string
+    model: string,
   ): Promise<ChatMessage> {
     if (!userMessage.trim()) {
       throw new Error('Message cannot be empty');
@@ -62,7 +62,7 @@ export class ChatService {
       { role: 'system', content: systemPrompt },
       ...previousMessages.map((msg) => ({ 
         role: msg.role, 
-        content: msg.content 
+        content: msg.content, 
       })),
       { role: 'user', content: userMessage },
     ];

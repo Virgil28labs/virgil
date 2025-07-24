@@ -117,7 +117,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
     } catch (error: any) {
       logger.error('Location fetch error', error as Error, {
         component: 'LocationContext',
-        action: 'updateLocationDataFromIP'
+        action: 'updateLocationDataFromIP',
       });
       dispatch({ type: 'SET_ERROR', payload: error.message });
     }

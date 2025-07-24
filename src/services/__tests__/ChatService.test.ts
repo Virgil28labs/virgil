@@ -36,7 +36,7 @@ describe('ChatService', () => {
 
     it('should throw error for empty message', async () => {
       await expect(
-        chatService.sendMessage('', systemPrompt, previousMessages, model)
+        chatService.sendMessage('', systemPrompt, previousMessages, model),
       ).rejects.toThrow('Message cannot be empty');
     });
 
@@ -52,7 +52,7 @@ describe('ChatService', () => {
         validUserMessage,
         systemPrompt,
         previousMessages,
-        model
+        model,
       );
 
       expect(dashboardAppService.getResponseForQuery).toHaveBeenCalledWith(validUserMessage);
@@ -82,7 +82,7 @@ describe('ChatService', () => {
         validUserMessage,
         systemPrompt,
         previousMessages,
-        model
+        model,
       );
 
       expect(dedupeFetch).toHaveBeenCalledWith(
@@ -101,7 +101,7 @@ describe('ChatService', () => {
             max_tokens: 200,
             temperature: 0.7,
           }),
-        }
+        },
       );
 
       expect(result).toMatchObject({
@@ -124,7 +124,7 @@ describe('ChatService', () => {
       (dedupeFetch as jest.Mock).mockResolvedValue(mockResponse);
 
       await expect(
-        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model)
+        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model),
       ).rejects.toThrow('Internal server error');
     });
 
@@ -141,7 +141,7 @@ describe('ChatService', () => {
       (dedupeFetch as jest.Mock).mockResolvedValue(mockResponse);
 
       await expect(
-        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model)
+        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model),
       ).rejects.toThrow('Invalid response from chat service');
     });
 
@@ -150,7 +150,7 @@ describe('ChatService', () => {
       (dedupeFetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       await expect(
-        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model)
+        chatService.sendMessage(validUserMessage, systemPrompt, previousMessages, model),
       ).rejects.toThrow('Network error');
     });
   });
@@ -196,7 +196,7 @@ describe('ChatService', () => {
         `${mockApiUrl}/health`,
         expect.objectContaining({
           method: 'GET',
-        })
+        }),
       );
     });
 

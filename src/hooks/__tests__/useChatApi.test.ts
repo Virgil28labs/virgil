@@ -44,7 +44,7 @@ describe('useChatApi', () => {
     (chatService.sendMessage as jest.Mock).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => 
-      useChatApi({ onSuccess, onTypingChange })
+      useChatApi({ onSuccess, onTypingChange }),
     );
 
     await act(async () => {
@@ -52,7 +52,7 @@ describe('useChatApi', () => {
         mockUserMessage,
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -60,7 +60,7 @@ describe('useChatApi', () => {
       mockUserMessage,
       mockSystemPrompt,
       mockPreviousMessages,
-      mockModel
+      mockModel,
     );
 
     expect(onTypingChange).toHaveBeenCalledWith(true);
@@ -87,7 +87,7 @@ describe('useChatApi', () => {
     (chatService.createFallbackMessage as jest.Mock).mockReturnValue(mockFallback);
 
     const { result } = renderHook(() => 
-      useChatApi({ onSuccess, onError, onTypingChange })
+      useChatApi({ onSuccess, onError, onTypingChange }),
     );
 
     await act(async () => {
@@ -95,7 +95,7 @@ describe('useChatApi', () => {
         mockUserMessage,
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -120,7 +120,7 @@ describe('useChatApi', () => {
     });
 
     const { result } = renderHook(() => 
-      useChatApi({ onSuccess, onError })
+      useChatApi({ onSuccess, onError }),
     );
 
     await act(async () => {
@@ -128,7 +128,7 @@ describe('useChatApi', () => {
         mockUserMessage,
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -146,7 +146,7 @@ describe('useChatApi', () => {
         '   ',
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -174,7 +174,7 @@ describe('useChatApi', () => {
         mockUserMessage,
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -205,7 +205,7 @@ describe('useChatApi', () => {
         mockUserMessage,
         mockSystemPrompt,
         mockPreviousMessages,
-        mockModel
+        mockModel,
       );
     });
 
@@ -245,9 +245,9 @@ describe('useChatApi', () => {
           mockUserMessage,
           mockSystemPrompt,
           mockPreviousMessages,
-          mockModel
+          mockModel,
         );
-      })
+      }),
     ).resolves.not.toThrow();
   });
 });

@@ -103,7 +103,7 @@ export class StorageMigration {
           key, 
           success: true, 
           oldValue: rawValue, 
-          newValue: newValue 
+          newValue: newValue, 
         };
       }
     } catch (error) {
@@ -112,7 +112,7 @@ export class StorageMigration {
         success: false, 
         oldValue: null, 
         newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: error instanceof Error ? error.message : 'Unknown error', 
       };
     }
   }
@@ -142,7 +142,7 @@ export class StorageMigration {
             key, 
             success: true, 
             oldValue: rawValue, 
-            newValue: newValue 
+            newValue: newValue, 
           };
         } else {
           // Invalid number, remove it
@@ -151,7 +151,7 @@ export class StorageMigration {
             key, 
             success: true, 
             oldValue: rawValue, 
-            newValue: null 
+            newValue: null, 
           };
         }
       }
@@ -161,7 +161,7 @@ export class StorageMigration {
         success: false, 
         oldValue: null, 
         newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: error instanceof Error ? error.message : 'Unknown error', 
       };
     }
   }
@@ -190,7 +190,7 @@ export class StorageMigration {
           key, 
           success: true, 
           oldValue: rawValue, 
-          newValue: newValue 
+          newValue: newValue, 
         };
       }
     } catch (error) {
@@ -199,7 +199,7 @@ export class StorageMigration {
         success: false, 
         oldValue: null, 
         newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: error instanceof Error ? error.message : 'Unknown error', 
       };
     }
   }
@@ -240,7 +240,7 @@ export class StorageMigration {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 

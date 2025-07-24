@@ -179,13 +179,13 @@ function VirgilChatbotInner() {
         systemPrompt,
         userQuery,
         state.dashboardContext,
-        state.contextualSuggestions
+        state.contextualSuggestions,
       );
       systemPrompt = enhancedPrompt.enhancedPrompt;
       dashboardContextService.logActivity(`Asked: "${userQuery.slice(0, 50)}..."`, 'virgil-chat');
     }
 
-    const responseRules = `\n\nBe conversational, concise, and use available context naturally.`;
+    const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
     
     return systemPrompt + responseRules;
   }, [staticPromptParts, state.memoryContext, state.dashboardContext, state.contextualSuggestions]);
@@ -237,8 +237,8 @@ function VirgilChatbotInner() {
 
   // Removed - no longer needed with ChatService
 
-  // Use chat API hook
-  const { sendMessage: sendChatMessage } = useChatApi({
+  // Use chat API hook with enhanced loading states
+  const { sendMessage: sendChatMessage, loadingState } = useChatApi({
     onSuccess: async (message) => {
       addMessage(message);
       
@@ -401,6 +401,7 @@ function VirgilChatbotInner() {
         onMarkAsImportant={markAsImportant}
         user={user}
         lastConversation={state.lastConversation}
+        loadingState={loadingState}
       />
 
       <ChatInput

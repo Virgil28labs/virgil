@@ -1,12 +1,12 @@
 import { memo, useState, useCallback, useMemo } from 'react';
-import { ModelOption } from '../../types/chat.types';
-import { DashboardContext } from '../../services/DashboardContextService';
-import { StoredConversation, MarkedMemory } from '../../services/MemoryService';
+import type { ModelOption } from '../../types/chat.types';
+import type { DashboardContext } from '../../services/DashboardContextService';
+import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
 import { StatusPills } from './StatusPills';
 import { WindowControls } from './WindowControls';
 import { ModelSelector } from './ModelSelector';
 import { ProfileDropdown } from './ProfileDropdown';
-import './ChatHeader.css';
+import './chat-interface.css';
 
 interface ChatHeaderProps {
   // Window state
@@ -115,7 +115,7 @@ const ChatHeader = memo(function ChatHeader({
                 <strong>Current System Prompt:</strong>
                 <p>{systemPromptInfo.prompt}</p>
                 {systemPromptInfo.hasCustomPrompt && (
-                  <small style={{ color: '#ff9f43', marginTop: '8px', display: 'block' }}>
+                  <small style={{ color: 'var(--color-active)', marginTop: '8px', display: 'block' }}>
                     ✏️ Custom prompt active
                   </small>
                 )}
@@ -154,7 +154,7 @@ const ChatHeader = memo(function ChatHeader({
         <button
           className="status-pill new-chat-pill"
           onClick={onNewChat}
-          title={messageCount > 0 ? "Start a new conversation (current one will be saved to memory)" : "Start a new conversation"}
+          title={messageCount > 0 ? 'Start a new conversation (current one will be saved to memory)' : 'Start a new conversation'}
         >
           ✨ NEW
         </button>

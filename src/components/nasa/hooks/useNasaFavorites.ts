@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
-import { logger } from '../../../lib/logger';
 import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
 
 // Simplified APOD for storage (reduce localStorage usage)

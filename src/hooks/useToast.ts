@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { Toast } from '../components/ToastNotification';
+import { toastService } from '../services/ToastService';
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -64,6 +65,15 @@ export function useToast() {
       message,
       ...options,
     });
+  }, [addToast]);
+
+  // Listen for global toast service events
+  useEffect(() => {
+    const unsubscribe = toastService.subscribe((toast) => {
+      addToast(toast);
+    });
+
+    return unsubscribe;
   }, [addToast]);
 
   return {

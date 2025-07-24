@@ -62,7 +62,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     } catch (error) {
       logger.error('Failed to fetch dog favorites', error as Error, {
         component: 'DogGalleryAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.favorites = [];
     }
@@ -202,7 +202,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
     // Specific breed queries
     const breedNames = ['retriever', 'labrador', 'poodle', 'bulldog', 'beagle', 
-                       'husky', 'corgi', 'terrier', 'shepherd', 'spaniel'];
+      'husky', 'corgi', 'terrier', 'shepherd', 'spaniel'];
     for (const breed of breedNames) {
       if (lowerQuery.includes(breed)) {
         return this.getSpecificBreedResponse(breed);
@@ -241,7 +241,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     const data = contextData.data;
 
     if (data.favorites.total === 0) {
-      return "No favorite dogs saved yet. Start exploring breeds in the Dog Gallery!";
+      return 'No favorite dogs saved yet. Start exploring breeds in the Dog Gallery!';
     }
 
     if (query.includes('what breed') || query.includes('which breed')) {
@@ -274,7 +274,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     const data = contextData.data;
 
     if (data.favorites.recent.length === 0) {
-      return "No favorite dogs yet. Visit the Dog Gallery to discover adorable pups!";
+      return 'No favorite dogs yet. Visit the Dog Gallery to discover adorable pups!';
     }
 
     const recent = data.favorites.recent[0];
@@ -299,7 +299,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     
     // Find all favorites matching the breed
     const matchingDogs = this.favorites.filter(dog => 
-      dog.breed.toLowerCase().includes(breed.toLowerCase())
+      dog.breed.toLowerCase().includes(breed.toLowerCase()),
     );
 
     if (matchingDogs.length === 0) {
@@ -317,7 +317,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     const data = contextData.data;
 
     if (data.favorites.total === 0) {
-      return "Dog Gallery: No favorites saved yet. Browse and save your favorite good boys and girls!";
+      return 'Dog Gallery: No favorites saved yet. Browse and save your favorite good boys and girls!';
     }
 
     let response = `Dog Gallery: ${data.favorites.total} favorite dogs`;
@@ -404,7 +404,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
         metadata: {
           breeds: Object.keys(this.getContextData().data.favorites.breeds).length,
           mostFavorited: this.getContextData().data.stats.mostFavoritedBreed,
-        }
+        },
       });
     }
     

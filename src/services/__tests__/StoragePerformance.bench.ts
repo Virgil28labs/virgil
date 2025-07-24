@@ -25,7 +25,7 @@ class StoragePerformanceBenchmark {
   private async runBenchmark(
     name: string,
     fn: () => Promise<void> | void,
-    iterations = 1000
+    iterations = 1000,
   ): Promise<BenchmarkResult> {
     const times: number[] = [];
     
@@ -47,7 +47,7 @@ class StoragePerformanceBenchmark {
       averageTime: times.reduce((a, b) => a + b, 0) / times.length,
       minTime: Math.min(...times),
       maxTime: Math.max(...times),
-      iterations
+      iterations,
     };
     
     this.results.push(result);
@@ -83,7 +83,7 @@ class StoragePerformanceBenchmark {
       id: 'test-123',
       name: 'Test Object',
       data: Array(10).fill({ value: 'test' }),
-      nested: { level1: { level2: { level3: 'deep' } } }
+      nested: { level1: { level2: { level3: 'deep' } } },
     };
 
     await this.runBenchmark('StorageService.set (object)', () => {
@@ -98,7 +98,7 @@ class StoragePerformanceBenchmark {
     const testArray = Array(100).fill(0).map((_, i) => ({
       id: i,
       value: `item-${i}`,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }));
 
     await this.runBenchmark('StorageService.set (large array)', () => {
@@ -149,9 +149,9 @@ class StoragePerformanceBenchmark {
         autoIncrement: false,
         indexes: [
           { name: 'timestamp', keyPath: 'timestamp' },
-          { name: 'category', keyPath: 'category' }
-        ]
-      }]
+          { name: 'category', keyPath: 'category' },
+        ],
+      }],
     });
 
     // Small object operations
@@ -159,7 +159,7 @@ class StoragePerformanceBenchmark {
       id: 'test-1',
       data: 'Small test data',
       timestamp: Date.now(),
-      category: 'test'
+      category: 'test',
     };
 
     await this.runBenchmark('IndexedDB.add (small object)', async () => {
@@ -178,10 +178,10 @@ class StoragePerformanceBenchmark {
       metadata: Array(50).fill(0).map((_, i) => ({
         index: i,
         value: `metadata-${i}`,
-        nested: { data: Array(10).fill('nested') }
+        nested: { data: Array(10).fill('nested') },
       })),
       timestamp: Date.now(),
-      category: 'large'
+      category: 'large',
     };
 
     await this.runBenchmark('IndexedDB.put (large object)', async () => {
@@ -193,7 +193,7 @@ class StoragePerformanceBenchmark {
       id: `batch-${i}`,
       data: `Batch item ${i}`,
       timestamp: Date.now() + i,
-      category: i % 3 === 0 ? 'A' : i % 3 === 1 ? 'B' : 'C'
+      category: i % 3 === 0 ? 'A' : i % 3 === 1 ? 'B' : 'C',
     }));
 
     await this.runBenchmark('IndexedDB.add (batch 50 items)', async () => {
@@ -245,7 +245,7 @@ class StoragePerformanceBenchmark {
     const categories = {
       'localStorage': this.results.filter(r => r.operation.includes('StorageService')),
       'IndexedDB': this.results.filter(r => r.operation.includes('IndexedDB')),
-      'Monitoring': this.results.filter(r => r.operation.includes('StorageMonitor'))
+      'Monitoring': this.results.filter(r => r.operation.includes('StorageMonitor')),
     };
 
     Object.entries(categories).forEach(([category, results]) => {
@@ -261,7 +261,7 @@ class StoragePerformanceBenchmark {
           result.operation.padEnd(50) +
           result.averageTime.toFixed(3).padEnd(12) +
           result.minTime.toFixed(3).padEnd(12) +
-          result.maxTime.toFixed(3).padEnd(12)
+          result.maxTime.toFixed(3).padEnd(12),
         );
       });
     });

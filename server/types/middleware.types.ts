@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request} from 'express';
+import { Response, NextFunction } from 'express';
 
 // Validation Types
 export interface ValidationRule {

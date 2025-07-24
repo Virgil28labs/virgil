@@ -117,7 +117,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       logger.error('Geocoding error', error as Error, {
         component: 'GoogleMapsModal',
         action: 'geocodeLocation',
-        metadata: { location }
+        metadata: { location },
       });
       return '';
     }
@@ -213,7 +213,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       logger.error('Directions error', error as Error, {
         component: 'GoogleMapsModal',
         action: 'calculateRoute',
-        metadata: { origin, destination }
+        metadata: { origin, destination },
       });
       setError('Unable to calculate route. Please try again.');
     }
@@ -482,7 +482,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       } catch (err) {
         logger.error('Error initializing map', err as Error, {
           component: 'GoogleMapsModal',
-          action: 'initializeMap'
+          action: 'initializeMap',
         });
         if (mounted) {
           setError('Failed to load Google Maps. Please try again.');
@@ -509,7 +509,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       } catch (error) {
         logger.error('Error loading saved places', error as Error, {
           component: 'GoogleMapsModal',
-          action: 'loadSavedPlaces'
+          action: 'loadSavedPlaces',
         });
       }
     }

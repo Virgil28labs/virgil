@@ -22,7 +22,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
     start, 
     pause, 
     reset, 
-    toggleSound 
+    toggleSound, 
   } = usePomodoro(DEFAULT_MINUTES);
 
   if (!isOpen) return null;

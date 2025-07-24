@@ -53,7 +53,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     } catch (error) {
       logger.error('Failed to fetch notes data', error as Error, {
         component: 'NotesAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.entries = [];
     }
@@ -85,15 +85,15 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       actionTypeDistribution: this.calculateActionTypeDistribution(),
       lastUpdate: this.entries.length > 0 
         ? this.entries.reduce((latest, entry) => 
-            entry.timestamp > latest ? entry.timestamp : latest, 
-            this.entries[0].timestamp
-          )
+          entry.timestamp > latest ? entry.timestamp : latest, 
+        this.entries[0].timestamp,
+        )
         : null,
     };
 
     const summary = this.generateSummary(data);
     const isActive = recentEntries.some(entry => 
-      now - entry.timestamp.getTime() < 30 * 60 * 1000 // Active if used in last 30 minutes
+      now - entry.timestamp.getTime() < 30 * 60 * 1000, // Active if used in last 30 minutes
     );
 
     return {
@@ -287,14 +287,14 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       .flatMap(entry => 
         entry.tasks
           .filter(task => !task.completed)
-          .map(task => ({ task, entry }))
+          .map(task => ({ task, entry })),
       )
       .slice(0, 5);
 
     let response = `You have ${taskStats.pending} pending tasks`;
 
     if (pendingTasks.length > 0) {
-      response += ". Here are your most recent:\n";
+      response += '. Here are your most recent:\n';
       pendingTasks.forEach(({ task, entry }) => {
         response += `• ${task.text} (from note: "${entry.content.substring(0, 30)}...")\n`;
       });
@@ -334,7 +334,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       
       let response = `You have ${distribution[requestedTag]} notes tagged with "${requestedTag}"`;
       if (taggedEntries.length > 0) {
-        response += ". Recent ones:\n";
+        response += '. Recent ones:\n';
         taggedEntries.forEach(entry => {
           response += `• "${entry.content.substring(0, 60)}..."\n`;
         });
@@ -348,7 +348,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       return "You haven't tagged any notes yet. Tags help organize notes into life areas: work, health, money, people, growth, and life.";
     }
 
-    let response = "Your notes by category:\n";
+    let response = 'Your notes by category:\n';
     activeTags.forEach(tag => {
       response += `• ${tag}: ${distribution[tag]} notes\n`;
     });
@@ -363,12 +363,12 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     // Extract search term (simple implementation)
     const searchMatch = query.match(/(?:search|find|about)\s+(?:for\s+)?["']?([^"']+)["']?/i);
     if (!searchMatch) {
-      return "What would you like to search for in your notes?";
+      return 'What would you like to search for in your notes?';
     }
 
     const searchTerm = searchMatch[1].toLowerCase();
     const matches = this.entries.filter(entry => 
-      entry.content.toLowerCase().includes(searchTerm)
+      entry.content.toLowerCase().includes(searchTerm),
     );
 
     if (matches.length === 0) {
@@ -411,7 +411,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       }
     }
 
-    response += ".";
+    response += '.';
     return response;
   }
 
@@ -422,7 +422,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     const matches = this.entries.filter(entry => 
       entry.content.toLowerCase().includes(lowerQuery) ||
       entry.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-      (entry.actionType && entry.actionType.toLowerCase().includes(lowerQuery))
+      (entry.actionType && entry.actionType.toLowerCase().includes(lowerQuery)),
     );
 
     return matches.map(entry => ({

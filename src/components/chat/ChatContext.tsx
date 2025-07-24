@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useReducer, useCallback } from 'react';
 import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
@@ -32,15 +33,15 @@ export function ChatProvider({ children }: ChatProviderProps) {
     try {
       const windowSize = StorageService.get<'normal' | 'large' | 'fullscreen'>(
         STORAGE_KEYS.WINDOW_SIZE, 
-        initial.windowSize
+        initial.windowSize,
       );
       const customSystemPrompt = StorageService.get<string>(
         STORAGE_KEYS.CUSTOM_SYSTEM_PROMPT, 
-        ''
+        '',
       );
       const selectedModel = StorageService.get<string>(
         STORAGE_KEYS.SELECTED_MODEL, 
-        'gpt-4.1-mini'
+        'gpt-4.1-mini',
       );
       
       return {

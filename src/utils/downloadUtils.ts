@@ -47,7 +47,7 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
     logger.error('Failed to download image', error as Error, {
       component: 'downloadUtils',
       action: 'downloadImage',
-      metadata: { imageUrl: image.url, title: image.title }
+      metadata: { imageUrl: image.url, title: image.title },
     });
     throw new Error('Failed to download image. Please try again.');
   }

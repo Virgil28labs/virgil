@@ -105,7 +105,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           logger.error('Failed to fetch fallback forecast', forecastError as Error, {
             component: 'WeatherContext',
             action: 'fetchWeatherAndForecast',
-            metadata: { fallback: true }
+            metadata: { fallback: true },
           });
         }
         
@@ -141,7 +141,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           logger.error('Failed to fetch forecast', forecastError as Error, {
             component: 'WeatherContext',
             action: 'fetchWeatherAndForecast',
-            metadata: { locationSource: 'coordinates' }
+            metadata: { locationSource: 'coordinates' },
           });
         }
       } else if (ipLocation?.city) {
@@ -162,7 +162,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           logger.error('Failed to fetch forecast', forecastError as Error, {
             component: 'WeatherContext',
             action: 'fetchWeatherAndForecast',
-            metadata: { locationSource: 'ipLocation' }
+            metadata: { locationSource: 'ipLocation' },
           });
         }
       } else {

@@ -80,7 +80,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     } catch (error) {
       logger.error('Failed to fetch circle game data', error as Error, {
         component: 'CircleGameAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.bestScore = 0;
       this.attempts = 0;
@@ -269,11 +269,11 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     if (this.bestScore >= 95) {
       response += " - That's a perfect circle! You're a true artist! ✨";
     } else if (this.bestScore >= 85) {
-      response += " - Excellent! Almost perfect!";
+      response += ' - Excellent! Almost perfect!';
     } else if (this.bestScore >= 75) {
-      response += " - Great job! Very circular!";
+      response += ' - Great job! Very circular!';
     } else if (this.bestScore >= 60) {
-      response += " - Good effort! Keep practicing!";
+      response += ' - Good effort! Keep practicing!';
     } else {
       response += " - Keep trying, you'll get better!";
     }
@@ -315,27 +315,27 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     const unlockedCount = Object.values(achievements).filter(a => a).length;
     
     if (unlockedCount === 0) {
-      return "No achievements unlocked yet. Keep playing to earn badges!";
+      return 'No achievements unlocked yet. Keep playing to earn badges!';
     }
 
     let response = `You've unlocked ${unlockedCount} achievement${unlockedCount !== 1 ? 's' : ''}:\n`;
     
-    if (achievements.firstPerfect) response += "• First Perfect - Score 95% or higher ✨\n";
-    if (achievements.circleMaster) response += "• Circle Master - Get 3 perfect scores 🎯\n";
-    if (achievements.consistentPlayer) response += "• Consistent Player - Play 20+ times 🎮\n";
-    if (achievements.improvingArtist) response += "• Improving Artist - Show steady improvement 📈\n";
-    if (achievements.circleNovice) response += "• Circle Novice - Play 5+ times 🎨\n";
+    if (achievements.firstPerfect) response += '• First Perfect - Score 95% or higher ✨\n';
+    if (achievements.circleMaster) response += '• Circle Master - Get 3 perfect scores 🎯\n';
+    if (achievements.consistentPlayer) response += '• Consistent Player - Play 20+ times 🎮\n';
+    if (achievements.improvingArtist) response += '• Improving Artist - Show steady improvement 📈\n';
+    if (achievements.circleNovice) response += '• Circle Novice - Play 5+ times 🎨\n';
 
     return response.trim();
   }
 
   private getProgressResponse(): string {
     if (this.scoreHistory.length < 2) {
-      return "Play more games to track your progress. Each circle helps you improve!";
+      return 'Play more games to track your progress. Each circle helps you improve!';
     }
 
     const improvementRate = this.calculateImprovementRate();
-    let response = "";
+    let response = '';
     
     if (improvementRate > 0.1) {
       const percent = Math.round(improvementRate * 100);
@@ -343,7 +343,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     } else if (improvementRate > 0) {
       response = "You're showing steady improvement! Keep practicing. ";
     } else {
-      response = "Your scores are consistent. Try drawing slower for better results. ";
+      response = 'Your scores are consistent. Try drawing slower for better results. ';
     }
 
     const recentScores = this.scoreHistory.slice(-5);
@@ -356,7 +356,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   private getStatsResponse(): string {
     if (this.attempts === 0) {
-      return "No game statistics yet. Play Perfect Circle to start tracking your performance!";
+      return 'No game statistics yet. Play Perfect Circle to start tracking your performance!';
     }
 
     const distribution = this.getScoreDistribution();
@@ -388,7 +388,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   private getOverviewResponse(): string {
     if (this.attempts === 0) {
-      return "Perfect Circle Game: No attempts yet. Challenge yourself to draw the perfect circle!";
+      return 'Perfect Circle Game: No attempts yet. Challenge yourself to draw the perfect circle!';
     }
 
     let response = `Perfect Circle: Best score ${this.bestScore}%, ${this.attempts} attempt${this.attempts !== 1 ? 's' : ''}`;

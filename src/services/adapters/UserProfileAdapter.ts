@@ -43,7 +43,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
         'address lookup',
         'profile details',
         'contact information',
-        'birthday information'
+        'birthday information',
       ],
       icon: this.icon,
     };
@@ -90,7 +90,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       
       // General profile keywords
       'my info', 'my information', 'my details', 'my data',
-      'about me', 'my profile', 'user profile', 'account info'
+      'about me', 'my profile', 'user profile', 'account info',
     ];
   }
 
@@ -156,7 +156,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
         const formattedDate = birthDate.toLocaleDateString('en-US', {
           month: 'long',
           day: 'numeric',
-          year: 'numeric'
+          year: 'numeric',
         });
         return `Your birthday is ${formattedDate}. You are ${age} years old.`;
       }
@@ -189,7 +189,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       return this.getContactSummary();
     }
 
-    return "I can help you with your profile information. You can ask about your name, email, phone, address, birthday, or other profile details.";
+    return 'I can help you with your profile information. You can ask about your name, email, phone, address, birthday, or other profile details.';
   }
 
   /**
@@ -273,7 +273,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   }
 
   private getProfileSummary(): string {
-    if (!this.profile) return "No profile information available.";
+    if (!this.profile) return 'No profile information available.';
     
     const sections: string[] = [];
     
@@ -321,7 +321,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     
     return sections.length > 0 
       ? `Here's your profile information:\n\n${sections.join('\n')}`
-      : "Your profile is incomplete. Consider adding more information.";
+      : 'Your profile is incomplete. Consider adding more information.';
   }
 
   private getContactSummary(): string {

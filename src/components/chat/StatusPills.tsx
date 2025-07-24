@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { DashboardContext } from '../../services/DashboardContextService';
-import './StatusPills.css';
+import type { DashboardContext } from '../../services/DashboardContextService';
+import './ui-controls.css';
 
 interface StatusPillsProps {
   showMemoryIndicator: boolean;

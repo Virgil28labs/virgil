@@ -56,8 +56,8 @@ describe('Storage Performance', () => {
           id: i,
           name: `Item ${i}`,
           description: 'x'.repeat(100),
-          metadata: { created: Date.now(), tags: ['tag1', 'tag2', 'tag3'] }
-        }))
+          metadata: { created: Date.now(), tags: ['tag1', 'tag2', 'tag3'] },
+        })),
       };
       
       const writeStart = performance.now();
@@ -131,7 +131,7 @@ describe('Storage Performance', () => {
       let errorCount = 0;
       
       // Make getItem fail 50% of the time
-      mockGetItem.mockImplementation((key) => {
+      mockGetItem.mockImplementation((_key) => {
         if (errorCount++ % 2 === 0) {
           throw new Error('Simulated storage error');
         }
@@ -164,7 +164,7 @@ describe('Storage Performance', () => {
       for (let i = 0; i < 50; i++) {
         StorageService.set(`size-test-${i}`, {
           data: 'x'.repeat(100),
-          index: i
+          index: i,
         });
       }
       

@@ -1,6 +1,6 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { ModelOption } from '../../types/chat.types';
-import './ModelSelector.css';
+import type { ModelOption } from '../../types/chat.types';
+import './ui-controls.css';
 
 interface ModelSelectorProps {
   selectedModel: string;

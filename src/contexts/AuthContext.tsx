@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (process.env.NODE_ENV === 'development') {
           logger.error('Auth session error', error as Error, {
             component: 'AuthContext',
-            action: 'authStateChange'
+            action: 'authStateChange',
           });
         }
         setUser(null);
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       logger.error('Sign out error', error as Error, {
         component: 'AuthContext',
-        action: 'signOut'
+        action: 'signOut',
       });
       return { error: error as Error };
     }
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       logger.error('Error refreshing user', error as Error, {
         component: 'AuthContext',
-        action: 'refreshUser'
+        action: 'refreshUser',
       });
     }
   };

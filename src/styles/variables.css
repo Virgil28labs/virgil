@@ -11,6 +11,12 @@
   --off-white: #f5f5f5;      /* Primary text, light backgrounds */
   --silver-grey: #b3b3b3;    /* Borders, dividers, disabled states */
   --soft-pink: #efb0c2;      /* Special highlights, success states */
+  --context-green: #2ecc71;  /* Context indicators, active status */
+  --error-red: #dc3545;      /* Error states, critical alerts */
+  --error-light: #f8d7da;    /* Light error backgrounds */
+  --warning-yellow: #ffc107;  /* Warning states */
+  --success-green: #28a745;   /* Success states */
+  --amber-orange: #ff9f43;    /* Active/highlighted states */
   
   /* Legacy variable mappings for backward compatibility */
   --brand-dark-purple: var(--deep-plum);
@@ -28,7 +34,22 @@
   --color-accent: var(--soft-pink);
   --color-text-primary: var(--off-white);
   --color-text-secondary: var(--silver-grey);
+  --color-text-dark: #2c3e50;      /* Dark text for light backgrounds */
+  --color-text-muted: #6c757d;     /* Muted text for less emphasis */
   --color-border: var(--silver-grey);
+  --color-error: var(--error-red);
+  --color-error-light: var(--error-light);
+  --color-warning: var(--warning-yellow);
+  --color-success: var(--success-green);
+  --color-chat-bg: #f8f4ff;        /* Light purple background for chat messages */
+  --color-error-border: rgba(220, 53, 69, 0.3);  /* Light error border */
+  --color-active: var(--amber-orange);    /* Active/highlighted text */
+  --color-primary-hover: color-mix(in srgb, var(--violet-purple) 80%, black);  /* Primary button hover */
+  --color-surface-light: #f5f6f8;   /* Very light background */
+  --color-surface-medium: #f0f1f4;  /* Medium light background */
+  --color-border-light: #f0f0f0;    /* Very light borders */
+  --color-success-hover: #218838;   /* Success button hover */
+  --color-error-hover: #c82333;     /* Error button hover */
   
   /* Gradients */
   --gradient-plum-lavender: linear-gradient(135deg, var(--deep-plum) 0%, var(--lavender) 100%);
@@ -41,10 +62,18 @@
   --elevation-3: 0 8px 16px rgba(57, 41, 62, 0.2);
   --elevation-hover: 0 6px 12px rgba(108, 59, 170, 0.15);
   
+  /* Elevation aliases for components */
+  --elevation-sm: var(--elevation-1);
+  --elevation-md: var(--elevation-2);
+  --elevation-lg: var(--elevation-3);
+  
   /* Transitions */
   --transition-fast: 200ms ease-in-out;
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 500ms ease-in-out;
+  
+  /* Transition aliases for components */
+  --transition-base: var(--transition-normal);
   
   /* Border Radius */
   --radius-small: 4px;

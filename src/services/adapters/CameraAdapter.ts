@@ -59,7 +59,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     } catch (error) {
       logger.error('Failed to fetch camera photos', error as Error, {
         component: 'CameraAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.photos = [];
     }
@@ -238,7 +238,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     const data = contextData.data;
 
     if (data.photos.recent.length === 0) {
-      return "No photos in your gallery yet. Start capturing memories with the camera!";
+      return 'No photos in your gallery yet. Start capturing memories with the camera!';
     }
 
     const mostRecent = data.photos.recent[0];
@@ -327,14 +327,14 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
     if (query.includes('week')) {
       if (data.stats.weekCount === 0) {
-        return "No photos taken this week. Time to capture some memories!";
+        return 'No photos taken this week. Time to capture some memories!';
       }
       return `You've taken ${data.stats.weekCount} photo${data.stats.weekCount !== 1 ? 's' : ''} in the past week.`;
     }
 
     if (query.includes('month')) {
       if (data.stats.monthCount === 0) {
-        return "No photos taken this month. Your camera is waiting!";
+        return 'No photos taken this month. Your camera is waiting!';
       }
       return `You've taken ${data.stats.monthCount} photo${data.stats.monthCount !== 1 ? 's' : ''} in the past month.`;
     }
@@ -347,7 +347,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     const data = contextData.data;
 
     if (data.photos.total === 0) {
-      return "Camera app: No photos saved yet. Open the camera to start capturing memories!";
+      return 'Camera app: No photos saved yet. Open the camera to start capturing memories!';
     }
 
     let response = `Camera gallery: ${data.photos.total} photos`;
@@ -463,7 +463,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
             today.setHours(0, 0, 0, 0);
             return p.timestamp >= today.getTime();
           }).length,
-        }
+        },
       });
     }
     

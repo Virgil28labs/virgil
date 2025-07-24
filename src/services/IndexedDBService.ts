@@ -126,7 +126,7 @@ export class IndexedDBService {
           if (!db.objectStoreNames.contains(storeConfig.name)) {
             const store = db.createObjectStore(storeConfig.name, {
               keyPath: storeConfig.keyPath,
-              autoIncrement: storeConfig.autoIncrement
+              autoIncrement: storeConfig.autoIncrement,
             });
 
             // Create indexes
@@ -134,7 +134,7 @@ export class IndexedDBService {
               store.createIndex(
                 indexConfig.name,
                 indexConfig.keyPath,
-                indexConfig.options
+                indexConfig.options,
               );
             });
           }
@@ -148,7 +148,7 @@ export class IndexedDBService {
    */
   private async executeWithRetry<T>(
     operation: () => Promise<T>,
-    retries = this.retryAttempts
+    retries = this.retryAttempts,
   ): Promise<OperationResult<T>> {
     const startTime = performance.now();
     
@@ -158,20 +158,20 @@ export class IndexedDBService {
         return {
           success: true,
           data,
-          duration: performance.now() - startTime
+          duration: performance.now() - startTime,
         };
       } catch (error) {
         if (attempt === retries) {
           return {
             success: false,
             error: error instanceof Error ? error : new Error(String(error)),
-            duration: performance.now() - startTime
+            duration: performance.now() - startTime,
           };
         }
         
         // Wait before retry with exponential backoff
         await new Promise(resolve => 
-          setTimeout(resolve, this.retryDelay * Math.pow(2, attempt))
+          setTimeout(resolve, this.retryDelay * Math.pow(2, attempt)),
         );
       }
     }
@@ -179,7 +179,7 @@ export class IndexedDBService {
     return {
       success: false,
       error: new Error('Operation failed after all retries'),
-      duration: performance.now() - startTime
+      duration: performance.now() - startTime,
     };
   }
 
@@ -316,7 +316,7 @@ export class IndexedDBService {
     dbName: string,
     storeName: string,
     indexName: string,
-    query?: IDBKeyRange | IDBValidKey
+    query?: IDBKeyRange | IDBValidKey,
   ): Promise<OperationResult<T[]>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
@@ -340,7 +340,7 @@ export class IndexedDBService {
     dbName: string,
     storeNames: string[],
     mode: IDBTransactionMode,
-    operation: (transaction: IDBTransaction) => Promise<T>
+    operation: (transaction: IDBTransaction) => Promise<T>,
   ): Promise<OperationResult<T>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
@@ -364,7 +364,7 @@ export class IndexedDBService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error : new Error('Failed to get storage estimate')
+        error: error instanceof Error ? error : new Error('Failed to get storage estimate'),
       };
     }
   }
@@ -403,7 +403,7 @@ export class IndexedDBService {
       request.onsuccess = () => resolve({ success: true });
       request.onerror = () => resolve({
         success: false,
-        error: new Error(`Failed to delete database ${dbName}: ${request.error?.message}`)
+        error: new Error(`Failed to delete database ${dbName}: ${request.error?.message}`),
       });
     });
   }
@@ -421,17 +421,17 @@ indexedDBService.registerDatabase({
       name: 'conversations',
       keyPath: 'id',
       indexes: [
-        { name: 'timestamp', keyPath: 'timestamp' }
-      ]
+        { name: 'timestamp', keyPath: 'timestamp' },
+      ],
     },
     {
       name: 'memories',
       keyPath: 'id',
       indexes: [
-        { name: 'timestamp', keyPath: 'timestamp' }
-      ]
-    }
-  ]
+        { name: 'timestamp', keyPath: 'timestamp' },
+      ],
+    },
+  ],
 });
 
 indexedDBService.registerDatabase({
@@ -443,10 +443,10 @@ indexedDBService.registerDatabase({
       keyPath: 'id',
       indexes: [
         { name: 'timestamp', keyPath: 'timestamp' },
-        { name: 'isFavorite', keyPath: 'isFavorite' }
-      ]
-    }
-  ]
+        { name: 'isFavorite', keyPath: 'isFavorite' },
+      ],
+    },
+  ],
 });
 
 indexedDBService.registerDatabase({
@@ -458,8 +458,8 @@ indexedDBService.registerDatabase({
       keyPath: 'id',
       indexes: [
         { name: 'timestamp', keyPath: 'timestamp' },
-        { name: 'tags', keyPath: 'tags', options: { unique: false, multiEntry: true } }
-      ]
-    }
-  ]
+        { name: 'tags', keyPath: 'tags', options: { unique: false, multiEntry: true } },
+      ],
+    },
+  ],
 });

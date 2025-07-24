@@ -109,7 +109,7 @@ export const shareApod = async (apod: ApodImage): Promise<boolean> => {
     logger.error('Share failed', error as Error, {
       component: 'nasaImageUtils',
       action: 'shareApod',
-      metadata: { apodTitle: apod.title }
+      metadata: { apodTitle: apod.title },
     });
   }
 

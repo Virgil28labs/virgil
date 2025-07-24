@@ -96,7 +96,7 @@ export class StorageMonitor {
     const [localStorageMetrics, indexedDBMetrics, storageEstimate] = await Promise.all([
       this.getLocalStorageMetrics(),
       this.getIndexedDBMetrics(),
-      this.getStorageEstimate()
+      this.getStorageEstimate(),
     ]);
 
     const totalUsed = localStorageMetrics.used + indexedDBMetrics.totalUsed;
@@ -108,8 +108,8 @@ export class StorageMonitor {
       total: {
         used: totalUsed,
         available: totalAvailable,
-        percentUsed: totalAvailable > 0 ? (totalUsed / totalAvailable) * 100 : 0
-      }
+        percentUsed: totalAvailable > 0 ? (totalUsed / totalAvailable) * 100 : 0,
+      },
     };
   }
 
@@ -143,7 +143,7 @@ export class StorageMonitor {
         used: totalSize,
         available,
         itemCount: items.length,
-        largestItems: items.slice(0, 10) // Top 10 largest items
+        largestItems: items.slice(0, 10), // Top 10 largest items
       };
     } catch (error) {
       console.error('Failed to get localStorage metrics:', error);
@@ -151,7 +151,7 @@ export class StorageMonitor {
         used: 0,
         available: 0,
         itemCount: 0,
-        largestItems: []
+        largestItems: [],
       };
     }
   }
@@ -182,7 +182,7 @@ export class StorageMonitor {
     return {
       databases,
       totalUsed,
-      available
+      available,
     };
   }
 
@@ -207,7 +207,7 @@ export class StorageMonitor {
         stores.push({
           name: storeName,
           recordCount,
-          estimatedSize
+          estimatedSize,
         });
 
         totalSize += estimatedSize;
@@ -219,7 +219,7 @@ export class StorageMonitor {
       name: dbName,
       stores,
       totalSize,
-      recordCount: totalRecords
+      recordCount: totalRecords,
     };
   }
 
@@ -231,7 +231,7 @@ export class StorageMonitor {
     const storeMap: Record<string, string[]> = {
       'VirgilMemory': ['conversations', 'memories'],
       'VirgilCameraDB': ['photos'],
-      'NotesDB': ['notes']
+      'NotesDB': ['notes'],
     };
 
     return storeMap[dbName] || [];
@@ -259,7 +259,7 @@ export class StorageMonitor {
         type: 'quota',
         severity: 'high',
         description: `Storage usage critical: ${metrics.total.percentUsed.toFixed(1)}% used`,
-        storage: 'indexedDB'
+        storage: 'indexedDB',
       });
       recommendations.push('Urgently clean up old data or export important data');
     } else if (metrics.total.percentUsed >= this.quotaWarningThreshold * 100) {
@@ -267,7 +267,7 @@ export class StorageMonitor {
         type: 'quota',
         severity: 'medium',
         description: `Storage usage high: ${metrics.total.percentUsed.toFixed(1)}% used`,
-        storage: 'indexedDB'
+        storage: 'indexedDB',
       });
       recommendations.push('Consider cleaning up old photos or chat history');
     }
@@ -278,7 +278,7 @@ export class StorageMonitor {
         type: 'quota',
         severity: 'medium',
         description: 'localStorage usage exceeds 5MB',
-        storage: 'localStorage'
+        storage: 'localStorage',
       });
       recommendations.push('Move large data from localStorage to IndexedDB');
     }
@@ -291,7 +291,7 @@ export class StorageMonitor {
         severity: 'low',
         description: `${largeItems.length} large items in localStorage`,
         storage: 'localStorage',
-        details: largeItems
+        details: largeItems,
       });
       recommendations.push('Consider moving large items to IndexedDB for better performance');
     }
@@ -303,12 +303,12 @@ export class StorageMonitor {
 
     // Determine overall status
     const status = issues.some(i => i.severity === 'high') ? 'critical' :
-                   issues.some(i => i.severity === 'medium') ? 'warning' : 'healthy';
+      issues.some(i => i.severity === 'medium') ? 'warning' : 'healthy';
 
     return {
       status,
       issues,
-      recommendations
+      recommendations,
     };
   }
 
@@ -332,9 +332,9 @@ export class StorageMonitor {
       issues.push({
         type: 'performance',
         severity: 'medium',
-        description: `Slow storage operations detected`,
+        description: 'Slow storage operations detected',
         storage: 'indexedDB',
-        details: slowOps
+        details: slowOps,
       });
       recommendations.push('Consider optimizing data access patterns or adding indexes');
     }
@@ -354,7 +354,7 @@ export class StorageMonitor {
         severity: 'high',
         description: 'High error rates in storage operations',
         storage: 'indexedDB',
-        details: highErrorOps
+        details: highErrorOps,
       });
       recommendations.push('Investigate storage errors and ensure proper error handling');
     }
@@ -399,7 +399,7 @@ export class StorageMonitor {
         type: operation,
         count: durations.length,
         avgDuration: avg,
-        errors
+        errors,
       });
 
       // Find slow operations
@@ -408,7 +408,7 @@ export class StorageMonitor {
           slowOperations.push({
             operation,
             duration,
-            timestamp: Date.now() - (durations.length - index) * 1000 // Approximate
+            timestamp: Date.now() - (durations.length - index) * 1000, // Approximate
           });
         }
       });
@@ -420,7 +420,7 @@ export class StorageMonitor {
 
     return {
       operations,
-      slowOperations: slowOperations.slice(0, 20) // Top 20 slowest
+      slowOperations: slowOperations.slice(0, 20), // Top 20 slowest
     };
   }
 

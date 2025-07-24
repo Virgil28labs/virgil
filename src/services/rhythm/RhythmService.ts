@@ -65,7 +65,7 @@ export class RhythmService {
     } catch (error) {
       logger.error('Pattern generation failed', error as Error, {
         component: 'RhythmService',
-        action: 'generateRhythmPattern'
+        action: 'generateRhythmPattern',
       });
       
       // Fallback to local algorithmic generation
@@ -159,7 +159,7 @@ export class RhythmService {
     } catch (error) {
       logger.error('Failed to fetch stats', error as Error, {
         component: 'RhythmService',
-        action: 'getPatternStats'
+        action: 'getPatternStats',
       });
       return {
         totalGenerations: 0,

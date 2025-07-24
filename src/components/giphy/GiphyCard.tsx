@@ -30,7 +30,7 @@ export const GiphyCard = memo(function GiphyCard({
       logger.error('Failed to copy GIF URL', error as Error, {
         component: 'GiphyCard',
         action: 'handleCopyUrl',
-        metadata: { gifTitle: gif.title }
+        metadata: { gifTitle: gif.title },
       });
     }
   }, [gif]);
@@ -47,7 +47,7 @@ export const GiphyCard = memo(function GiphyCard({
       logger.error('Failed to download GIF', error as Error, {
         component: 'GiphyCard',
         action: 'handleDownload',
-        metadata: { gifTitle: gif.title }
+        metadata: { gifTitle: gif.title },
       });
     }
   }, [gif]);

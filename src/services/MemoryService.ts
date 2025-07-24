@@ -1,4 +1,5 @@
 import type { ChatMessage } from '../types/chat.types';
+import { toastService } from './ToastService';
 
 export interface StoredConversation {
   id: string;
@@ -24,11 +25,23 @@ export class MemoryService {
   private readonly CONTINUOUS_CONVERSATION_ID = 'continuous-main';
   private readonly MAX_RECENT_MESSAGES = 50;  // For context window
 
+  // Performance caching layer
+  private recentMessagesCache: ChatMessage[] = [];
+  private contextCache: string = '';
+  private contextCacheTimestamp: number = 0;
+  private readonly CONTEXT_CACHE_DURATION = 30000; // 30 seconds
+  private memoriesCache: MarkedMemory[] | null = null;
+  private conversationMetaCache: Omit<StoredConversation, 'messages'> | null = null;
+
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        const error = request.error;
+        toastService.memoryError('init', error as Error);
+        reject(error);
+      };
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
@@ -67,7 +80,28 @@ export class MemoryService {
       });
     } catch (error) {
       console.error('Failed to get continuous conversation:', error);
+      toastService.memoryError('load', error as Error);
       return null;
+    }
+  }
+
+  // Cache management methods
+  private invalidateContextCache(): void {
+    this.contextCache = '';
+    this.contextCacheTimestamp = 0;
+  }
+
+  private isContextCacheValid(): boolean {
+    return !!this.contextCache && (Date.now() - this.contextCacheTimestamp) < this.CONTEXT_CACHE_DURATION;
+  }
+
+  private updateRecentMessagesCache(newMessages: ChatMessage[]): void {
+    // Add new messages to cache
+    this.recentMessagesCache.push(...newMessages);
+    
+    // Keep only recent messages in cache
+    if (this.recentMessagesCache.length > this.MAX_RECENT_MESSAGES) {
+      this.recentMessagesCache = this.recentMessagesCache.slice(-this.MAX_RECENT_MESSAGES);
     }
   }
 
@@ -75,36 +109,90 @@ export class MemoryService {
     if (!this.db || newMessages.length === 0) return;
 
     try {
-      // Get existing continuous conversation first (uses its own transaction)
-      const existing = await this.getContinuousConversation();
+      // Get existing metadata (much faster than loading full conversation)
+      let existing = this.conversationMetaCache;
+      if (!existing) {
+        const fullConversation = await this.getContinuousConversation();
+        if (fullConversation) {
+          existing = {
+            id: fullConversation.id,
+            firstMessage: fullConversation.firstMessage,
+            lastMessage: fullConversation.lastMessage,
+            timestamp: fullConversation.timestamp,
+            messageCount: fullConversation.messageCount,
+          };
+          this.conversationMetaCache = existing;
+        }
+      }
+
+      // Update cache with new messages first (for immediate responsiveness)
+      this.updateRecentMessagesCache(newMessages);
+      this.invalidateContextCache();
+
+      // Calculate new metadata incrementally
+      const newMessageCount = (existing?.messageCount || 0) + newMessages.length;
+      const userMessages = newMessages.filter(m => m.role === 'user');
+      const assistantMessages = newMessages.filter(m => m.role === 'assistant');
       
-      // Append new messages to existing conversation
-      const allMessages = existing ? [...existing.messages, ...newMessages] : newMessages;
-      const userMessages = allMessages.filter(m => m.role === 'user');
-      const assistantMessages = allMessages.filter(m => m.role === 'assistant');
+      const newFirstMessage = existing?.firstMessage || 
+        (userMessages[0]?.content.slice(0, 100) || newMessages[0]?.content.slice(0, 100) || '');
+      const newLastMessage = assistantMessages.length > 0 
+        ? assistantMessages[assistantMessages.length - 1].content.slice(0, 100)
+        : existing?.lastMessage || '';
+
+      // For incremental saving, we need to get the existing messages
+      // But we can optimize this by only loading when necessary
+      const existingConversation = await this.getContinuousConversation();
+      const allMessages = existingConversation ? [...existingConversation.messages, ...newMessages] : newMessages;
 
       const conversation: StoredConversation = {
         id: this.CONTINUOUS_CONVERSATION_ID,
         messages: allMessages,
-        firstMessage: userMessages[0]?.content.slice(0, 100) || '',
-        lastMessage: assistantMessages[assistantMessages.length - 1]?.content.slice(0, 100) || '',
+        firstMessage: newFirstMessage,
+        lastMessage: newLastMessage,
         timestamp: Date.now(),
-        messageCount: allMessages.length,
+        messageCount: newMessageCount,
       };
 
-      // Now create a fresh transaction for the write operation
+      // Update metadata cache
+      this.conversationMetaCache = {
+        id: conversation.id,
+        firstMessage: conversation.firstMessage,
+        lastMessage: conversation.lastMessage,
+        timestamp: conversation.timestamp,
+        messageCount: conversation.messageCount,
+      };
+
+      // Save to IndexedDB
       const transaction = this.db.transaction(['conversations'], 'readwrite');
       const store = transaction.objectStore('conversations');
 
       await new Promise<void>((resolve, reject) => {
-        const request = store.put(conversation);  // Using put instead of add to update existing
+        const request = store.put(conversation);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
       console.error('Failed to save conversation:', error);
+      // Reset caches on error to maintain consistency
+      this.recentMessagesCache = [];
+      this.conversationMetaCache = null;
+      this.invalidateContextCache();
+      
+      toastService.memoryError('save', error as Error);
       throw error;
     }
+  }
+
+  // Cached version of getMarkedMemories
+  private async getMarkedMemoriesCached(): Promise<MarkedMemory[]> {
+    if (this.memoriesCache !== null) {
+      return this.memoriesCache;
+    }
+
+    const memories = await this.getMarkedMemories();
+    this.memoriesCache = memories;
+    return memories;
   }
 
   async markAsImportant(_messageId: string, content: string, context: string, tag?: string): Promise<void> {
@@ -124,11 +212,24 @@ export class MemoryService {
       
       await new Promise<void>((resolve, reject) => {
         const request = store.add(memory);
-        request.onsuccess = () => resolve();
+        request.onsuccess = () => {
+          // Update cache immediately for responsiveness
+          if (this.memoriesCache) {
+            this.memoriesCache.unshift(memory); // Add to beginning (most recent first)
+          }
+          this.invalidateContextCache();
+          toastService.memorySuccess('mark');
+          resolve();
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
       console.error('Failed to mark memory as important:', error);
+      // Reset memories cache on error
+      this.memoriesCache = null;
+      this.invalidateContextCache();
+      
+      toastService.memoryError('mark', error as Error);
       throw error;
     }
   }
@@ -147,25 +248,31 @@ export class MemoryService {
   async getMarkedMemories(): Promise<MarkedMemory[]> {
     if (!this.db) return [];
 
-    const transaction = this.db.transaction(['memories'], 'readonly');
-    const store = transaction.objectStore('memories');
-    const index = store.index('timestamp');
+    try {
+      const transaction = this.db.transaction(['memories'], 'readonly');
+      const store = transaction.objectStore('memories');
+      const index = store.index('timestamp');
 
-    const memories: MarkedMemory[] = [];
+      const memories: MarkedMemory[] = [];
 
-    return new Promise((resolve, reject) => {
-      const request = index.openCursor(null, 'prev');
-      request.onsuccess = () => {
-        const cursor = request.result;
-        if (cursor) {
-          memories.push(cursor.value);
-          cursor.continue();
-        } else {
-          resolve(memories);
-        }
-      };
-      request.onerror = () => reject(request.error);
-    });
+      return new Promise((resolve, reject) => {
+        const request = index.openCursor(null, 'prev');
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (cursor) {
+            memories.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(memories);
+          }
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to get marked memories:', error);
+      toastService.memoryError('load', error as Error);
+      return [];
+    }
   }
 
   async searchConversations(query: string): Promise<StoredConversation[]> {
@@ -176,25 +283,39 @@ export class MemoryService {
 
     return conversations.filter(conv => 
       conv.messages.some(msg => 
-        msg.content.toLowerCase().includes(searchTerm)
-      )
+        msg.content.toLowerCase().includes(searchTerm),
+      ),
     );
   }
 
   async getRecentMessages(limit: number = 50): Promise<ChatMessage[]> {
+    // Use cache if available and sufficient
+    if (this.recentMessagesCache.length >= limit) {
+      return this.recentMessagesCache.slice(-limit);
+    }
+
+    // If cache is insufficient, load from DB and populate cache
     const conversation = await this.getContinuousConversation();
     if (!conversation || !conversation.messages.length) return [];
     
-    // Return the last N messages
-    return conversation.messages.slice(-limit);
+    // Update cache with recent messages
+    this.recentMessagesCache = conversation.messages.slice(-this.MAX_RECENT_MESSAGES);
+    
+    // Return the requested number of messages
+    return this.recentMessagesCache.slice(-limit);
   }
 
   async getContextForPrompt(): Promise<string> {
-    // Get recent messages for active context
+    // Return cached context if still valid
+    if (this.isContextCacheValid()) {
+      return this.contextCache;
+    }
+
+    // Get recent messages for active context (now cached)
     const recentMessages = await this.getRecentMessages(this.MAX_RECENT_MESSAGES);
     
-    // Get ALL marked memories (no limit)
-    const memories = await this.getMarkedMemories();
+    // Get memories with caching
+    const memories = await this.getMarkedMemoriesCached();
 
     let context = '';
 
@@ -224,46 +345,97 @@ export class MemoryService {
       });
     }
 
+    // Cache the result
+    this.contextCache = context;
+    this.contextCacheTimestamp = Date.now();
+
     return context;
   }
 
   async forgetMemory(memoryId: string): Promise<void> {
     if (!this.db) return;
 
-    const transaction = this.db.transaction(['memories'], 'readwrite');
-    const store = transaction.objectStore('memories');
-    
-    await new Promise<void>((resolve, reject) => {
-      const request = store.delete(memoryId);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    try {
+      const transaction = this.db.transaction(['memories'], 'readwrite');
+      const store = transaction.objectStore('memories');
+      
+      await new Promise<void>((resolve, reject) => {
+        const request = store.delete(memoryId);
+        request.onsuccess = () => {
+          // Update cache immediately
+          if (this.memoriesCache) {
+            this.memoriesCache = this.memoriesCache.filter(mem => mem.id !== memoryId);
+          }
+          this.invalidateContextCache();
+          toastService.memorySuccess('forget');
+          resolve();
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to forget memory:', error);
+      // Reset cache on error to maintain consistency
+      this.memoriesCache = null;
+      this.invalidateContextCache();
+      
+      toastService.memoryError('forget', error as Error);
+      throw error;
+    }
   }
 
   async exportAllData(): Promise<{ conversations: StoredConversation[]; memories: MarkedMemory[] }> {
-    const conversations = await this.getRecentConversations(1000);
-    const memories = await this.getMarkedMemories();
-    
-    return { conversations, memories };
+    try {
+      const conversations = await this.getRecentConversations(1000);
+      const memories = await this.getMarkedMemories();
+      
+      toastService.memorySuccess('export');
+      return { conversations, memories };
+    } catch (error) {
+      console.error('Failed to export data:', error);
+      toastService.memoryError('export', error as Error);
+      throw error;
+    }
   }
 
   async clearAllData(): Promise<void> {
     if (!this.db) return;
 
-    const transaction = this.db.transaction(['conversations', 'memories'], 'readwrite');
-    
-    await Promise.all([
-      new Promise<void>((resolve, reject) => {
-        const request = transaction.objectStore('conversations').clear();
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      }),
-      new Promise<void>((resolve, reject) => {
-        const request = transaction.objectStore('memories').clear();
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      }),
-    ]);
+    try {
+      const transaction = this.db.transaction(['conversations', 'memories'], 'readwrite');
+      
+      await Promise.all([
+        new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore('conversations').clear();
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        }),
+        new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore('memories').clear();
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        }),
+      ]);
+
+      // Clear all caches after successful database clear
+      this.recentMessagesCache = [];
+      this.contextCache = '';
+      this.contextCacheTimestamp = 0;
+      this.memoriesCache = null;
+      this.conversationMetaCache = null;
+      
+      toastService.memorySuccess('clear');
+    } catch (error) {
+      console.error('Failed to clear all data:', error);
+      // Still reset caches even if DB operation failed for consistency
+      this.recentMessagesCache = [];
+      this.contextCache = '';
+      this.contextCacheTimestamp = 0;
+      this.memoriesCache = null;
+      this.conversationMetaCache = null;
+      
+      toastService.memoryError('clear', error as Error);
+      throw error;
+    }
   }
 
   // Cleanup method removed - continuous conversation is kept indefinitely

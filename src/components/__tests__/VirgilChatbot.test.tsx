@@ -198,7 +198,7 @@ describe('VirgilChatbot', () => {
       expect(DynamicContextBuilder.buildEnhancedPrompt).toHaveBeenCalled();
       expect(dashboardContextService.logActivity).toHaveBeenCalledWith(
         expect.stringContaining('Asked: "What is the weather'),
-        'virgil-chat'
+        'virgil-chat',
       );
     });
   });

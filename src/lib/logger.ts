@@ -76,7 +76,7 @@ export const logError = (component: string, action: string, error: Error, additi
   logger.error(`${action} failed`, error, {
     component,
     action,
-    metadata: additionalInfo
+    metadata: additionalInfo,
   });
 };
 
@@ -84,7 +84,7 @@ export const logInfo = (component: string, action: string, metadata?: Record<str
   logger.info(`${action} completed`, {
     component,
     action,
-    metadata
+    metadata,
   });
 };
 
@@ -92,6 +92,6 @@ export const logDebug = (component: string, action: string, metadata?: Record<st
   logger.debug(`${action} initiated`, {
     component,
     action,
-    metadata
+    metadata,
   });
 };

@@ -72,7 +72,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     } catch (error) {
       logger.error('Failed to fetch NASA favorites', error as Error, {
         component: 'NasaApodAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.favorites = [];
     }
@@ -163,7 +163,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
       'galaxy', 'nebula', 'planet', 'moon', 'sun', 'star', 'comet', 
       'asteroid', 'mars', 'jupiter', 'saturn', 'hubble', 'webb',
       'black hole', 'supernova', 'eclipse', 'aurora', 'milky way',
-      'iss', 'spacecraft', 'meteor'
+      'iss', 'spacecraft', 'meteor',
     ];
     
     this.favorites.forEach(fav => {
@@ -286,7 +286,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const data = contextData.data;
 
     if (data.favorites.recent.length === 0) {
-      return "No space images saved yet. Open NASA APOD to explore the cosmos!";
+      return 'No space images saved yet. Open NASA APOD to explore the cosmos!';
     }
 
     const recent = data.favorites.recent[0];
@@ -309,7 +309,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     this.ensureFreshData();
     
     const matchingFavorites = this.favorites.filter(fav => 
-      (fav.title + ' ' + fav.explanation).toLowerCase().includes(topic.toLowerCase())
+      (fav.title + ' ' + fav.explanation).toLowerCase().includes(topic.toLowerCase()),
     );
 
     if (matchingFavorites.length === 0) {
@@ -339,7 +339,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const data = contextData.data;
 
     if (!data.stats.oldestFavorite) {
-      return "No space images saved yet. Start building your cosmic collection!";
+      return 'No space images saved yet. Start building your cosmic collection!';
     }
 
     const oldest = this.favorites[this.favorites.length - 1];
@@ -380,7 +380,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const data = contextData.data;
 
     if (data.favorites.total === 0) {
-      return "NASA APOD: No favorites saved yet. Explore daily astronomy pictures and save your cosmic favorites!";
+      return 'NASA APOD: No favorites saved yet. Explore daily astronomy pictures and save your cosmic favorites!';
     }
 
     let response = `NASA APOD: ${data.favorites.total} space favorites`;
@@ -492,7 +492,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         appName: this.appName,
         metadata: {
           copyrighted: this.favorites.filter(f => f.mediaType === 'image' && f.copyright).length,
-        }
+        },
       });
     }
     
@@ -504,7 +504,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         appName: this.appName,
         metadata: {
           copyrighted: this.favorites.filter(f => f.mediaType === 'video' && f.copyright).length,
-        }
+        },
       });
     }
     

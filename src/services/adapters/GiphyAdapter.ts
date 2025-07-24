@@ -76,7 +76,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     } catch (error) {
       logger.error('Failed to fetch Giphy favorites', error as Error, {
         component: 'GiphyAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.favorites = [];
     }
@@ -314,7 +314,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     const data = contextData.data;
 
     if (data.favorites.recent.length === 0) {
-      return "No GIFs saved yet. Start building your collection with Giphy!";
+      return 'No GIFs saved yet. Start building your collection with Giphy!';
     }
 
     const recent = data.favorites.recent[0];
@@ -337,7 +337,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     const data = contextData.data;
 
     if (data.favorites.total === 0) {
-      return "No GIFs saved yet to analyze ratings.";
+      return 'No GIFs saved yet to analyze ratings.';
     }
 
     let response = 'Your GIF collection ratings:';
@@ -359,7 +359,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     const data = contextData.data;
 
     if (data.favorites.total === 0) {
-      return "Giphy Gallery: No favorites saved yet. Find and save your favorite GIFs and memes!";
+      return 'Giphy Gallery: No favorites saved yet. Find and save your favorite GIFs and memes!';
     }
 
     let response = `Giphy Gallery: ${data.favorites.total} favorite GIFs`;
@@ -445,7 +445,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
         metadata: {
           categories: Object.keys(this.getContextData().data.favorites.categories).length,
           averageSize: this.getContextData().data.stats.averageSize,
-        }
+        },
       });
     }
     

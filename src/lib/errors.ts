@@ -111,6 +111,6 @@ export function logError(error: unknown, component: string, action?: string): vo
         statusCode: errorObj.statusCode,
         details: errorObj.details,
       },
-    }
+    },
   );
 }

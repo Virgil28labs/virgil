@@ -61,7 +61,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     } catch (error) {
       logger.error('Failed to load Pomodoro stats', error as Error, {
         component: 'PomodoroAdapter',
-        action: 'loadStats'
+        action: 'loadStats',
       });
     }
   }
@@ -73,7 +73,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     } catch (error) {
       logger.error('Failed to save Pomodoro stats', error as Error, {
         component: 'PomodoroAdapter',
-        action: 'saveStats'
+        action: 'saveStats',
       });
     }
   }
@@ -201,11 +201,11 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       const hoursSince = Math.floor(timeSinceLastSession / (1000 * 60 * 60));
       
       if (hoursSince < 1) {
-        response += "Keep up the momentum!";
+        response += 'Keep up the momentum!';
       } else if (hoursSince < 3) {
-        response += "Perfect time for another session!";
+        response += 'Perfect time for another session!';
       } else {
-        response += "Ready for another focus session?";
+        response += 'Ready for another focus session?';
       }
     }
 
@@ -219,15 +219,15 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     // Morning recommendation
     if (hour >= 6 && hour < 12) {
       if (sessionsCompleted === 0) {
-        return "Morning is a great time for focused work! Consider starting with a 25-minute Pomodoro session to kick off your productive day.";
+        return 'Morning is a great time for focused work! Consider starting with a 25-minute Pomodoro session to kick off your productive day.';
       }
-      return "Great morning for deep work! Another 25-minute session can help maintain your focus momentum.";
+      return 'Great morning for deep work! Another 25-minute session can help maintain your focus momentum.';
     }
 
     // Afternoon recommendation
     if (hour >= 12 && hour < 17) {
       if (sessionsCompleted < 3) {
-        return "Afternoon is perfect for tackling important tasks. A 25-minute Pomodoro can help you power through!";
+        return 'Afternoon is perfect for tackling important tasks. A 25-minute Pomodoro can help you power through!';
       }
       return "You've been productive today! Consider a shorter 15-minute session if you need a quick focus boost.";
     }
@@ -237,7 +237,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       if (sessionsCompleted >= 6) {
         return "You've had a very productive day with 6+ sessions! Consider winding down to avoid burnout.";
       }
-      return "Evening focus sessions work well for wrapping up tasks. Try a 25-minute session with a relaxing break after.";
+      return 'Evening focus sessions work well for wrapping up tasks. Try a 25-minute session with a relaxing break after.';
     }
 
     // Late night
@@ -255,7 +255,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       return `Pomodoro Timer: ${sessionsCompleted} sessions completed today (${totalFocusMinutes} minutes total). ${this.currentData.isActive ? 'Timer is open and ready!' : 'Open the timer to start another session.'}`;
     }
 
-    return "Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?";
+    return 'Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?';
   }
 
   async search(_query: string): Promise<any[]> {

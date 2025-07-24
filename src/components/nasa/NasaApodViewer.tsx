@@ -57,7 +57,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
       
       logger.error('Failed to load APOD', err as Error, {
         component: 'NasaApodViewer',
-        action: 'loadDailyApod'
+        action: 'loadDailyApod',
       });
     } finally {
       setLoading(false);

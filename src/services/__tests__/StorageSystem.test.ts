@@ -248,7 +248,7 @@ describe('Storage System', () => {
       const settings = {
         selectedModel: 'gpt-4.1-mini',
         customPrompt: 'You are a helpful assistant',
-        windowSize: 'normal' as const
+        windowSize: 'normal' as const,
       };
 
       StorageService.set(STORAGE_KEYS.SELECTED_MODEL, settings.selectedModel);
@@ -271,7 +271,7 @@ describe('Storage System', () => {
             emoji: '💪',
             checkIns: ['2024-01-01', '2024-01-02', '2024-01-03'],
             streak: 3,
-            longestStreak: 3
+            longestStreak: 3,
           },
           {
             id: 'habit-2',
@@ -279,21 +279,21 @@ describe('Storage System', () => {
             emoji: '📚',
             checkIns: ['2024-01-01'],
             streak: 0,
-            longestStreak: 1
-          }
+            longestStreak: 1,
+          },
         ],
         achievements: [
-          { id: 'first-checkin', unlocked: true, progress: 100 }
+          { id: 'first-checkin', unlocked: true, progress: 100 },
         ],
         settings: {
           soundEnabled: true,
-          notifications: false
+          notifications: false,
         },
         stats: {
           totalCheckIns: 4,
           currentStreak: 3,
-          perfectDays: ['2024-01-01']
-        }
+          perfectDays: ['2024-01-01'],
+        },
       };
 
       StorageService.set(STORAGE_KEYS.VIRGIL_HABITS, habitsData);
@@ -310,7 +310,7 @@ describe('Storage System', () => {
       // Dog favorites
       const dogFavorites = [
         { url: 'https://dog.ceo/1.jpg', breed: 'corgi', timestamp: Date.now() },
-        { url: 'https://dog.ceo/2.jpg', breed: 'husky', timestamp: Date.now() }
+        { url: 'https://dog.ceo/2.jpg', breed: 'husky', timestamp: Date.now() },
       ];
       StorageService.set(STORAGE_KEYS.DOG_FAVORITES, dogFavorites);
 
@@ -321,8 +321,8 @@ describe('Storage System', () => {
           title: 'Andromeda Galaxy',
           url: 'https://nasa.gov/1.jpg',
           explanation: 'Beautiful galaxy',
-          hdurl: 'https://nasa.gov/1-hd.jpg'
-        }
+          hdurl: 'https://nasa.gov/1-hd.jpg',
+        },
       ];
       StorageService.set(STORAGE_KEYS.NASA_FAVORITES, nasaFavorites);
 

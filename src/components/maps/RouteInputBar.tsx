@@ -102,10 +102,10 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
         } catch (error) {
           // localStorage might be full or disabled
           logger.warn('Failed to save destination to localStorage', {
-        component: 'RouteInputBar',
-        action: 'saveDestination',
-        metadata: { error }
-      });
+            component: 'RouteInputBar',
+            action: 'saveDestination',
+            metadata: { error },
+          });
         }
         
         if (onDestinationSelect) {
@@ -202,7 +202,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       logger.warn('Failed to save destination to localStorage', {
         component: 'RouteInputBar',
         action: 'saveDestination',
-        metadata: { error }
+        metadata: { error },
       });
     }
     

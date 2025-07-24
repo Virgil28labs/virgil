@@ -6,7 +6,7 @@ function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="skeleton"
       data-testid="skeleton-loader"
-      className={cn("animate-pulse rounded-md", className)}
+      className={cn('animate-pulse rounded-md', className)}
       style={{ backgroundColor: '#b3b3b3' }}
       {...props}
     />

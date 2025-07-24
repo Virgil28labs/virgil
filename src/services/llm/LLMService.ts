@@ -132,7 +132,7 @@ export class LLMService extends EventEmitter {
           context,
           provider,
         },
-        true
+        true,
       );
       const reader = response.body.getReader();
       const decoder = new TextDecoder();

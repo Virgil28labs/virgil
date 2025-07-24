@@ -72,7 +72,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     } catch (error) {
       logger.error('Failed to fetch rhythm patterns', error as Error, {
         component: 'RhythmMachineAdapter',
-        action: 'fetchData'
+        action: 'fetchData',
       });
       this.saveSlots = [null, null, null, null, null];
     }
@@ -346,7 +346,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     const data = contextData.data;
 
     if (data.patterns.recent.length === 0) {
-      return "No drum patterns saved yet. Create your first beat in the Rhythm Machine!";
+      return 'No drum patterns saved yet. Create your first beat in the Rhythm Machine!';
     }
 
     const recent = data.patterns.recent[0];
@@ -379,7 +379,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     const data = contextData.data;
 
     if (data.patterns.total === 0) {
-      return "No patterns saved to analyze complexity.";
+      return 'No patterns saved to analyze complexity.';
     }
 
     const avgComplexityPercent = Math.round(data.stats.averageComplexity * 100);
@@ -434,7 +434,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     const data = contextData.data;
 
     if (data.patterns.total === 0) {
-      return "Rhythm Machine: No patterns saved yet. Create beats and explore different genres!";
+      return 'Rhythm Machine: No patterns saved yet. Create beats and explore different genres!';
     }
 
     let response = `Rhythm Machine: ${data.patterns.total} drum patterns`;

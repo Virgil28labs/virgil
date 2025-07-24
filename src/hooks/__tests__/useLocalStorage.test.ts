@@ -13,7 +13,7 @@ describe('useLocalStorage', () => {
 
   it('should return initial value when localStorage is empty', () => {
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [value] = result.current;
@@ -24,7 +24,7 @@ describe('useLocalStorage', () => {
     localStorage.setItem(TEST_KEY, JSON.stringify({ stored: 'value' }));
 
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [value] = result.current;
@@ -33,7 +33,7 @@ describe('useLocalStorage', () => {
 
   it('should update localStorage when setValue is called', () => {
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [, setValue] = result.current;
@@ -51,7 +51,7 @@ describe('useLocalStorage', () => {
     localStorage.setItem(TEST_KEY, JSON.stringify(TEST_VALUE));
 
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, { default: 'value' })
+      useLocalStorage(TEST_KEY, { default: 'value' }),
     );
 
     const [, , removeValue] = result.current;
@@ -74,7 +74,7 @@ describe('useLocalStorage', () => {
     });
 
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [, setValue] = result.current;
@@ -92,7 +92,7 @@ describe('useLocalStorage', () => {
     } else {
       expect(consoleSpy).toHaveBeenCalled();
       const errorCall = consoleSpy.mock.calls.find(call => 
-        typeof call[0] === 'string' && call[0].includes('Error')
+        typeof call[0] === 'string' && call[0].includes('Error'),
       );
       expect(errorCall).toBeDefined();
     }
@@ -107,7 +107,7 @@ describe('useLocalStorage', () => {
     localStorage.setItem(TEST_KEY, 'invalid json {');
 
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [value] = result.current;
@@ -121,10 +121,10 @@ describe('useLocalStorage', () => {
 
   it('should sync across multiple hook instances via storage events', () => {
     const { result: hook1 } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
     const { result: hook2 } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const [, setValue1] = hook1.current;
@@ -154,7 +154,7 @@ describe('useLocalStorage', () => {
 
   it('should handle storage events from other tabs', () => {
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const newValue = { fromOtherTab: true };
@@ -175,7 +175,7 @@ describe('useLocalStorage', () => {
 
   it('should ignore storage events for different keys', () => {
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const originalValue = result.current[0];
@@ -195,7 +195,7 @@ describe('useLocalStorage', () => {
 
   it('should handle null newValue in storage events', () => {
     const { result } = renderHook(() => 
-      useLocalStorage(TEST_KEY, TEST_VALUE)
+      useLocalStorage(TEST_KEY, TEST_VALUE),
     );
 
     const originalValue = result.current[0];

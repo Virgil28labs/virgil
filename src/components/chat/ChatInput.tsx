@@ -1,6 +1,6 @@
 import { memo, useRef, useEffect, useCallback } from 'react';
-import { DashboardContext } from '../../services/DashboardContextService';
-import './ChatInput.css';
+import type { DashboardContext } from '../../services/DashboardContextService';
+import './chat-interface.css';
 
 interface ChatInputProps {
   input: string;

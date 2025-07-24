@@ -32,7 +32,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
       logger.error('Failed to download APOD', error as Error, {
         component: 'NasaApodGallery',
         action: 'handleDownload',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
     } finally {
       setDownloadingId(null);
@@ -49,7 +49,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
       logger.error('Failed to copy APOD', error as Error, {
         component: 'NasaApodGallery',
         action: 'handleCopy',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
       setCopyingId(null);
     }
@@ -65,7 +65,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
       logger.error('Failed to share APOD', error as Error, {
         component: 'NasaApodGallery',
         action: 'handleShare',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
       setSharingId(null);
     }

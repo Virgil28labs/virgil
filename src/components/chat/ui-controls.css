@@ -1,0 +1,314 @@
+/* UI Controls - Consolidated Styles */
+/* WindowControls, StatusPills, and ModelSelector components */
+
+/* ========================================
+   WINDOW CONTROLS COMPONENT
+   ======================================== */
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.minimize-btn,
+.size-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--brand-medium-gray, #b3b3b3);
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  /* Ensure visibility with explicit color fallback */
+  opacity: 1;
+  visibility: visible;
+}
+
+.minimize-btn:hover,
+.size-toggle-btn:hover {
+  background: var(--brand-light-gray, #f5f5f5);
+  color: var(--brand-dark-purple, #39293e);
+}
+
+.minimize-btn {
+  font-size: 0.8rem;
+  font-weight: bold;
+  /* Primary close action - slightly more prominent */
+}
+
+.size-toggle-btn {
+  font-size: 0.8rem;
+}
+
+/* ========================================
+   STATUS PILLS COMPONENT
+   ======================================== */
+
+/* Compact Status Cluster */
+.status-cluster {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+}
+
+.status-pill {
+  width: 54px;
+  height: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: transparent;
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3px;
+  /* Fixed width ensures consistent sizing */
+  flex-shrink: 0;
+}
+
+.memory-pill {
+  background: color-mix(in srgb, var(--violet-purple) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--violet-purple) 25%, transparent);
+  color: color-mix(in srgb, var(--violet-purple) 90%, var(--deep-plum));
+}
+
+.memory-pill:hover {
+  background: color-mix(in srgb, var(--violet-purple) 20%, transparent);
+  border-color: color-mix(in srgb, var(--violet-purple) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.context-pill {
+  background: color-mix(in srgb, var(--context-green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--context-green) 25%, transparent);
+  color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
+}
+
+.context-pill:hover {
+  background: color-mix(in srgb, var(--context-green) 20%, transparent);
+  border-color: color-mix(in srgb, var(--context-green) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.new-chat-pill {
+  background: color-mix(in srgb, var(--soft-pink) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--soft-pink) 25%, transparent);
+  color: color-mix(in srgb, var(--soft-pink) 90%, var(--deep-plum));
+}
+
+.new-chat-pill:hover {
+  background: color-mix(in srgb, var(--soft-pink) 20%, transparent);
+  border-color: color-mix(in srgb, var(--soft-pink) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.edit-pill {
+  background: color-mix(in srgb, var(--lavender) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--lavender) 25%, transparent);
+  color: color-mix(in srgb, var(--lavender) 90%, var(--deep-plum));
+}
+
+.edit-pill:hover {
+  background: color-mix(in srgb, var(--lavender) 20%, transparent);
+  border-color: color-mix(in srgb, var(--lavender) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* ========================================
+   MODEL SELECTOR COMPONENT
+   ======================================== */
+
+.model-selector {
+  position: relative;
+}
+
+.model-dropdown-btn {
+  background: var(--off-white);
+  border: 1px solid var(--silver-grey);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  color: var(--silver-grey);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-base);
+}
+
+.model-dropdown-btn.compact {
+  height: 20px;
+  width: 54px;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 12px;
+  gap: 0.15rem;
+  background: color-mix(in srgb, var(--silver-grey) 12%, var(--off-white));
+  border: 1px solid color-mix(in srgb, var(--silver-grey) 25%, var(--off-white));
+  color: color-mix(in srgb, var(--silver-grey) 90%, var(--deep-plum));
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3px;
+  justify-content: center;
+  /* Match status pill styling */
+  flex-shrink: 0;
+}
+
+.model-dropdown-btn:hover {
+  background: var(--off-white);
+  border-color: var(--lavender);
+}
+
+.model-dropdown-btn.compact:hover {
+  background: color-mix(in srgb, var(--silver-grey) 20%, var(--off-white));
+  border-color: color-mix(in srgb, var(--silver-grey) 40%, var(--off-white));
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.dropdown-arrow {
+  font-size: 0.7rem;
+  transition: transform var(--transition-base);
+}
+
+.model-dropdown-btn:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.model-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 120px;
+  background: var(--off-white);
+  border: 1px solid var(--silver-grey);
+  border-radius: 8px;
+  box-shadow: var(--elevation-md);
+  margin-top: 2px;
+  z-index: 1002;
+  overflow: hidden;
+  animation: slideDown var(--transition-fast) ease-out;
+  /* Compact mini-list design */
+}
+
+.model-option {
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--off-white);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.model-option:last-child {
+  border-bottom: none;
+}
+
+.model-option:hover {
+  background: var(--off-white);
+}
+
+.model-option.selected {
+  background: color-mix(in srgb, var(--violet-purple) 8%, var(--off-white));
+  border-left: 2px solid var(--violet-purple);
+}
+
+.model-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--deep-plum);
+  line-height: 1.1;
+}
+
+.model-description {
+  font-size: 0.65rem;
+  color: var(--silver-grey);
+  line-height: 1.2;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
+   SHARED ANIMATIONS
+   ======================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 480px) {
+  /* Window Controls */
+  .window-controls {
+    gap: 0.2rem;
+  }
+  
+  .minimize-btn,
+  .size-toggle-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  /* Status Pills */
+  .status-pill {
+    width: 48px;
+    height: 18px;
+    font-size: 9px;
+  }
+  
+  .status-cluster {
+    gap: 4px;
+  }
+
+  /* Model Selector */
+  .model-dropdown-btn.compact {
+    width: 48px;
+    height: 18px;
+    font-size: 9px;
+  }
+  
+  .model-dropdown {
+    width: 110px;
+  }
+  
+  .model-name {
+    font-size: 0.7rem;
+  }
+  
+  .model-description {
+    font-size: 0.6rem;
+  }
+}

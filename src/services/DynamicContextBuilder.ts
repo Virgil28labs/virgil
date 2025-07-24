@@ -29,30 +29,30 @@ export class DynamicContextBuilder {
   // Keywords that indicate different types of context relevance
   private static readonly TIME_KEYWORDS = [
     'time', 'when', 'today', 'now', 'current', 'morning', 'afternoon', 'evening', 'night',
-    'schedule', 'plan', 'later', 'soon', 'tomorrow', 'yesterday', 'week', 'weekend'
+    'schedule', 'plan', 'later', 'soon', 'tomorrow', 'yesterday', 'week', 'weekend',
   ];
 
   private static readonly LOCATION_KEYWORDS = [
     'where', 'location', 'here', 'near', 'nearby', 'local', 'around', 'area',
     'city', 'place', 'address', 'map', 'directions', 'distance', 'travel', 'go',
-    'ip', 'ip address', 'internet', 'isp', 'provider', 'postal', 'zip', 'postcode'
+    'ip', 'ip address', 'internet', 'isp', 'provider', 'postal', 'zip', 'postcode',
   ];
 
   private static readonly WEATHER_KEYWORDS = [
     'weather', 'temperature', 'hot', 'cold', 'warm', 'cool', 'rain', 'sunny', 'cloudy',
-    'outside', 'outdoor', 'climate', 'forecast', 'umbrella', 'coat', 'jacket'
+    'outside', 'outdoor', 'climate', 'forecast', 'umbrella', 'coat', 'jacket',
   ];
 
   private static readonly ACTIVITY_KEYWORDS = [
     'doing', 'activity', 'working', 'using', 'help', 'show', 'open', 'start',
-    'dashboard', 'feature', 'component', 'tool', 'app', 'function'
+    'dashboard', 'feature', 'component', 'tool', 'app', 'function',
   ];
 
   private static readonly USER_KEYWORDS = [
     'my', 'me', 'I', 'personal', 'profile', 'account', 'settings', 'preferences',
     'name', 'remember', 'save', 'history', 'past', 'before', 'email', 'phone',
     'birthday', 'birth', 'age', 'old', 'gender', 'marital', 'married', 'address',
-    'contact', 'info', 'information', 'details', 'who am i', 'about me', 'identity'
+    'contact', 'info', 'information', 'details', 'who am i', 'about me', 'identity',
   ];
 
   private static readonly DEVICE_KEYWORDS = [
@@ -60,7 +60,7 @@ export class DynamicContextBuilder {
     'os', 'operating system', 'mac', 'windows', 'linux', 'system', 'hardware',
     'cpu', 'processor', 'memory', 'ram', 'screen', 'resolution', 'display',
     'network', 'connection', 'speed', 'battery', 'storage', 'specs', 'specifications',
-    'using', 'running', 'what device', 'what browser', 'what computer', 'what system'
+    'using', 'running', 'what device', 'what browser', 'what computer', 'what system',
   ];
 
   /**
@@ -89,7 +89,7 @@ export class DynamicContextBuilder {
 
   private static calculateKeywordRelevance(words: string[], keywords: string[]): number {
     const matches = words.filter(word => 
-      keywords.some(keyword => word.includes(keyword) || keyword.includes(word))
+      keywords.some(keyword => word.includes(keyword) || keyword.includes(word)),
     );
     
     // Base score from keyword matches
@@ -109,7 +109,7 @@ export class DynamicContextBuilder {
     originalPrompt: string,
     userQuery: string,
     context: DashboardContext,
-    suggestions: ContextualSuggestion[] = []
+    suggestions: ContextualSuggestion[] = [],
   ): EnhancedPrompt {
     const relevanceScores = this.calculateRelevance(userQuery);
     const contextUsed: string[] = [];
@@ -168,7 +168,7 @@ export class DynamicContextBuilder {
     const relevantApps = dashboardAppService.findAppsForQuery(userQuery);
     if (relevantApps.length > 0) {
       const appContext = dashboardAppService.getDetailedContext(
-        relevantApps.map(app => app.appName)
+        relevantApps.map(app => app.appName),
       );
       if (appContext) {
         enhancedPrompt += `\n\nDASHBOARD APP DATA:${appContext}`;
@@ -197,7 +197,7 @@ export class DynamicContextBuilder {
     const locationQueries = [
       'where am i', 'my location', 'my address', 'where do i live',
       'what\'s my ip', 'my ip address', 'what is my ip', 'my isp',
-      'my zip', 'my postal', 'my city', 'my country'
+      'my zip', 'my postal', 'my city', 'my country',
     ];
     return locationQueries.some(locQuery => query.toLowerCase().includes(locQuery));
   }
@@ -207,7 +207,7 @@ export class DynamicContextBuilder {
       'who am i', 'my name', 'what\'s my name', 'what is my name',
       'my email', 'my phone', 'my birthday', 'my age', 'how old am i',
       'my address', 'my contact', 'my info', 'my profile', 'about me',
-      'my gender', 'am i married', 'my marital'
+      'my gender', 'am i married', 'my marital',
     ];
     return userQueries.some(userQuery => query.toLowerCase().includes(userQuery));
   }
@@ -218,7 +218,7 @@ export class DynamicContextBuilder {
       'what os', 'what operating system', 'my device', 'my computer',
       'my browser', 'my system', 'specs', 'specifications', 'hardware',
       'how much ram', 'how much memory', 'cpu', 'processor', 'screen resolution',
-      'what am i using', 'what am i running'
+      'what am i using', 'what am i running',
     ];
     return deviceQueries.some(deviceQuery => query.toLowerCase().includes(deviceQuery));
   }
@@ -416,7 +416,7 @@ export class DynamicContextBuilder {
 
   private static filterRelevantSuggestions(
     suggestions: ContextualSuggestion[],
-    relevanceScores: ContextRelevance
+    relevanceScores: ContextRelevance,
   ): ContextualSuggestion[] {
     return suggestions.filter(suggestion => {
       // Check if suggestion triggers match relevance scores

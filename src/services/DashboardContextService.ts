@@ -306,7 +306,7 @@ export class DashboardContextService {
     
     // Keep only recent activities (last 10 minutes)
     this.activityLog = this.activityLog.filter(
-      log => timestamp - log.timestamp < 10 * 60 * 1000
+      log => timestamp - log.timestamp < 10 * 60 * 1000,
     );
     
     // Update activity context
@@ -359,14 +359,14 @@ export class DashboardContextService {
     let contextString = '';
 
     // Time context
-    contextString += `\n\nCURRENT CONTEXT:\n`;
+    contextString += '\n\nCURRENT CONTEXT:\n';
     contextString += `- Current time: ${ctx.currentTime}\n`;
     contextString += `- Current date: ${ctx.currentDate} (${ctx.dayOfWeek})\n`;
     contextString += `- Time of day: ${ctx.timeOfDay}\n`;
 
     // Location context
     if (ctx.location.hasGPS || ctx.location.ipAddress) {
-      contextString += `\nLOCATION:\n`;
+      contextString += '\nLOCATION:\n';
       if (ctx.location.city) {
         contextString += `- Current location: ${ctx.location.city}`;
         if (ctx.location.region) contextString += `, ${ctx.location.region}`;
@@ -389,7 +389,7 @@ export class DashboardContextService {
 
     // Weather context
     if (ctx.weather.hasData) {
-      contextString += `\nWEATHER:\n`;
+      contextString += '\nWEATHER:\n';
       contextString += `- Temperature: ${ctx.weather.temperature}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'}`;
       if (ctx.weather.feelsLike) {
         contextString += ` (feels like ${ctx.weather.feelsLike}°${ctx.weather.unit === 'fahrenheit' ? 'F' : 'C'})`;
@@ -405,7 +405,7 @@ export class DashboardContextService {
 
     // User context
     if (ctx.user.isAuthenticated) {
-      contextString += `\nUSER:\n`;
+      contextString += '\nUSER:\n';
       if (ctx.user.profile?.fullName || ctx.user.profile?.nickname || ctx.user.name) {
         const displayName = ctx.user.profile?.nickname || ctx.user.profile?.fullName || ctx.user.name;
         contextString += `- Name: ${displayName}\n`;
@@ -452,18 +452,18 @@ export class DashboardContextService {
 
     // Activity context
     if (ctx.activity.activeComponents.length > 0) {
-      contextString += `\nACTIVE FEATURES:\n`;
+      contextString += '\nACTIVE FEATURES:\n';
       contextString += `- Currently using: ${ctx.activity.activeComponents.join(', ')}\n`;
     }
 
     // Environment hints
-    contextString += `\nENVIRONMENT:\n`;
+    contextString += '\nENVIRONMENT:\n';
     contextString += `- Device: ${ctx.environment.deviceType}\n`;
     contextString += `- Time in session: ${Math.floor(ctx.activity.timeSpentInSession / 1000 / 60)} minutes\n`;
 
     // Device context
     if (ctx.device.hasData) {
-      contextString += `\nDEVICE INFO:\n`;
+      contextString += '\nDEVICE INFO:\n';
       if (ctx.device.browser) contextString += `- Browser: ${ctx.device.browser}\n`;
       if (ctx.device.os) contextString += `- Operating System: ${ctx.device.os}\n`;
       if (ctx.device.device) contextString += `- Device Type: ${ctx.device.device}\n`;

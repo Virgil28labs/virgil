@@ -7,7 +7,6 @@ import type {
   GiphyAction, 
   GiphyImage,
 } from '../../types';
-import { logger } from '../../lib/logger';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
 
 // Initial state

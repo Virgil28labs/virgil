@@ -38,7 +38,7 @@ export class EventEmitter {
         logger.error(`Error in event listener for ${event}`, error as Error, {
           component: 'EventEmitter',
           action: 'emit',
-          metadata: { event }
+          metadata: { event },
         });
       }
     });

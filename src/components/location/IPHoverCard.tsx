@@ -189,7 +189,7 @@ export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
       const placement = spaceBelow > cardHeight + offset ? 'bottom' : 'top';
       
       // Calculate position
-      let top = placement === 'top' 
+      const top = placement === 'top' 
         ? rect.top - cardHeight - offset 
         : rect.bottom + offset;
       
@@ -229,7 +229,7 @@ export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
       <IPHoverCard {...cardProps} />
       <div className="ip-hover-arrow" />
     </div>,
-    document.body
+    document.body,
   );
 });
 

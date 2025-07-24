@@ -78,22 +78,22 @@ export class DashboardAppService {
     { 
       name: 'favorites', 
       keywords: ['favorite', 'favorites', 'starred', 'liked', 'saved favorite'],
-      aggregationType: 'sum'
+      aggregationType: 'sum',
     },
     { 
       name: 'images', 
       keywords: ['image', 'images', 'photo', 'photos', 'picture', 'pictures', 'pic', 'pics'],
-      aggregationType: 'sum'
+      aggregationType: 'sum',
     },
     { 
       name: 'saved', 
       keywords: ['saved', 'stored', 'collected', 'kept'],
-      aggregationType: 'sum'
+      aggregationType: 'sum',
     },
     { 
       name: 'media', 
       keywords: ['media', 'content', 'files'],
-      aggregationType: 'sum'
+      aggregationType: 'sum',
     },
   ];
   
@@ -152,7 +152,7 @@ export class DashboardAppService {
           logger.error(`Error getting data from ${appName}`, error as Error, {
             component: 'DashboardAppService',
             action: 'getCompleteContext',
-            metadata: { appName }
+            metadata: { appName },
           });
         }
       }
@@ -216,7 +216,7 @@ export class DashboardAppService {
       'entire dashboard',
       'everything',
       'all saved',
-      'all my'
+      'all my',
     ];
     
     return crossAppKeywords.some(keyword => lowerQuery.includes(keyword));
@@ -231,7 +231,7 @@ export class DashboardAppService {
     
     for (const concept of this.crossAppConcepts) {
       const hasKeyword = concept.keywords.some(keyword => 
-        lowerQuery.includes(keyword.toLowerCase())
+        lowerQuery.includes(keyword.toLowerCase()),
       );
       
       if (hasKeyword) {
@@ -312,7 +312,7 @@ export class DashboardAppService {
       const favoriteItems = allFavorites.filter(item => 
         item.label.toLowerCase().includes('favorite') || 
         item.label.toLowerCase().includes('dog') || // Dog Gallery favorites
-        item.label.toLowerCase().includes('space') // NASA favorites
+        item.label.toLowerCase().includes('space'), // NASA favorites
       );
       
       if (favoriteItems.length === 0) {
@@ -405,10 +405,10 @@ export class DashboardAppService {
         const total = items.reduce((sum, item) => sum + item.count, 0);
         if (total > 0) {
           const typeLabel = type === 'image' ? 'images' : 
-                           type === 'video' ? 'videos' :
-                           type === 'audio' ? 'audio files' :
-                           type === 'document' ? 'documents' :
-                           'items';
+            type === 'video' ? 'videos' :
+              type === 'audio' ? 'audio files' :
+                type === 'document' ? 'documents' :
+                  'items';
           summary.push(`${total} ${typeLabel}`);
         }
       });
@@ -417,7 +417,7 @@ export class DashboardAppService {
         return "You don't have any saved content across your dashboard apps yet.";
       }
       
-      let response = "Across all dashboard apps, you have: ";
+      let response = 'Across all dashboard apps, you have: ';
       if (summary.length > 2) {
         const last = summary.pop();
         response += summary.join(', ') + ', and ' + last;
@@ -467,7 +467,7 @@ export class DashboardAppService {
             logger.error(`Error getting response from ${app.appName}`, error as Error, {
               component: 'DashboardAppService',
               action: 'handleAppAction',
-              metadata: { appName: app.appName }
+              metadata: { appName: app.appName },
             });
           }
         }
@@ -485,7 +485,7 @@ export class DashboardAppService {
             logger.error(`Error getting response from ${app.appName}`, error as Error, {
               component: 'DashboardAppService',
               action: 'handleAppAction',
-              metadata: { appName: app.appName }
+              metadata: { appName: app.appName },
             });
           }
         }
@@ -515,7 +515,7 @@ export class DashboardAppService {
           logger.error(`Error searching ${adapter.appName}`, error as Error, {
             component: 'DashboardAppService',
             action: 'searchAllApps',
-            metadata: { appName: adapter.appName, query }
+            metadata: { appName: adapter.appName, query },
           });
         }
       }

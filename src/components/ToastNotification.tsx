@@ -44,8 +44,8 @@ export const ToastNotification = memo(function ToastNotification({
       icon: '⚠',
     },
     info: {
-      backgroundColor: 'var(--brand-accent-purple)',
-      borderColor: 'var(--brand-light-purple)',
+      backgroundColor: 'var(--violet-purple)',
+      borderColor: 'var(--lavender)',
       icon: 'ℹ',
     },
   };

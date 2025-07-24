@@ -361,7 +361,7 @@ describe('LLM Routes', () => {
 
   describe('POST /api/v1/llm/tokenize', () => {
     it('should count tokens in text', async () => {
-      // countTokens uses text.length / 4, so for 
+      // countTokens uses text.length / 4, so for
       // 'This is a sample text to tokenize' (34 chars) = 9 tokens
       mockLLMProxy.countTokens.mockResolvedValue(9);
 

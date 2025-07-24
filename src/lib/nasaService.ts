@@ -488,7 +488,7 @@ class NasaApodService {
     limit: number | null;
     reset: Date | null;
     percentage: number | null;
-  } {
+    } {
     const percentage = this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null
       ? (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100
       : null;

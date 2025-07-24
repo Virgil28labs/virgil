@@ -44,7 +44,7 @@ export const GiphyModal = memo(function GiphyModal({
       logger.error('Failed to download GIF', error as Error, {
         component: 'GiphyModal',
         action: 'handleDownload',
-        metadata: { gifTitle: currentGif.title }
+        metadata: { gifTitle: currentGif.title },
       });
     }
   }, [currentGif]);
@@ -63,7 +63,7 @@ export const GiphyModal = memo(function GiphyModal({
       logger.error('Failed to copy GIF URL', error as Error, {
         component: 'GiphyModal',
         action: 'handleCopyLink',
-        metadata: { gifTitle: currentGif.title }
+        metadata: { gifTitle: currentGif.title },
       });
     }
   }, [currentGif]);

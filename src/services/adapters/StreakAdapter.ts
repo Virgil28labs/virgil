@@ -60,8 +60,8 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
         stats: {
           totalCheckIns: 0,
           currentStreak: 0,
-          perfectDays: []
-        }
+          perfectDays: [],
+        },
       };
       this.userData = StorageService.get<UserHabitsData>(this.STORAGE_KEY, defaultData);
       if (this.userData && this.userData.habits.length > 0) {
@@ -70,7 +70,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     } catch (error) {
       logger.error('Failed to load habit data', error as Error, {
         component: 'StreakAdapter',
-        action: 'loadUserData'
+        action: 'loadUserData',
       });
     }
   }
@@ -231,7 +231,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     if (!this.userData || this.userData.habits.length === 0) return 0;
 
     const allCheckIns = this.userData.habits.flatMap(h => 
-      h.checkIns.map(date => new Date(date).getTime())
+      h.checkIns.map(date => new Date(date).getTime()),
     );
 
     return allCheckIns.length > 0 ? Math.max(...allCheckIns) : 0;
@@ -331,10 +331,10 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
       .sort((a, b) => b.streak - a.streak);
 
     if (habitsWithStreaks.length === 0) {
-      return "No active streaks yet. Check in your habits today to start building streaks!";
+      return 'No active streaks yet. Check in your habits today to start building streaks!';
     }
 
-    let response = `Your current streaks:\n`;
+    let response = 'Your current streaks:\n';
     habitsWithStreaks.forEach(habit => {
       response += `• ${habit.emoji} ${habit.name}: ${habit.streak}-day streak`;
       if (habit.streak === habit.longestStreak && habit.streak > 1) {
@@ -355,7 +355,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     
     // Look for specific habit name in query
     const habit = data.habits.find(h => 
-      query.toLowerCase().includes(h.name.toLowerCase())
+      query.toLowerCase().includes(h.name.toLowerCase()),
     );
 
     if (habit) {
@@ -374,7 +374,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
     return `You're tracking ${data.habits.length} habit${data.habits.length > 1 ? 's' : ''}:\n` +
            data.habits.map(h => 
-             `• ${h.emoji} ${h.name} (${h.streak}-day streak${h.isCheckedToday ? ', ✅ done today' : ''})`
+             `• ${h.emoji} ${h.name} (${h.streak}-day streak${h.isCheckedToday ? ', ✅ done today' : ''})`,
            ).join('\n');
   }
 
@@ -385,7 +385,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
       return "No progress yet - you haven't started tracking any habits. Begin your journey today!";
     }
 
-    let response = `Your habit tracking progress:\n`;
+    let response = 'Your habit tracking progress:\n';
     response += `• Total check-ins: ${data.stats.totalCheckIns}\n`;
     response += `• Habits tracked: ${data.stats.totalHabits}\n`;
     response += `• Best streak: ${data.stats.bestStreak} days\n`;
@@ -409,7 +409,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     const data = this.transformUserData();
     
     if (data.habits.length === 0) {
-      return "Habit Tracker helps you build positive routines with visual streaks. Open it to add your first habit and start your journey!";
+      return 'Habit Tracker helps you build positive routines with visual streaks. Open it to add your first habit and start your journey!';
     }
 
     return `Habit Tracker: ${data.stats.habitsCompletedToday}/${data.stats.totalHabits} habits done today. ` +

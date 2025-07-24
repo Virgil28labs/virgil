@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import './WindowControls.css';
+import './ui-controls.css';
 
 interface WindowControlsProps {
   windowSize: 'normal' | 'large' | 'fullscreen';

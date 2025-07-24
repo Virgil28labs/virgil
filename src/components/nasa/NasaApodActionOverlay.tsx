@@ -31,7 +31,7 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
       logger.error('Failed to download APOD', error as Error, {
         component: 'NasaApodActionOverlay',
         action: 'handleDownload',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
     }
   }, [apod]);
@@ -55,7 +55,7 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
       logger.error('Failed to copy APOD', error as Error, {
         component: 'NasaApodActionOverlay',
         action: 'handleCopy',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
     }
   }, [apod]);
@@ -73,7 +73,7 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
       logger.error('Failed to share APOD', error as Error, {
         component: 'NasaApodActionOverlay',
         action: 'handleShare',
-        metadata: { apodTitle: apod.title }
+        metadata: { apodTitle: apod.title },
       });
     }
   }, [apod]);
