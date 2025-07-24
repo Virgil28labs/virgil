@@ -100,19 +100,22 @@ export function LocationProvider({ children }: LocationProviderProps) {
       if (!gpsRequestInProgressRef.current) {
         gpsRequestInProgressRef.current = true;
         
-        // Pass the existing IP location to avoid duplicate fetching
-        locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
-          // Only update if we got GPS coordinates or better address
-          if (fullLocationData.coordinates || 
-              (fullLocationData.address?.street && !state.address?.street)) {
-            dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData });
-          }
-        }).catch(() => {
-          // Silently ignore GPS errors since we already have IP location
-          // This is expected behavior when location services are unavailable
-        }).finally(() => {
-          gpsRequestInProgressRef.current = false;
-        });
+        // Add warm-up delay to let location services initialize
+        setTimeout(() => {
+          // Pass the existing IP location to avoid duplicate fetching
+          locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
+            // Only update if we got GPS coordinates or better address
+            if (fullLocationData.coordinates || 
+                (fullLocationData.address?.street && !state.address?.street)) {
+              dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData });
+            }
+          }).catch(() => {
+            // Silently ignore GPS errors since we already have IP location
+            // This is expected behavior when location services are unavailable
+          }).finally(() => {
+            gpsRequestInProgressRef.current = false;
+          });
+        }, 500); // 500ms warm-up delay
       }
     } catch (error: any) {
       logger.error('Location fetch error', error as Error, {

@@ -57,14 +57,34 @@ export const locationService = {
         return;
       }
 
+      // First attempt with low accuracy for faster response
+      const lowAccuracyOptions: PositionOptions = {
+        enableHighAccuracy: false,
+        timeout: 5000, // Shorter timeout for first attempt
+        maximumAge: 300000,
+      };
+
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
+        async (position) => {
+          const coords: Coordinates = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
             timestamp: position.timestamp,
-          });
+          };
+
+          // If accuracy is poor (> 100m), try once more with high accuracy
+          if (position.coords.accuracy > 100) {
+            try {
+              const highAccuracyCoords = await this.getHighAccuracyPosition();
+              resolve(highAccuracyCoords);
+            } catch {
+              // If high accuracy fails, use the low accuracy result
+              resolve(coords);
+            }
+          } else {
+            resolve(coords);
+          }
         },
         (error: GeolocationPositionError) => {
           let errorMessage = 'Unable to retrieve your location';
@@ -81,11 +101,32 @@ export const locationService = {
           }
           reject(new Error(errorMessage));
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000, // Increased to 10s for better reliability on first load
-          maximumAge: 300000,
+        lowAccuracyOptions,
+      );
+    });
+  },
+
+  async getHighAccuracyPosition(): Promise<Coordinates> {
+    return new Promise<Coordinates>((resolve, reject) => {
+      const highAccuracyOptions: PositionOptions = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
+          });
         },
+        (error) => {
+          reject(error);
+        },
+        highAccuracyOptions,
       );
     });
   },

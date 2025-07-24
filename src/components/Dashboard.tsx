@@ -177,7 +177,7 @@ export const Dashboard = memo(function Dashboard() {
                   onClick={() => setShowMapsModal(true)}
                   title="Click to view on map"
                 >
-                  {address.street}
+                  {address.house_number && `${address.house_number} `}{address.street}
                 </p>
               ) : address.formatted ? (
                 <p 
