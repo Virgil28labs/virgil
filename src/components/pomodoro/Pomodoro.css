@@ -3,493 +3,84 @@
 /* Import core variables */
 @import '../../styles/variables.css';
 
-/* Backdrop - Consistent with other modals */
-.pomodoro-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(30, 20, 40, 0.5);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  animation: fadeIn 0.3s ease-out;
-  padding: 60px;
+/* Pomodoro Modal Styles */
+.pomodoro-modal .modal-content {
+  padding: 2rem;
   font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* Main Panel - Glass effect matching Dog Gallery */
-.pomodoro-panel {
-  background: #39293e;
-  border: 1px solid rgba(178, 165, 193, 0.3);
-  border-radius: 2rem;
-  padding: 1.5rem;
-  width: 480px;
-  max-width: calc(100vw - 120px);
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header */
-.pomodoro-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.pomodoro-header h2 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #b2a5c1;
-  letter-spacing: -0.3px;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: var(--silver-grey);
-  cursor: pointer;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s var(--transition-normal);
-}
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--off-white);
-  transform: rotate(90deg);
-}
-
-
-/* Session Mode Toggle */
-.mode-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.8rem;
-  background: rgba(178, 165, 193, 0.05);
-  border-radius: 2rem;
-  font-size: 0.7rem;
-  color: rgba(178, 165, 193, 0.7);
-  margin: 0 auto 0.75rem;
-  border: 1px solid rgba(178, 165, 193, 0.1);
-}
-
-.mode-indicator span {
-  transition: all 0.3s ease;
-}
-
-.mode-indicator span.active {
-  color: var(--off-white);
-  font-weight: 600;
-}
-
-.mode-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--violet-purple);
-  transition: all 0.3s ease;
-}
-
-.mode-dot.break-mode {
-  background: var(--soft-pink);
-}
-
-/* Clock Container */
-.clock-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  margin: 0.5rem 0;
-}
-
-/* Quote Backdrop */
-.quote-backdrop {
-  position: absolute;
-  top: -2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.875rem;
-  color: rgba(178, 165, 193, 0.5);
-  font-style: italic;
-  text-align: center;
-  max-width: 80%;
-  opacity: 0.7;
-  transition: opacity 1s ease;
-  pointer-events: none;
-  letter-spacing: 0.02em;
-}
-
-/* Visual Clock */
-.visual-clock {
-  position: relative;
-  width: 280px;
-  height: 280px;
-  cursor: grab;
-  transition: transform 0.3s ease;
-}
-
-.visual-clock:hover {
-  transform: scale(1.02);
-}
-
-.visual-clock:active {
-  cursor: grabbing;
-}
-
-.visual-clock.dragging {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
-
-/* Clock SVG */
-.clock-svg {
-  width: 100%;
   height: 100%;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.2));
 }
 
-/* Clock Numbers */
-.clock-number {
-  transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+.pomodoro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 2rem;
+  outline: none;
+  border: none;
 }
 
-.clock-number.active {
-  fill: var(--off-white) !important;
-  font-weight: 700;
-  font-size: 18px;
-}
-
-
+/* Time Display */
 .time-display {
-  font-size: 3rem;
-  font-weight: 300;
+  font-size: 3.5rem;
+  font-weight: 200;
   color: #f5f5f5;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
   text-align: center;
+  width: 100%;
 }
 
-.motivational-text {
-  font-size: 1rem;
-  color: #b2a5c1;
-  text-align: center;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
-  line-height: 1.4;
-  min-height: 1.5rem;
-  font-weight: 500;
-}
-
-/* Clock Animations */
-.breathing-ring {
-  animation: breathe 4s ease-in-out infinite;
-}
-
-.progress-arc {
-  filter: drop-shadow(0 0 6px currentColor);
-  animation: arcGlow 2s ease-in-out infinite;
-}
-
-.minute-hand {
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
-  transition: all 0.3s ease;
-  pointer-events: none;
-}
-
-.minute-hand-knob {
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
-  transition: all 0.3s ease;
-  cursor: grab;
-}
-
-.visual-clock.dragging .minute-hand-knob {
-  transform: scale(1.2);
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
-}
-
-.center-dot {
-  filter: drop-shadow(0 0 6px currentColor);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.center-dot:hover {
-  transform: scale(1.5);
-  filter: drop-shadow(0 0 10px currentColor);
-}
-
-.second-indicator {
-  filter: drop-shadow(0 0 6px currentColor);
-  animation: secondTick 1s steps(60) infinite;
-}
-
-/* Floating Particles */
-.floating-particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--lavender);
-  border-radius: 50%;
-  opacity: 0.6;
-  top: 50%;
-  left: 50%;
-  animation: orbit var(--speed) linear infinite;
-  transform-origin: 0 0;
-}
-
-/* Session History */
-.session-history {
-  position: absolute;
-  bottom: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(178, 165, 193, 0.1);
-  border-radius: 2rem;
-}
-
-.history-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-}
-
-.history-dot.work {
-  background: var(--violet-purple);
-}
-
-.history-dot.break {
-  background: var(--soft-pink);
-}
-
-.history-dot:hover {
-  transform: scale(1.3);
-  opacity: 1;
-}
-
-
-/* Tomato Progress */
-.tomato-progress {
-  display: flex;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
-}
-
-.tomato-slot {
-  width: 40px;
-  height: 40px;
+/* Progress Container */
+.progress-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(178, 165, 193, 0.1);
-  border: 2px dashed rgba(178, 165, 193, 0.3);
-  border-radius: 50%;
+  position: relative;
+}
+
+/* Progress Ring */
+.progress-ring {
+  filter: drop-shadow(0 4px 20px rgba(108, 59, 170, 0.3));
+}
+
+.progress-ring-bg {
   transition: all 0.3s ease;
 }
 
-.tomato-slot.filled {
-  background: rgba(239, 176, 194, 0.1);
-  border-style: solid;
-  border-color: rgba(239, 176, 194, 0.4);
-  animation: tomatoGrow 0.5s ease-out;
-}
-
-.tomato-slot .tomato {
-  font-size: 1.5rem;
-  opacity: 0;
-  transform: scale(0);
-  transition: all 0.3s ease;
-}
-
-.tomato-slot.filled .tomato {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Interaction Container - holds presets or message */
-.interaction-container {
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0.5rem 0 1rem 0;
-  transition: all 0.3s ease;
+.progress-ring-fill {
+  transition: stroke-dashoffset 0.3s ease;
+  stroke-linecap: round;
 }
 
 /* Preset Buttons */
 .preset-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 1.5rem;
   justify-content: center;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
-.preset-btn {
-  padding: 0.4rem 0.8rem;
-  background: rgba(178, 165, 193, 0.08);
-  border: 1px solid rgba(178, 165, 193, 0.2);
-  border-radius: 1rem;
-  color: #b2a5c1;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.preset-btn:hover {
-  background: rgba(178, 165, 193, 0.15);
-  border-color: rgba(178, 165, 193, 0.3);
-  transform: translateY(-1px);
-}
-
-.preset-btn.active {
-  background: rgba(108, 59, 170, 0.2);
-  border-color: rgba(108, 59, 170, 0.4);
-  color: #d8c9e6;
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Control Buttons */
 .controls {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   align-items: center;
   justify-content: center;
-  margin-top: 0.75rem;
-}
-
-.control-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  border: none;
-  border-radius: 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: 'Montserrat', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.control-btn.primary {
-  background: var(--violet-purple);
-  color: var(--off-white);
-}
-
-.control-btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(108, 59, 170, 0.3);
-}
-
-.control-btn.primary:active {
-  transform: translateY(0);
-}
-
-.control-btn.secondary {
-  background: rgba(178, 165, 193, 0.2);
-  color: var(--off-white);
-  border: 1px solid rgba(178, 165, 193, 0.3);
-}
-
-.control-btn.secondary:hover {
-  background: rgba(178, 165, 193, 0.3);
-  transform: translateY(-2px);
-}
-
-/* Sound Toggle */
-.sound-toggle {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
-  background: rgba(178, 165, 193, 0.1);
-  border: 1px solid rgba(178, 165, 193, 0.2);
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sound-toggle:hover {
-  background: rgba(178, 165, 193, 0.2);
-  transform: scale(1.1) rotate(15deg);
-}
-
-/* Timer Display (when running) */
-.timer-display {
-  font-size: 4rem;
-  font-weight: 200;
-  color: var(--off-white);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-  margin: 2rem 0;
-  position: relative;
-}
-
-.timer-display.pulse {
-  animation: timerPulse 1s ease-in-out infinite;
-}
-
-/* Particle Container */
-.particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: var(--soft-pink);
-  border-radius: 50%;
-  animation: particleFloat 3s ease-out forwards;
+  flex-wrap: wrap;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
   from { 
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to { 
     opacity: 1;
@@ -497,102 +88,37 @@
   }
 }
 
-@keyframes tomatoBounce {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-5px) rotate(-5deg); }
-  75% { transform: translateY(-5px) rotate(5deg); }
-}
-
-@keyframes breathe {
-  0%, 100% { 
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes arcGlow {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-@keyframes centerPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-@keyframes secondTick {
-  0% { opacity: 1; }
-  100% { opacity: 1; }
-}
-
-@keyframes orbit {
-  from {
-    transform: rotate(var(--rotation, 0deg)) translateX(var(--distance, 160px)) rotate(calc(var(--rotation, 0deg) * -1));
-  }
-  to {
-    transform: rotate(calc(var(--rotation, 0deg) + 360deg)) translateX(var(--distance, 160px)) rotate(calc(var(--rotation, 0deg) * -1 - 360deg));
-  }
-}
-
-@keyframes fadeInOut {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-@keyframes tomatoGrow {
-  0% { transform: scale(0) rotate(0deg); }
-  50% { transform: scale(1.3) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
-}
-
-@keyframes timerPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.98); opacity: 0.8; }
-}
-
-@keyframes particleFloat {
-  0% {
-    transform: translateY(0) translateX(0) scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100px) translateX(var(--x-drift, 50px)) scale(1);
-    opacity: 0;
-  }
-}
-
 /* Responsive */
 @media (max-width: 480px) {
-  .pomodoro-panel {
-    width: 100%;
-    min-height: auto;
+  .pomodoro-modal .modal-content {
     padding: 1.5rem;
-  }
-  
-  .visual-clock {
-    width: 280px;
-    height: 280px;
-  }
-  
-  .clock-svg {
-    width: 280px;
-    height: 280px;
   }
   
   .time-display {
     font-size: 3rem;
   }
   
-  .motivational-text {
-    font-size: 0.75rem;
+  .progress-ring {
+    width: 180px;
+    height: 180px;
   }
   
-  .quote-backdrop {
-    font-size: 0.75rem;
-    max-width: 90%;
+  .progress-ring-bg,
+  .progress-ring-fill {
+    r: 78;
   }
+  
+  .preset-buttons {
+    gap: 1rem;
+  }
+  
+  .controls {
+    gap: 0.75rem;
+  }
+}
+
+/* Focus styles for accessibility */
+.pomodoro-content button:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
 }
