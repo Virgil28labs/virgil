@@ -8,11 +8,19 @@ import { retryWithBackoff } from './retryUtils';
 // Environment-configurable API settings
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const NASA_APOD_BASE = import.meta.env.VITE_NASA_APOD_URL || 'https://api.nasa.gov/planetary/apod';
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours (APOD doesn't change during the day)
 const FIRST_APOD_DATE = '1995-06-16'; // First APOD date
 
 class NasaApodService {
   private cache: Map<string, { data: ApodImage; timestamp: number }> = new Map();
+  private pendingRequests: Map<string, Promise<ApodImage>> = new Map();
+  private lastRequestTime = 0;
+  private minRequestInterval = 1000; // Minimum 1 second between requests
+  private rateLimitInfo = {
+    remaining: null as number | null,
+    limit: null as number | null,
+    reset: null as number | null,
+  };
   private defaultParams = {
     api_key: NASA_API_KEY,
     hd: true, // Always request HD URLs when available
@@ -21,6 +29,46 @@ class NasaApodService {
   constructor() {
     if (!NASA_API_KEY || NASA_API_KEY === 'your_nasa_api_key_here') {
       console.warn('NASA API key not configured. Using DEMO_KEY with limited requests per hour.');
+    }
+    
+    // Load cache from localStorage
+    this.loadCacheFromStorage();
+  }
+
+  /**
+   * Load cached data from localStorage
+   */
+  private loadCacheFromStorage(): void {
+    try {
+      const storedCache = localStorage.getItem('nasa-apod-cache');
+      if (storedCache) {
+        const parsed = JSON.parse(storedCache);
+        const now = Date.now();
+        
+        // Restore valid cache entries
+        Object.entries(parsed).forEach(([key, value]: [string, any]) => {
+          if (value && value.timestamp && now - value.timestamp < CACHE_DURATION) {
+            this.cache.set(key, value);
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load NASA APOD cache from localStorage:', error);
+    }
+  }
+
+  /**
+   * Save cache to localStorage
+   */
+  private saveCacheToStorage(): void {
+    try {
+      const cacheObject: Record<string, any> = {};
+      this.cache.forEach((value, key) => {
+        cacheObject[key] = value;
+      });
+      localStorage.setItem('nasa-apod-cache', JSON.stringify(cacheObject));
+    } catch (error) {
+      console.warn('Failed to save NASA APOD cache to localStorage:', error);
     }
   }
 
@@ -53,6 +101,52 @@ class NasaApodService {
   }
 
   /**
+   * Throttle requests to prevent hitting rate limits
+   */
+  private async throttleRequest(): Promise<void> {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    
+    if (timeSinceLastRequest < this.minRequestInterval) {
+      const waitTime = this.minRequestInterval - timeSinceLastRequest;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    this.lastRequestTime = Date.now();
+  }
+
+  /**
+   * Extract rate limit information from response headers
+   */
+  private extractRateLimitInfo(response: Response): void {
+    try {
+      const remaining = response.headers.get('X-RateLimit-Remaining');
+      const limit = response.headers.get('X-RateLimit-Limit');
+      const reset = response.headers.get('X-RateLimit-Reset');
+      
+      if (remaining !== null) {
+        this.rateLimitInfo.remaining = parseInt(remaining, 10);
+      }
+      if (limit !== null) {
+        this.rateLimitInfo.limit = parseInt(limit, 10);
+      }
+      if (reset !== null) {
+        this.rateLimitInfo.reset = parseInt(reset, 10) * 1000; // Convert to milliseconds
+      }
+      
+      // Log rate limit status
+      if (this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null) {
+        const percentage = (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100;
+        if (percentage < 20) {
+          console.warn(`NASA API rate limit warning: ${this.rateLimitInfo.remaining}/${this.rateLimitInfo.limit} requests remaining`);
+        }
+      }
+    } catch (error) {
+      // Silently ignore header parsing errors
+    }
+  }
+
+  /**
    * Make authenticated API request to NASA APOD
    */
   private async makeNasaRequest(params: NasaApodParams = {}): Promise<Response> {
@@ -70,6 +164,9 @@ class NasaApodService {
         url.searchParams.append(key, String(value));
       }
     });
+
+    // Throttle requests to prevent rate limiting
+    await this.throttleRequest();
 
     try {
       const response = await retryWithBackoff(
@@ -94,6 +191,9 @@ class NasaApodService {
             throw new ApodServiceError(errorMessage, res.status);
           }
           
+          // Extract rate limit info from successful response
+          this.extractRateLimitInfo(res);
+          
           return res;
         },
         {
@@ -101,6 +201,13 @@ class NasaApodService {
           initialDelay: 1000,
           onRetry: (attempt, error) => {
             console.warn(`NASA APOD API retry ${attempt}:`, error.message);
+          },
+          shouldRetry: (error) => {
+            // Don't retry rate limit errors (429) or client errors (4xx)
+            if (error instanceof ApodServiceError) {
+              return error.status ? error.status >= 500 : true;
+            }
+            return true;
           },
         },
       );
@@ -143,25 +250,45 @@ class NasaApodService {
       return cached.data;
     }
 
-    try {
-      const response = await this.makeNasaRequest({ date });
-      const data: NasaApodResponse = await response.json();
-
-      const apodImage = this.transformApodResponse(data);
-
-      // Cache the result
-      this.cache.set(cacheKey, {
-        data: apodImage,
-        timestamp: Date.now(),
-      });
-
-      return apodImage;
-    } catch (error) {
-      if (error instanceof ApodServiceError) {
-        throw error;
-      }
-      throw new ApodServiceError(`Failed to fetch APOD for date ${date}: ${error}`);
+    // Check if there's already a pending request for this date
+    const pendingRequest = this.pendingRequests.get(date);
+    if (pendingRequest) {
+      return pendingRequest;
     }
+
+    // Create a new request promise
+    const requestPromise = (async () => {
+      try {
+        const response = await this.makeNasaRequest({ date });
+        const data: NasaApodResponse = await response.json();
+
+        const apodImage = this.transformApodResponse(data);
+
+        // Cache the result
+        this.cache.set(cacheKey, {
+          data: apodImage,
+          timestamp: Date.now(),
+        });
+        
+        // Save cache to localStorage
+        this.saveCacheToStorage();
+
+        return apodImage;
+      } catch (error) {
+        if (error instanceof ApodServiceError) {
+          throw error;
+        }
+        throw new ApodServiceError(`Failed to fetch APOD for date ${date}: ${error}`);
+      } finally {
+        // Remove from pending requests
+        this.pendingRequests.delete(date);
+      }
+    })();
+
+    // Store the pending request
+    this.pendingRequests.set(date, requestPromise);
+
+    return requestPromise;
   }
 
   /**
@@ -336,6 +463,11 @@ class NasaApodService {
    */
   clearCache(): void {
     this.cache.clear();
+    try {
+      localStorage.removeItem('nasa-apod-cache');
+    } catch (error) {
+      console.warn('Failed to clear NASA APOD cache from localStorage:', error);
+    }
   }
 
   /**
@@ -349,9 +481,35 @@ class NasaApodService {
   }
 
   /**
+   * Get current rate limit status
+   */
+  getRateLimitStatus(): {
+    remaining: number | null;
+    limit: number | null;
+    reset: Date | null;
+    percentage: number | null;
+  } {
+    const percentage = this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null
+      ? (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100
+      : null;
+    
+    return {
+      remaining: this.rateLimitInfo.remaining,
+      limit: this.rateLimitInfo.limit,
+      reset: this.rateLimitInfo.reset ? new Date(this.rateLimitInfo.reset) : null,
+      percentage,
+    };
+  }
+
+  /**
    * Preload adjacent dates for faster navigation
    */
-  async preloadAdjacentDates(currentDate: string): Promise<void> {
+  async preloadAdjacentDates(_currentDate: string): Promise<void> {
+    // Temporarily disabled to prevent rate limiting issues
+    // TODO: Re-enable once rate limiting is properly handled
+    return;
+    
+    /* Original implementation - to be restored later
     const promises: Promise<ApodImage>[] = [];
     
     // Preload previous day
@@ -374,6 +532,7 @@ class NasaApodService {
     Promise.all(promises).catch(() => {
       // Silently handle preload failures
     });
+    */
   }
 }
 

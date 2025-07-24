@@ -8,6 +8,7 @@ interface RetryOptions {
   maxDelay?: number;
   backoffFactor?: number;
   onRetry?: (attempt: number, error: any) => void;
+  shouldRetry?: (error: any) => boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ export async function retryWithBackoff<T>(
     maxDelay = 10000,
     backoffFactor = 2,
     onRetry,
+    shouldRetry = () => true,
   } = options;
 
   let lastError: any;
@@ -33,14 +35,22 @@ export async function retryWithBackoff<T>(
     } catch (error) {
       lastError = error;
       
-      if (attempt === maxRetries) {
+      // Check if we should retry this error
+      if (!shouldRetry(error) || attempt === maxRetries) {
         throw error;
       }
       
-      const delay = Math.min(
+      // For rate limit errors (429), use longer delay
+      let delay = Math.min(
         initialDelay * Math.pow(backoffFactor, attempt),
         maxDelay,
       );
+      
+      // Check if error has status code 429 and Retry-After header
+      if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
+        // Use 60 seconds for rate limit errors
+        delay = 60000;
+      }
       
       if (onRetry) {
         onRetry(attempt + 1, error);

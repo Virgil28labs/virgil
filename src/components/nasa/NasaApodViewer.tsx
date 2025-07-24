@@ -49,6 +49,12 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load APOD';
       setError(errorMessage);
+      
+      // Special handling for rate limit errors
+      if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('too many requests')) {
+        setError('NASA API rate limit reached. Please try again later.');
+      }
+      
       logger.error('Failed to load APOD', err as Error, {
         component: 'NasaApodViewer',
         action: 'loadDailyApod'
@@ -113,10 +119,10 @@ export const NasaApodViewer = memo(function NasaApodViewer({
 
   // Load APOD when opened
   useEffect(() => {
-    if (isOpen && !currentApod && !loading) {
+    if (isOpen && !currentApod && !loading && !error) {
       loadApodByDate(selectedDate);
     }
-  }, [isOpen, currentApod, loading, selectedDate, loadApodByDate]);
+  }, [isOpen, selectedDate]); // Removed dependencies that could cause re-renders
 
   // Clear state when closed
   useEffect(() => {
