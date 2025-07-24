@@ -83,34 +83,6 @@ html, body {
   height: 100%;
 }
 
-/* Skeleton loader animations */
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-.skeleton-loader {
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-}
-
-.skeleton-text-line {
-  margin-bottom: 0.5rem;
-}
-
-.skeleton-text-line:last-child {
-  margin-bottom: 0;
-}
-
-.skeleton-card {
-  padding: 1rem;
-  border-radius: 8px;
-  background: var(--brand-dark-purple);
-  border: 1px solid var(--brand-light-purple);
-}
 
 /* Screen reader only content */
 .sr-only {
@@ -218,10 +190,6 @@ html, body {
     transition-duration: 0.01ms !important;
   }
 
-  .skeleton-loader {
-    animation: none;
-    background: var(--brand-light-purple);
-  }
 }
 
 /* High contrast mode support */

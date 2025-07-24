@@ -14,7 +14,7 @@ import { CameraEmojiButton } from './camera/CameraEmojiButton';
 import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton';
 import { NotesEmojiButton } from './notes/NotesEmojiButton';
 import { LoadingFallback } from './LoadingFallback';
-import { SkeletonLoader } from './SkeletonLoader';
+import { Skeleton } from './ui/skeleton';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { GoogleMapsModal } from './maps/GoogleMapsModal';
@@ -188,10 +188,10 @@ export const Dashboard = memo(function Dashboard() {
                   {address.formatted.split(',')[0]}
                 </p>
               ) : (
-                <SkeletonLoader width="200px" height="16px" />
+                <Skeleton className="w-48 h-4" />
               )
             ) : locationLoading ? (
-              <SkeletonLoader width="200px" height="16px" />
+              <Skeleton className="w-48 h-4" />
             ) : ipLocation?.city ? (
               <p 
                 className="street-address clickable"
@@ -221,7 +221,7 @@ export const Dashboard = memo(function Dashboard() {
                 />
               </div>
             ) : locationLoading ? (
-              <SkeletonLoader width="120px" height="16px" />
+              <Skeleton className="w-32 h-4" />
             ) : (
               <p className="ip-error">IP address unavailable</p>
             )}
@@ -244,7 +244,7 @@ export const Dashboard = memo(function Dashboard() {
                 Elevation: unavailable
               </p>
             ) : locationLoading ? (
-              <SkeletonLoader width="120px" height="16px" />
+              <Skeleton className="w-32 h-4" />
             ) : null}
           </div>
         </div>

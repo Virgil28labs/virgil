@@ -1,7 +1,7 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { useWeather } from '../contexts/WeatherContext';
 import { weatherService } from '../lib/weatherService';
-import { SkeletonLoader } from './SkeletonLoader';
+import { Skeleton } from './ui/skeleton';
 import { WeatherForecast } from './WeatherForecast';
 
 /**
@@ -55,7 +55,7 @@ export const Weather = memo(function Weather() {
       {loading && !hasWeather ? (
         // Initial loading state
         <div className="weather-content">
-          <SkeletonLoader width="120px" height="24px" />
+          <Skeleton className="w-32 h-6" />
         </div>
       ) : data ? (
         // Weather data available
@@ -83,7 +83,7 @@ export const Weather = memo(function Weather() {
       ) : (
         // Default state - show loading skeleton
         <div className="weather-content">
-          <SkeletonLoader width="120px" height="24px" />
+          <Skeleton className="w-32 h-6" />
         </div>
       )}
       

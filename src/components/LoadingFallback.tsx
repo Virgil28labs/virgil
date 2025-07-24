@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { SkeletonLoader } from './SkeletonLoader';
+import { Skeleton } from './ui/skeleton';
 
 interface LoadingFallbackProps {
   message?: string;
@@ -23,11 +23,9 @@ export const LoadingFallback = memo(function LoadingFallback({
         style={{ padding: '1rem' }}
       >
         {Array.from({ length: skeletonCount }, (_, i) => (
-          <SkeletonLoader 
+          <Skeleton 
             key={i}
-            height={i === 0 ? '40px' : '20px'}
-            width={i === skeletonCount - 1 ? '60%' : '100%'}
-            className="skeleton-line"
+            className={`${i === 0 ? 'h-10' : 'h-5'} ${i === skeletonCount - 1 ? 'w-3/5' : 'w-full'} mb-2`}
           />
         ))}
       </div>

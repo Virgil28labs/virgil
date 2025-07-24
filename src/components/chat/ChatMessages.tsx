@@ -1,8 +1,9 @@
-import { memo, useRef, useEffect } from 'react';
+import { memo, useRef, useEffect, useState } from 'react';
 import { ChatMessage } from '../../types/chat.types';
 import { StoredConversation } from '../../services/MemoryService';
-import { SkeletonLoader } from '../SkeletonLoader';
+import { Skeleton } from '../ui/skeleton';
 import { User } from '../../types/auth.types';
+import { FormattedText } from '../../utils/textFormatter';
 import './ChatMessages.css';
 
 interface ChatMessagesProps {
@@ -27,6 +28,7 @@ const ChatMessages = memo(function ChatMessages({
   lastConversation,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -34,6 +36,18 @@ const ChatMessages = memo(function ChatMessages({
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isTyping]);
+
+  // Delay showing typing indicator for better UX
+  // Only show skeleton if response takes >300ms to prevent flash on fast responses
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isTyping) {
+      timer = setTimeout(() => setShowTypingIndicator(true), 300);
+    } else {
+      setShowTypingIndicator(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isTyping]);
 
   const renderWelcomeMessage = () => (
     <div className="welcome-msg">
@@ -68,7 +82,7 @@ const ChatMessages = memo(function ChatMessages({
         </div>
       )}
       <div className="msg-content" role="text">
-        {message.content}
+        <FormattedText content={message.content} />
         <button
           className="remember-btn"
           onClick={() => onMarkAsImportant(message)}
@@ -81,20 +95,6 @@ const ChatMessages = memo(function ChatMessages({
     </div>
   );
 
-  const renderTypingIndicator = () => (
-    <div className="message assistant-msg" role="status" aria-label="Virgil is typing">
-      <div className="msg-avatar" aria-hidden="true">
-        <span className="chatbot-avatar-v">V</span>
-      </div>
-      <div className="msg-content">
-        <SkeletonLoader width="80%" height="16px" />
-        <div className="typing-status">
-          <span className="typing-indicator">💭 Thinking...</span>
-        </div>
-        <span className="sr-only">Virgil is typing a response</span>
-      </div>
-    </div>
-  );
 
   const renderError = () => (
     <div className="error-msg">
@@ -118,7 +118,16 @@ const ChatMessages = memo(function ChatMessages({
       {messages.map(renderMessage)}
 
       {/* Typing indicator */}
-      {isTyping && renderTypingIndicator()}
+      {showTypingIndicator && (
+        <div className="flex items-center space-x-3 mb-2 px-2" role="status" aria-label="Virgil is typing">
+          <Skeleton className="h-6 w-6 rounded-full" />
+          <div className="space-y-1">
+            <Skeleton className="h-3 w-[160px]" />
+            <Skeleton className="h-3 w-[120px]" />
+          </div>
+          <span className="sr-only">Virgil is typing a response</span>
+        </div>
+      )}
 
       {/* Error message */}
       {error && renderError()}

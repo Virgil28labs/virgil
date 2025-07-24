@@ -10,7 +10,7 @@ import { Dashboard } from './components/Dashboard';
 import { LazyVirgilChatbot } from './components/LazyComponents';
 import { LoadingFallback } from './components/LoadingFallback';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { SkeletonLoader } from './components/SkeletonLoader';
+import { Skeleton } from './components/ui/skeleton';
 import { ToastContainer } from './components/ToastNotification';
 import { useToast } from './hooks/useToast';
 import { StorageMigration } from './services/StorageMigration';
@@ -34,13 +34,13 @@ function AppContent(): React.ReactElement {
     return (
       <div className="loading-screen">
         <div style={{ maxWidth: '400px', margin: '0 auto', padding: '2rem' }}>
-          <SkeletonLoader height="60px" borderRadius="8px" />
+          <Skeleton className="h-16 rounded-lg" />
           <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-            <SkeletonLoader height="20px" width="60%" />
+            <Skeleton className="h-5 w-3/5" />
           </div>
-          <SkeletonLoader height="40px" />
+          <Skeleton className="h-10" />
           <div style={{ marginTop: '2rem' }}>
-            <SkeletonLoader height="200px" borderRadius="12px" />
+            <Skeleton className="h-48 rounded-xl" />
           </div>
         </div>
       </div>
