@@ -417,7 +417,16 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           await loadGoogleMaps({ apiKey });
         }
         
-        if (!mounted || !mapRef.current) return;
+        // Wait for Google Maps to be fully initialized
+        if (!window.google?.maps?.ControlPosition) {
+          console.log('Waiting for Google Maps to fully initialize...');
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        if (!mounted || !mapRef.current || !window.google?.maps?.ControlPosition) {
+          console.error('Google Maps not properly initialized');
+          return;
+        }
         
         // Create map instance
         const map = new google.maps.Map(mapRef.current, {
@@ -431,7 +440,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           disableDefaultUI: true,
           zoomControl: true,
           zoomControlOptions: {
-            position: google.maps.ControlPosition.RIGHT_CENTER,
+            position: google.maps.ControlPosition?.RIGHT_CENTER || 6, // 6 is RIGHT_CENTER fallback
           },
           streetViewControl: false,
           mapTypeControl: false,

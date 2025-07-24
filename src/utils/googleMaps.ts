@@ -57,10 +57,17 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
       script.onload = () => {
         // Add extra time for Google Maps to initialize
         setTimeout(() => {
-          if (typeof google !== 'undefined' && google.maps) {
+          if (typeof google !== 'undefined' && google.maps && google.maps.ControlPosition) {
             resolve(google);
           } else {
-            reject(new Error('Google Maps failed to initialize properly'));
+            // Wait a bit longer if ControlPosition isn't ready yet
+            setTimeout(() => {
+              if (typeof google !== 'undefined' && google.maps) {
+                resolve(google);
+              } else {
+                reject(new Error('Google Maps failed to initialize properly'));
+              }
+            }, 500);
           }
         }, 100);
       };
