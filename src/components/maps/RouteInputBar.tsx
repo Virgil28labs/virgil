@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { SavedPlace } from '../../types/maps.types';
 import './RouteInputBar.css';
 import { logger } from '../../lib/logger';
+import { useGooglePlacesAutocomplete } from '../../hooks/useGooglePlacesAutocomplete';
 
 interface RouteInputBarProps {
   currentLocation: google.maps.LatLngLiteral | null
@@ -46,23 +47,27 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   
   const originInputRef = useRef<HTMLInputElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
-  const originAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const destinationAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const [activeInput, setActiveInput] = useState<'origin' | 'destination' | null>(null);
+  const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
+  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
 
-  // Initialize autocomplete for origin
-  useEffect(() => {
-    if (!originInputRef.current || !window.google?.maps?.places) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(originInputRef.current, {
-      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+  // Origin autocomplete hook
+  const {
+    suggestions: originSuggestions,
+    isLoading: originLoading,
+    clearSuggestions: clearOriginSuggestions,
+    selectPlace: selectOriginPlace,
+  } = useGooglePlacesAutocomplete(
+    originInputRef,
+    {
       types: ['geocode', 'establishment'],
-    });
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
+      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+    },
+    (place) => {
       if (place && place.geometry) {
         setOrigin(place.name || place.formatted_address || '');
         setIsOriginCurrentLocation(false);
+        setShowOriginSuggestions(false);
         if (onOriginSelect) {
           onOriginSelect(place);
         }
@@ -71,31 +76,26 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
           onRouteRequest(place.name || place.formatted_address || '', destination);
         }
       }
-    });
+    }
+  );
 
-    originAutocompleteRef.current = autocomplete;
-
-    return () => {
-      if (originAutocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(originAutocompleteRef.current);
-      }
-    };
-  }, [destination, onOriginSelect, onRouteRequest]);
-
-  // Initialize autocomplete for destination
-  useEffect(() => {
-    if (!destinationInputRef.current || !window.google?.maps?.places) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(destinationInputRef.current, {
-      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+  // Destination autocomplete hook
+  const {
+    suggestions: destinationSuggestions,
+    isLoading: destinationLoading,
+    clearSuggestions: clearDestinationSuggestions,
+    selectPlace: selectDestinationPlace,
+  } = useGooglePlacesAutocomplete(
+    destinationInputRef,
+    {
       types: ['geocode', 'establishment'],
-    });
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
+      fields: ['place_id', 'geometry', 'name', 'formatted_address'],
+    },
+    (place) => {
       if (place && place.geometry) {
         const destinationText = place.name || place.formatted_address || '';
         setDestination(destinationText);
+        setShowDestinationSuggestions(false);
         // Save to localStorage
         try {
           localStorage.setItem('virgil_last_destination', destinationText);
@@ -114,16 +114,8 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
         // Auto-trigger route
         onRouteRequest(origin, destinationText);
       }
-    });
-
-    destinationAutocompleteRef.current = autocomplete;
-
-    return () => {
-      if (destinationAutocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(destinationAutocompleteRef.current);
-      }
-    };
-  }, [origin, onDestinationSelect, onRouteRequest]);
+    }
+  );
 
   // Update origin when current address changes
   useEffect(() => {
@@ -137,11 +129,14 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       setOrigin('');
       setIsOriginCurrentLocation(false);
     }
+    setActiveInput('origin');
+    setShowOriginSuggestions(true);
   }, [isOriginCurrentLocation]);
 
   const handleOriginChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setOrigin(e.target.value);
     setIsOriginCurrentLocation(false);
+    setShowOriginSuggestions(true);
   }, []);
 
   const handleDestinationChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,6 +145,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     if (e.target.value) {
       setShowSavedPlaces(false);
     }
+    setShowDestinationSuggestions(true);
   }, []);
 
   const handleSwapLocations = useCallback(() => {
@@ -221,12 +217,32 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
     if (!destination && savedPlaces.length > 0) {
       setShowSavedPlaces(true);
     }
+    setActiveInput('destination');
   }, [destination, savedPlaces]);
 
   const handleDestinationBlur = useCallback(() => {
     // Delay to allow click on dropdown items
-    setTimeout(() => setShowSavedPlaces(false), 200);
+    setTimeout(() => {
+      setShowSavedPlaces(false);
+      setShowDestinationSuggestions(false);
+    }, 200);
   }, []);
+
+  const handleOriginBlur = useCallback(() => {
+    // Delay to allow click on dropdown items
+    setTimeout(() => {
+      setShowOriginSuggestions(false);
+    }, 200);
+  }, []);
+
+  // Handle suggestion selection
+  const handleOriginSuggestionSelect = useCallback(async (suggestion: any) => {
+    await selectOriginPlace(suggestion);
+  }, [selectOriginPlace]);
+
+  const handleDestinationSuggestionSelect = useCallback(async (suggestion: any) => {
+    await selectDestinationPlace(suggestion);
+  }, [selectDestinationPlace]);
 
   return (
     <div className="route-input-bar">
@@ -241,6 +257,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
             value={origin}
             onChange={handleOriginChange}
             onFocus={handleOriginFocus}
+            onBlur={handleOriginBlur}
             placeholder="From"
             className={`route-input ${isOriginCurrentLocation ? 'current-location' : ''}`}
           />
@@ -255,6 +272,23 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
                 <circle cx="8" cy="8" r="3" fill="currentColor" />
               </svg>
             </button>
+          )}
+          
+          {/* Origin autocomplete suggestions */}
+          {showOriginSuggestions && originSuggestions.length > 0 && (
+            <div className="autocomplete-dropdown">
+              {originSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  className="autocomplete-item"
+                  onClick={() => handleOriginSuggestionSelect(suggestion)}
+                  type="button"
+                >
+                  <div className="autocomplete-main">{suggestion.suggestion.mainText}</div>
+                  <div className="autocomplete-secondary">{suggestion.suggestion.secondaryText}</div>
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
@@ -322,6 +356,23 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
                 />
               </svg>
             </button>
+          )}
+          
+          {/* Destination autocomplete suggestions */}
+          {showDestinationSuggestions && destinationSuggestions.length > 0 && !showSavedPlaces && (
+            <div className="autocomplete-dropdown">
+              {destinationSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  className="autocomplete-item"
+                  onClick={() => handleDestinationSuggestionSelect(suggestion)}
+                  type="button"
+                >
+                  <div className="autocomplete-main">{suggestion.suggestion.mainText}</div>
+                  <div className="autocomplete-secondary">{suggestion.suggestion.secondaryText}</div>
+                </button>
+              ))}
+            </div>
           )}
           
           {/* Saved places dropdown */}

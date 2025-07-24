@@ -51,7 +51,7 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
         delete (window as any).__googleMapsCallback;
       };
 
-      script.src = `https://maps.googleapis.com/maps/api/js?${params}`;
+      script.src = `https://maps.googleapis.com/maps/api/js?${params}&v=beta`;
 
       // Handle load success
       script.onload = () => {
