@@ -54,7 +54,7 @@ export function useGooglePlacesAutocomplete(
 
     try {
       // Import the places library if not already loaded
-      const placesLib = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
+      const _placesLib = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
       
       let formattedSuggestions: PlaceSuggestion[] = [];
       
@@ -86,9 +86,9 @@ export function useGooglePlacesAutocomplete(
               placeId: suggestion.placePrediction.placeId || '',
             },
           }));
-        } catch (apiError) {
+        } catch (_apiError) {
           // New API failed, will use fallback
-          throw apiError;
+          // Let it fall through to the fallback method
         }
       } else {
         // Fallback to classic AutocompleteService
@@ -102,7 +102,7 @@ export function useGooglePlacesAutocomplete(
         };
         
         // Use promise wrapper for callback-based API
-        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, reject) => {
+        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, _reject) => {
           service.getPlacePredictions(request, (predictions, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
               resolve(predictions);

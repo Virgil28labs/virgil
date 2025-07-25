@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useState, useCallback, useMemo } from 'react';
 import type { ModelOption } from '../../types/chat.types';
 import type { DashboardContext } from '../../services/DashboardContextService';
 import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';

@@ -250,7 +250,11 @@ describe('useLLM', () => {
 
     it('sets streaming state during request', async () => {
       let resolveStream: () => void;
-      let streamPromise: Promise<void>;
+      
+      // Create the promise before using it
+      const streamPromise = new Promise<void>(resolve => {
+        resolveStream = resolve;
+      });
       
       const slowStream = {
         [Symbol.asyncIterator]: async function* () {
@@ -260,11 +264,6 @@ describe('useLLM', () => {
           yield mockStreamChunks[1];
         },
       };
-      
-      // Create the promise before using it
-      streamPromise = new Promise(resolve => {
-        resolveStream = resolve;
-      });
       
       (llmService.completeStream as jest.Mock).mockReturnValue(slowStream);
       
@@ -513,7 +512,11 @@ describe('useLLM', () => {
 
     it('is false when streaming', async () => {
       let resolveStream: () => void;
-      let streamPromise: Promise<void>;
+      
+      // Create the promise before using it
+      const streamPromise = new Promise<void>(resolve => {
+        resolveStream = resolve;
+      });
       
       const slowStream = {
         [Symbol.asyncIterator]: async function* () {
@@ -523,11 +526,6 @@ describe('useLLM', () => {
           yield mockStreamChunks[1];
         },
       };
-      
-      // Create the promise before using it
-      streamPromise = new Promise(resolve => {
-        resolveStream = resolve;
-      });
       
       (llmService.completeStream as jest.Mock).mockReturnValue(slowStream);
       

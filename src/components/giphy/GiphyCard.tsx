@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyCardProps } from '../../types';
 import { logger } from '../../lib/logger';

@@ -142,7 +142,7 @@ class NasaApodService {
           console.warn(`NASA API rate limit warning: ${this.rateLimitInfo.remaining}/${this.rateLimitInfo.limit} requests remaining`);
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Silently ignore header parsing errors
     }
   }

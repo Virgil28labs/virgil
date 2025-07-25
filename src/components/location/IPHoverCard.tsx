@@ -5,11 +5,11 @@
  * Shows location, ISP, connection type, and privacy indicators.
  */
 
-import { memo, useEffect, useState, useRef } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { IpLocation } from '../../types/location.types';
 
-interface IPHoverCardProps {
+interface IpHoverCardProps {
   ipLocation: IpLocation;
   isVisible: boolean;
   className?: string;
@@ -24,7 +24,7 @@ const IPHoverCard = memo(function IPHoverCard({
   ipLocation,
   isVisible,
   className = '',
-}: IPHoverCardProps) {
+}: IpHoverCardProps) {
   if (!isVisible || !ipLocation) return null;
 
   // Check if we have limited data (e.g., reserved IP range)
@@ -157,7 +157,7 @@ const IPHoverCard = memo(function IPHoverCard({
  * Positioned wrapper for the hover card
  * Handles smart positioning relative to the trigger element
  */
-interface PositionedIPHoverCardProps extends IPHoverCardProps {
+interface PositionedIPHoverCardProps extends IpHoverCardProps {
   triggerRef?: React.RefObject<HTMLDivElement | null>;
 }
 

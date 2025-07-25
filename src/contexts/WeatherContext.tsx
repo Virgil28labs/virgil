@@ -110,7 +110,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
         }
         
         return;
-      } catch (fallbackError: any) {
+      } catch (_fallbackError: any) {
         dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
         return;
       }

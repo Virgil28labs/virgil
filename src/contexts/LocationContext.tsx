@@ -117,12 +117,12 @@ export function LocationProvider({ children }: LocationProviderProps) {
           });
         }, 500); // 500ms warm-up delay
       }
-    } catch (error: any) {
-      logger.error('Location fetch error', error as Error, {
+    } catch (_error: any) {
+      logger.error('Location fetch error', _error as Error, {
         component: 'LocationContext',
         action: 'updateLocationDataFromIP',
       });
-      dispatch({ type: 'SET_ERROR', payload: error.message });
+      dispatch({ type: 'SET_ERROR', payload: _error.message });
     }
   }, []);
 
@@ -146,7 +146,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       return () => {
         permission.removeEventListener('change', handlePermissionChange);
       };
-    } catch (error: any) {
+    } catch (_error: any) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'unavailable' });
       return () => {};
     }
@@ -157,9 +157,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
       await locationService.getCurrentPosition();
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'granted' });
       await fetchLocationData(true);
-    } catch (error: any) {
+    } catch (_error: any) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'denied' });
-      dispatch({ type: 'SET_ERROR', payload: error.message });
+      dispatch({ type: 'SET_ERROR', payload: _error.message });
     }
   }, [fetchLocationData]);
 

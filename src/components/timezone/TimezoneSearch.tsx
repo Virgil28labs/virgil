@@ -5,7 +5,7 @@
  * Features city-first search with keyboard navigation and accessibility support.
  */
 
-import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { TimezoneInfo } from './timezoneData';
 import { searchTimezones, getPopularTimezones } from './timezoneData';
 

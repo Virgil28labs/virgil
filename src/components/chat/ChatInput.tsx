@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useCallback } from 'react';
+import React, { memo, useRef, useEffect, useCallback } from 'react';
 import type { DashboardContext } from '../../services/DashboardContextService';
 import './chat-interface.css';
 

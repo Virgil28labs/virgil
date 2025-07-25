@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import type { MarkedMemory, StoredConversation } from '../../services/MemoryService';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import './memory-modals.css';
@@ -137,17 +137,19 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           return a.timestamp - b.timestamp;
         case 'recent':
           return b.timestamp - a.timestamp;
-        case 'length':
+        case 'length': {
           const aLength = a.content?.length || a.messageCount || 0;
           const bLength = b.content?.length || b.messageCount || 0;
           return bLength - aLength;
-        case 'relevance':
+        }
+        case 'relevance': {
           // Simple relevance based on query matches
           if (!filters.query.trim()) return b.timestamp - a.timestamp;
           const query = filters.query.toLowerCase();
           const aMatches = (a.content || a.firstMessage || '').toLowerCase().split(query).length - 1;
           const bMatches = (b.content || b.firstMessage || '').toLowerCase().split(query).length - 1;
           return bMatches - aMatches;
+        }
         default:
           return b.timestamp - a.timestamp;
       }

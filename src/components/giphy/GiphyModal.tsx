@@ -1,4 +1,4 @@
-import { memo, useEffect, useCallback, useState } from 'react';
+import React, { memo, useEffect, useCallback, useState } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyModalProps } from '../../types/giphy.types';
 import { logger } from '../../lib/logger';
@@ -80,7 +80,7 @@ export const GiphyModal = memo(function GiphyModal({
           title: currentGif.title || 'Check out this GIF!',
           url: shareUrl,
         });
-      } catch (error) {
+      } catch (_error) {
         // User cancelled or error occurred, fallback to copy
         await navigator.clipboard.writeText(shareUrl);
         setShowCopied(true);

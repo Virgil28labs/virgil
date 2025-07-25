@@ -412,6 +412,7 @@ export class PhotoStorage {
         await this.deletePhotos(idsToDelete);
       }
     } catch (_error) {
+      // Storage cleanup errors are non-critical
     }
   }
 

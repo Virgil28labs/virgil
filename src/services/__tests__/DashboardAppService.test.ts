@@ -56,7 +56,7 @@ class MockAdapter implements AppDataAdapter {
     return `Response from ${this.appName} for: ${query}`;
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(_query: string): Promise<any[]> {
     if (this.mockData.searchResults) {
       return this.mockData.searchResults;
     }

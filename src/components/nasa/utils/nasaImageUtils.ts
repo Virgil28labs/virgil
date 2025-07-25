@@ -1,10 +1,11 @@
 import type { ApodImage } from '../../../types/nasa.types';
+import type { MouseEvent, SyntheticEvent } from 'react';
 import { downloadImage } from '../../../utils/downloadUtils';
 import { logger } from '../../../lib/logger';
 import { dashboardContextService } from '../../../services/DashboardContextService';
 
 // Common event handler for stopping propagation
-export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
+export const stopEvent = (e: MouseEvent | SyntheticEvent) => {
   e.preventDefault();
   e.stopPropagation();
 };
@@ -31,7 +32,7 @@ export const downloadApodImage = async (
       title: apod.title,
       date: apod.date,
     }, 'nasa-apod');
-  } catch (error) {
+  } catch (_error) {
     // If download fails, open image in new tab as fallback
     window.open(imageUrl, '_blank');
   }
@@ -85,7 +86,7 @@ export const copyApodToClipboard = async (apod: ApodImage): Promise<boolean> => 
       await navigator.clipboard.writeText(apod.imageUrl);
       return false; // URL copied instead
     }
-  } catch (error) {
+  } catch (_error) {
     // Final fallback - copy URL
     await navigator.clipboard.writeText(apod.imageUrl);
     return false; // URL copied instead
@@ -105,9 +106,9 @@ export const shareApod = async (apod: ApodImage): Promise<boolean> => {
       await navigator.share(shareData);
       return true;
     }
-  } catch (error) {
+  } catch (_error) {
     // User cancelled or error occurred
-    logger.error('Share failed', error as Error, {
+    logger.error('Share failed', _error as Error, {
       component: 'nasaImageUtils',
       action: 'shareApod',
       metadata: { apodTitle: apod.title },

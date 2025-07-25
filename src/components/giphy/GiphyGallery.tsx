@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { GiphyGalleryProvider, useGiphyGallery } from './GiphyGalleryProvider';
 import { GiphyTabs } from './GiphyTabs';
 import { GiphySearchControls } from './GiphySearchControls';

@@ -56,7 +56,7 @@ export function useRouteState(): RouteState & RouteActions {
   const setShowRouteOptions = useCallback((show: boolean | ((prev: boolean) => boolean)) => {
     setState(prev => ({ 
       ...prev, 
-      showRouteOptions: typeof show === 'function' ? show(prev.showRouteOptions) : show 
+      showRouteOptions: typeof show === 'function' ? show(prev.showRouteOptions) : show, 
     }));
   }, []);
 

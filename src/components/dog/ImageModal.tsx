@@ -1,4 +1,4 @@
-import { memo, useEffect, useCallback, useState } from 'react';
+import React, { memo, useEffect, useCallback, useState } from 'react';
 import type { ImageModalProps } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 

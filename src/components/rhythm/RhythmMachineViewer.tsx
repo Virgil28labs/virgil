@@ -1,4 +1,4 @@
-import { memo, useEffect, useCallback, useState, useRef, useMemo } from 'react';
+import React, { memo, useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import './RhythmMachineViewer.css';
 import { rhythmService } from '../../services/rhythm';
 import type { RhythmPattern } from '../../services/rhythm';

@@ -5,7 +5,7 @@
  * Integrates modal, hover panel, and click/hover interactions.
  */
 
-import { memo, useState, useCallback, useRef, useEffect } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { TimezoneModal } from './TimezoneModal';
 import { PositionedTimezoneHoverPanel } from './TimezoneHoverPanel';
 import { useTimezones } from './useTimezones';

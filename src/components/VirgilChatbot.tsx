@@ -1,4 +1,4 @@
-import { useEffect, useCallback, memo } from 'react';
+import React, { useEffect, useCallback, memo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import type { ModelOption } from '../types/chat.types';
 import { useFocusManagement } from '../hooks/useFocusManagement';
@@ -74,12 +74,12 @@ function VirgilChatbotInner() {
   });
 
   const { 
-    sendMessage, 
+    sendMessage: _sendMessage, 
     handleSubmit, 
     handleKeyDown, 
     handleQuickAction,
     loadingState,
-    inputRef,
+    inputRef: _inputRef,
   } = useMessageHandling({
     selectedModel: state.selectedModel,
     messages: state.messages,

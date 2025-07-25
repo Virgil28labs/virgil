@@ -5,7 +5,7 @@
  * reordering, and editing with full accessibility support.
  */
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { TimezoneSearch } from './TimezoneSearch';
 import { useTimezones, useTimezoneFormatters } from './useTimezones';
 

@@ -1,5 +1,4 @@
-import type { Request} from 'express';
-import { Response, NextFunction } from 'express';
+import type { Request } from 'express';
 
 // Validation Types
 export interface ValidationRule {
@@ -18,6 +17,7 @@ export interface ValidationResult {
 }
 
 // Rate Limiting Types
+/* eslint-disable no-unused-vars */
 export interface RateLimitOptions {
   windowMs: number;
   max: number;
@@ -26,6 +26,7 @@ export interface RateLimitOptions {
   legacyHeaders?: boolean;
   skip?: (req: Request) => boolean;
 }
+/* eslint-enable no-unused-vars */
 
 export interface RateLimitInfo {
   limit: number;

@@ -23,6 +23,7 @@ export interface ApiResponse extends Response {
   };
 }
 
+/* eslint-disable no-unused-vars */
 export type MiddlewareFunction = (
   req: ApiRequest,
   res: ApiResponse,
@@ -35,6 +36,7 @@ export type ErrorHandler = (
   res: ApiResponse,
   next: NextFunction
 ) => void;
+/* eslint-enable no-unused-vars */
 
 export interface ServerConfig {
   port: number;

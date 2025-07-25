@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { DogCard } from './DogCard';
 import type { DogImage } from './hooks/useDogApi';
 

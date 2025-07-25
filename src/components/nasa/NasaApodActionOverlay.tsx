@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import type { ApodImage } from '../../types/nasa.types';
 import { 
   stopEvent, 

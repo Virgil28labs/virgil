@@ -280,7 +280,7 @@ export const locationService = {
           },
         },
       );
-    } catch (error) {
+    } catch (_error) {
       // Return null instead of throwing to allow graceful degradation
       return null as any;
     }
@@ -367,6 +367,7 @@ export const locationService = {
       if (addressResult.status === 'fulfilled') {
         result.address = addressResult.value;
       } else {
+        // Address lookup failed - non-critical, continue without address
       }
       
       if (elevationResult.status === 'fulfilled' && elevationResult.value) {
@@ -381,7 +382,7 @@ export const locationService = {
       }
       
       return result;
-    } catch (error) {
+    } catch (_error) {
       return {};
     }
   },

@@ -1,5 +1,7 @@
+import type { MouseEvent, SyntheticEvent } from 'react';
+
 // Common event handler for stopping propagation
-export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
+export const stopEvent = (e: MouseEvent | SyntheticEvent) => {
   e.preventDefault();
   e.stopPropagation();
 };
@@ -12,7 +14,7 @@ export const downloadImage = async (url: string, breed: string) => {
   
   const a = document.createElement('a');
   a.href = objectUrl;
-  a.download = `doggo-${breed}-${Date.now()}.jpg`;
+  a.download = `doggo-${breed}-${new Date().getTime()}.jpg`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -61,7 +63,7 @@ export const copyImageToClipboard = async (url: string): Promise<boolean> => {
       await navigator.clipboard.writeText(url);
       return false;
     }
-  } catch (error) {
+  } catch (_error) {
     // Final fallback
     await navigator.clipboard.writeText(url);
     return false;

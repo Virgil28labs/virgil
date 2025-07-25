@@ -220,7 +220,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const handleCameraCapture = useCallback(async (dataUrl: string) => {
     try {
       await handlePhotoCapture(dataUrl);
-    } catch (err) {
+    } catch (_err) {
       onError('Failed to save photo');
     }
   }, [handlePhotoCapture, onError]);

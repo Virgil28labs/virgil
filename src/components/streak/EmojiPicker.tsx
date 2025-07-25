@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void

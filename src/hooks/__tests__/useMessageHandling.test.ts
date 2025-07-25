@@ -1,3 +1,4 @@
+import type React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMessageHandling } from '../useMessageHandling';
 import { chatService } from '../../services/ChatService';
@@ -19,7 +20,7 @@ jest.mock('../../services/MemoryService', () => ({
 
 jest.mock('../useChatApi', () => ({
   useChatApi: ({ onSuccess, onError, onTypingChange }: any) => {
-    const sendMessage = jest.fn(async (text, system, messages, model) => {
+    const sendMessage = jest.fn(async (text, _system, _messages, _model) => {
       // Simulate API call
       if (text === 'error') {
         onError('API Error');

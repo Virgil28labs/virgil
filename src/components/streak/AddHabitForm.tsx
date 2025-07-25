@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { EmojiSuggestions } from './EmojiSuggestions';
 import { EmojiPicker } from './EmojiPicker';
 import { EMOJI_DATABASE } from '../../data/habitEmojis';

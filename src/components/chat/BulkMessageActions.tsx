@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { toastService } from '../../services/ToastService';
 import { dashboardContextService } from '../../services/DashboardContextService';
@@ -43,7 +43,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       
       await navigator.clipboard.writeText(combinedText);
       toastService.success(`${selectedMessageData.length} messages copied to clipboard`);
-    } catch (error) {
+    } catch (_error) {
       toastService.error('Failed to copy messages');
     }
   }, [selectedMessageData]);
@@ -77,7 +77,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       URL.revokeObjectURL(url);
       
       toastService.success(`${selectedMessageData.length} messages exported successfully`);
-    } catch (error) {
+    } catch (_error) {
       toastService.error('Failed to export messages');
     } finally {
       setIsExporting(false);

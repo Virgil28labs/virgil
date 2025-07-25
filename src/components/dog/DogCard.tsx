@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 import type { DogCardProps } from '../../types';
 import { DogFavoriteOverlay } from './DogFavoriteOverlay';
 import { DogCardActions } from './DogCardActions';

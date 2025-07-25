@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useEffect } from 'react';
+import React, { memo, useState, useCallback, useEffect } from 'react';
 import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
 import { MemoryService, memoryService } from '../../services/MemoryService';
 import { ConversationView } from './ConversationView';
@@ -54,7 +54,7 @@ const MemoryModal = memo(function MemoryModal({
       const newContext = await memoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(!!newContext);
-    } catch (error) {
+    } catch (_error) {
       // Error is already handled by MemoryService with toast notifications
     } finally {
       setIsLoading(false);
@@ -73,7 +73,7 @@ const MemoryModal = memo(function MemoryModal({
       a.download = `virgil-memory-${dashboardContextService.getLocalDate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch (_error) {
       // Error is already handled by MemoryService with toast notifications
     } finally {
       setIsLoading(false);
@@ -92,7 +92,7 @@ const MemoryModal = memo(function MemoryModal({
         onMemoryIndicatorUpdate(false);
         setSelectedConversation(null); // Reset selected conversation
         onClose();
-      } catch (error) {
+      } catch (_error) {
         // Error is already handled by MemoryService with toast notifications
       } finally {
         setIsLoading(false);
@@ -123,7 +123,7 @@ const MemoryModal = memo(function MemoryModal({
       const newContext = await memoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(true);
-    } catch (error) {
+    } catch (_error) {
       // Error is already handled by MemoryService with toast notifications
     } finally {
       setIsLoading(false);

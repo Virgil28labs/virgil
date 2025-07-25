@@ -5,7 +5,7 @@
  * Clean, lightweight design.
  */
 
-import { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useTimezones, useTimezoneFormatters } from './useTimezones';
 
 interface TimezoneHoverPanelProps {

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import type React from 'react';
 import { chatService } from '../services/ChatService';
 import { memoryService } from '../services/MemoryService';
 import { useChatApi } from './useChatApi';

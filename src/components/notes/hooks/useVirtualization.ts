@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import type { RefObject } from 'react';
 
 interface VirtualizationOptions {
   /** Total number of items */
@@ -24,7 +25,7 @@ interface VirtualizationResult {
   /** Offset for the visible items */
   offsetY: number
   /** Ref to attach to scroll container */
-  scrollContainerRef: React.RefObject<HTMLDivElement | null>
+  scrollContainerRef: RefObject<HTMLDivElement | null>
   /** Handler for scroll events */
   handleScroll: () => void
 }

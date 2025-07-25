@@ -63,9 +63,11 @@ export interface LLMAnalytics {
   error?: string;
 }
 
+/* eslint-disable no-unused-vars */
 export interface LLMCache {
   get: (key: string) => Promise<LLMResponse | null>;
   set: (key: string, value: LLMResponse, ttl?: number) => Promise<void>;
   delete: (key: string) => Promise<void>;
   clear: () => Promise<void>;
 }
+/* eslint-enable no-unused-vars */

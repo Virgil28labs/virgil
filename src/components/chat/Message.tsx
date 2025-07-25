@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { FormattedText } from '../../utils/textFormatter';
 import { toastService } from '../../services/ToastService';
@@ -29,7 +29,7 @@ const Message = memo(function Message({
       setCopiedMessageId(message.id);
       setTimeout(() => setCopiedMessageId(null), 2000);
       toastService.success('Message copied to clipboard');
-    } catch (error) {
+    } catch (_error) {
       toastService.error('Failed to copy message to clipboard');
     }
   }, [message.id, message.content]);
@@ -46,9 +46,9 @@ const Message = memo(function Message({
         // Fallback to copying
         await handleCopyMessage();
       }
-    } catch (error) {
+    } catch (_error) {
       // User cancelled share or error occurred
-      if (error instanceof Error && error.name !== 'AbortError') {
+      if (_error instanceof Error && _error.name !== 'AbortError') {
         toastService.error('Failed to share message');
       }
     }
