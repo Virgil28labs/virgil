@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * Time Test Utilities
  * 
@@ -5,6 +6,10 @@
  * Provides time travel, freezing, and common test scenarios.
  */
 
+/* eslint-env jest */
+/* global expect, beforeEach, afterEach */
+
+import 'jest';
 import { createMockTimeService, type MockTimeService } from '../services/__mocks__/TimeService';
 
 export interface TimeTestContext {
@@ -76,15 +81,19 @@ export class TimeTravel {
     weeks: (n: number) => this.timeService.advanceTime(n * 7 * 24 * 60 * 60 * 1000),
     months: (n: number) => {
       const current = this.timeService.getCurrentDateTime();
-      const future = new Date(current);
-      future.setMonth(future.getMonth() + n);
-      this.timeService.setMockDate(future);
+      if (typeof this.timeService.addMonths === 'function') {
+        this.timeService.setMockDate(this.timeService.addMonths(current, n));
+      } else {
+        throw new Error('MockTimeService.addMonths is required for month jumps');
+      }
     },
     years: (n: number) => {
       const current = this.timeService.getCurrentDateTime();
-      const future = new Date(current);
-      future.setFullYear(future.getFullYear() + n);
-      this.timeService.setMockDate(future);
+      if (typeof this.timeService.addYears === 'function') {
+        this.timeService.setMockDate(this.timeService.addYears(current, n));
+      } else {
+        throw new Error('MockTimeService.addYears is required for year jumps');
+      }
     },
   };
   
@@ -96,50 +105,30 @@ export class TimeTravel {
     weeks: (n: number) => this.timeService.advanceTime(-n * 7 * 24 * 60 * 60 * 1000),
     months: (n: number) => {
       const current = this.timeService.getCurrentDateTime();
-      const past = new Date(current);
-      past.setMonth(past.getMonth() - n);
-      this.timeService.setMockDate(past);
+      if (typeof this.timeService.addMonths === 'function') {
+        this.timeService.setMockDate(this.timeService.addMonths(current, -n));
+      } else {
+        throw new Error('MockTimeService.addMonths is required for month jumps');
+      }
     },
     years: (n: number) => {
       const current = this.timeService.getCurrentDateTime();
-      const past = new Date(current);
-      past.setFullYear(past.getFullYear() - n);
-      this.timeService.setMockDate(past);
+      if (typeof this.timeService.addYears === 'function') {
+        this.timeService.setMockDate(this.timeService.addYears(current, -n));
+      } else {
+        throw new Error('MockTimeService.addYears is required for year jumps');
+      }
     },
   };
   
   to = {
     // Jump to specific times of day
-    morning: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(8, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
-    noon: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(12, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
-    afternoon: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(15, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
-    evening: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(19, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
-    night: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(23, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
-    midnight: () => {
-      const date = new Date(this.timeService.getCurrentDateTime());
-      date.setHours(0, 0, 0, 0);
-      this.timeService.setMockDate(date);
-    },
+    morning: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 8)),
+    noon: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 12)),
+    afternoon: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 15)),
+    evening: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 19)),
+    night: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 23)),
+    midnight: () => this.timeService.setMockDate(this.timeService.startOfDay()),
     
     // Jump to specific dates
     startOfDay: () => {

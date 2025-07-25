@@ -28,7 +28,7 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
     // In a real implementation, you would analyze traffic data from the map
     // For now, we'll simulate it based on time of day
     const updateTrafficLevel = () => {
-      const hour = timeService.getCurrentDateTime().getHours();
+      const hour = timeService.getHours(timeService.getCurrentDateTime());
       
       // Rush hour patterns
       if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {

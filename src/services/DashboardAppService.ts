@@ -9,7 +9,7 @@
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
 
-export interface AppContextData<T = any> {
+export interface AppContextData<T = unknown> {
   appName: string;
   displayName: string;
   isActive: boolean;
@@ -25,7 +25,7 @@ export interface AggregateableData {
   count: number;
   label: string;
   appName: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CrossAppConcept {
@@ -35,7 +35,7 @@ export interface CrossAppConcept {
   requiresExplicitIntent?: boolean;
 }
 
-export interface AppDataAdapter<T = any> {
+export interface AppDataAdapter<T = unknown> {
   // Basic metadata
   readonly appName: string;
   readonly displayName: string;
@@ -55,7 +55,7 @@ export interface AppDataAdapter<T = any> {
   getResponse?(query: string): Promise<string>;
   
   // Search within app data
-  search?(query: string): Promise<any[]>;
+  search?(query: string): Promise<unknown[]>;
   
   // Cross-app aggregation support (optional)
   supportsAggregation?(): boolean;
@@ -502,8 +502,8 @@ export class DashboardAppService {
   /**
    * Search across all apps
    */
-  async searchAllApps(query: string): Promise<{ appName: string; results: any[] }[]> {
-    const searchResults: { appName: string; results: any[] }[] = [];
+  async searchAllApps(query: string): Promise<{ appName: string; results: unknown[] }[]> {
+    const searchResults: { appName: string; results: unknown[] }[] = [];
     
     for (const adapter of this.adapters.values()) {
       if (adapter.search) {

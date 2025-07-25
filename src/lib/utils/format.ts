@@ -6,7 +6,7 @@ import { timeService } from '../../services/TimeService';
  * Format a number with commas for thousands
  */
 export function formatNumber(num: number): string {
-  return num.toLocaleString();
+  return new Intl.NumberFormat().format(num);
 }
 
 /**

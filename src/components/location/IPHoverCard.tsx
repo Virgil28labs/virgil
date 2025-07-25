@@ -41,7 +41,7 @@ const IPHoverCard = memo(function IPHoverCard({
     try {
       const date = timeService.parseDate(ipLocation.timezone_details.current_time);
       if (!date) return { time: 'N/A', isNight: false };
-      const hours = date.getHours();
+      const hours = timeService.getHours(date);
       const timeStr = timeService.formatTimeToLocal(date, {
         hour: 'numeric',
         minute: '2-digit',

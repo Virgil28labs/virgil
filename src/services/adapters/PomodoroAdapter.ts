@@ -215,7 +215,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   }
 
   private getFocusRecommendation(): string {
-    const hour = timeService.getCurrentDateTime().getHours();
+    const hour = timeService.getHours(timeService.getCurrentDateTime());
     const { sessionsCompleted } = this.currentData.todayStats;
 
     // Morning recommendation

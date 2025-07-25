@@ -6,7 +6,6 @@
  */
 
 import { timeService } from '../TimeService';
-import { logger } from '../../lib/logger';
 
 // Mock dependencies that use TimeService
 jest.mock('../../lib/logger');
