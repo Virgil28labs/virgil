@@ -1,7 +1,7 @@
 import type {
   Coordinates,
   Address,
-  IPLocation,
+  IpLocation,
   LocationData,
 } from '../types/location.types';
 import { retryWithBackoff } from './retryUtils';
@@ -182,7 +182,7 @@ export const locationService = {
   },
 
 
-  async getIPLocation(ip?: string): Promise<IPLocation> {
+  async getIpLocation(ip?: string): Promise<IpLocation> {
     return retryWithBackoff(
       async () => {
         // If no IP provided, ipwho.is returns info about the caller's IP
@@ -198,7 +198,7 @@ export const locationService = {
         }
         
         // Extract all available fields for the hover card
-        const ipLocation: IPLocation = {
+        const ipLocation: IpLocation = {
           ip: data.ip,
           country: data.country,
           region: data.region,
@@ -294,12 +294,12 @@ export const locationService = {
 
     try {
       // Get IP location in one call
-      const ipLocation = await this.getIPLocation();
+      const ipLocation = await this.getIpLocation();
       locationData.ipLocation = ipLocation;
       
       // Create basic address from IP data
       if (ipLocation?.city) {
-        locationData.address = this.createAddressFromIPLocation(ipLocation);
+        locationData.address = this.createAddressFromIpLocation(ipLocation);
       }
     } catch (_error) {
       // Return empty location data on error
@@ -308,16 +308,16 @@ export const locationService = {
     return locationData;
   },
 
-  async getFullLocationData(existingIPLocation?: IPLocation): Promise<LocationData> {
+  async getFullLocationData(existingIpLocation?: IpLocation): Promise<LocationData> {
     const locationData: LocationData = {
       timestamp: Date.now(),
     };
 
     // If we already have IP location, use it; otherwise fetch it
-    if (existingIPLocation) {
-      locationData.ipLocation = existingIPLocation;
+    if (existingIpLocation) {
+      locationData.ipLocation = existingIpLocation;
     } else {
-      const ipLocationResult = await this.fetchIPLocationData();
+      const ipLocationResult = await this.fetchIpLocationData();
       if (ipLocationResult) {
         locationData.ipLocation = ipLocationResult;
       }
@@ -338,16 +338,16 @@ export const locationService = {
 
     // If we have no GPS but have IP location, create a basic address from IP data
     if (!locationData.address && locationData.ipLocation?.city) {
-      locationData.address = this.createAddressFromIPLocation(locationData.ipLocation);
+      locationData.address = this.createAddressFromIpLocation(locationData.ipLocation);
     }
 
     return locationData;
   },
 
-  async fetchIPLocationData(): Promise<IPLocation | undefined> {
+  async fetchIpLocationData(): Promise<IpLocation | undefined> {
     try {
       // Call without IP parameter to get caller's location
-      return await this.getIPLocation();
+      return await this.getIpLocation();
     } catch (_error) {
       return undefined;
     }
@@ -386,7 +386,7 @@ export const locationService = {
     }
   },
 
-  createAddressFromIPLocation(ipLocation: IPLocation): Address {
+  createAddressFromIpLocation(ipLocation: IpLocation): Address {
     return {
       street: '',
       house_number: '',

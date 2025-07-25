@@ -57,7 +57,7 @@ const mockLocationData: Partial<LocationContextValue> = {
     timezone: 'America/New_York',
   } as any,
   hasGPSLocation: true,
-  hasIPLocation: true,
+  hasIpLocation: true,
 };
 
 describe('RaccoonMascot', () => {
@@ -70,7 +70,7 @@ describe('RaccoonMascot', () => {
       address: null,
       ipLocation: null,
       hasGPSLocation: false,
-      hasIPLocation: false,
+      hasIpLocation: false,
     });
   });
 

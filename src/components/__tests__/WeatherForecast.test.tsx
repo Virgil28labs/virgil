@@ -8,6 +8,7 @@ jest.mock('../../lib/weatherService');
 describe('WeatherForecast', () => {
   const mockForecast: ForecastData = {
     cityName: 'New York',
+    country: 'US',
     forecasts: [
       {
         date: '2024-01-15',
@@ -15,9 +16,12 @@ describe('WeatherForecast', () => {
           id: 800,
           main: 'Clear',
           description: 'clear sky',
+          icon: '01d',
         },
         tempMin: 45,
         tempMax: 60,
+        humidity: 50,
+        windSpeed: 10,
       },
       {
         date: '2024-01-16',
@@ -25,9 +29,12 @@ describe('WeatherForecast', () => {
           id: 801,
           main: 'Clouds',
           description: 'few clouds',
+          icon: '02d',
         },
         tempMin: 42,
         tempMax: 58,
+        humidity: 60,
+        windSpeed: 15,
       },
       {
         date: '2024-01-17',
@@ -35,9 +42,12 @@ describe('WeatherForecast', () => {
           id: 500,
           main: 'Rain',
           description: 'light rain',
+          icon: '10d',
         },
         tempMin: 50,
         tempMax: 65,
+        humidity: 80,
+        windSpeed: 20,
       },
       {
         date: '2024-01-18',
@@ -45,9 +55,12 @@ describe('WeatherForecast', () => {
           id: 600,
           main: 'Snow',
           description: 'light snow',
+          icon: '13d',
         },
         tempMin: 30,
         tempMax: 38,
+        humidity: 90,
+        windSpeed: 25,
       },
       {
         date: '2024-01-19',
@@ -55,9 +68,12 @@ describe('WeatherForecast', () => {
           id: 200,
           main: 'Thunderstorm',
           description: 'thunderstorm',
+          icon: '11d',
         },
         tempMin: 55,
         tempMax: 70,
+        humidity: 85,
+        windSpeed: 30,
       },
     ],
   };
@@ -154,9 +170,12 @@ describe('WeatherForecast', () => {
           condition: {
             main: 'Unknown',
             description: 'unknown condition',
+            icon: '01d',
           },
           tempMin: 45,
           tempMax: 60,
+          humidity: 50,
+          windSpeed: 10,
         },
       ],
     };
@@ -236,6 +255,7 @@ describe('WeatherForecast', () => {
   it('handles empty forecast array gracefully', () => {
     const emptyForecast = {
       cityName: 'New York',
+      country: 'US',
       forecasts: [],
     };
 
@@ -273,18 +293,23 @@ describe('WeatherForecast', () => {
   it('handles weekend days correctly', () => {
     const weekendForecast = {
       cityName: 'New York',
+      country: 'US',
       forecasts: [
         {
           date: '2024-01-13', // Saturday
-          condition: { id: 800, main: 'Clear', description: 'clear' },
+          condition: { id: 800, main: 'Clear', description: 'clear', icon: '01d' },
           tempMin: 45,
           tempMax: 60,
+          humidity: 50,
+          windSpeed: 10,
         },
         {
           date: '2024-01-14', // Sunday
-          condition: { id: 801, main: 'Clouds', description: 'cloudy' },
+          condition: { id: 801, main: 'Clouds', description: 'cloudy', icon: '02d' },
           tempMin: 42,
           tempMax: 58,
+          humidity: 60,
+          windSpeed: 15,
         },
       ],
     };
@@ -298,7 +323,7 @@ describe('WeatherForecast', () => {
     // At least one should be a weekend day
     const weekendDays = ['SAT', 'SUN'];
     const hasWeekendDay = dayNames.some(dayElement => 
-      weekendDays.includes(dayElement.textContent || '')
+      weekendDays.includes(dayElement.textContent || ''),
     );
     expect(hasWeekendDay).toBe(true);
   });
@@ -306,12 +331,15 @@ describe('WeatherForecast', () => {
   it('handles negative temperatures', () => {
     const coldForecast = {
       cityName: 'Anchorage',
+      country: 'US',
       forecasts: [
         {
           date: '2024-01-15',
-          condition: { id: 600, main: 'Snow', description: 'heavy snow' },
+          condition: { id: 600, main: 'Snow', description: 'heavy snow', icon: '13d' },
           tempMin: -10,
           tempMax: -2,
+          humidity: 95,
+          windSpeed: 35,
         },
       ],
     };

@@ -27,7 +27,7 @@ export function useContextSync() {
       error: null,
       permissionStatus: 'granted',
       hasLocation: !!(coordinates || ipLocation),
-      hasIPLocation: !!ipLocation,
+      hasIpLocation: !!ipLocation,
       initialized: true,
       lastUpdated: dashboardContextService.getTimestamp(),
       fetchLocationData: () => Promise.resolve(),

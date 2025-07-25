@@ -20,7 +20,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   onRouteRequest,
   onOriginSelect,
   onDestinationSelect,
-  currentDestinationPlace,
   hasRoute = false,
   onClearRoute,
 }) => {
@@ -37,9 +36,8 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   const [destination, setDestination] = useState(initialDestination);
   const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true);
   
-  const originInputRef = useRef<HTMLInputElement>(null);
-  const destinationInputRef = useRef<HTMLInputElement>(null);
-  const [activeInput, setActiveInput] = useState<'origin' | 'destination' | null>(null);
+  const originInputRef = useRef<HTMLInputElement>(null!);
+  const destinationInputRef = useRef<HTMLInputElement>(null!);
   const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
 
@@ -52,8 +50,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   // Origin autocomplete hook
   const {
     suggestions: originSuggestions,
-    isLoading: originLoading,
-    clearSuggestions: clearOriginSuggestions,
     selectPlace: selectOriginPlace,
   } = useGooglePlacesAutocomplete(
     originInputRef,
@@ -71,14 +67,12 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
           onRouteRequest(place.name || place.formatted_address || '', destination);
         }
       }
-    }
+    },
   );
 
   // Destination autocomplete hook
   const {
     suggestions: destinationSuggestions,
-    isLoading: destinationLoading,
-    clearSuggestions: clearDestinationSuggestions,
     selectPlace: selectDestinationPlace,
   } = useGooglePlacesAutocomplete(
     destinationInputRef,
@@ -106,7 +100,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
         // Auto-trigger route
         onRouteRequest(origin, destinationText);
       }
-    }
+    },
   );
 
   // Update origin when current address changes
@@ -121,7 +115,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       setOrigin('');
       setIsOriginCurrentLocation(false);
     }
-    setActiveInput('origin');
     setShowOriginSuggestions(true);
   }, [isOriginCurrentLocation]);
 
@@ -157,7 +150,6 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   }, [currentAddress, destination, onRouteRequest]);
 
   const handleDestinationClick = useCallback(() => {
-    setActiveInput('destination');
   }, []);
 
   const handleDestinationBlur = useCallback(() => {

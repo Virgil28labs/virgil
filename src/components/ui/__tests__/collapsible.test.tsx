@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../collapsible';
 
 // Mock Radix UI Collapsible
@@ -20,15 +20,15 @@ jest.mock('@radix-ui/react-collapsible', () => {
         onOpenChange: (newOpen: boolean) => {
           setIsOpen(newOpen);
           onOpenChange?.(newOpen);
-        }
+        },
       };
 
       return (
         <div data-state={isOpen ? 'open' : 'closed'} {...props}>
-          {React.Children.map(children, child =>
+          {React.Children.map(children, (child: any) =>
             React.isValidElement(child)
               ? React.cloneElement(child, { contextValue } as any)
-              : child
+              : child,
           )}
         </div>
       );
@@ -66,7 +66,7 @@ describe('Collapsible Component', () => {
       <Collapsible data-testid="collapsible">
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Hidden content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const collapsible = screen.getByTestId('collapsible');
@@ -79,7 +79,7 @@ describe('Collapsible Component', () => {
       <Collapsible defaultOpen data-testid="collapsible">
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Visible content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const collapsible = screen.getByTestId('collapsible');
@@ -92,7 +92,7 @@ describe('Collapsible Component', () => {
       <Collapsible>
         <CollapsibleTrigger>Click me</CollapsibleTrigger>
         <CollapsibleContent>Collapsible content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const trigger = screen.getByText('Click me');
@@ -119,7 +119,7 @@ describe('Collapsible Component', () => {
       <Collapsible onOpenChange={handleOpenChange}>
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const trigger = screen.getByText('Toggle');
@@ -136,16 +136,16 @@ describe('Collapsible Component', () => {
       <Collapsible open={false}>
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     expect(screen.queryByText('Content')).not.toBeInTheDocument();
     
     rerender(
-      <Collapsible open={true}>
+      <Collapsible open>
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     expect(screen.getByText('Content')).toBeInTheDocument();
@@ -160,7 +160,7 @@ describe('Collapsible Component', () => {
       >
         <CollapsibleTrigger>Toggle</CollapsibleTrigger>
         <CollapsibleContent>Content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const collapsible = screen.getByTestId('collapsible');
@@ -174,7 +174,7 @@ describe('CollapsibleTrigger Component', () => {
     render(
       <Collapsible>
         <CollapsibleTrigger>Trigger Button</CollapsibleTrigger>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const trigger = screen.getByText('Trigger Button');
@@ -191,7 +191,7 @@ describe('CollapsibleTrigger Component', () => {
         >
           Trigger
         </CollapsibleTrigger>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const trigger = screen.getByTestId('trigger');
@@ -204,7 +204,7 @@ describe('CollapsibleTrigger Component', () => {
       <Collapsible>
         <CollapsibleTrigger data-testid="trigger">Toggle</CollapsibleTrigger>
         <CollapsibleContent>Content</CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const trigger = screen.getByTestId('trigger');
@@ -222,7 +222,7 @@ describe('CollapsibleTrigger Component', () => {
           <span>Custom trigger</span>
           <svg data-testid="icon">↓</svg>
         </CollapsibleTrigger>
-      </Collapsible>
+      </Collapsible>,
     );
     
     expect(screen.getByText('Custom trigger')).toBeInTheDocument();
@@ -238,7 +238,7 @@ describe('CollapsibleContent Component', () => {
         <CollapsibleContent data-testid="content">
           Hidden content
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     expect(screen.queryByTestId('content')).not.toBeInTheDocument();
@@ -251,7 +251,7 @@ describe('CollapsibleContent Component', () => {
         <CollapsibleContent data-testid="content">
           Visible content
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const content = screen.getByTestId('content');
@@ -272,7 +272,7 @@ describe('CollapsibleContent Component', () => {
         >
           Content
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     const content = screen.getByTestId('collapsible-content');
@@ -292,7 +292,7 @@ describe('CollapsibleContent Component', () => {
             <button>Action</button>
           </div>
         </CollapsibleContent>
-      </Collapsible>
+      </Collapsible>,
     );
     
     expect(screen.getByText('Title')).toBeInTheDocument();
@@ -314,7 +314,7 @@ describe('Complete Collapsible usage', () => {
           <CollapsibleTrigger>Section 2</CollapsibleTrigger>
           <CollapsibleContent>Content 2</CollapsibleContent>
         </Collapsible>
-      </div>
+      </div>,
     );
     
     const trigger1 = screen.getByText('Section 1');

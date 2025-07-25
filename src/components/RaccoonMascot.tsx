@@ -46,7 +46,7 @@ type WallSide = 'left' | 'right' | null;
  */
 const RaccoonMascot = memo(function RaccoonMascot() {
   // Location data for dynamic hit box updates
-  const { address, ipLocation, hasGPSLocation, hasIPLocation } = useLocation();
+  const { address, ipLocation, hasGPSLocation, hasIpLocation } = useLocation();
 
   // Physics Constants
   const PHYSICS = {
@@ -238,12 +238,12 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       address?.formatted || '',
       ipLocation?.ip || '',
       hasGPSLocation.toString(),
-      hasIPLocation.toString(),
+      hasIpLocation.toString(),
       window.innerWidth,
       window.innerHeight,
     ];
     return relevantData.join('|');
-  }, [address, ipLocation, hasGPSLocation, hasIPLocation]);
+  }, [address, ipLocation, hasGPSLocation, hasIpLocation]);
 
   /**
    * Detects and measures UI elements that the raccoon can interact with

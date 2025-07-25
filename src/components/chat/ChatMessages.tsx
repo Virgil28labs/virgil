@@ -143,7 +143,7 @@ const ChatMessages = memo(function ChatMessages({
           variant="message"
           type={loadingState.type}
           progress={loadingState.progress}
-          isVisible={true}
+          isVisible
         />
       )}
       
@@ -151,7 +151,7 @@ const ChatMessages = memo(function ChatMessages({
       {showTypingIndicator && !loadingState && (
         <LoadingStates 
           variant="typing"
-          isVisible={true}
+          isVisible
         />
       )}
       

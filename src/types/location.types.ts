@@ -21,7 +21,7 @@ export interface Address {
   formatted: string;
 }
 
-export interface IPLocation {
+export interface IpLocation {
   ip: string;
   country?: string;
   region?: string;
@@ -49,14 +49,14 @@ export interface IPLocation {
 export interface LocationData {
   coordinates?: Coordinates;
   address?: Address;
-  ipLocation?: IPLocation;
+  ipLocation?: IpLocation;
   timestamp: number;
 }
 
 export interface LocationState {
   coordinates: Coordinates | null;
   address: Address | null;
-  ipLocation: IPLocation | null;
+  ipLocation: IpLocation | null;
   loading: boolean;
   error: string | null;
   permissionStatus: PermissionStatus;
@@ -70,7 +70,7 @@ export interface LocationContextValue extends LocationState {
   clearError: () => void;
   hasLocation: boolean;
   hasGPSLocation: boolean;
-  hasIPLocation: boolean;
+  hasIpLocation: boolean;
 }
 
 

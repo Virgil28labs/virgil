@@ -48,10 +48,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     hasActiveRoute,
     showRouteOptions,
     routeInfoVisible,
-    setCurrentRoute,
-    setAlternativeRoutes,
     setSelectedRouteIndex,
-    setHasActiveRoute,
     setShowRouteOptions,
     setRouteInfoVisible,
     clearRoute: clearRouteState,
@@ -69,12 +66,12 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       lat: coordinates.latitude,
       lng: coordinates.longitude,
     } : null,
-    [coordinates]
+  [coordinates],
   );
 
   const currentAddressDisplay = useMemo(() => 
     currentAddress || address?.formatted || 'Current Location',
-    [currentAddress, address?.formatted]
+  [currentAddress, address?.formatted],
   );
 
   // Cleanup function
@@ -132,8 +129,8 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
           });
         }),
         new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Geocoding timeout')), 3000)
-        )
+          setTimeout(() => reject(new Error('Geocoding timeout')), 3000),
+        ),
       ]);
       
       return result[0]?.formatted_address || '';
@@ -369,14 +366,14 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
 
   // Handle toggle expand/collapse
   const handleToggleExpand = useCallback(() => {
-    setShowRouteOptions(prev => !prev);
+    setShowRouteOptions((prev) => !prev);
     
     // Clear auto-collapse timer if user manually toggles
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
       autoCollapseTimerRef.current = null;
     }
-  }, []);
+  }, [setShowRouteOptions]);
 
   // Handle close route info
   const handleCloseRouteInfo = useCallback(() => {
@@ -450,7 +447,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
             lng: coordinates.longitude,
           },
           zoom: 14,
-          mapId: "VIRGIL_TRAFFIC_MAP",
+          mapId: 'VIRGIL_TRAFFIC_MAP',
           disableDefaultUI: true,
           zoomControl: true,
           zoomControlOptions: {

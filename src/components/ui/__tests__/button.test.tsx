@@ -132,7 +132,7 @@ describe('Button Component', () => {
         form="test-form"
       >
         Submit
-      </Button>
+      </Button>,
     );
     
     const button = screen.getByRole('button');
@@ -155,7 +155,7 @@ describe('Button Component', () => {
     render(
       <Button variant="secondary" size="lg">
         Secondary Large
-      </Button>
+      </Button>,
     );
     
     const button = screen.getByRole('button');

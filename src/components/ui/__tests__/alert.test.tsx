@@ -69,7 +69,7 @@ describe('Alert Component', () => {
         style={{ margin: '10px' }}
       >
         Alert with attributes
-      </Alert>
+      </Alert>,
     );
     
     const alert = screen.getByRole('alert');
@@ -83,7 +83,7 @@ describe('Alert Component', () => {
       <Alert>
         <svg className="icon">Icon</svg>
         <span>Alert text</span>
-      </Alert>
+      </Alert>,
     );
     
     const alert = screen.getByRole('alert');
@@ -116,7 +116,7 @@ describe('AlertTitle Component', () => {
     render(
       <AlertTitle id="alert-title" data-testid="title">
         Title
-      </AlertTitle>
+      </AlertTitle>,
     );
     
     const title = screen.getByText('Title');
@@ -139,7 +139,7 @@ describe('AlertDescription Component', () => {
     render(
       <AlertDescription className="custom-description">
         Description
-      </AlertDescription>
+      </AlertDescription>,
     );
     
     const description = screen.getByText('Description');
@@ -151,7 +151,7 @@ describe('AlertDescription Component', () => {
     render(
       <AlertDescription id="alert-desc" data-testid="desc">
         Description
-      </AlertDescription>
+      </AlertDescription>,
     );
     
     const description = screen.getByText('Description');
@@ -164,10 +164,9 @@ describe('AlertDescription Component', () => {
       <AlertDescription>
         <strong>Important:</strong> This is a description with{' '}
         <a href="#">a link</a>.
-      </AlertDescription>
+      </AlertDescription>,
     );
     
-    const description = screen.getByText(/This is a description with/);
     const strong = screen.getByText('Important:');
     const link = screen.getByText('a link');
     
@@ -187,7 +186,7 @@ describe('Alert with composed elements', () => {
         <AlertDescription>
           This is an informational alert with a title and description.
         </AlertDescription>
-      </Alert>
+      </Alert>,
     );
     
     const alert = screen.getByRole('alert');
@@ -210,7 +209,7 @@ describe('Alert with composed elements', () => {
             Your changes have been saved successfully.
           </AlertDescription>
         </div>
-      </Alert>
+      </Alert>,
     );
     
     const alert = screen.getByRole('alert');

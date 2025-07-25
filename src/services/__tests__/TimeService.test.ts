@@ -12,10 +12,10 @@ describe('TimeService', () => {
     jest.useFakeTimers();
     
     // Mock Date constructor
-    global.Date = jest.fn((...args) => {
+    global.Date = jest.fn((...args: any[]) => {
       if (args.length) {
         // If arguments are passed, create a real date with those args
-        return new originalDate(...args);
+        return new (originalDate as any)(...args);
       }
       // Otherwise return the mock date
       return mockDate;
@@ -194,7 +194,7 @@ describe('TimeService', () => {
       
       expect(consoleError).toHaveBeenCalledWith(
         'Error in time update callback:',
-        expect.any(Error)
+        expect.any(Error),
       );
       
       unsubscribe();

@@ -29,7 +29,7 @@ interface UseGooglePlacesAutocompleteReturn {
 export function useGooglePlacesAutocomplete(
   inputRef: RefObject<HTMLInputElement>,
   options: AutocompleteOptions = {},
-  onPlaceSelect?: (place: google.maps.places.PlaceResult) => void
+  onPlaceSelect?: (place: google.maps.places.PlaceResult) => void,
 ): UseGooglePlacesAutocompleteReturn {
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -236,7 +236,7 @@ export function useGooglePlacesAutocomplete(
               } else {
                 reject(new Error(`Failed to get place details: ${status}`));
               }
-            }
+            },
           );
         });
       }

@@ -38,20 +38,23 @@ describe('ConversationView Component', () => {
       id: 'msg-1',
       role: 'user',
       content: 'Hello Virgil',
-      timestamp: Date.now() - 1000,
+      timestamp: (Date.now() - 1000).toString(),
     },
     {
       id: 'msg-2',
       role: 'assistant',
       content: 'Hello! How can I help you?',
-      timestamp: Date.now(),
+      timestamp: Date.now().toString(),
     },
   ];
 
   const mockConversation: StoredConversation = {
+    id: 'test-conversation',
     timestamp: Date.now(),
     messageCount: 2,
     messages: mockMessages,
+    firstMessage: 'Hello Virgil',
+    lastMessage: 'Hello! How can I help you?',
   };
 
   const mockOnBack = jest.fn();
@@ -67,7 +70,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     expect(screen.getByText('Conversation History')).toBeInTheDocument();
@@ -81,7 +84,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     const backButton = screen.getByText('← Back');
@@ -97,7 +100,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     // Check first message
@@ -119,7 +122,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     // All messages should receive the nickname 'Ben'
@@ -133,7 +136,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     const markButtons = screen.getAllByText('Mark Important');
@@ -162,7 +165,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     const exportButton = screen.getByTitle('Download conversation');
@@ -184,8 +187,8 @@ describe('ConversationView Component', () => {
   it('exports correct conversation data format', () => {
     let capturedBlob: Blob | null = null;
     
-    jest.spyOn(global, 'Blob').mockImplementation((parts: any[]) => {
-      const blob = new Blob(parts);
+    jest.spyOn(global, 'Blob').mockImplementation((parts?: BlobPart[], options?: BlobPropertyBag) => {
+      const blob = new Blob(parts, options);
       capturedBlob = blob;
       return blob;
     });
@@ -195,7 +198,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByTitle('Download conversation'));
@@ -219,9 +222,12 @@ describe('ConversationView Component', () => {
 
   it('handles empty conversation', () => {
     const emptyConversation: StoredConversation = {
+      id: 'empty-conversation',
       timestamp: Date.now(),
       messageCount: 0,
       messages: [],
+      firstMessage: '',
+      lastMessage: '',
     };
 
     render(
@@ -229,7 +235,7 @@ describe('ConversationView Component', () => {
         conversation={emptyConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     expect(screen.getByText('0 messages')).toBeInTheDocument();
@@ -242,7 +248,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     expect(container.querySelector('.conversation-detail')).toBeInTheDocument();
@@ -258,7 +264,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     // The mock Message component would receive showExtendedActions=true
@@ -268,17 +274,20 @@ describe('ConversationView Component', () => {
   });
 
   it('renders with long conversation correctly', () => {
-    const longMessages = Array.from({ length: 50 }, (_, i) => ({
+    const longMessages: ChatMessage[] = Array.from({ length: 50 }, (_, i) => ({
       id: `msg-${i}`,
       role: i % 2 === 0 ? 'user' : 'assistant',
       content: `Message ${i}`,
-      timestamp: Date.now() - (50 - i) * 1000,
-    } as ChatMessage));
+      timestamp: (Date.now() - (50 - i) * 1000).toString(),
+    }));
 
     const longConversation: StoredConversation = {
+      id: 'long-conversation',
       timestamp: Date.now(),
       messageCount: 50,
       messages: longMessages,
+      firstMessage: 'Message 0',
+      lastMessage: 'Message 49',
     };
 
     render(
@@ -286,7 +295,7 @@ describe('ConversationView Component', () => {
         conversation={longConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     expect(screen.getByText('50 messages')).toBeInTheDocument();
@@ -299,7 +308,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     const header = screen.getByText('Conversation History');
@@ -310,7 +319,7 @@ describe('ConversationView Component', () => {
         conversation={mockConversation}
         onBack={mockOnBack}
         onMarkAsImportant={mockOnMarkAsImportant}
-      />
+      />,
     );
 
     // Should be the same element

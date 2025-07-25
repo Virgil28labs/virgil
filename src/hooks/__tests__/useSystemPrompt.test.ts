@@ -138,7 +138,7 @@ describe('useSystemPrompt Hook', () => {
     it('updates when dashboard context changes', () => {
       const { result, rerender } = renderHook(
         (props) => useSystemPrompt(props),
-        { initialProps: defaultProps }
+        { initialProps: defaultProps },
       );
       
       expect(result.current.locationContext).toBe('Santa Monica, USA');
@@ -213,13 +213,13 @@ describe('useSystemPrompt Hook', () => {
         expect.stringContaining('You are Virgil'),
         'What is the weather?',
         mockDashboardContext,
-        ['weather', 'location']
+        ['weather', 'location'],
       );
       
       expect(prompt).toContain('Enhanced prompt with context');
       expect(dashboardContextService.logActivity).toHaveBeenCalledWith(
         'Asked: "What is the weather?"',
-        'virgil-chat'
+        'virgil-chat',
       );
     });
 
@@ -231,7 +231,7 @@ describe('useSystemPrompt Hook', () => {
       
       expect(dashboardContextService.logActivity).toHaveBeenCalledWith(
         `Asked: "${'A'.repeat(50)}..."`,
-        'virgil-chat'
+        'virgil-chat',
       );
     });
 
@@ -274,7 +274,7 @@ describe('useSystemPrompt Hook', () => {
     it('updates createSystemPrompt when dependencies change', () => {
       const { result, rerender } = renderHook(
         (props) => useSystemPrompt(props),
-        { initialProps: defaultProps }
+        { initialProps: defaultProps },
       );
       
       const createPrompt1 = result.current.createSystemPrompt;
@@ -291,7 +291,7 @@ describe('useSystemPrompt Hook', () => {
     it('only recalculates static parts when dependencies change', () => {
       const { result, rerender } = renderHook(
         (props) => useSystemPrompt(props),
-        { initialProps: defaultProps }
+        { initialProps: defaultProps },
       );
       
       const prompt1 = result.current.createSystemPrompt();

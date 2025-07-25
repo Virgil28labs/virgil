@@ -22,7 +22,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
   const [isExporting, setIsExporting] = useState(false);
 
   const selectedMessageData = messages.filter(msg => 
-    selectedMessages.includes(msg.id)
+    selectedMessages.includes(msg.id),
   );
 
   const handleSelectAll = useCallback(() => {
@@ -67,7 +67,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-        type: 'application/json' 
+        type: 'application/json', 
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

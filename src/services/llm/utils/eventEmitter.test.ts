@@ -362,13 +362,13 @@ describe('EventEmitter', () => {
       const listener1 = jest.fn();
       const listener3 = jest.fn();
       
-      let unsubscribe2: any;
+      const unsubscribeFns: { fn?: () => void } = {};
       const listener2 = jest.fn(() => {
-        unsubscribe2();
+        unsubscribeFns.fn?.();
       });
       
       emitter.on('test', listener1);
-      unsubscribe2 = emitter.on('test', listener2);
+      unsubscribeFns.fn = emitter.on('test', listener2);
       emitter.on('test', listener3);
       
       emitter.emit('test', 'data');

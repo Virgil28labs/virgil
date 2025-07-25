@@ -67,13 +67,13 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
       filteredMemories = memories.filter(memory =>
         memory.content.toLowerCase().includes(query) ||
         memory.context.toLowerCase().includes(query) ||
-        memory.tag?.toLowerCase().includes(query)
+        memory.tag?.toLowerCase().includes(query),
       );
 
       filteredConversations = conversations.filter(conv =>
         conv.firstMessage.toLowerCase().includes(query) ||
         conv.lastMessage.toLowerCase().includes(query) ||
-        conv.messages.some(msg => msg.content.toLowerCase().includes(query))
+        conv.messages.some(msg => msg.content.toLowerCase().includes(query)),
       );
     }
 
@@ -105,11 +105,11 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
       }
 
       filteredMemories = filteredMemories.filter(memory =>
-        memory.timestamp >= startTime && memory.timestamp <= endTime
+        memory.timestamp >= startTime && memory.timestamp <= endTime,
       );
 
       filteredConversations = filteredConversations.filter(conv =>
-        conv.timestamp >= startTime && conv.timestamp <= endTime
+        conv.timestamp >= startTime && conv.timestamp <= endTime,
       );
     }
 
@@ -118,7 +118,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
       filteredMemories = filteredMemories.filter(memory => {
         if (memory.tag && filters.tags.includes(memory.tag)) return true;
         return filters.tags.some(tag => 
-          memory.content.toLowerCase().includes(`#${tag.toLowerCase()}`)
+          memory.content.toLowerCase().includes(`#${tag.toLowerCase()}`),
         );
       });
     }

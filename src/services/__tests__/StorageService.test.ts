@@ -112,7 +112,7 @@ describe('StorageService', () => {
       
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        JSON.stringify(testObject)
+        JSON.stringify(testObject),
       );
     });
 
@@ -121,7 +121,7 @@ describe('StorageService', () => {
       
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        '"test string"'
+        '"test string"',
       );
     });
 
@@ -141,7 +141,7 @@ describe('StorageService', () => {
       
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        JSON.stringify(testArray)
+        JSON.stringify(testArray),
       );
     });
 
@@ -150,7 +150,7 @@ describe('StorageService', () => {
       
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        'null'
+        'null',
       );
     });
 
@@ -159,7 +159,7 @@ describe('StorageService', () => {
       
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        undefined
+        undefined,
       );
     });
   });
@@ -292,7 +292,7 @@ describe('StorageService', () => {
       // Check that it was re-saved as JSON
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'testKey',
-        '"plain string"'
+        '"plain string"',
       );
     });
 
@@ -321,7 +321,7 @@ describe('StorageService', () => {
       // Already JSON should be re-saved as-is
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         'key3',
-        JSON.stringify({ already: 'json' })
+        JSON.stringify({ already: 'json' }),
       );
     });
 

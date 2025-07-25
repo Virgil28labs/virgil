@@ -60,7 +60,7 @@ describe('useDataExport Hook', () => {
       } as any);
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: mockMessages })
+        useDataExport({ user: mockUser, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
@@ -95,7 +95,7 @@ describe('useDataExport Hook', () => {
       });
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: mockMessages })
+        useDataExport({ user: mockUser, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
@@ -127,7 +127,7 @@ describe('useDataExport Hook', () => {
       });
 
       const { result } = renderHook(() => 
-        useDataExport({ user: null, messages: mockMessages })
+        useDataExport({ user: null, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
@@ -155,7 +155,7 @@ describe('useDataExport Hook', () => {
       } as User;
 
       const { result } = renderHook(() => 
-        useDataExport({ user: userWithoutMetadata, messages: mockMessages })
+        useDataExport({ user: userWithoutMetadata, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
@@ -178,7 +178,7 @@ describe('useDataExport Hook', () => {
       });
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: [] })
+        useDataExport({ user: mockUser, messages: [] }),
       );
 
       result.current.handleExportMessages();
@@ -196,14 +196,14 @@ describe('useDataExport Hook', () => {
       const blobSpy = jest.spyOn(global, 'Blob');
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: mockMessages })
+        useDataExport({ user: mockUser, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
 
       expect(blobSpy).toHaveBeenCalledWith(
         [expect.any(String)],
-        { type: 'application/json' }
+        { type: 'application/json' },
       );
     });
 
@@ -211,7 +211,7 @@ describe('useDataExport Hook', () => {
       const blobSpy = jest.spyOn(global, 'Blob');
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: mockMessages })
+        useDataExport({ user: mockUser, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();
@@ -226,7 +226,7 @@ describe('useDataExport Hook', () => {
     it('memoizes handleExportMessages based on dependencies', () => {
       const { result, rerender } = renderHook(
         (props) => useDataExport(props),
-        { initialProps: { user: mockUser, messages: mockMessages } }
+        { initialProps: { user: mockUser, messages: mockMessages } },
       );
 
       const handler1 = result.current.handleExportMessages;
@@ -261,7 +261,7 @@ describe('useDataExport Hook', () => {
       } as any);
 
       const { result } = renderHook(() => 
-        useDataExport({ user: mockUser, messages: mockMessages })
+        useDataExport({ user: mockUser, messages: mockMessages }),
       );
 
       result.current.handleExportMessages();

@@ -75,7 +75,7 @@ const mockLocationValue = {
   fetchLocationData: jest.fn(),
   requestLocationPermission: jest.fn(),
   hasGPSLocation: true,
-  hasIPLocation: true,
+  hasIpLocation: true,
   initialized: true,
   clearError: jest.fn(),
 };
@@ -128,7 +128,7 @@ describe('Dashboard', () => {
       fetchLocationData: jest.fn(),
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
-      hasIPLocation: false,
+      hasIpLocation: false,
       initialized: false,
     });
     
@@ -196,7 +196,7 @@ describe('Dashboard', () => {
       fetchLocationData: jest.fn(),
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
-      hasIPLocation: true,
+      hasIpLocation: true,
       initialized: true,
     });
     
@@ -215,7 +215,7 @@ describe('Dashboard', () => {
       fetchLocationData: jest.fn(),
       requestLocationPermission: jest.fn(),
       hasGPSLocation: false,
-      hasIPLocation: true,
+      hasIpLocation: true,
       initialized: true,
     });
     

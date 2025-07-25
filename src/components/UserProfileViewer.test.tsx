@@ -57,7 +57,7 @@ const mockLocationData = {
   lastUpdated: Date.now(),
   hasLocation: true,
   hasGPSLocation: true,
-  hasIPLocation: true,
+  hasIpLocation: true,
   initialized: true,
   fetchLocationData: jest.fn(),
   requestLocationPermission: jest.fn(),
@@ -155,7 +155,13 @@ describe('UserProfileViewer', () => {
     
     mockUseDeviceInfo.mockReturnValue({
       deviceInfo: null,
-      permissions: {},
+      permissions: {
+        geolocation: 'granted' as PermissionState,
+        camera: 'prompt' as PermissionState,
+        microphone: 'denied' as PermissionState,
+        notifications: 'granted' as PermissionState,
+        clipboard: 'granted' as PermissionState,
+      },
       requestPermission: jest.fn(),
       refreshDeviceInfo: jest.fn(),
     });
@@ -165,6 +171,7 @@ describe('UserProfileViewer', () => {
       loading: false,
       saving: false,
       saveSuccess: false,
+      validationErrors: {},
       updateField: jest.fn(),
       updateAddress: jest.fn(),
       saveProfile: jest.fn(),
@@ -333,6 +340,7 @@ describe('UserProfileViewer', () => {
       loading: false,
       saving: false,
       saveSuccess: false,
+      validationErrors: {},
       updateField: jest.fn(),
       updateAddress: jest.fn(),
       saveProfile: jest.fn(),

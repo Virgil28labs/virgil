@@ -71,7 +71,7 @@ describe('Separator Component', () => {
           decorative={false} 
           orientation="vertical" 
           data-testid="separator" 
-        />
+        />,
       );
       
       const separator = screen.getByTestId('separator');
@@ -96,7 +96,7 @@ describe('Separator Component', () => {
         id="test-separator"
         data-testid="separator"
         style={{ margin: '20px' }}
-      />
+      />,
     );
     
     const separator = screen.getByTestId('separator');
@@ -124,7 +124,7 @@ describe('Separator in different contexts', () => {
         <div>Content above</div>
         <Separator data-testid="separator" />
         <div>Content below</div>
-      </div>
+      </div>,
     );
     
     const separator = screen.getByTestId('separator');
@@ -137,7 +137,7 @@ describe('Separator in different contexts', () => {
         <div>Left content</div>
         <Separator orientation="vertical" data-testid="separator" />
         <div>Right content</div>
-      </div>
+      </div>,
     );
     
     const separator = screen.getByTestId('separator');
@@ -152,7 +152,7 @@ describe('Separator in different contexts', () => {
         <div>Section 2</div>
         <Separator data-testid="separator-2" />
         <div>Section 3</div>
-      </div>
+      </div>,
     );
     
     const separator1 = screen.getByTestId('separator-1');
@@ -169,7 +169,7 @@ describe('Separator in different contexts', () => {
       <div>
         <Separator className="bg-gray-200" data-testid="light-separator" />
         <Separator className="bg-gray-800" data-testid="dark-separator" />
-      </div>
+      </div>,
     );
     
     const lightSeparator = screen.getByTestId('light-separator');

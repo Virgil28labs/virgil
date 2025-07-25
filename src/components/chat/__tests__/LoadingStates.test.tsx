@@ -4,7 +4,7 @@ import { LoadingStates } from '../LoadingStates';
 describe('LoadingStates Component', () => {
   describe('Visibility', () => {
     it('renders when isVisible is true', () => {
-      render(<LoadingStates variant="typing" isVisible={true} />);
+      render(<LoadingStates variant="typing" isVisible />);
       expect(screen.getByRole('status')).toBeInTheDocument();
     });
 
@@ -96,7 +96,7 @@ describe('LoadingStates Component', () => {
           variant="message" 
           type="generating" 
           message="Custom progress message" 
-        />
+        />,
       );
       
       expect(screen.getByText('Custom progress message')).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('LoadingStates Component', () => {
   describe('Memoization', () => {
     it('does not re-render when props remain the same', () => {
       const { rerender } = render(
-        <LoadingStates variant="typing" type="thinking" />
+        <LoadingStates variant="typing" type="thinking" />,
       );
 
       const initialElement = screen.getByText('Virgil is thinking...');

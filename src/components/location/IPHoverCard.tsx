@@ -7,10 +7,10 @@
 
 import { memo, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import type { IPLocation } from '../../types/location.types';
+import type { IpLocation } from '../../types/location.types';
 
 interface IPHoverCardProps {
-  ipLocation: IPLocation;
+  ipLocation: IpLocation;
   isVisible: boolean;
   className?: string;
 }

@@ -237,7 +237,7 @@ describe('locationService', () => {
   });
 
 
-  describe('getIPLocation', () => {
+  describe('getIpLocation', () => {
     it('returns IP location data on success', async () => {
       const mockResponse = {
         success: true,
@@ -257,7 +257,7 @@ describe('locationService', () => {
         json: async () => mockResponse,
       });
 
-      const result = await locationService.getIPLocation('192.168.1.1');
+      const result = await locationService.getIpLocation('192.168.1.1');
 
       expect(result).toEqual({
         ip: '192.168.1.1',
@@ -284,7 +284,7 @@ describe('locationService', () => {
         json: async () => mockResponse,
       });
 
-      await expect(locationService.getIPLocation('invalid'))
+      await expect(locationService.getIpLocation('invalid'))
         .rejects.toThrow('Invalid IP address');
     });
 
@@ -299,7 +299,7 @@ describe('locationService', () => {
         json: async () => mockResponse,
       });
 
-      await expect(locationService.getIPLocation('invalid'))
+      await expect(locationService.getIpLocation('invalid'))
         .rejects.toThrow('Failed to get location from IP');
     });
 
@@ -307,7 +307,7 @@ describe('locationService', () => {
       // Mock for all retry attempts
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
-      await expect(locationService.getIPLocation('192.168.1.1'))
+      await expect(locationService.getIpLocation('192.168.1.1'))
         .rejects.toThrow('Network error');
     });
   });
@@ -321,7 +321,7 @@ describe('locationService', () => {
       });
 
       // Mock IP location fetch
-      const mockIPLocation = {
+      const mockIpLocation = {
         success: true,
         ip: '192.168.1.1',
         country: 'United States',
@@ -335,7 +335,7 @@ describe('locationService', () => {
       };
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockIPLocation,
+        json: async () => mockIpLocation,
       });
 
       // Mock GPS position
@@ -405,7 +405,7 @@ describe('locationService', () => {
           ok: true,
           json: async () => ({ ip: '192.168.1.1' }),
         })
-        // 2-4. getIPLocation - fails (3 retry attempts)
+        // 2-4. getIpLocation - fails (3 retry attempts)
         .mockRejectedValueOnce(new Error('IP location failed'))
         .mockRejectedValueOnce(new Error('IP location failed'))
         .mockRejectedValueOnce(new Error('IP location failed'))

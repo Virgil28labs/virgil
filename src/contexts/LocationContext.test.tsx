@@ -10,7 +10,7 @@ jest.mock('../lib/locationService', () => ({
     getCurrentPosition: jest.fn(),
     getAddressFromCoordinates: jest.fn(),
     getIPAddress: jest.fn(),
-    getIPLocation: jest.fn(),
+    getIpLocation: jest.fn(),
     getFullLocationData: jest.fn(),
     getQuickLocation: jest.fn().mockResolvedValue({ 
       ipLocation: undefined,
@@ -44,7 +44,7 @@ const mockAddress = {
   formatted: '123 Main St, New York, NY 10001, USA',
 };
 
-const mockIPLocation = {
+const mockIpLocation = {
   ip: '127.0.0.1',
   city: 'New York',
   region: 'NY',
@@ -90,7 +90,7 @@ describe('LocationContext', () => {
     });
     mockLocationService.getCurrentPosition.mockResolvedValue(mockCoordinates);
     mockLocationService.getAddressFromCoordinates.mockResolvedValue(mockAddress);
-    mockLocationService.getIPLocation.mockResolvedValue(mockIPLocation);
+    mockLocationService.getIpLocation.mockResolvedValue(mockIpLocation);
   });
 
   it('throws error when useLocation is used outside provider', () => {
@@ -142,7 +142,7 @@ describe('LocationContext', () => {
     const mockLocationData = {
       coordinates: mockCoordinates,
       address: mockAddress,
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     };
     
@@ -156,7 +156,7 @@ describe('LocationContext', () => {
     
     expect(result.current.coordinates).toEqual(mockCoordinates);
     expect(result.current.address).toEqual(mockAddress);
-    expect(result.current.ipLocation).toEqual(mockIPLocation);
+    expect(result.current.ipLocation).toEqual(mockIpLocation);
     expect(result.current.hasLocation).toBe(true);
   });
 
@@ -174,7 +174,7 @@ describe('LocationContext', () => {
     
     // Mock getQuickLocation to return IP location
     mockLocationService.getQuickLocation.mockResolvedValue({
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     
@@ -182,7 +182,7 @@ describe('LocationContext', () => {
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: undefined,
       address: undefined,
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     
@@ -195,7 +195,7 @@ describe('LocationContext', () => {
     
     expect(result.current.coordinates).toBeNull();
     expect(result.current.address).toBeNull();
-    expect(result.current.ipLocation).toEqual(mockIPLocation);
+    expect(result.current.ipLocation).toEqual(mockIpLocation);
   });
 
   it('handles geolocation timeout', async () => {
@@ -217,7 +217,7 @@ describe('LocationContext', () => {
     const initialLocationData = {
       coordinates: mockCoordinates,
       address: mockAddress,
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     };
     
@@ -311,13 +311,13 @@ describe('LocationContext', () => {
     
     // Update mocks to return coordinates
     mockLocationService.getQuickLocation.mockResolvedValue({
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: mockCoordinates,
       address: mockAddress,
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     
@@ -358,7 +358,7 @@ describe('LocationContext', () => {
     
     // Mock getQuickLocation to return IP location only
     mockLocationService.getQuickLocation.mockResolvedValue({
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     
@@ -366,7 +366,7 @@ describe('LocationContext', () => {
     mockLocationService.getFullLocationData.mockResolvedValue({
       coordinates: undefined,
       address: undefined,
-      ipLocation: mockIPLocation,
+      ipLocation: mockIpLocation,
       timestamp: Date.now(),
     });
     
@@ -377,6 +377,6 @@ describe('LocationContext', () => {
     }, { timeout: 3000 });
     
     expect(result.current.coordinates).toBeNull();
-    expect(result.current.ipLocation).toEqual(mockIPLocation);
+    expect(result.current.ipLocation).toEqual(mockIpLocation);
   });
 });

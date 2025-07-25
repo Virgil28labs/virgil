@@ -114,7 +114,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
       setError,
       clearMessages,
       newChat,
-    ]
+    ],
   );
   
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

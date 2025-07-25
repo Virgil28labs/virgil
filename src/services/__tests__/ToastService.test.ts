@@ -1,5 +1,4 @@
 import { toastService } from '../ToastService';
-import type { Toast } from '../../components/ToastNotification';
 
 describe('ToastService', () => {
   let mockListener: jest.Mock;

@@ -61,7 +61,7 @@ describe('Logger', () => {
         
         expect(consoleDebugSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [DEBUG] Debug message',
-          ''
+          '',
         );
       });
 
@@ -74,7 +74,7 @@ describe('Logger', () => {
         
         expect(consoleDebugSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [DEBUG] [TestComponent:testAction] Debug message',
-          { key: 'value' }
+          { key: 'value' },
         );
       });
 
@@ -83,7 +83,7 @@ describe('Logger', () => {
         
         expect(consoleDebugSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [DEBUG] [TestComponent] Debug message',
-          ''
+          '',
         );
       });
     });
@@ -94,7 +94,7 @@ describe('Logger', () => {
         
         expect(consoleInfoSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [INFO] Info message',
-          ''
+          '',
         );
       });
 
@@ -105,7 +105,7 @@ describe('Logger', () => {
         
         expect(consoleInfoSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [INFO] Info message',
-          { count: 42, status: 'active' }
+          { count: 42, status: 'active' },
         );
       });
     });
@@ -116,7 +116,7 @@ describe('Logger', () => {
         
         expect(consoleWarnSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [WARN] Warning message',
-          ''
+          '',
         );
       });
 
@@ -129,7 +129,7 @@ describe('Logger', () => {
         
         expect(consoleWarnSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [WARN] [ApiService:fetchData] Warning message',
-          { retries: 3 }
+          { retries: 3 },
         );
       });
     });
@@ -140,7 +140,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] Error message',
-          ''
+          '',
         );
       });
 
@@ -150,7 +150,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] Error occurred',
-          error
+          error,
         );
       });
 
@@ -164,7 +164,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] [Database:connect] Error occurred',
-          error
+          error,
         );
       });
 
@@ -176,7 +176,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] Error occurred',
-          error
+          error,
         );
       });
     });
@@ -243,7 +243,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] [UserService:login] login failed',
-          error
+          error,
         );
       });
 
@@ -253,7 +253,7 @@ describe('Logger', () => {
         
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [ERROR] [UserService:login] login failed',
-          error
+          error,
         );
       });
     });
@@ -264,7 +264,7 @@ describe('Logger', () => {
         
         expect(consoleInfoSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [INFO] [PaymentService:processPayment] processPayment completed',
-          { amount: 100, currency: 'USD' }
+          { amount: 100, currency: 'USD' },
         );
       });
 
@@ -273,7 +273,7 @@ describe('Logger', () => {
         
         expect(consoleInfoSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [INFO] [PaymentService:processPayment] processPayment completed',
-          undefined
+          undefined,
         );
       });
     });
@@ -284,7 +284,7 @@ describe('Logger', () => {
         
         expect(consoleDebugSpy).toHaveBeenCalledWith(
           '[2024-01-15T10:30:00.000Z] [DEBUG] [CacheService:checkCache] checkCache initiated',
-          { key: 'user:123', hit: true }
+          { key: 'user:123', hit: true },
         );
       });
     });
@@ -296,7 +296,7 @@ describe('Logger', () => {
       
       expect(consoleInfoSpy).toHaveBeenCalledWith(
         '[2024-01-15T10:30:00.000Z] [INFO] [App] Message',
-        ''
+        '',
       );
     });
 
@@ -305,7 +305,7 @@ describe('Logger', () => {
       
       expect(consoleInfoSpy).toHaveBeenCalledWith(
         '[2024-01-15T10:30:00.000Z] [INFO] [App:test] Message',
-        ''
+        '',
       );
     });
 
@@ -314,7 +314,7 @@ describe('Logger', () => {
       
       expect(consoleInfoSpy).toHaveBeenCalledWith(
         '[2024-01-15T10:30:00.000Z] [INFO] [Test] Message',
-        ''
+        '',
       );
     });
   });

@@ -58,7 +58,7 @@ const mockLocationContext: LocationContextValue = {
   lastUpdated: Date.now(),
   hasLocation: true,
   hasGPSLocation: true,
-  hasIPLocation: true,
+  hasIpLocation: true,
   initialized: true,
   fetchLocationData: jest.fn(),
   requestLocationPermission: jest.fn(),
@@ -114,7 +114,7 @@ describe('WeatherContext', () => {
       ipLocation: null,
       hasLocation: false,
       hasGPSLocation: false,
-      hasIPLocation: false,
+      hasIpLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {
@@ -150,7 +150,7 @@ describe('WeatherContext', () => {
       ipLocation: null,
       hasLocation: false,
       hasGPSLocation: false,
-      hasIPLocation: false,
+      hasIpLocation: false,
     };
     
     const { result } = renderHook(() => useWeather(), {

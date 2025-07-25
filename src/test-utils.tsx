@@ -32,7 +32,7 @@ export const mockLocationContextValue = {
   address: '123 Test St, New York, NY 10001',
   ipLocation: { lat: 40.7128, lng: -74.0060 },
   hasGPSLocation: true,
-  hasIPLocation: true,
+  hasIpLocation: true,
   refreshLocation: jest.fn(),
   requestLocationPermission: jest.fn(),
 };

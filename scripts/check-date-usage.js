@@ -116,7 +116,7 @@ try {
     console.log('✅ No direct Date usage found! All time operations use TimeService.');
   } else {
     console.log(
-      `⚠️  Found ${totalIssues} instances of direct Date usage in ${results.length} files:\n`
+      `⚠️  Found ${totalIssues} instances of direct Date usage in ${results.length} files:\n`,
     );
     
     results.forEach(({ file, issues }) => {

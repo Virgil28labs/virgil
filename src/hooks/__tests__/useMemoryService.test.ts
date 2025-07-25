@@ -113,7 +113,7 @@ describe('useMemoryService Hook', () => {
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Failed to initialize memory service:',
-          expect.any(Error)
+          expect.any(Error),
         );
       });
 
@@ -200,7 +200,7 @@ describe('useMemoryService Hook', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to load recent messages:',
-        expect.any(Error)
+        expect.any(Error),
       );
       
       consoleErrorSpy.mockRestore();
@@ -219,7 +219,7 @@ describe('useMemoryService Hook', () => {
       expect(memoryService.markAsImportant).toHaveBeenCalledWith(
         'msg-123',
         'Important information',
-        'Context summary'
+        'Context summary',
       );
 
       await waitFor(() => {
@@ -249,7 +249,7 @@ describe('useMemoryService Hook', () => {
       expect(memoryService.markAsImportant).toHaveBeenCalledWith(
         'msg-123',
         'Important information',
-        expect.stringContaining('From conversation on')
+        expect.stringContaining('From conversation on'),
       );
     });
 
@@ -265,7 +265,7 @@ describe('useMemoryService Hook', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to mark message as important:',
-        expect.any(Error)
+        expect.any(Error),
       );
       expect(mockSetError).toHaveBeenCalledWith('Unable to save memory. Please try again.');
       
@@ -332,7 +332,7 @@ describe('useMemoryService Hook', () => {
     it('updates markAsImportant when dashboardContext changes', () => {
       const { result, rerender } = renderHook(
         (props) => useMemoryService(props),
-        { initialProps: defaultProps }
+        { initialProps: defaultProps },
       );
       
       const mark1 = result.current.markAsImportant;

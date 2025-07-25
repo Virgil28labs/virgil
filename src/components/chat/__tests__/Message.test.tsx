@@ -34,7 +34,7 @@ describe('Message Component', () => {
     id: 'test-123',
     role: 'user',
     content: 'Test message content',
-    timestamp: Date.now(),
+    timestamp: Date.now().toString(),
   };
 
   const mockOnMarkAsImportant = jest.fn();
@@ -53,7 +53,7 @@ describe('Message Component', () => {
           userNickname="Ben"
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="chat"
-        />
+        />,
       );
 
       expect(screen.getByText('Test message content')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('Message Component', () => {
           message={assistantMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="chat"
-        />
+        />,
       );
 
       expect(screen.getByRole('article')).toHaveClass('message assistant-msg');
@@ -85,7 +85,7 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="chat"
-        />
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Remember this message'));
@@ -101,7 +101,7 @@ describe('Message Component', () => {
           userNickname="Ben"
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-        />
+        />,
       );
 
       expect(screen.getByText('Ben')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('Message Component', () => {
           userNickname="Ben"
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-        />
+        />,
       );
 
       expect(screen.getByText('Virgil')).toBeInTheDocument();
@@ -131,7 +131,7 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-        />
+        />,
       );
 
       const timestamp = new Date(mockMessage.timestamp!).toLocaleTimeString();
@@ -144,7 +144,7 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-        />
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Copy message'));
@@ -166,7 +166,7 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-        />
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Copy message'));
@@ -182,8 +182,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Share message'));
@@ -209,8 +209,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Share message'));
@@ -237,8 +237,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Share message'));
@@ -265,8 +265,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Export message'));
@@ -294,8 +294,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Quote message'));
@@ -314,8 +314,8 @@ describe('Message Component', () => {
           message={mockMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Quote message'));
@@ -333,7 +333,7 @@ describe('Message Component', () => {
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
           showExtendedActions={false}
-        />
+        />,
       );
 
       // Extended actions should not be visible initially
@@ -359,8 +359,8 @@ describe('Message Component', () => {
           message={multiLineMessage}
           onMarkAsImportant={mockOnMarkAsImportant}
           variant="conversation"
-          showExtendedActions={true}
-        />
+          showExtendedActions
+        />,
       );
 
       fireEvent.click(screen.getByTitle('Quote message'));
@@ -376,7 +376,7 @@ describe('Message Component', () => {
           message={mockMessage}
           userNickname="Ben"
           onMarkAsImportant={mockOnMarkAsImportant}
-        />
+        />,
       );
 
       const initialContent = screen.getByText('Test message content');
@@ -387,7 +387,7 @@ describe('Message Component', () => {
           message={mockMessage}
           userNickname="Ben"
           onMarkAsImportant={mockOnMarkAsImportant}
-        />
+        />,
       );
 
       // Should be the same element (not re-rendered)

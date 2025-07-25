@@ -1,4 +1,5 @@
-import { DashboardAppService, AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import { DashboardAppService } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 
 jest.mock('../../lib/logger');
@@ -10,7 +11,7 @@ class MockAdapter implements AppDataAdapter {
     public displayName: string,
     private mockData: any = {},
     private keywords: string[] = [],
-    private canAnswerFn?: (query: string) => boolean
+    private canAnswerFn?: (query: string) => boolean,
   ) {}
 
   icon = '🎯';
@@ -40,7 +41,7 @@ class MockAdapter implements AppDataAdapter {
       return this.canAnswerFn(query);
     }
     return this.keywords.some(keyword => 
-      query.toLowerCase().includes(keyword.toLowerCase())
+      query.toLowerCase().includes(keyword.toLowerCase()),
     );
   }
 
@@ -178,7 +179,7 @@ describe('DashboardAppService', () => {
       expect(logger.error).toHaveBeenCalledWith(
         'Error getting data from badApp',
         expect.any(Error),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -491,7 +492,7 @@ describe('DashboardAppService', () => {
           apps: expect.any(Map),
           activeApps: expect.any(Array),
           lastUpdated: expect.any(Number),
-        })
+        }),
       );
       
       // Unsubscribe
@@ -618,7 +619,7 @@ describe('DashboardAppService', () => {
       expect(result).toBeTruthy();
       // The result will be from the first matching app
       expect(result?.appName).toBe('app1');
-      expect(result?.response).toContain("Response from app1");
+      expect(result?.response).toContain('Response from app1');
       
       testService.destroy();
     });

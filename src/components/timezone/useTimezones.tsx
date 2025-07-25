@@ -30,7 +30,6 @@ interface UseTimezonesReturn {
 
 const STORAGE_KEY = 'virgil_selected_timezones';
 const MAX_TIMEZONES = 5;
-const UPDATE_INTERVAL = 10000; // Update every 10 seconds for better performance
 
 /**
  * Load timezones from localStorage with error handling
@@ -81,7 +80,7 @@ export function useTimezones(): UseTimezonesReturn {
     loadTimezonesFromStorage(),
   );
   const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() => 
-    DateTime.fromJSDate(dashboardContextService.getCurrentDateTime())
+    DateTime.fromJSDate(dashboardContextService.getCurrentDateTime()),
   );
   const [isUpdating, setIsUpdating] = useState(false);
 

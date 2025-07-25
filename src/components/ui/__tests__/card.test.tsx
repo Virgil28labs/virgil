@@ -5,7 +5,7 @@ import {
   CardTitle, 
   CardDescription, 
   CardContent, 
-  CardFooter 
+  CardFooter, 
 } from '../card';
 
 describe('Card Component', () => {
@@ -40,7 +40,7 @@ describe('Card Component', () => {
         style={{ margin: '10px' }}
       >
         Card with attributes
-      </Card>
+      </Card>,
     );
     
     const card = screen.getByTestId('card');
@@ -96,7 +96,7 @@ describe('CardTitle Component', () => {
     render(
       <CardTitle id="card-title" data-testid="title">
         Title with attributes
-      </CardTitle>
+      </CardTitle>,
     );
     
     const title = screen.getByTestId('title');
@@ -118,7 +118,7 @@ describe('CardDescription Component', () => {
     render(
       <CardDescription className="custom-description">
         Description
-      </CardDescription>
+      </CardDescription>,
     );
     
     const description = screen.getByText('Description');
@@ -150,7 +150,7 @@ describe('CardContent Component', () => {
       <CardContent>
         <p>Paragraph 1</p>
         <p>Paragraph 2</p>
-      </CardContent>
+      </CardContent>,
     );
     
     expect(screen.getByText('Paragraph 1')).toBeInTheDocument();
@@ -183,7 +183,7 @@ describe('CardFooter Component', () => {
       <CardFooter>
         <button>Cancel</button>
         <button>Save</button>
-      </CardFooter>
+      </CardFooter>,
     );
     
     expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -205,7 +205,7 @@ describe('Complete Card composition', () => {
         <CardFooter>
           <button>Action</button>
         </CardFooter>
-      </Card>
+      </Card>,
     );
     
     // Card container
@@ -247,7 +247,7 @@ describe('Complete Card composition', () => {
         <CardFooter className="custom-footer">
           Custom footer
         </CardFooter>
-      </Card>
+      </Card>,
     );
     
     const card = screen.getByText('Custom Title').closest('#main-card');

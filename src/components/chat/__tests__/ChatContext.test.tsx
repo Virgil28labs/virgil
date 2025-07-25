@@ -23,7 +23,7 @@ describe('ChatContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Set default mock returns
-    (StorageService.get as jest.Mock).mockImplementation((key, defaultValue) => defaultValue);
+    (StorageService.get as jest.Mock).mockImplementation((_key, defaultValue) => defaultValue);
   });
 
   describe('ChatProvider', () => {
@@ -163,7 +163,7 @@ describe('ChatContext', () => {
           id: 'msg-1',
           role: 'user',
           content: 'Hello',
-          timestamp: Date.now(),
+          timestamp: Date.now().toString(),
         };
 
         act(() => {
@@ -177,7 +177,7 @@ describe('ChatContext', () => {
           id: 'msg-2',
           role: 'assistant',
           content: 'Hi there!',
-          timestamp: Date.now(),
+          timestamp: Date.now().toString(),
         };
 
         act(() => {
@@ -261,13 +261,13 @@ describe('ChatContext', () => {
             id: 'msg-1',
             role: 'user',
             content: 'Hello',
-            timestamp: Date.now(),
+            timestamp: Date.now().toString(),
           });
           result.current.addMessage({
             id: 'msg-2',
             role: 'assistant',
             content: 'Hi!',
-            timestamp: Date.now(),
+            timestamp: Date.now().toString(),
           });
         });
 
@@ -293,7 +293,7 @@ describe('ChatContext', () => {
             id: 'msg-1',
             role: 'user',
             content: 'Hello',
-            timestamp: Date.now(),
+            timestamp: Date.now().toString(),
           });
           result.current.setError('Some error');
           result.current.setInput('Some input');
@@ -324,7 +324,7 @@ describe('ChatContext', () => {
       const { rerender } = render(
         <ChatProvider>
           <TestComponent />
-        </ChatProvider>
+        </ChatProvider>,
       );
 
       expect(renderCount).toBe(1);
@@ -333,7 +333,7 @@ describe('ChatContext', () => {
       rerender(
         <ChatProvider>
           <TestComponent />
-        </ChatProvider>
+        </ChatProvider>,
       );
 
       // Should not cause additional render
@@ -357,7 +357,7 @@ describe('ChatContext', () => {
       render(
         <ChatProvider>
           <TestComponent />
-        </ChatProvider>
+        </ChatProvider>,
       );
 
       expect(renderCount).toBe(1);

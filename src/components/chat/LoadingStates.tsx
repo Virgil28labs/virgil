@@ -65,9 +65,9 @@ const LoadingStates = memo(function LoadingStates({
           <div className="typing-content">
             <div className="typing-text">{getLoadingText()}</div>
             <div className="typing-dots">
-              <span className="dot dot-1"></span>
-              <span className="dot dot-2"></span>
-              <span className="dot dot-3"></span>
+              <span className="dot dot-1" />
+              <span className="dot dot-2" />
+              <span className="dot dot-3" />
             </div>
           </div>
         </div>
@@ -101,9 +101,9 @@ const LoadingStates = memo(function LoadingStates({
           )}
           
           <div className="loading-animation">
-            <div className="pulse-dot pulse-1"></div>
-            <div className="pulse-dot pulse-2"></div>
-            <div className="pulse-dot pulse-3"></div>
+            <div className="pulse-dot pulse-1" />
+            <div className="pulse-dot pulse-2" />
+            <div className="pulse-dot pulse-3" />
           </div>
         </div>
       </div>

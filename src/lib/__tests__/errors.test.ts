@@ -260,7 +260,7 @@ describe('logError', () => {
           statusCode: 500,
           details: { extra: 'data' },
         },
-      }
+      },
     );
   });
 
@@ -281,7 +281,7 @@ describe('logError', () => {
           statusCode: 503,
           details: undefined,
         },
-      }
+      },
     );
   });
 
@@ -295,7 +295,7 @@ describe('logError', () => {
       error,
       expect.objectContaining({
         action: 'unknown',
-      })
+      }),
     );
   });
 
@@ -313,7 +313,7 @@ describe('logError', () => {
           statusCode: 500,
           details: 'String error',
         },
-      }
+      },
     );
   });
 });

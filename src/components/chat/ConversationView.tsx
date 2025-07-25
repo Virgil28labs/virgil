@@ -84,7 +84,7 @@ const ConversationView = memo(function ConversationView({
             userNickname={profile.nickname || 'You'}
             onMarkAsImportant={onMarkAsImportant}
             variant="conversation"
-            showExtendedActions={true}
+            showExtendedActions
           />
         ))}
       </div>

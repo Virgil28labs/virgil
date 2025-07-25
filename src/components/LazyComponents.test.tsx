@@ -44,7 +44,7 @@ jest.mock('../lib/weatherService', () => ({
 
 jest.mock('../lib/locationService', () => ({
   locationService: {
-    getIPLocation: jest.fn(),
+    getIpLocation: jest.fn(),
     getAddressFromCoordinates: jest.fn(),
   },
 }));
@@ -124,7 +124,7 @@ describe('LazyComponents', () => {
       const locationService = await lazyLocationService();
       
       expect(locationService).toBeDefined();
-      expect(locationService.getIPLocation).toBeDefined();
+      expect(locationService.getIpLocation).toBeDefined();
       expect(locationService.getAddressFromCoordinates).toBeDefined();
     });
   });

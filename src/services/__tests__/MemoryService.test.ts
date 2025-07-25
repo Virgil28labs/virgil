@@ -1,7 +1,6 @@
-import { MemoryService } from '../MemoryService';
+import { MemoryService, type MarkedMemory } from '../MemoryService';
 import { toastService } from '../ToastService';
 import type { ChatMessage } from '../../types/chat.types';
-import type { StoredConversation, MarkedMemory } from '../MemoryService';
 
 // Mock dependencies
 jest.mock('../ToastService', () => ({
@@ -42,9 +41,9 @@ const mockDB = {
   close: jest.fn(),
 };
 
-const mockRequest = {
+const mockRequest: any = {
   result: mockDB,
-  error: null,
+  error: null as Error | null,
   onsuccess: null,
   onerror: null,
   onupgradeneeded: null,
@@ -111,8 +110,8 @@ describe('MemoryService', () => {
 
   describe('saveConversation', () => {
     const mockMessages: ChatMessage[] = [
-      { id: 'msg-1', role: 'user', content: 'Hello', timestamp: Date.now() },
-      { id: 'msg-2', role: 'assistant', content: 'Hi there!', timestamp: Date.now() },
+      { id: 'msg-1', role: 'user', content: 'Hello', timestamp: Date.now().toString() },
+      { id: 'msg-2', role: 'assistant', content: 'Hi there!', timestamp: Date.now().toString() },
     ];
 
     beforeEach(async () => {
@@ -150,13 +149,13 @@ describe('MemoryService', () => {
           firstMessage: 'Hello',
           lastMessage: 'Hi there!',
           messageCount: 2,
-        })
+        }),
       );
     });
 
     it('appends to existing conversation', async () => {
       const existingMessages = [
-        { id: 'old-1', role: 'user', content: 'Previous message', timestamp: Date.now() - 10000 },
+        { id: 'old-1', role: 'user' as const, content: 'Previous message', timestamp: (Date.now() - 10000).toString() },
       ];
       
       const getRequest = {
@@ -189,7 +188,7 @@ describe('MemoryService', () => {
           messages: [...existingMessages, ...mockMessages],
           messageCount: 3,
           lastMessage: 'Hi there!',
-        })
+        }),
       );
     });
 
@@ -288,7 +287,7 @@ describe('MemoryService', () => {
       const markPromise = memoryService.markAsImportant(
         'msg-123',
         'Important information',
-        'User asked about weather'
+        'User asked about weather',
       );
       
       addRequest.onsuccess?.();
@@ -301,7 +300,7 @@ describe('MemoryService', () => {
           content: 'Important information',
           context: 'User asked about weather',
           timestamp: expect.any(Number),
-        })
+        }),
       );
       
       expect(toastService.memorySuccess).toHaveBeenCalledWith('Memory saved');

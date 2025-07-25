@@ -608,7 +608,7 @@ describe('DashboardContextService', () => {
       const coldSuggestion = suggestions.find(s => s.id === 'cold-weather');
       expect(coldSuggestion).toBeDefined();
       expect(coldSuggestion?.content).toContain("It's quite cold today");
-      expect(coldSuggestion?.content).toContain("warm coat");
+      expect(coldSuggestion?.content).toContain('warm coat');
     });
 
     it('generates hot weather suggestion', () => {
@@ -630,7 +630,7 @@ describe('DashboardContextService', () => {
       const hotSuggestion = suggestions.find(s => s.id === 'hot-weather');
       expect(hotSuggestion).toBeDefined();
       expect(hotSuggestion?.content).toContain("It's warm today");
-      expect(hotSuggestion?.content).toContain("outdoor activities");
+      expect(hotSuggestion?.content).toContain('outdoor activities');
     });
 
     it('generates location-aware suggestion', () => {

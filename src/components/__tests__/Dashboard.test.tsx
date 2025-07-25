@@ -312,7 +312,7 @@ describe('Dashboard', () => {
       fireEvent.click(elevationDisplay);
       expect(logger.warn).toHaveBeenCalledWith(
         'Failed to save elevation unit preference',
-        expect.any(Object)
+        expect.any(Object),
       );
     }
   });
@@ -321,11 +321,6 @@ describe('Dashboard', () => {
     render(<Dashboard />);
     
     expect(dashboardAppService.registerAdapter).toHaveBeenCalledTimes(9);
-    
-    const adapterTypes = [
-      'notes', 'pomodoro', 'streaks', 'camera', 
-      'dog', 'nasa', 'giphy', 'rhythm', 'circle'
-    ];
     
     // Check each adapter was registered
     const calls = (dashboardAppService.registerAdapter as jest.Mock).mock.calls;
@@ -341,7 +336,7 @@ describe('Dashboard', () => {
     
     const adapterIds = [
       'notes', 'pomodoro', 'streaks', 'camera',
-      'dog', 'nasa', 'giphy', 'rhythm', 'circle'
+      'dog', 'nasa', 'giphy', 'rhythm', 'circle',
     ];
     
     adapterIds.forEach(id => {

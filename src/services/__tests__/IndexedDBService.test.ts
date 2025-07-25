@@ -34,7 +34,7 @@ const mockIndex = {
   getAll: jest.fn(),
 };
 
-const mockRequest = {
+const mockRequest: any = {
   result: null,
   error: null,
   onsuccess: null,
@@ -42,7 +42,7 @@ const mockRequest = {
   onupgradeneeded: null,
 };
 
-const mockOpenDBRequest = {
+const mockOpenDBRequest: any = {
   ...mockRequest,
   result: mockDatabase,
 };
@@ -369,7 +369,7 @@ describe('IndexedDBService', () => {
           async (transaction) => {
             expect(transaction).toBe(mockTransaction);
             return customResult;
-          }
+          },
         );
         
         expect(result.success).toBe(true);
@@ -454,7 +454,7 @@ describe('IndexedDBService', () => {
       expect(mockStore.createIndex).toHaveBeenCalledWith(
         'testIndex',
         'testField',
-        { unique: true }
+        { unique: true },
       );
     });
   });
@@ -522,7 +522,7 @@ describe('IndexedDBService', () => {
 
     it('handles database not registered error', async () => {
       await expect(service.get('UnregisteredDB', 'store', 1)).rejects.toThrow(
-        'Database UnregisteredDB not registered'
+        'Database UnregisteredDB not registered',
       );
     });
   });

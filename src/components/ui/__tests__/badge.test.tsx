@@ -89,7 +89,7 @@ describe('Badge Component', () => {
         style={{ margin: '5px' }}
       >
         Badge with attrs
-      </Badge>
+      </Badge>,
     );
     
     const badge = screen.getByText('Badge with attrs');
@@ -104,7 +104,7 @@ describe('Badge Component', () => {
       <Badge>
         <svg data-testid="icon">★</svg>
         <span>Badge Text</span>
-      </Badge>
+      </Badge>,
     );
     
     const badge = screen.getByText('Badge Text').closest('span.inline-flex');

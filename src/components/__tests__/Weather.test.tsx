@@ -117,7 +117,7 @@ describe('Weather', () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
     
-    const { rerender } = render(<Weather />);
+    render(<Weather />);
     expect(screen.getByText('ERR')).toBeInTheDocument();
     
     process.env.NODE_ENV = originalEnv;

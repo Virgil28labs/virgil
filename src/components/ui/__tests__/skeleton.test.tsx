@@ -32,7 +32,7 @@ describe('Skeleton Component', () => {
         role="progressbar"
         aria-label="Loading content"
         style={{ margin: '10px', backgroundColor: '#b3b3b3' }}
-      />
+      />,
     );
     
     const skeleton = screen.getByTestId('skeleton-loader');
@@ -53,7 +53,7 @@ describe('Skeleton Component', () => {
     render(
       <Skeleton>
         <span className="sr-only">Loading...</span>
-      </Skeleton>
+      </Skeleton>,
     );
     
     const skeleton = screen.getByTestId('skeleton-loader');
@@ -88,7 +88,7 @@ describe('Skeleton Component', () => {
         
         {/* Card skeleton */}
         <Skeleton className="h-32 w-full rounded-lg" />
-      </div>
+      </div>,
     );
     
     const skeletons = screen.getAllByTestId('skeleton-loader');
@@ -117,16 +117,16 @@ describe('Skeleton Component', () => {
         style={{ 
           backgroundColor: '#e0e0e0',
           height: '50px',
-          width: '200px' 
+          width: '200px', 
         }} 
-      />
+      />,
     );
     
     const skeleton = screen.getByTestId('skeleton-loader');
     expect(skeleton).toHaveStyle({ 
       backgroundColor: '#e0e0e0',
       height: '50px',
-      width: '200px'
+      width: '200px',
     });
   });
 });
@@ -142,7 +142,7 @@ describe('Skeleton usage patterns', () => {
         ) : (
           <p>Loaded text content</p>
         )}
-      </div>
+      </div>,
     );
     
     const skeleton = screen.getByTestId('skeleton-loader');
@@ -156,7 +156,7 @@ describe('Skeleton usage patterns', () => {
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
-      </div>
+      </div>,
     );
     
     const skeletons = screen.getAllByTestId('skeleton-loader');
@@ -175,7 +175,7 @@ describe('Skeleton usage patterns', () => {
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-full" />
         </div>
-      </div>
+      </div>,
     );
     
     const skeletons = screen.getAllByTestId('skeleton-loader');

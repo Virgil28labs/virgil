@@ -65,7 +65,7 @@ const Message = memo(function Message({
     };
 
     const blob = new Blob([JSON.stringify(messageData, null, 2)], { 
-      type: 'application/json' 
+      type: 'application/json', 
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -153,7 +153,7 @@ const Message = memo(function Message({
         {/* Primary actions - always visible */}
         <div className="primary-actions">
           <button
-            className={`message-action-btn copy-action`}
+            className={'message-action-btn copy-action'}
             onClick={handleCopyMessage}
             title={copiedMessageId === message.id ? 'Copied!' : 'Copy message'}
             aria-label={copiedMessageId === message.id ? 'Copied!' : 'Copy message'}

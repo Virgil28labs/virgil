@@ -19,7 +19,7 @@ interface RouteActions {
   setAlternativeRoutes: (routes: google.maps.DirectionsRoute[]) => void;
   setSelectedRouteIndex: (index: number) => void;
   setHasActiveRoute: (hasRoute: boolean) => void;
-  setShowRouteOptions: (show: boolean) => void;
+  setShowRouteOptions: (show: boolean | ((prev: boolean) => boolean)) => void;
   setRouteInfoVisible: (visible: boolean) => void;
   clearRoute: () => void;
   setRouteData: (routes: google.maps.DirectionsRoute[]) => void;
@@ -53,8 +53,11 @@ export function useRouteState(): RouteState & RouteActions {
     setState(prev => ({ ...prev, hasActiveRoute: hasRoute }));
   }, []);
 
-  const setShowRouteOptions = useCallback((show: boolean) => {
-    setState(prev => ({ ...prev, showRouteOptions: show }));
+  const setShowRouteOptions = useCallback((show: boolean | ((prev: boolean) => boolean)) => {
+    setState(prev => ({ 
+      ...prev, 
+      showRouteOptions: typeof show === 'function' ? show(prev.showRouteOptions) : show 
+    }));
   }, []);
 
   const setRouteInfoVisible = useCallback((visible: boolean) => {

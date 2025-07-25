@@ -186,14 +186,14 @@ describe('StorageMonitor', () => {
           type: 'quota',
           severity: 'high',
           description: expect.stringContaining('Storage usage critical'),
-        })
+        }),
       );
     });
 
     it('returns critical status when usage is very high', async () => {
       (StorageService.keys as jest.Mock).mockReturnValue([]);
       // Return different counts for different stores to control the total
-      (indexedDBService.count as jest.Mock).mockImplementation((db, store) => {
+      (indexedDBService.count as jest.Mock).mockImplementation(() => {
         // Each database has different stores, return small counts
         return { success: true, data: 10 };
       });
@@ -240,7 +240,7 @@ describe('StorageMonitor', () => {
           severity: 'low',
           description: expect.stringContaining('large items in localStorage'),
           storage: 'localStorage',
-        })
+        }),
       );
       expect(health.recommendations).toContain('Consider moving large items to IndexedDB for better performance');
     });
@@ -268,7 +268,7 @@ describe('StorageMonitor', () => {
           type: 'performance',
           severity: 'medium',
           description: 'Slow storage operations detected',
-        })
+        }),
       );
       expect(health.recommendations).toContain('Consider optimizing data access patterns or adding indexes');
     });
@@ -296,7 +296,7 @@ describe('StorageMonitor', () => {
           type: 'error',
           severity: 'high',
           description: 'High error rates in storage operations',
-        })
+        }),
       );
       expect(health.recommendations).toContain('Investigate storage errors and ensure proper error handling');
     });
@@ -315,7 +315,7 @@ describe('StorageMonitor', () => {
           count: 2,
           avgDuration: 55,
           errors: 0,
-        })
+        }),
       );
     });
 
@@ -332,7 +332,7 @@ describe('StorageMonitor', () => {
           count: 3,
           avgDuration: 110,
           errors: 2,
-        })
+        }),
       );
     });
 
@@ -346,13 +346,13 @@ describe('StorageMonitor', () => {
         expect.objectContaining({
           operation: 'slowOp',
           duration: 150,
-        })
+        }),
       );
       
       expect(metrics.slowOperations).not.toContainEqual(
         expect.objectContaining({
           operation: 'fastOp',
-        })
+        }),
       );
     });
 
@@ -432,7 +432,7 @@ describe('StorageMonitor', () => {
       const suggestions = await monitor.getCleanupSuggestions();
       
       expect(suggestions).toContainEqual(
-        expect.stringContaining('Move "bigData" from localStorage to IndexedDB')
+        expect.stringContaining('Move "bigData" from localStorage to IndexedDB'),
       );
     });
 
@@ -499,7 +499,7 @@ describe('StorageMonitor', () => {
             expect.objectContaining({ name: 'conversations', recordCount: 5 }),
             expect.objectContaining({ name: 'memories', recordCount: 10 }),
           ]),
-        })
+        }),
       );
     });
   });

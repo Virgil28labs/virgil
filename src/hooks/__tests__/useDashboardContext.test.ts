@@ -107,7 +107,7 @@ describe('useDashboardContext Hook', () => {
 
   it('unsubscribes on unmount', () => {
     const { unmount } = renderHook(() => 
-      useDashboardContext({ dispatch: mockDispatch })
+      useDashboardContext({ dispatch: mockDispatch }),
     );
 
     expect(mockUnsubscribe).not.toHaveBeenCalled();
@@ -119,7 +119,7 @@ describe('useDashboardContext Hook', () => {
 
   it('memoizes initializeDashboardContext function', () => {
     const { result, rerender } = renderHook(() => 
-      useDashboardContext({ dispatch: mockDispatch })
+      useDashboardContext({ dispatch: mockDispatch }),
     );
 
     const init1 = result.current.initializeDashboardContext;
@@ -134,7 +134,7 @@ describe('useDashboardContext Hook', () => {
   it('updates initializeDashboardContext when dispatch changes', () => {
     const { result, rerender } = renderHook(
       (props) => useDashboardContext(props),
-      { initialProps: { dispatch: mockDispatch } }
+      { initialProps: { dispatch: mockDispatch } },
     );
 
     const init1 = result.current.initializeDashboardContext;
@@ -209,7 +209,7 @@ describe('useDashboardContext Hook', () => {
 
   it('returns unsubscribe function from initializeDashboardContext', () => {
     const { result } = renderHook(() => 
-      useDashboardContext({ dispatch: mockDispatch })
+      useDashboardContext({ dispatch: mockDispatch }),
     );
 
     const unsubscribeResult = result.current.initializeDashboardContext();
