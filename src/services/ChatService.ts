@@ -89,22 +89,17 @@ export class ChatService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({})) as ChatApiResponse;
         const errorMessage = errorData.error || `Chat service error: ${response.status}`;
-        console.error('Chat API error:', errorMessage);
         throw new Error(errorMessage);
       }
 
       const data = await response.json() as ChatApiResponse;
       
       if (!data.success || !data.message) {
-        console.error('Invalid API response:', data);
         throw new Error('Invalid response from chat service');
       }
 
       return this.createAssistantMessage(data.message.content);
     } catch (error) {
-      // Log the error for debugging
-      console.error('Chat service error:', error);
-      
       // Re-throw with a user-friendly message
       if (error instanceof Error) {
         throw error;

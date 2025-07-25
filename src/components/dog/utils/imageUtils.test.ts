@@ -1,3 +1,4 @@
+import type React from 'react';
 import { stopEvent, downloadImage, copyImageToClipboard } from './imageUtils';
 
 describe('imageUtils', () => {
@@ -6,7 +7,20 @@ describe('imageUtils', () => {
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
-      } as unknown as Event;
+        currentTarget: null,
+        target: null,
+        bubbles: false,
+        cancelable: true,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        nativeEvent: new MouseEvent('click'),
+        timeStamp: Date.now(),
+        type: 'click',
+        isPropagationStopped: jest.fn(() => false),
+        isDefaultPrevented: jest.fn(() => false),
+        persist: jest.fn(),
+      } as unknown as React.SyntheticEvent;
 
       stopEvent(mockEvent);
 

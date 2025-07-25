@@ -54,16 +54,6 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
   }
 }
 
-/**
- * Downloads multiple images as a zip file
- * @param images - Array of images to download
- * @param zipFilename - Name for the zip file
- */
-export async function downloadImagesAsZip(_images: DownloadableImage[], _zipFilename: string): Promise<void> {
-  // This would require a zip library like JSZip
-  // For now, throw an error indicating this feature needs implementation
-  throw new Error('Bulk download feature is not yet implemented');
-}
 
 /**
  * Copies image URL to clipboard

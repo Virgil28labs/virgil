@@ -3,6 +3,9 @@
  * For VirgilChatbot and chat functionality
  */
 
+import type React from 'react';
+import type { ChatAction, ChatState } from '../components/chat/chatTypes';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -17,16 +20,6 @@ export interface ModelOption {
   description: string;
 }
 
-export interface ChatState {
-  isOpen: boolean;
-  messages: ChatMessage[];
-  input: string;
-  isTyping: boolean;
-  error: string | null;
-  selectedModel: string;
-  showModelDropdown: boolean;
-  showTooltip: boolean;
-}
 
 export interface ChatHookOptions {
   model?: string;
@@ -69,4 +62,19 @@ export interface ChatError {
   message: string;
   code?: string;
   recoverable?: boolean;
+}
+
+export interface ChatContextValue {
+  state: ChatState;
+  dispatch: React.Dispatch<ChatAction>;
+  
+  // Convenience methods
+  setOpen: (isOpen: boolean) => void;
+  setWindowSize: (size: 'normal' | 'large' | 'fullscreen') => void;
+  addMessage: (message: ChatMessage) => void;
+  setInput: (input: string) => void;
+  setTyping: (isTyping: boolean) => void;
+  setError: (error: string | null) => void;
+  clearMessages: () => void;
+  newChat: () => void;
 }

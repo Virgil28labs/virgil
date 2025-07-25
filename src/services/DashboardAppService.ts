@@ -184,7 +184,11 @@ export class DashboardAppService {
       this.setCacheData(appName, data);
       return data;
     } catch (error) {
-      console.error(`Error getting data from ${appName}:`, error);
+      logger.error(`Error getting data from ${appName}`, error as Error, {
+        component: 'DashboardAppService',
+        action: 'getData',
+        metadata: { appName },
+      });
       return null;
     }
   }

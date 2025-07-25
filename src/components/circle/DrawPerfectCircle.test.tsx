@@ -37,7 +37,7 @@ const mockCanvasContext = {
 };
 
 // Mock HTMLCanvasElement
-HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext) as jest.MockedFunction<typeof HTMLCanvasElement.prototype.getContext>;
+HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext) as unknown as jest.MockedFunction<HTMLCanvasElement['getContext']>;
 
 // Mock getBoundingClientRect
 HTMLCanvasElement.prototype.getBoundingClientRect = jest.fn(() => ({

@@ -2,7 +2,6 @@ import type { WeatherData, ForecastData } from '../types/weather.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 import { timeService } from '../services/TimeService';
-import { getErrorMessage } from '../utils/errorUtils';
 
 const BACKEND_API_BASE = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -75,8 +74,7 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (error) {
-      console.error('Weather fetch error:', getErrorMessage(error));
+    } catch (_error) {
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -128,8 +126,7 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (error) {
-      console.error('Weather fetch error:', getErrorMessage(error));
+    } catch (_error) {
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -197,8 +194,7 @@ class WeatherService {
       });
 
       return forecastData;
-    } catch (error) {
-      console.error('Forecast fetch error:', getErrorMessage(error));
+    } catch (_error) {
       throw new Error('Failed to fetch forecast data');
     }
   }
@@ -250,8 +246,7 @@ class WeatherService {
       });
 
       return forecastData;
-    } catch (error) {
-      console.error('Forecast fetch error:', getErrorMessage(error));
+    } catch (_error) {
       throw new Error('Failed to fetch forecast data');
     }
   }

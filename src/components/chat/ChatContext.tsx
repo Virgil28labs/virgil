@@ -1,25 +1,9 @@
-import React, { type ReactNode, useReducer, useCallback, useMemo } from 'react';
-import type { ChatState, ChatAction } from './chatTypes';
+import { type ReactNode, useReducer, useCallback, useMemo } from 'react';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
-import type { ChatMessage } from '../../types/chat.types';
+import type { ChatMessage, ChatContextValue } from '../../types/chat.types';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
 import { ChatContext } from './ChatContextTypes';
-
-export interface ChatContextValue {
-  state: ChatState;
-  dispatch: React.Dispatch<ChatAction>;
-  
-  // Convenience methods
-  setOpen: (isOpen: boolean) => void;
-  setWindowSize: (size: 'normal' | 'large' | 'fullscreen') => void;
-  addMessage: (message: ChatMessage) => void;
-  setInput: (input: string) => void;
-  setTyping: (isTyping: boolean) => void;
-  setError: (error: string | null) => void;
-  clearMessages: () => void;
-  newChat: () => void;
-}
 
 interface ChatProviderProps {
   children: ReactNode;
