@@ -3,7 +3,7 @@ import type { ChatMessage } from '../../types/chat.types';
 import type { StoredConversation } from '../../services/MemoryService';
 import { Skeleton } from '../ui/skeleton';
 import type { User } from '../../types/auth.types';
-import { FormattedText } from '../../utils/textFormatter';
+import { FormattedText } from '../FormattedText';
 import { LoadingStates } from './LoadingStates';
 import { timeService } from '../../services/TimeService';
 import './chat-interface.css';

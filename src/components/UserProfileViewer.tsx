@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useEffect, useState, useMemo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useLocation } from '../contexts/LocationContext';
+import { useAuth } from '../hooks/useAuth';
+import { useLocation } from '../hooks/useLocation';
 import { useWeather } from '../contexts/WeatherContext';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';

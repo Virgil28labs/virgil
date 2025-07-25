@@ -68,7 +68,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
    * @returns Evaluation result with score and message
    */
   const evaluateCircle = useCallback((points: Point[]): EvaluationResult => {
-    if (points.length < EVALUATION_CONFIG.minPoints!) {
+    if (points.length < EVALUATION_CONFIG.minPoints) {
       return { score: 0, message: 'Draw a complete circle!' };
     }
 
@@ -109,7 +109,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       Math.pow(endPoint.x - startPoint.x, 2) + 
       Math.pow(endPoint.y - startPoint.y, 2),
     );
-    const maxClosureDistance = avgRadius * EVALUATION_CONFIG.maxClosureDistanceFactor!;
+    const maxClosureDistance = avgRadius * EVALUATION_CONFIG.maxClosureDistanceFactor;
     const isClosed = closureDistance < maxClosureDistance;
 
     // Calculate score
@@ -117,7 +117,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     const varianceScore = Math.max(0, 1 - (radiusVariance / maxVariance));
     const closureScore = isClosed ? 1 : 0.5;
     
-    let totalScore = Math.round((varianceScore * EVALUATION_CONFIG.varianceWeight! + closureScore * EVALUATION_CONFIG.closureWeight!) * 100);
+    let totalScore = Math.round((varianceScore * EVALUATION_CONFIG.varianceWeight + closureScore * EVALUATION_CONFIG.closureWeight) * 100);
     totalScore = Math.max(0, Math.min(100, totalScore));
 
     // Get appropriate message

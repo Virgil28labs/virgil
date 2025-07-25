@@ -184,7 +184,8 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
           if (!activityMap.has(checkInDate)) {
             activityMap.set(checkInDate, { habits: new Set(), habitNames: [] });
           }
-          const activity = activityMap.get(checkInDate)!;
+          const activity = activityMap.get(checkInDate);
+          if (!activity) return;
           activity.habits.add(habit.id);
           activity.habitNames.push(habit.name);
         }
@@ -421,13 +422,21 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
              : 'Great job today! 🌟');
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     if (!this.userData) return [];
 
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    interface SearchResult {
+      id: string;
+      type: string;
+      name: string;
+      emoji: string;
+      streak?: number;
+      relevance: number;
+    }
+    const results: SearchResult[] = [];
 
     // Search in habit names
     this.userData.habits.forEach(habit => {
@@ -443,7 +452,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => b.relevance - a.relevance) as unknown[];
   }
 
   subscribe(callback: (data: StreakData) => void): () => void {

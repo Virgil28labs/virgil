@@ -1,11 +1,11 @@
-import React, { type ReactNode, createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import React, { type ReactNode, createContext, useReducer, useCallback, useMemo } from 'react';
 import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
 import type { ChatMessage } from '../../types/chat.types';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
 
-interface ChatContextValue {
+export interface ChatContextValue {
   state: ChatState;
   dispatch: React.Dispatch<ChatAction>;
   
@@ -20,7 +20,7 @@ interface ChatContextValue {
   newChat: () => void;
 }
 
-const ChatContext = createContext<ChatContextValue | undefined>(undefined);
+export const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 interface ChatProviderProps {
   children: ReactNode;
@@ -119,10 +119,3 @@ export function ChatProvider({ children }: ChatProviderProps) {
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
 
-export function useChatContext() {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error('useChatContext must be used within a ChatProvider');
-  }
-  return context;
-}

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { locationService } from '../lib/locationService';
 import type { 
   LocationContextValue, 
@@ -217,10 +217,3 @@ export function LocationProvider({ children }: LocationProviderProps) {
   );
 }
 
-export function useLocation(): LocationContextValue {
-  const context = useContext(LocationContext);
-  if (!context) {
-    throw new Error('useLocation must be used within a LocationProvider');
-  }
-  return context;
-}

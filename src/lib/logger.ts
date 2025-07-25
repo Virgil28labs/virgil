@@ -10,7 +10,7 @@ type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 interface LogContext {
   component?: string;
   action?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 class Logger {
@@ -33,9 +33,11 @@ class Logger {
     if (this.isDevelopment) {
       switch (level) {
         case 'debug':
+          // eslint-disable-next-line no-console
           console.debug(formattedMessage, context?.metadata || '');
           break;
         case 'info':
+          // eslint-disable-next-line no-console
           console.info(formattedMessage, context?.metadata || '');
           break;
         case 'warn':
@@ -49,6 +51,7 @@ class Logger {
       // In production, you could send to a logging service
       // For now, only log warnings and errors
       if (level === 'warn' || level === 'error') {
+        // eslint-disable-next-line no-console
         console[level](formattedMessage, error || context?.metadata || '');
       }
     }
@@ -74,7 +77,7 @@ class Logger {
 export const logger = new Logger();
 
 // Convenience exports for common logging patterns
-export const logError = (component: string, action: string, error: Error, additionalInfo?: Record<string, any>) => {
+export const logError = (component: string, action: string, error: Error, additionalInfo?: Record<string, unknown>) => {
   logger.error(`${action} failed`, error, {
     component,
     action,
@@ -82,7 +85,7 @@ export const logError = (component: string, action: string, error: Error, additi
   });
 };
 
-export const logInfo = (component: string, action: string, metadata?: Record<string, any>) => {
+export const logInfo = (component: string, action: string, metadata?: Record<string, unknown>) => {
   logger.info(`${action} completed`, {
     component,
     action,
@@ -90,7 +93,7 @@ export const logInfo = (component: string, action: string, metadata?: Record<str
   });
 };
 
-export const logDebug = (component: string, action: string, metadata?: Record<string, any>) => {
+export const logDebug = (component: string, action: string, metadata?: Record<string, unknown>) => {
   logger.debug(`${action} initiated`, {
     component,
     action,

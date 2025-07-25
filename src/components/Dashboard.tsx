@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useState, Suspense, useRef, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useLocation } from '../contexts/LocationContext';
+import { useAuth } from '../hooks/useAuth';
+import { useLocation } from '../hooks/useLocation';
 import { VirgilTextLogo } from './VirgilTextLogo';
 import { DateTime } from './DateTime';
 import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents';

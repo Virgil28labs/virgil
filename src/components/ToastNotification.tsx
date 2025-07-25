@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, useCallback } from 'react';
 
 export interface Toast {
   id: string;
@@ -66,14 +66,14 @@ export const ToastNotification = memo(function ToastNotification({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [duration, persistent]);
+  }, [duration, persistent, handleDismiss]);
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     setIsLeaving(true);
     setTimeout(() => {
       onDismiss(id);
     }, 300);
-  };
+  }, [id, onDismiss]);
 
   return (
     <div

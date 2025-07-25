@@ -457,11 +457,11 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
 

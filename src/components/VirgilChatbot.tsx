@@ -1,5 +1,5 @@
 import { useEffect, useCallback, memo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import type { ModelOption } from '../types/chat.types';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
@@ -102,7 +102,8 @@ function VirgilChatbotInner() {
     if (state.messages.length === 0) {
       loadRecentMessages();
     }
-  }, []); // Only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount - we intentionally only want this to run once
 
   // Use localStorage hook for selected model
   const [, setStoredModel] = useLocalStorage('virgil-selected-model', 'gpt-4.1-mini');

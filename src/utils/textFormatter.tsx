@@ -1,10 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
-
-export interface FormattedTextProps {
-  content: string;
-}
 
 // Pre-compiled regex patterns for better performance
 const IMPORTANT_PATTERN = /^(⚠️|💡|📝|🔥|✅|❌|🚨|💭)\s*(.+)/;
@@ -179,24 +175,3 @@ function formatInlineElements(text: string): React.ReactNode[] {
 
   return elements.length > 0 ? elements : [text];
 }
-
-/**
- * Main component for rendering formatted text
- * Optimized with memoization to prevent expensive regex operations on every render
- */
-export const FormattedText = React.memo(function FormattedText({ content }: FormattedTextProps): React.ReactElement {
-  // Memoize the expensive formatting operation based on content
-  const formattedElements = useMemo(() => {
-    return formatText(content);
-  }, [content]);
-  
-  return (
-    <div className="space-y-2">
-      {formattedElements.map((element, index) => (
-        <React.Fragment key={index}>
-          {element}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-});

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { timeService } from '../services/TimeService';
 
 // Type definitions for the component

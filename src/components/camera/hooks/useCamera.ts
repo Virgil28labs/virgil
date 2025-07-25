@@ -3,7 +3,11 @@ import type { CameraState } from '../../../types/camera.types';
 import { CameraUtils } from '../utils/cameraUtils';
 
 export const useCamera = () => {
-  const cameraRef = useRef<any>(null);
+  // Camera ref type from react-camera-pro library
+  const cameraRef = useRef<{
+    takePhoto: () => string;
+    switchCamera: () => 'user' | 'environment';
+  } | null>(null);
   const [cameraState, setCameraState] = useState<CameraState>({
     isActive: false,
     isCapturing: false,

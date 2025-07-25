@@ -370,11 +370,11 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     await this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     // Search by photo name or tags
     this.photos.forEach(photo => {

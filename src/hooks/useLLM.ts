@@ -4,7 +4,7 @@ import type { LLMRequest, LLMResponse, LLMConfig } from '../types/llm.types';
 
 interface UseLLMReturn {
   complete: (options: Partial<LLMRequest>) => Promise<LLMResponse | null>;
-  completeStream: (options: Partial<LLMRequest>) => AsyncGenerator<any, void, unknown>;
+  completeStream: (options: Partial<LLMRequest>) => AsyncGenerator<string, void, unknown>;
   cancel: () => void;
   clearError: () => void;
   loading: boolean;
@@ -40,12 +40,12 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
 
       return response;
 
-    } catch (err: any) {
+    } catch (err) {
       if (err.name === 'AbortError') {
         return null;
       }
       
-      setError(err);
+      setError(err as Error);
       throw err;
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
     }
   }, [loading, config]);
 
-  const completeStream = useCallback(async function* (options: Partial<LLMRequest>): AsyncGenerator<any, void, unknown> {
+  const completeStream = useCallback(async function* (options: Partial<LLMRequest>): AsyncGenerator<string, void, unknown> {
     if (streaming) {
       return;
     }
@@ -71,8 +71,8 @@ export function useLLM(config: Partial<LLMConfig> = {}): UseLLMReturn {
         yield chunk;
       }
 
-    } catch (err: any) {
-      setError(err);
+    } catch (err) {
+      setError(err as Error);
       throw err;
     } finally {
       setStreaming(false);

@@ -4,7 +4,7 @@ import { timeService } from '../../../services/TimeService';
 export class CameraUtils {
   static async checkCameraPermission(): Promise<boolean> {
     try {
-      const result = await navigator.permissions.query({ name: 'camera' as any });
+      const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
       return result.state === 'granted';
     } catch (_error) {
       console.warn('Permission API not supported, checking via getUserMedia');
@@ -26,9 +26,10 @@ export class CameraUtils {
     }
   }
 
-  static createCameraError(error: any): CameraError {
-    const errorName = error?.name || 'Unknown';
-    const errorMessage = error?.message || 'Unknown error';
+  static createCameraError(error: unknown): CameraError {
+    const errorObj = error as Error;
+    const errorName = errorObj?.name || 'Unknown';
+    const errorMessage = errorObj?.message || 'Unknown error';
 
     switch (errorName) {
       case 'NotAllowedError':

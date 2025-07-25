@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
-import { useLocation } from './LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
 import { timeService } from '../services/TimeService';
 import type { 

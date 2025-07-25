@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
-import { FormattedText } from '../../utils/textFormatter';
+import { FormattedText } from '../FormattedText';
 import { toastService } from '../../services/ToastService';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';

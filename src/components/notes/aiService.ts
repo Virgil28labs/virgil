@@ -139,7 +139,7 @@ async function callAIService(content: string): Promise<AIResponse> {
       return {
         tags: validTags,
         actionType: validActionType,
-        tasks: parsed.tasks.filter((task: any) => typeof task === 'string'),
+        tasks: parsed.tasks.filter((task: unknown) => typeof task === 'string') as string[],
         mood: parsed.mood && ['positive', 'neutral', 'negative'].includes(parsed.mood) 
           ? parsed.mood 
           : undefined,

@@ -404,11 +404,11 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     // Search in titles and explanations
     this.favorites.forEach(fav => {

@@ -87,9 +87,9 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
 
       return null;
 
-    } catch (error: any) {
+    } catch (error) {
       // Add error message for user feedback
-      addMessage('system', `Error: ${error.message}`);
+      addMessage('system', `Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw error;
     }
   }, [messages, complete, systemPrompt, addMessage, clearError]);
@@ -147,10 +147,10 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
 
       return { ...assistantMessage, streaming: false } as ChatMessage;
 
-    } catch (error: any) {
+    } catch (error) {
       // Remove the failed streaming message and add error
       setMessages(prev => prev.filter(msg => msg.id !== assistantMessageId));
-      addMessage('system', `Error: ${error.message}`);
+      addMessage('system', `Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw error;
     } finally {
       setIsTyping(false);
@@ -246,7 +246,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
         return true;
       }
       return false;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to load conversation:', error);
       return false;
     }

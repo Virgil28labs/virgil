@@ -60,7 +60,9 @@ describe('LoginForm', () => {
     const form = container.querySelector('form');
     
     // Mock form submission to bypass HTML5 validation
-    fireEvent.submit(form!);
+    if (form) {
+      fireEvent.submit(form);
+    }
     
     await waitFor(() => {
       expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();

@@ -70,7 +70,7 @@ export function isActionType(value: unknown): value is ActionType {
 export function isNotesError(value: unknown): value is NotesError {
   return (
     value instanceof NotesError ||
-    (value instanceof Error && 'type' in value && isErrorType((value as any).type))
+    (value instanceof Error && 'type' in value && isErrorType((value as Error & { type: unknown }).type))
   );
 }
 

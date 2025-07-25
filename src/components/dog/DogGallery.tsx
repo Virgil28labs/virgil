@@ -1,5 +1,6 @@
 import { memo } from 'react';
-import { DogGalleryProvider, useDogGallery } from './DogGalleryProvider';
+import { DogGalleryProvider } from './DogGalleryProvider';
+import { useDogGallery } from './hooks/useDogGallery';
 import { DogGalleryTabs } from './DogGalleryTabs';
 import { DogGalleryContent } from './DogGalleryContent';
 import { ImageModal } from './ImageModal';

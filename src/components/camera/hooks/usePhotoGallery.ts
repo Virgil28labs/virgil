@@ -70,14 +70,35 @@ export const usePhotoGallery = () => {
   }, []);
 
   const selectAllPhotos = useCallback(() => {
-    const currentPhotos = getCurrentPhotos();
+    let currentPhotos: SavedPhoto[] = [];
+    
+    switch (galleryState.activeTab) {
+      case 'gallery':
+        currentPhotos = photos;
+        break;
+      case 'favorites':
+        currentPhotos = favorites;
+        break;
+      case 'camera':
+      default:
+        currentPhotos = [];
+        break;
+    }
+    
+    if (galleryState.filter === 'favorites') {
+      currentPhotos = currentPhotos.filter(photo => photo.isFavorite);
+    } else if (galleryState.filter === 'recent') {
+      const oneDayAgo = timeService.getTimestamp() - (24 * 60 * 60 * 1000);
+      currentPhotos = currentPhotos.filter(photo => photo.timestamp > oneDayAgo);
+    }
+    
     const allPhotoIds = new Set(currentPhotos.map(photo => photo.id));
     
     updateGalleryState({
       selectedPhotos: allPhotoIds,
       isSelectionMode: allPhotoIds.size > 0,
     });
-  }, []);
+  }, [updateGalleryState, galleryState.activeTab, galleryState.filter, photos, favorites]);
 
   const clearSelection = useCallback(() => {
     updateGalleryState({

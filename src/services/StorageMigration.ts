@@ -10,8 +10,8 @@ import { StorageService, STORAGE_KEYS } from './StorageService';
 interface MigrationResult {
   key: string;
   success: boolean;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
   error?: string;
 }
 
@@ -28,10 +28,12 @@ export class StorageMigration {
     // Check if migrations have already been run
     const lastVersion = StorageService.get(this.MIGRATION_VERSION_KEY, '0.0.0');
     if (lastVersion === this.CURRENT_VERSION) {
+      // eslint-disable-next-line no-console
       console.log('Storage migrations already up to date');
       return results;
     }
 
+    // eslint-disable-next-line no-console
     console.log('Running storage migrations...');
 
     // Migrate string values that should remain strings but need JSON encoding
@@ -76,6 +78,7 @@ export class StorageMigration {
     // Update migration version
     StorageService.set(this.MIGRATION_VERSION_KEY, this.CURRENT_VERSION);
 
+    // eslint-disable-next-line no-console
     console.log('Storage migrations completed', results);
     return results;
   }
@@ -211,6 +214,7 @@ export class StorageMigration {
     deprecatedKeys.forEach(key => {
       try {
         localStorage.removeItem(key);
+        // eslint-disable-next-line no-console
         console.log(`Removed deprecated key: ${key}`);
       } catch (error) {
         console.error(`Failed to remove deprecated key ${key}:`, error);
@@ -277,6 +281,7 @@ export class StorageMigration {
         localStorage.setItem(key, value);
       });
       
+      // eslint-disable-next-line no-console
       console.log('Storage restored from backup');
     } catch (error) {
       console.error('Failed to restore from backup:', error);

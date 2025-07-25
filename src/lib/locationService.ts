@@ -175,8 +175,8 @@ export const locationService = {
       {
         maxRetries: 3,
         initialDelay: 1000,
-        onRetry: (attempt, error) => {
-          console.log(`Retrying reverse geocoding (attempt ${attempt}):`, error.message);
+        onRetry: (_attempt, _error) => {
+          // console.log(`Retrying reverse geocoding (attempt ${_attempt}):`, _error.message);
         },
       },
     );

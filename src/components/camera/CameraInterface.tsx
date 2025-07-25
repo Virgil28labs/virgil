@@ -50,7 +50,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
     const currentIndex = timerOptions.indexOf(cameraState.timer);
     const nextIndex = (currentIndex + 1) % timerOptions.length;
     onSetTimer(timerOptions[nextIndex]);
-  }, [cameraState.timer, onSetTimer]);
+  }, [cameraState.timer, onSetTimer, timerOptions]);
 
   return (
     <div className="camera-controls">

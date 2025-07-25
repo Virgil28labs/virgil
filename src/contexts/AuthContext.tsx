@@ -1,29 +1,22 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { AuthContextValue } from '../types/auth.types';
 import { logger } from '../lib/logger';
+import { AuthContext } from './AuthContextTypes';
 
 /**
  * Authentication Context for Virgil
  * Manages user authentication state using Supabase Auth
  */
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-export const useAuth = (): AuthContextValue => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -32,7 +25,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
-      } catch (error: any) {
+      } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           logger.error('Auth session error', error as Error, {
             component: 'AuthContext',

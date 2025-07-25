@@ -133,7 +133,12 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
     }
 
     // Sorting
-    const sortFn = (a: any, b: any) => {
+    type SortableItem = (MarkedMemory | StoredConversation) & {
+      content?: string;
+      messageCount?: number;
+      firstMessage?: string;
+    };
+    const sortFn = (a: SortableItem, b: SortableItem) => {
       switch (filters.sortBy) {
         case 'oldest':
           return a.timestamp - b.timestamp;

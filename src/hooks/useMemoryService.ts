@@ -4,7 +4,6 @@ import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { timeService } from '../services/TimeService';
 import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
-import type { MarkedMemory, StoredConversation } from '../services/MemoryService';
 
 interface UseMemoryServiceProps {
   dispatch: (action: any) => void;

@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RaccoonMascot } from './RaccoonMascot';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import type { LocationContextValue } from '../types/location.types';
 import { timeService } from '../services/TimeService';
 
-// Mock LocationContext
-jest.mock('../contexts/LocationContext', () => ({
+// Mock useLocation hook
+jest.mock('../hooks/useLocation', () => ({
   useLocation: jest.fn(),
 }));
 
@@ -31,7 +31,7 @@ const mockRequestAnimationFrame = (callback: (time: number) => void) => {
   setTimeout(() => callback(timeService.getTimestamp()), 16); // 60fps
   return 1;
 };
-global.requestAnimationFrame = mockRequestAnimationFrame as any;
+global.requestAnimationFrame = mockRequestAnimationFrame as typeof requestAnimationFrame;
 global.cancelAnimationFrame = jest.fn();
 
 // Mock Audio for sound effects
@@ -49,14 +49,14 @@ const mockLocationData: Partial<LocationContextValue> = {
     city: 'New York',
     postcode: '10001',
     country: 'USA',
-  } as any,
+  },
   ipLocation: {
     ip: '192.168.1.1',
     city: 'New York',
     region: 'NY',
     country: 'USA',
     timezone: 'America/New_York',
-  } as any,
+  },
   hasGPSLocation: true,
   hasIpLocation: true,
 };

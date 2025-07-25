@@ -6,7 +6,7 @@ describe('imageUtils', () => {
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
-      } as any;
+      } as unknown as Event;
 
       stopEvent(mockEvent);
 
@@ -36,7 +36,7 @@ describe('imageUtils', () => {
         href: '',
         download: '',
         click: jest.fn(),
-      } as any;
+      } as unknown as HTMLAnchorElement;
 
       createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor);
       appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation();

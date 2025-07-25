@@ -23,7 +23,7 @@ interface UseMessageHandlingReturn {
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleQuickAction: (action: string) => void;
   loadingState: any;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 export function useMessageHandling({
@@ -37,7 +37,7 @@ export function useMessageHandling({
   isTyping,
   input,
 }: UseMessageHandlingProps): UseMessageHandlingReturn {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Use chat API hook with enhanced loading states
   const { sendMessage: sendChatMessage, loadingState } = useChatApi({

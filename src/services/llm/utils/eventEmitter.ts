@@ -14,7 +14,7 @@ export class EventEmitter {
     if (!this.events[event]) {
       this.events[event] = [];
     }
-    this.events[event].push(listener);
+    this.events[event].push(listener as EventListener);
     
     // Return unsubscribe function
     return () => this.off(event, listener);

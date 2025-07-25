@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { FetchControls } from './FetchControls';
 import { DogGrid } from './DogGrid';
 import { DogImageStates } from './DogImageStates';
-import { useDogGallery } from './DogGalleryProvider';
+import { useDogGallery } from './hooks/useDogGallery';
 
 export const DogGalleryContent = memo(function DogGalleryContent() {
   const {

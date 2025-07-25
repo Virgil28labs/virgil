@@ -17,8 +17,3 @@ export const LazyWeather = lazy(() => import('./Weather.tsx').then(module => ({
 export const LazyUserProfileViewer = lazy(() => import('./UserProfileViewer.tsx').then(module => ({
   default: module.UserProfileViewer,
 })));
-
-// Lazy load services that are only needed conditionally
-export const lazyWeatherService = () => import('../lib/weatherService.ts').then(module => module.weatherService);
-
-export const lazyLocationService = () => import('../lib/locationService.ts').then(module => module.locationService);

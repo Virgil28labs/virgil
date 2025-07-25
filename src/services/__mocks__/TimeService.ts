@@ -5,9 +5,9 @@
  * Enables time control, travel, and consistent behavior across test suites.
  */
 
-import type { TimeService as OriginalTimeService, TimeUpdate } from '../TimeService';
+import type { TimeUpdate } from '../TimeService';
 
-export class MockTimeService implements OriginalTimeService {
+export class MockTimeService {
   private mockDate: Date;
   private frozenTime: boolean = false;
   private timeListeners: ((time: TimeUpdate) => void)[] = [];

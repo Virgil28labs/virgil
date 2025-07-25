@@ -432,7 +432,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         
         // Wait for Google Maps to be fully initialized
         if (!window.google?.maps?.ControlPosition) {
-          console.log('Waiting for Google Maps to fully initialize...');
+          // console.log('Waiting for Google Maps to fully initialize...');
           await new Promise(resolve => setTimeout(resolve, 500));
         }
         

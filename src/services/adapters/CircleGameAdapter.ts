@@ -409,11 +409,11 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     // Search for score-related queries
     if (lowerQuery.includes('score') || lowerQuery.includes('best')) {

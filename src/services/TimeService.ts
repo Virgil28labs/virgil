@@ -29,7 +29,6 @@ export class TimeService {
   private static readonly MINUTE_MS = 60 * 1000;
   private static readonly HOUR_MS = 60 * 60 * 1000;
   private static readonly DAY_MS = 24 * 60 * 60 * 1000;
-  private static readonly WEEK_MS = 7 * 24 * 60 * 60 * 1000;
   
   constructor() {
     // Initialize memoized formatters

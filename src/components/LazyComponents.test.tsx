@@ -5,14 +5,13 @@ import {
   LazyVirgilChatbot,
   LazyWeather,
   LazyUserProfileViewer,
-  lazyWeatherService,
-  lazyLocationService,
 } from './LazyComponents';
+import { lazyWeatherService, lazyLocationService } from '../lib/lazyServices';
 
 // Mock React.lazy to return resolved promises with proper component structure
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
-  lazy: (importFn: () => Promise<any>) => {
+  lazy: (importFn: () => Promise<{ default: React.ComponentType }>) => {
     const MockComponent = () => {
       // Determine which component based on the import function
       const importStr = importFn.toString();

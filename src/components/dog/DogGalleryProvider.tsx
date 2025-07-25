@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer, useCallback, useEffect, memo } from 'react';
+import { createContext, useReducer, useCallback, useEffect, memo } from 'react';
 import { useDogApi } from './hooks/useDogApi';
 import { useDogFavorites } from './hooks/useDogFavorites';
 import type { DogGalleryContextType, DogGalleryState, TabType } from '../../types';
@@ -39,7 +39,7 @@ function dogGalleryReducer(state: DogGalleryState, action: DogGalleryAction): Do
 }
 
 // Create the context
-const DogGalleryContext = createContext<DogGalleryContextType | undefined>(undefined);
+export const DogGalleryContext = createContext<DogGalleryContextType | undefined>(undefined);
 
 // Provider props
 interface DogGalleryProviderProps {
@@ -112,14 +112,3 @@ export const DogGalleryProvider = memo(function DogGalleryProvider({ children, i
   );
 });
 
-// Custom hook to use the context
-export function useDogGallery(): DogGalleryContextType {
-  const context = useContext(DogGalleryContext);
-  if (context === undefined) {
-    throw new Error('useDogGallery must be used within a DogGalleryProvider');
-  }
-  return context;
-}
-
-// Export context for testing
-export { DogGalleryContext };

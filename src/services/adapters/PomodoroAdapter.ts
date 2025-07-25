@@ -260,7 +260,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     return 'Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?';
   }
 
-  async search(_query: string): Promise<any[]> {
+  async search(_query: string): Promise<unknown[]> {
     // Pomodoro doesn't have searchable content, return empty
     return [];
   }

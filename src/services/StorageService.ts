@@ -134,7 +134,7 @@ export class StorageService {
   /**
    * Storage event listener for cross-tab synchronization
    */
-  static onChange(key: string, callback: (value: any) => void): () => void {
+  static onChange<T = unknown>(key: string, callback: (value: T) => void): () => void {
     const handler = (e: StorageEvent) => {
       if (e.key === key && e.newValue !== null) {
         try {

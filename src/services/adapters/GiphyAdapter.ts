@@ -375,11 +375,11 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     return response;
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     // Search in titles
     this.favorites.forEach(gif => {

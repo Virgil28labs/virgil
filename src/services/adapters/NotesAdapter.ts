@@ -412,7 +412,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     return response;
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     await this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();

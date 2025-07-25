@@ -33,7 +33,11 @@ export class MapService {
     if (!this.instances.has(map)) {
       this.instances.set(map, new MapService(map));
     }
-    return this.instances.get(map)!;
+    const instance = this.instances.get(map);
+    if (!instance) {
+      throw new Error('MapService instance not found');
+    }
+    return instance;
   }
 
   private initializeServices(): void {
@@ -62,7 +66,11 @@ export class MapService {
 
     try {
       const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
-        this.directionsService!.route(request, (result, status) => {
+        if (!this.directionsService) {
+          reject(new Error('DirectionsService not initialized'));
+          return;
+        }
+        this.directionsService.route(request, (result, status) => {
           if (status === 'OK' && result) {
             resolve(result);
           } else {
@@ -95,7 +103,11 @@ export class MapService {
 
     try {
       const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-        this.geocoder!.geocode({ location: latLng }, (results, status) => {
+        if (!this.geocoder) {
+          reject(new Error('Geocoder not initialized'));
+          return;
+        }
+        this.geocoder.geocode({ location: latLng }, (results, status) => {
           if (status === 'OK' && results) {
             resolve(results);
           } else {

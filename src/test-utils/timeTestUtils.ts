@@ -202,7 +202,7 @@ export const timeScenarios = {
 /**
  * Test helper for timezone scenarios
  */
-export function withTimezone(timeService: MockTimeService, timezone: string, fn: () => void): void {
+export function withTimezone(_timeService: MockTimeService, _timezone: string, fn: () => void): void {
   // Note: This is a simplified version. In real implementation,
   // we'd need to mock Intl.DateTimeFormat to respect timezone
   const originalFormat = Intl.DateTimeFormat;

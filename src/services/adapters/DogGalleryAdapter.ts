@@ -335,11 +335,11 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     return response;
   }
 
-  async search(query: string): Promise<any[]> {
+  async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
     
     const lowerQuery = query.toLowerCase();
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     // Search by breed
     this.favorites.forEach(dog => {

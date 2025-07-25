@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useLocation } from '../contexts/LocationContext';
+import { useAuth } from '../hooks/useAuth';
+import { useLocation } from '../hooks/useLocation';
 import { useWeather } from '../contexts/WeatherContext';
 import { useUserProfile } from './useUserProfile';
 import { dashboardContextService } from '../services/DashboardContextService';

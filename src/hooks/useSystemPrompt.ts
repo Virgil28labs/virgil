@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { dashboardContextService } from '../services/DashboardContextService';
-import type { DashboardContext } from '../services/DashboardContextService';
+import type { DashboardContext, ContextualSuggestion } from '../services/DashboardContextService';
 import type { User } from '../types/auth.types';
 
 interface UseSystemPromptProps {
@@ -9,7 +9,7 @@ interface UseSystemPromptProps {
   customSystemPrompt: string;
   memoryContext: string;
   dashboardContext: DashboardContext | null;
-  contextualSuggestions: string[];
+  contextualSuggestions: ContextualSuggestion[];
 }
 
 interface UseSystemPromptReturn {

@@ -61,7 +61,7 @@ export interface SecurityOptions {
     origin: string | string[];
     credentials: boolean;
   };
-  helmet: Record<string, any>;
+  helmet: Record<string, unknown>;
   rateLimit: RateLimitOptions;
 }
 
@@ -70,7 +70,7 @@ export interface LogEntry {
   timestamp: string;
   level: 'info' | 'warn' | 'error' | 'debug';
   message: string;
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
   requestId?: string;
   userId?: string;
 }
@@ -79,7 +79,7 @@ export interface LogEntry {
 export interface ApiError extends Error {
   status: number;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface ErrorResponse {
@@ -87,7 +87,7 @@ export interface ErrorResponse {
     message: string;
     status: number;
     code?: string;
-    details?: any;
+    details?: unknown;
     stack?: string;
   };
 }

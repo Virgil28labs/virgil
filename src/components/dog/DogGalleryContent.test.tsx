@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { DogGalleryContent } from './DogGalleryContent';
-import { useDogGallery } from './DogGalleryProvider';
+import { useDogGallery } from './hooks/useDogGallery';
 import type { DogImage, DogGalleryContextType } from '../../types';
 
 // Mock the components
@@ -39,7 +39,7 @@ jest.mock('./DogImageStates', () => ({
   ),
 }));
 
-jest.mock('./DogGalleryProvider', () => ({
+jest.mock('./hooks/useDogGallery', () => ({
   useDogGallery: jest.fn(),
 }));
 

@@ -35,7 +35,7 @@ export function useGooglePlacesAutocomplete(
   const [isLoading, setIsLoading] = useState(false);
   const sessionTokenRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const fetchSuggestionsRef = useRef<(input: string) => Promise<void>>();
+  const fetchSuggestionsRef = useRef<((input: string) => Promise<void>) | undefined>(undefined);
 
   // Initialize session token
   useEffect(() => {
@@ -54,7 +54,7 @@ export function useGooglePlacesAutocomplete(
 
     try {
       // Import the places library if not already loaded
-      const _placesLib = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
+      await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
       
       let formattedSuggestions: PlaceSuggestion[] = [];
       
@@ -102,7 +102,7 @@ export function useGooglePlacesAutocomplete(
         };
         
         // Use promise wrapper for callback-based API
-        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, _reject) => {
+        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve) => {
           service.getPlacePredictions(request, (predictions, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
               resolve(predictions);
@@ -180,7 +180,7 @@ export function useGooglePlacesAutocomplete(
 
   const selectPlace = useCallback(async (suggestion: PlaceSuggestion): Promise<google.maps.places.PlaceResult> => {
     try {
-      let placeResult: google.maps.places.PlaceResult;
+      let placeResult: google.maps.places.PlaceResult | undefined;
       
       // Try new API first if available
       if (suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
@@ -195,8 +195,8 @@ export function useGooglePlacesAutocomplete(
           });
 
           // Debug: Log the actual place object structure
-          console.log('New API place object:', place);
-          console.log('Available properties:', Object.keys(place));
+          // console.log('New API place object:', place);
+          // console.log('Available properties:', Object.keys(place));
 
           // Convert to PlaceResult format for compatibility with better error handling
           placeResult = {
@@ -210,7 +210,7 @@ export function useGooglePlacesAutocomplete(
           };
 
           // Log the converted result for debugging
-          console.log('Converted PlaceResult:', placeResult);
+          // console.log('Converted PlaceResult:', placeResult);
         } catch (newApiError) {
           console.warn('New API failed, falling back to classic API:', newApiError);
           // Fall through to classic API
@@ -220,7 +220,7 @@ export function useGooglePlacesAutocomplete(
       // Use classic API if new API failed or isn't available
       if (!placeResult) {
         // Classic API - use PlacesService to get details
-        console.log('Using classic API fallback');
+        // console.log('Using classic API fallback');
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         
         placeResult = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
@@ -230,7 +230,7 @@ export function useGooglePlacesAutocomplete(
               fields: options.fields || ['place_id', 'geometry', 'name', 'formatted_address'],
             },
             (place, status) => {
-              console.log('Classic API response:', { place, status });
+              // console.log('Classic API response:', { place, status });
               if (status === google.maps.places.PlacesServiceStatus.OK && place) {
                 resolve(place);
               } else {
