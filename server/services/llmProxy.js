@@ -183,80 +183,80 @@ class LLMProxy extends EventEmitter {
     const { messages, model, temperature, maxTokens, stream } = options;
 
     switch (provider) {
-      case 'openai':
-        return {
-          model,
-          messages,
+    case 'openai':
+      return {
+        model,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+        stream,
+      };
+
+    case 'anthropic': {
+      // Convert to Anthropic format
+      const systemMessage = messages.find(m => m.role === 'system');
+      const nonSystemMessages = messages.filter(m => m.role !== 'system');
+
+      return {
+        model,
+        messages: nonSystemMessages,
+        system: systemMessage?.content,
+        max_tokens: maxTokens,
+        temperature,
+        stream,
+      };
+    }
+
+    case 'ollama':
+      return {
+        model,
+        messages,
+        options: {
           temperature,
-          max_tokens: maxTokens,
-          stream,
-        };
+          num_predict: maxTokens,
+        },
+        stream,
+      };
 
-      case 'anthropic': {
-        // Convert to Anthropic format
-        const systemMessage = messages.find(m => m.role === 'system');
-        const nonSystemMessages = messages.filter(m => m.role !== 'system');
-
-        return {
-          model,
-          messages: nonSystemMessages,
-          system: systemMessage?.content,
-          max_tokens: maxTokens,
-          temperature,
-          stream,
-        };
-      }
-
-      case 'ollama':
-        return {
-          model,
-          messages,
-          options: {
-            temperature,
-            num_predict: maxTokens,
-          },
-          stream,
-        };
-
-      default:
-        throw new Error(`Unknown provider: ${provider}`);
+    default:
+      throw new Error(`Unknown provider: ${provider}`);
     }
   }
 
   parseResponse(provider, data) {
     switch (provider) {
-      case 'openai':
-        return {
-          content: data.choices[0].message.content,
-          usage: data.usage,
-          model: data.model,
-          finish_reason: data.choices[0].finish_reason,
-        };
+    case 'openai':
+      return {
+        content: data.choices[0].message.content,
+        usage: data.usage,
+        model: data.model,
+        finish_reason: data.choices[0].finish_reason,
+      };
 
-      case 'anthropic':
-        return {
-          content: data.content[0].text,
-          usage: {
-            prompt_tokens: data.usage.input_tokens,
-            completion_tokens: data.usage.output_tokens,
-            total_tokens: data.usage.input_tokens + data.usage.output_tokens,
-          },
-          model: data.model,
-          finish_reason: data.stop_reason,
-        };
+    case 'anthropic':
+      return {
+        content: data.content[0].text,
+        usage: {
+          prompt_tokens: data.usage.input_tokens,
+          completion_tokens: data.usage.output_tokens,
+          total_tokens: data.usage.input_tokens + data.usage.output_tokens,
+        },
+        model: data.model,
+        finish_reason: data.stop_reason,
+      };
 
-      case 'ollama':
-        return {
-          content: data.message.content,
-          usage: {
-            total_tokens: data.eval_count || 0,
-          },
-          model: data.model,
-          finish_reason: 'stop',
-        };
+    case 'ollama':
+      return {
+        content: data.message.content,
+        usage: {
+          total_tokens: data.eval_count || 0,
+        },
+        model: data.model,
+        finish_reason: 'stop',
+      };
 
-      default:
-        throw new Error(`Unknown provider: ${provider}`);
+    default:
+      throw new Error(`Unknown provider: ${provider}`);
     }
   }
 

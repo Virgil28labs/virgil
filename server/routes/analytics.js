@@ -40,14 +40,14 @@ router.post('/track', (req, res) => {
 
     // Store event based on type
     switch (event) {
-      case 'llm_request':
-        trackLLMRequest(analyticsEvent);
-        break;
-      case 'llm_error':
-        trackError(analyticsEvent);
-        break;
-      default:
-        analytics.requests.push(analyticsEvent);
+    case 'llm_request':
+      trackLLMRequest(analyticsEvent);
+      break;
+    case 'llm_error':
+      trackError(analyticsEvent);
+      break;
+    default:
+      analytics.requests.push(analyticsEvent);
     }
 
     res.json({ success: true });

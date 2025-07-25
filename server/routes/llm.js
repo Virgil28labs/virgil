@@ -4,7 +4,7 @@ const { LLMProxy } = require('../services/llmProxy');
 const { RequestQueue } = require('../services/queue');
 const { validateRequest, validateBatchRequest } = require('../middleware/validation');
 const { cacheMiddleware } = require('../middleware/cache');
-const { asyncHandler, ValidationError } = require('../lib/errors');
+const { asyncHandler, ValidationError: _ValidationError } = require('../lib/errors');
 
 // Factory function for creating router with injected dependencies
 function createLLMRouter(llmProxyInstance, requestQueueInstance) {
