@@ -7,6 +7,34 @@ import type { WeatherData } from '../types/weather.types';
 jest.mock('./requestDeduplication');
 const mockDedupeFetch = dedupeFetch as jest.MockedFunction<typeof dedupeFetch>;
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('./logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../services/TimeService', () => {
+  const actualMock = jest.requireActual('../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock console methods
 const originalConsole = {
   log: console.log,
@@ -36,11 +64,15 @@ describe('weatherService', () => {
     timezone: -28800,
     cityName: 'New York',
     country: 'US',
-    timestamp: Date.now(),
+    timestamp: mockTimeService.getTimestamp(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     // Clear cache before each test
     weatherService.clearCache();
     // Mock console methods
@@ -49,6 +81,9 @@ describe('weatherService', () => {
   });
 
   afterEach(() => {
+    // Clean up TimeService
+    mockTimeService.destroy();
+    
     // Restore console
     console.log = originalConsole.log;
     console.error = originalConsole.error;
@@ -115,7 +150,7 @@ describe('weatherService', () => {
       await weatherService.getWeatherByCoordinates(40.7128, -74.0060);
 
       // Fast-forward time by 11 minutes
-      jest.spyOn(Date, 'now').mockReturnValue(Date.now() + 11 * 60 * 1000);
+      mockTimeService.advanceTime(11 * 60 * 1000);
 
       // Second call should refetch
       const updatedWeatherData = { ...mockWeatherData, temperature: 75 };

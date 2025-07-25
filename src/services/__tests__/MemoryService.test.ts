@@ -10,6 +10,45 @@ jest.mock('../ToastService', () => ({
   },
 }));
 
+jest.mock('../DashboardContextService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockTimeInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    dashboardContextService: {
+      getTimestamp: jest.fn(() => mockTimeInstance.getTimestamp()),
+    },
+  };
+});
+
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 // Mock IndexedDB
 const mockIndexedDB = {
   open: jest.fn(),
@@ -39,6 +78,9 @@ const mockDB = {
     createIndex: jest.fn(),
   })),
   close: jest.fn(),
+  objectStoreNames: {
+    contains: jest.fn(() => false),
+  },
 };
 
 const mockRequest: any = {
@@ -57,7 +99,13 @@ describe('MemoryService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    memoryService = new MemoryService();
+    jest.useFakeTimers();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
+    // Set up indexedDB before creating service
+    (global as any).indexedDB = mockIndexedDB;
     
     // Setup default mock behavior
     mockIndexedDB.open.mockReturnValue(mockRequest);
@@ -68,6 +116,14 @@ describe('MemoryService', () => {
     mockObjectStore.clear.mockReturnValue({ onsuccess: null, onerror: null });
     mockObjectStore.count.mockReturnValue({ result: 0, onsuccess: null, onerror: null });
     mockObjectStore.openCursor.mockReturnValue({ onsuccess: null, onerror: null });
+    
+    // Create service after all mocks are set up
+    memoryService = new MemoryService();
+  });
+  
+  afterEach(() => {
+    mockTimeService.destroy();
+    jest.useRealTimers();
   });
 
   describe('init', () => {
@@ -110,8 +166,8 @@ describe('MemoryService', () => {
 
   describe('saveConversation', () => {
     const mockMessages: ChatMessage[] = [
-      { id: 'msg-1', role: 'user', content: 'Hello', timestamp: Date.now().toString() },
-      { id: 'msg-2', role: 'assistant', content: 'Hi there!', timestamp: Date.now().toString() },
+      { id: 'msg-1', role: 'user', content: 'Hello', timestamp: mockTimeService.getTimestamp().toString() },
+      { id: 'msg-2', role: 'assistant', content: 'Hi there!', timestamp: mockTimeService.getTimestamp().toString() },
     ];
 
     beforeEach(async () => {
@@ -155,7 +211,7 @@ describe('MemoryService', () => {
 
     it('appends to existing conversation', async () => {
       const existingMessages = [
-        { id: 'old-1', role: 'user' as const, content: 'Previous message', timestamp: (Date.now() - 10000).toString() },
+        { id: 'old-1', role: 'user' as const, content: 'Previous message', timestamp: (mockTimeService.getTimestamp() - 10000).toString() },
       ];
       
       const getRequest = {
@@ -165,7 +221,7 @@ describe('MemoryService', () => {
           firstMessage: 'Previous message',
           lastMessage: 'Previous message',
           messageCount: 1,
-          timestamp: Date.now() - 10000,
+          timestamp: mockTimeService.getTimestamp() - 10000,
         },
         onsuccess: null,
         onerror: null,
@@ -221,7 +277,7 @@ describe('MemoryService', () => {
     it('returns cached messages when available', async () => {
       // Set cache
       (memoryService as any).recentMessagesCache = [
-        { id: 'cached-1', role: 'user', content: 'Cached message', timestamp: Date.now() },
+        { id: 'cached-1', role: 'user', content: 'Cached message', timestamp: mockTimeService.getTimestamp() },
       ];
       
       const messages = await memoryService.getRecentMessages(10);
@@ -233,9 +289,9 @@ describe('MemoryService', () => {
 
     it('fetches messages from database when cache is empty', async () => {
       const storedMessages = [
-        { id: 'msg-1', role: 'user', content: 'Message 1', timestamp: Date.now() - 2000 },
-        { id: 'msg-2', role: 'assistant', content: 'Message 2', timestamp: Date.now() - 1000 },
-        { id: 'msg-3', role: 'user', content: 'Message 3', timestamp: Date.now() },
+        { id: 'msg-1', role: 'user', content: 'Message 1', timestamp: mockTimeService.getTimestamp() - 2000 },
+        { id: 'msg-2', role: 'assistant', content: 'Message 2', timestamp: mockTimeService.getTimestamp() - 1000 },
+        { id: 'msg-3', role: 'user', content: 'Message 3', timestamp: mockTimeService.getTimestamp() },
       ];
       
       const getRequest = {
@@ -296,7 +352,7 @@ describe('MemoryService', () => {
       
       expect(mockObjectStore.add).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: 'msg-123',
+          id: expect.stringMatching(/^mem-\d+-[a-z0-9]+$/),
           content: 'Important information',
           context: 'User asked about weather',
           timestamp: expect.any(Number),
@@ -333,7 +389,7 @@ describe('MemoryService', () => {
           id: 'mem-1',
           content: 'Cached memory',
           context: 'Test context',
-          timestamp: Date.now(),
+          timestamp: mockTimeService.getTimestamp(),
         },
       ];
       (memoryService as any).memoriesCache = cachedMemories;
@@ -354,9 +410,9 @@ describe('MemoryService', () => {
       
       // Simulate cursor iterations
       const memories = [
-        { id: 'mem-1', content: 'Memory 1', context: 'Context 1', timestamp: Date.now() - 2000 },
-        { id: 'mem-2', content: 'Memory 2', context: 'Context 2', timestamp: Date.now() },
-        { id: 'mem-3', content: 'Memory 3', context: 'Context 3', timestamp: Date.now() - 1000 },
+        { id: 'mem-1', content: 'Memory 1', context: 'Context 1', timestamp: mockTimeService.getTimestamp() - 2000 },
+        { id: 'mem-2', content: 'Memory 2', context: 'Context 2', timestamp: mockTimeService.getTimestamp() },
+        { id: 'mem-3', content: 'Memory 3', context: 'Context 3', timestamp: mockTimeService.getTimestamp() - 1000 },
       ];
       
       let cursorIndex = 0;
@@ -394,7 +450,7 @@ describe('MemoryService', () => {
     it('returns cached context when fresh', async () => {
       const cachedContext = 'Cached context information';
       (memoryService as any).contextCache = cachedContext;
-      (memoryService as any).contextCacheTimestamp = Date.now() - 10000; // 10 seconds ago
+      (memoryService as any).contextCacheTimestamp = mockTimeService.getTimestamp() - 10000; // 10 seconds ago
       
       const context = await memoryService.getContextForPrompt();
       
@@ -403,21 +459,21 @@ describe('MemoryService', () => {
     });
 
     it('generates new context when cache is stale', async () => {
-      (memoryService as any).contextCacheTimestamp = Date.now() - 60000; // 1 minute ago
+      (memoryService as any).contextCacheTimestamp = mockTimeService.getTimestamp() - 60000; // 1 minute ago
       
       const memories: MarkedMemory[] = [
         {
           id: 'mem-1',
           content: 'Important fact 1',
           context: 'Context 1',
-          timestamp: Date.now() - 2000,
+          timestamp: mockTimeService.getTimestamp() - 2000,
           tag: 'weather',
         },
         {
           id: 'mem-2',
           content: 'Important fact 2',
           context: 'Context 2',
-          timestamp: Date.now(),
+          timestamp: mockTimeService.getTimestamp(),
         },
       ];
       
@@ -466,7 +522,7 @@ describe('MemoryService', () => {
         id: 'continuous-main',
         firstMessage: 'First',
         lastMessage: 'Last',
-        timestamp: Date.now(),
+        timestamp: mockTimeService.getTimestamp(),
         messageCount: 10,
       };
       (memoryService as any).conversationMetaCache = cachedMeta;
@@ -488,7 +544,7 @@ describe('MemoryService', () => {
         ],
         firstMessage: 'Message 1',
         lastMessage: 'Message 2',
-        timestamp: Date.now(),
+        timestamp: mockTimeService.getTimestamp(),
         messageCount: 2,
       };
       

@@ -4,6 +4,21 @@ import { logger } from '../../lib/logger';
 
 jest.mock('../../lib/logger');
 
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 // Mock adapter implementation
 class MockAdapter implements AppDataAdapter {
   constructor(
@@ -21,7 +36,7 @@ class MockAdapter implements AppDataAdapter {
       appName: this.appName,
       displayName: this.displayName,
       isActive: this.mockData.isActive || false,
-      lastUsed: Date.now(),
+      lastUsed: mockTimeService.getTimestamp(),
       data: this.mockData,
       summary: this.mockData.summary || 'Test summary',
       capabilities: this.mockData.capabilities || ['test'],
@@ -77,11 +92,14 @@ describe('DashboardAppService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
     // Create new instance to avoid state pollution
     service = new DashboardAppService();
   });
 
   afterEach(() => {
+    mockTimeService.destroy();
     service.destroy();
   });
 
@@ -562,16 +580,12 @@ describe('DashboardAppService', () => {
       service.getAppData('app1');
       expect(getContextSpy).toHaveBeenCalledTimes(1);
       
-      // Advance time beyond cache TTL
-      const originalNow = Date.now;
-      Date.now = jest.fn(() => originalNow() + 6000); // 6 seconds later
+      // Advance time beyond cache TTL (6 seconds)
+      mockTimeService.advanceTime(6000);
       
       // Should fetch fresh data
       service.getAppData('app1');
       expect(getContextSpy).toHaveBeenCalledTimes(2);
-      
-      // Restore
-      Date.now = originalNow;
     });
   });
 

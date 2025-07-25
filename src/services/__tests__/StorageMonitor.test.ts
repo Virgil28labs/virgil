@@ -2,6 +2,34 @@ import { StorageMonitor } from '../StorageMonitor';
 import { StorageService } from '../StorageService';
 import { indexedDBService } from '../IndexedDBService';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../StorageService');
 jest.mock('../IndexedDBService');
@@ -25,12 +53,19 @@ describe('StorageMonitor', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     // Reset singleton
     (StorageMonitor as any).instance = undefined;
     monitor = StorageMonitor.getInstance();
     
     // Clear any metrics from previous tests
     monitor.clearMetrics();
+  });
+
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('getInstance', () => {
@@ -371,13 +406,13 @@ describe('StorageMonitor', () => {
 
   describe('getCleanupSuggestions', () => {
     it('suggests cleaning old conversations', async () => {
-      const oldTimestamp = Date.now() - (35 * 24 * 60 * 60 * 1000); // 35 days ago
+      const oldTimestamp = mockTimeService.getTimestamp() - (35 * 24 * 60 * 60 * 1000); // 35 days ago
       
       (indexedDBService.getAll as jest.Mock).mockResolvedValue({
         success: true,
         data: [
           { id: 1, timestamp: oldTimestamp },
-          { id: 2, timestamp: Date.now() },
+          { id: 2, timestamp: mockTimeService.getTimestamp() },
           { id: 3, timestamp: oldTimestamp },
         ],
       });

@@ -5,6 +5,34 @@ import { chatService } from '../../services/ChatService';
 import { memoryService } from '../../services/MemoryService';
 import type { ChatMessage } from '../../types/chat.types';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../../services/ChatService', () => ({
   chatService: {
@@ -21,6 +49,10 @@ jest.mock('../../services/MemoryService', () => ({
 jest.mock('../useChatApi', () => ({
   useChatApi: ({ onSuccess, onError, onTypingChange }: any) => {
     const sendMessage = jest.fn(async (text, _system, _messages, _model) => {
+      // Get mockTimeService from the import above
+      const { timeService } = require('../../services/TimeService');
+      const mockTimeService = timeService as any;
+      
       // Simulate API call
       if (text === 'error') {
         onError('API Error');
@@ -32,7 +64,7 @@ jest.mock('../useChatApi', () => ({
           id: 'assistant-123',
           role: 'assistant',
           content: 'Assistant response',
-          timestamp: Date.now(),
+          timestamp: mockTimeService.getTimestamp(),
         });
       }
     });
@@ -62,13 +94,20 @@ describe('useMessageHandling Hook', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     (chatService.createUserMessage as jest.Mock).mockImplementation(text => ({
       id: 'user-123',
       role: 'user',
       content: text,
-      timestamp: Date.now(),
+      timestamp: mockTimeService.getTimestamp(),
     }));
     (memoryService.saveConversation as jest.Mock).mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('sendMessage', () => {

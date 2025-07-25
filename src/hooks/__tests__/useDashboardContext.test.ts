@@ -3,6 +3,34 @@ import { useDashboardContext } from '../useDashboardContext';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import type { DashboardContext } from '../../services/DashboardContextService';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../../services/DashboardContextService', () => ({
   dashboardContextService: {
@@ -16,21 +44,7 @@ describe('useDashboardContext Hook', () => {
   const mockDispatch = jest.fn();
   const mockUnsubscribe = jest.fn();
   
-  const mockContext: DashboardContext = {
-    location: { city: 'Santa Monica', country: 'USA' },
-    weather: {
-      temp: 72,
-      description: 'Sunny',
-      humidity: 65,
-      windSpeed: 10,
-    },
-    user: null,
-    activities: ['weather-checked', 'location-updated'],
-    appStates: {
-      weather: { lastUpdate: Date.now() },
-    },
-    lastUpdated: Date.now(),
-  };
+  let mockContext: DashboardContext;
 
   const mockSuggestions = [
     'Check the weather forecast',
@@ -39,10 +53,33 @@ describe('useDashboardContext Hook', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
+    // Set up mock context with current timestamp
+    mockContext = {
+      location: { city: 'Santa Monica', country: 'USA' },
+      weather: {
+        temp: 72,
+        description: 'Sunny',
+        humidity: 65,
+        windSpeed: 10,
+      },
+      user: null,
+      activities: ['weather-checked', 'location-updated'],
+      appStates: {
+        weather: { lastUpdate: mockTimeService.getTimestamp() },
+      },
+      lastUpdated: mockTimeService.getTimestamp(),
+    };
     
     (dashboardContextService.subscribe as jest.Mock).mockReturnValue(mockUnsubscribe);
     (dashboardContextService.getContext as jest.Mock).mockReturnValue(mockContext);
     (dashboardContextService.generateSuggestions as jest.Mock).mockReturnValue(mockSuggestions);
+  });
+  
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   it('initializes dashboard context on mount', () => {

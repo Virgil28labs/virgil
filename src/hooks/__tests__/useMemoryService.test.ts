@@ -5,6 +5,34 @@ import { DynamicContextBuilder } from '../../services/DynamicContextBuilder';
 import type { ChatMessage } from '../../types/chat.types';
 import type { DashboardContext } from '../../services/DashboardContextService';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../../services/MemoryService', () => ({
   memoryService: {
@@ -28,32 +56,9 @@ describe('useMemoryService Hook', () => {
   const mockDispatch = jest.fn();
   const mockSetError = jest.fn();
   
-  const mockDashboardContext: DashboardContext = {
-    location: { city: 'Santa Monica', country: 'USA' },
-    weather: null,
-    user: null,
-    activities: [],
-    appStates: {},
-    lastUpdated: Date.now(),
-  };
-
-  const mockMessage: ChatMessage = {
-    id: 'msg-123',
-    role: 'user',
-    content: 'Important information',
-    timestamp: Date.now(),
-  };
-
-  const mockMemoryData = {
-    lastConversation: { messageCount: 5, timestamp: Date.now() },
-    markedMemories: [
-      { id: 'mem-1', content: 'Memory 1', timestamp: Date.now() },
-    ],
-    recentConversations: [
-      { timestamp: Date.now(), messageCount: 3, messages: [] },
-    ],
-    memoryContext: 'Context for prompt',
-  };
+  let mockDashboardContext: DashboardContext;
+  let mockMessage: ChatMessage;
+  let mockMemoryData: any;
 
   const defaultProps = {
     dispatch: mockDispatch,
@@ -63,6 +68,36 @@ describe('useMemoryService Hook', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
+    // Set up mock data with current timestamps
+    mockDashboardContext = {
+      location: { city: 'Santa Monica', country: 'USA' },
+      weather: null,
+      user: null,
+      activities: [],
+      appStates: {},
+      lastUpdated: mockTimeService.getTimestamp(),
+    };
+
+    mockMessage = {
+      id: 'msg-123',
+      role: 'user',
+      content: 'Important information',
+      timestamp: mockTimeService.getTimestamp(),
+    };
+
+    mockMemoryData = {
+      lastConversation: { messageCount: 5, timestamp: mockTimeService.getTimestamp() },
+      markedMemories: [
+        { id: 'mem-1', content: 'Memory 1', timestamp: mockTimeService.getTimestamp() },
+      ],
+      recentConversations: [
+        { timestamp: mockTimeService.getTimestamp(), messageCount: 3, messages: [] },
+      ],
+      memoryContext: 'Context for prompt',
+    };
     
     // Setup default mock returns
     (memoryService.init as jest.Mock).mockResolvedValue(undefined);
@@ -73,6 +108,10 @@ describe('useMemoryService Hook', () => {
     (memoryService.getRecentMessages as jest.Mock).mockResolvedValue([]);
     (memoryService.markAsImportant as jest.Mock).mockResolvedValue(undefined);
     (DynamicContextBuilder.createContextSummary as jest.Mock).mockReturnValue('Context summary');
+  });
+  
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('initializeMemory', () => {
@@ -153,8 +192,8 @@ describe('useMemoryService Hook', () => {
   describe('loadRecentMessages', () => {
     it('loads recent messages successfully', async () => {
       const recentMessages: ChatMessage[] = [
-        { id: '1', role: 'user', content: 'Hello', timestamp: Date.now() },
-        { id: '2', role: 'assistant', content: 'Hi there!', timestamp: Date.now() },
+        { id: '1', role: 'user', content: 'Hello', timestamp: mockTimeService.getTimestamp() },
+        { id: '2', role: 'assistant', content: 'Hi there!', timestamp: mockTimeService.getTimestamp() },
       ];
       
       (memoryService.getRecentMessages as jest.Mock).mockResolvedValue(recentMessages);
@@ -275,7 +314,7 @@ describe('useMemoryService Hook', () => {
     it('updates memory data after marking as important', async () => {
       const updatedMemories = [
         ...mockMemoryData.markedMemories,
-        { id: 'mem-2', content: 'New memory', timestamp: Date.now() },
+        { id: 'mem-2', content: 'New memory', timestamp: mockTimeService.getTimestamp() },
       ];
       const updatedContext = 'Updated context';
 

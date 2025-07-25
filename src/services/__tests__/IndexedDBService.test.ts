@@ -1,5 +1,33 @@
 import { IndexedDBService } from '../IndexedDBService';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 // Mock IndexedDB
 const mockDatabase = {
   version: 1,
@@ -63,7 +91,7 @@ const mockStorage = {
   storage: mockStorage,
 };
 (global as any).performance = {
-  now: jest.fn(() => Date.now()),
+  now: jest.fn(() => mockTimeService.getTimestamp()),
 };
 
 describe('IndexedDBService', () => {
@@ -71,6 +99,9 @@ describe('IndexedDBService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     // Get a fresh instance by clearing the singleton
     (IndexedDBService as any).instance = undefined;
     service = IndexedDBService.getInstance();
@@ -79,6 +110,10 @@ describe('IndexedDBService', () => {
     mockDatabase.objectStoreNames.contains.mockReturnValue(false);
     mockDatabase.transaction.mockReturnValue(mockTransaction);
     mockObjectStore.index.mockReturnValue(mockIndex);
+  });
+
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('getInstance', () => {

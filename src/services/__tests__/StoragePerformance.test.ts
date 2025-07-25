@@ -7,9 +7,39 @@
 
 import { StorageService } from '../StorageService';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 describe('Storage Performance', () => {
   beforeEach(() => {
     localStorage.clear();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
   });
 
   describe('localStorage Performance', () => {
@@ -36,7 +66,7 @@ describe('Storage Performance', () => {
     it('should perform write operations under 2ms average', () => {
       const iterations = 1000;
       const times: number[] = [];
-      const testData = { id: 1, value: 'test', timestamp: Date.now() };
+      const testData = { id: 1, value: 'test', timestamp: mockTimeService.getTimestamp() };
       
       for (let i = 0; i < iterations; i++) {
         const start = performance.now();
@@ -57,7 +87,7 @@ describe('Storage Performance', () => {
           id: i,
           name: `Item ${i}`,
           description: 'x'.repeat(100),
-          metadata: { created: Date.now(), tags: ['tag1', 'tag2', 'tag3'] },
+          metadata: { created: mockTimeService.getTimestamp(), tags: ['tag1', 'tag2', 'tag3'] },
         })),
       };
       
@@ -187,5 +217,6 @@ describe('Storage Performance', () => {
 
   afterEach(() => {
     localStorage.clear();
+    mockTimeService.destroy();
   });
 });

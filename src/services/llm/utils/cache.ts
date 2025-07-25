@@ -1,4 +1,4 @@
-import { timeService } from '../TimeService';
+import { timeService } from '../../TimeService';
 
 interface CacheOptions {
   ttl?: number;

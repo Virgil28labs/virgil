@@ -7,9 +7,44 @@
 import { StorageService, STORAGE_KEYS } from '../StorageService';
 import { StorageMigration } from '../StorageMigration';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
+
 describe('Storage System', () => {
   beforeEach(() => {
     localStorage.clear();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+  });
+  
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('StorageService Core Functionality', () => {
@@ -309,8 +344,8 @@ describe('Storage System', () => {
     it('should handle favorites collections correctly', () => {
       // Dog favorites
       const dogFavorites = [
-        { url: 'https://dog.ceo/1.jpg', breed: 'corgi', timestamp: Date.now() },
-        { url: 'https://dog.ceo/2.jpg', breed: 'husky', timestamp: Date.now() },
+        { url: 'https://dog.ceo/1.jpg', breed: 'corgi', timestamp: mockTimeService.getTimestamp() },
+        { url: 'https://dog.ceo/2.jpg', breed: 'husky', timestamp: mockTimeService.getTimestamp() },
       ];
       StorageService.set(STORAGE_KEYS.DOG_FAVORITES, dogFavorites);
 

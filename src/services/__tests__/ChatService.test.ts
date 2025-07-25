@@ -9,8 +9,60 @@ jest.mock('../../lib/requestDeduplication');
 jest.mock('../DashboardAppService', () => ({
   dashboardAppService: {
     getResponseForQuery: jest.fn(),
+    subscribe: jest.fn(),
+    unsubscribe: jest.fn(),
+    destroy: jest.fn(),
   },
 }));
+jest.mock('../DashboardContextService', () => {
+  // Use the actual mock TimeService methods
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockTimeInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    dashboardContextService: {
+      getContext: jest.fn().mockReturnValue({
+        currentTime: '12:00',
+        currentDate: 'January 20, 2024',
+        timeOfDay: 'afternoon',
+        location: { hasGPS: false },
+        weather: { hasData: false },
+        user: { isAuthenticated: false },
+      }),
+      getContextForPrompt: jest.fn().mockReturnValue('Test context'),
+      getCurrentDateTime: jest.fn(() => mockTimeInstance.getCurrentDateTime()),
+      getTimestamp: jest.fn(() => mockTimeInstance.getTimestamp()),
+    },
+  };
+});
+
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  const actualMock = jest.requireActual('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+const mockTimeService = timeService as any;
 
 describe('ChatService', () => {
   let chatService: ChatService;
@@ -19,9 +71,13 @@ describe('ChatService', () => {
   beforeEach(() => {
     chatService = new ChatService(mockApiUrl);
     jest.clearAllMocks();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
   });
 
   afterEach(() => {
+    mockTimeService.destroy();
     jest.restoreAllMocks();
   });
 
@@ -166,7 +222,7 @@ describe('ChatService', () => {
       });
       expect(message.id).toMatch(/^\d+-user$/);
       expect(message.timestamp).toBeDefined();
-      expect(new Date(message.timestamp).getTime()).toBeLessThanOrEqual(Date.now());
+      expect(new Date(message.timestamp).getTime()).toBeLessThanOrEqual(mockTimeService.getTimestamp());
     });
   });
 

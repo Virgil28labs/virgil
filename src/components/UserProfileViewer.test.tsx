@@ -7,6 +7,34 @@ import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { useUserProfile } from '../hooks/useUserProfile';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../services/TimeService', () => {
+  const actualMock = jest.requireActual('../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../contexts/AuthContext');
 jest.mock('../contexts/LocationContext');
@@ -33,7 +61,7 @@ const mockUser = {
 };
 
 const mockLocationData = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: mockTimeService.getTimestamp() },
   address: {
     street: '123 Main St',
     house_number: '123',
@@ -54,7 +82,7 @@ const mockLocationData = {
   loading: false,
   error: null,
   permissionStatus: 'granted' as const,
-  lastUpdated: Date.now(),
+  lastUpdated: mockTimeService.getTimestamp(),
   hasLocation: true,
   hasGPSLocation: true,
   hasIpLocation: true,
@@ -86,7 +114,7 @@ const mockWeatherData = {
   timezone: -28800,
   cityName: 'New York',
   country: 'US',
-  timestamp: Date.now(),
+  timestamp: mockTimeService.getTimestamp(),
 };
 
 const mockSignOut = jest.fn().mockResolvedValue({ error: null });
@@ -121,6 +149,8 @@ Object.assign(navigator, {
 describe('UserProfileViewer', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
     
     mockUseAuth.mockReturnValue({
       user: mockUser,
@@ -141,7 +171,7 @@ describe('UserProfileViewer', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now(),
+      lastUpdated: mockTimeService.getTimestamp(),
     });
     
     mockUseKeyboardNavigation.mockReturnValue({
@@ -176,6 +206,10 @@ describe('UserProfileViewer', () => {
       updateAddress: jest.fn(),
       saveProfile: jest.fn(),
     });
+  });
+
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   it('renders nothing when closed', () => {

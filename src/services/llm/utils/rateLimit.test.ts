@@ -1,21 +1,46 @@
 import { RateLimiter } from './rateLimit';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../../services/TimeService';
+const mockTimeService = timeService as any;
+
 describe('RateLimiter', () => {
   let limiter: RateLimiter;
-  let originalDateNow: () => number;
 
   beforeEach(() => {
-    originalDateNow = Date.now;
-    // Mock Date.now to have control over time
-    let currentTime = 1000000;
-    Date.now = jest.fn(() => currentTime);
-    jest.spyOn(Date, 'now').mockImplementation(() => currentTime++);
+    jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
     
     limiter = new RateLimiter();
   });
 
   afterEach(() => {
-    Date.now = originalDateNow;
+    mockTimeService.destroy();
   });
 
   describe('constructor', () => {
@@ -56,51 +81,43 @@ describe('RateLimiter', () => {
     });
 
     it('should allow requests after window expires', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Fill up the limit
       for (let i = 0; i < 20; i++) {
         limiter.checkLimit();
-        currentTime += 100;
+        mockTimeService.advanceTime(100);
       }
       
       // Should be blocked
       expect(limiter.checkLimit()).toBe(false);
       
       // Advance time past the window
-      currentTime += 60000;
+      mockTimeService.advanceTime(60000);
       
       // Should allow new requests
       expect(limiter.checkLimit()).toBe(true);
     });
 
     it('should track requests in sliding window', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Add 10 requests
       for (let i = 0; i < 10; i++) {
         limiter.checkLimit();
-        currentTime += 1000;
+        mockTimeService.advanceTime(1000);
       }
       
       // Advance time by 30 seconds (half window)
-      currentTime += 30000;
+      mockTimeService.advanceTime(30000);
       
       // Add 10 more requests
       for (let i = 0; i < 10; i++) {
         expect(limiter.checkLimit()).toBe(true);
-        currentTime += 100;
+        mockTimeService.advanceTime(100);
       }
       
       // Should be at limit
       expect(limiter.checkLimit()).toBe(false);
       
       // Advance time so first requests expire
-      currentTime += 30000;
+      mockTimeService.advanceTime(30000);
       
       // Should allow new requests as old ones expired
       expect(limiter.checkLimit()).toBe(true);
@@ -121,19 +138,15 @@ describe('RateLimiter', () => {
     });
 
     it('should update remaining requests as window slides', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Add 10 requests
       for (let i = 0; i < 10; i++) {
         limiter.checkLimit();
-        currentTime += 100;
+        mockTimeService.advanceTime(100);
       }
       expect(limiter.getRemainingRequests()).toBe(10);
       
       // Advance time past window
-      currentTime += 61000;
+      mockTimeService.advanceTime(61000);
       
       // All requests should have expired
       expect(limiter.getRemainingRequests()).toBe(20);
@@ -155,9 +168,7 @@ describe('RateLimiter', () => {
     });
 
     it('should return reset time based on oldest request', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      const startTime = 1000000;
-      mockNow.mockImplementation(() => startTime);
+      const startTime = mockTimeService.getTimestamp();
       
       limiter.checkLimit();
       
@@ -166,25 +177,21 @@ describe('RateLimiter', () => {
     });
 
     it('should update reset time as old requests expire', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Add first request
       limiter.checkLimit();
-      const firstRequestTime = currentTime;
+      const firstRequestTime = mockTimeService.getTimestamp();
       
       // Add more requests later
-      currentTime += 30000;
+      mockTimeService.advanceTime(30000);
       limiter.checkLimit();
-      const secondRequestTime = currentTime;
+      const secondRequestTime = mockTimeService.getTimestamp();
       
       // Reset time should be based on first request
       let resetTime = limiter.getResetTime();
       expect(resetTime).toEqual(new Date(firstRequestTime + 60000));
       
       // Advance time past first request's window
-      currentTime = firstRequestTime + 61000;
+      mockTimeService.advanceTime(31000);
       
       // Call getRemainingRequests to trigger cleanup of expired requests
       limiter.getRemainingRequests();
@@ -197,9 +204,7 @@ describe('RateLimiter', () => {
 
   describe('getStats', () => {
     it('should return comprehensive stats', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      const currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
+      const currentTime = mockTimeService.getTimestamp();
       
       // Add some requests
       for (let i = 0; i < 5; i++) {
@@ -218,18 +223,14 @@ describe('RateLimiter', () => {
     });
 
     it('should clean up old requests when getting stats', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Add requests
       for (let i = 0; i < 10; i++) {
         limiter.checkLimit();
-        currentTime += 100;
+        mockTimeService.advanceTime(100);
       }
       
       // Advance time past window
-      currentTime += 61000;
+      mockTimeService.advanceTime(61000);
       
       const stats = limiter.getStats();
       expect(stats.currentRequests).toBe(0);
@@ -263,10 +264,6 @@ describe('RateLimiter', () => {
         windowMs: 100,
       });
       
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Fill limit
       for (let i = 0; i < 5; i++) {
         expect(fastLimiter.checkLimit()).toBe(true);
@@ -275,20 +272,16 @@ describe('RateLimiter', () => {
       expect(fastLimiter.checkLimit()).toBe(false);
       
       // Wait for window to expire
-      currentTime += 101;
+      mockTimeService.advanceTime(101);
       
       expect(fastLimiter.checkLimit()).toBe(true);
     });
 
     it('should handle large number of requests', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Simulate burst of requests
       for (let i = 0; i < 100; i++) {
         limiter.checkLimit();
-        currentTime += 10;
+        mockTimeService.advanceTime(10);
       }
       
       const stats = limiter.getStats();
@@ -296,21 +289,17 @@ describe('RateLimiter', () => {
     });
 
     it('should handle requests at exact window boundary', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       limiter.checkLimit();
       
       // Advance exactly to window boundary
-      currentTime += 60000;
+      mockTimeService.advanceTime(60000);
       
       // At exact window boundary, request is excluded (time > windowStart)
       const stats = limiter.getStats();
       expect(stats.currentRequests).toBe(0);
       
       // One millisecond later, it should be gone
-      currentTime += 1;
+      mockTimeService.advanceTime(1);
       const newStats = limiter.getStats();
       expect(newStats.currentRequests).toBe(0);
     });
@@ -336,18 +325,14 @@ describe('RateLimiter', () => {
     });
 
     it('should handle time going backwards gracefully', () => {
-      const mockNow = jest.spyOn(Date, 'now');
-      let currentTime = 1000000;
-      mockNow.mockImplementation(() => currentTime);
-      
       // Add some requests
       for (let i = 0; i < 5; i++) {
         limiter.checkLimit();
-        currentTime += 1000;
+        mockTimeService.advanceTime(1000);
       }
       
       // Time goes backwards (e.g., system clock adjustment)
-      currentTime -= 10000;
+      mockTimeService.advanceTime(-10000);
       
       // Should still respect the existing requests
       const stats = limiter.getStats();

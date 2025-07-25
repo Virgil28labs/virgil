@@ -7,6 +7,34 @@ import { weatherService } from '../lib/weatherService';
 import type { WeatherData } from '../types/weather.types';
 import type { LocationContextValue } from '../types/location.types';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../services/TimeService', () => {
+  const actualMock = jest.requireActual('../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock the weather service completely
 jest.mock('../lib/weatherService', () => ({
   weatherService: {
@@ -45,17 +73,17 @@ const mockWeatherData: WeatherData = {
   timezone: -28800,
   cityName: 'New York',
   country: 'US',
-  timestamp: Date.now(),
+  timestamp: mockTimeService.getTimestamp(),
 };
 
 const mockLocationContext: LocationContextValue = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: mockTimeService.getTimestamp() },
   address: null,
   ipLocation: { ip: '127.0.0.1', city: 'New York', region: 'NY', country: 'US', timezone: 'America/New_York' },
   loading: false,
   error: null,
   permissionStatus: 'granted',
-  lastUpdated: Date.now(),
+  lastUpdated: mockTimeService.getTimestamp(),
   hasLocation: true,
   hasGPSLocation: true,
   hasIpLocation: true,
@@ -79,6 +107,10 @@ describe('WeatherContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     // Mock successful forecast response by default
     mockWeatherService.getForecastByCoordinates.mockResolvedValue({} as any);
     mockWeatherService.getForecastByCity.mockResolvedValue({} as any);
@@ -89,6 +121,7 @@ describe('WeatherContext', () => {
       jest.runOnlyPendingTimers();
     });
     jest.useRealTimers();
+    mockTimeService.destroy();
   });
 
   it('throws error when useWeather is used outside provider', () => {

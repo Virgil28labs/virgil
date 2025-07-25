@@ -7,6 +7,34 @@ import type { LLMResponse } from '../types/llm.types';
 // Mock useLLM hook
 jest.mock('./useLLM');
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../services/TimeService', () => {
+  const actualMock = jest.requireActual('../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock data
 const mockLLMResponse: LLMResponse = {
   id: 'llm-response-1',
@@ -34,6 +62,9 @@ describe('useChat', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     mockComplete = jest.fn().mockResolvedValue(mockLLMResponse);
     mockCompleteStream = jest.fn();
     mockClearError = jest.fn();
@@ -45,6 +76,10 @@ describe('useChat', () => {
       error: null,
       clearError: mockClearError,
     });
+  });
+  
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('Basic Functionality', () => {
@@ -539,8 +574,8 @@ describe('useChat', () => {
       
       const exportData = {
         messages: [
-          { id: '1', role: 'user', content: 'Loaded message', timestamp: new Date().toISOString() },
-          { id: '2', role: 'assistant', content: 'Loaded response', timestamp: new Date().toISOString() },
+          { id: '1', role: 'user', content: 'Loaded message', timestamp: mockTimeService.toISOString() },
+          { id: '2', role: 'assistant', content: 'Loaded response', timestamp: mockTimeService.toISOString() },
         ],
       };
       
@@ -557,16 +592,16 @@ describe('useChat', () => {
       
       const exportData = {
         messages: [
-          { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: new Date().toISOString() },
+          { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: mockTimeService.toISOString() },
         ],
         systemPrompt: 'Test prompt',
-        exportedAt: new Date().toISOString(),
+        exportedAt: mockTimeService.toISOString(),
         summary: {
           userMessages: 1,
           assistantMessages: 0,
           totalMessages: 1,
-          lastMessage: { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: new Date().toISOString() },
-          conversationStarted: new Date().toISOString(),
+          lastMessage: { id: '1', role: 'user' as const, content: 'Loaded message', timestamp: mockTimeService.toISOString() },
+          conversationStarted: mockTimeService.toISOString(),
         },
       };
       

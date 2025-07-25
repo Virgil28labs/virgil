@@ -1,7 +1,44 @@
+import React from 'react';
 import { renderHook } from '@testing-library/react';
 import { useDataExport } from '../useDataExport';
 import type { ChatMessage } from '../../types/chat.types';
 import type { User } from '../../types/auth.types';
+
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-15T10:30:00.000Z');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../services/TimeService';
+const mockTimeService = timeService as any;
+
+// Mock DashboardContextService
+jest.mock('../../services/DashboardContextService', () => ({
+  dashboardContextService: {
+    getCurrentDateTime: jest.fn(() => new Date('2024-01-15T10:30:00.000Z')),
+    getLocalDate: jest.fn(() => '2024-01-15'),
+  },
+}));
 
 // Mock URL methods
 global.URL.createObjectURL = jest.fn(() => 'mock-blob-url');
@@ -16,36 +53,38 @@ describe('useDataExport Hook', () => {
     },
   } as User;
 
-  const mockMessages: ChatMessage[] = [
-    {
-      id: 'msg-1',
-      role: 'user',
-      content: 'Hello Virgil',
-      timestamp: Date.now() - 2000,
-    },
-    {
-      id: 'msg-2',
-      role: 'assistant',
-      content: 'Hello! How can I help you?',
-      timestamp: Date.now() - 1000,
-    },
-    {
-      id: 'msg-3',
-      role: 'user',
-      content: 'What is the weather?',
-      timestamp: Date.now(),
-    },
-  ];
+  let mockMessages: ChatMessage[];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock date for consistent testing
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2024-01-15T10:30:00.000Z'));
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-15T10:30:00.000Z');
+    
+    // Set up messages with current timestamps
+    mockMessages = [
+      {
+        id: 'msg-1',
+        role: 'user',
+        content: 'Hello Virgil',
+        timestamp: mockTimeService.getTimestamp() - 2000,
+      },
+      {
+        id: 'msg-2',
+        role: 'assistant',
+        content: 'Hello! How can I help you?',
+        timestamp: mockTimeService.getTimestamp() - 1000,
+      },
+      {
+        id: 'msg-3',
+        role: 'user',
+        content: 'What is the weather?',
+        timestamp: mockTimeService.getTimestamp(),
+      },
+    ];
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    mockTimeService.destroy();
   });
 
   describe('handleExportMessages', () => {
@@ -242,8 +281,8 @@ describe('useDataExport Hook', () => {
         id: 'msg-4',
         role: 'assistant',
         content: 'The weather is sunny!',
-        timestamp: Date.now(),
-      }];
+        timestamp: mockTimeService.getTimestamp(),
+      }] as ChatMessage[];
       
       rerender({ user: mockUser, messages: newMessages });
       const handler3 = result.current.handleExportMessages;

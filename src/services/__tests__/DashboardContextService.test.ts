@@ -5,9 +5,35 @@ import { userProfileAdapter } from '../adapters/UserProfileAdapter';
 jest.mock('../DashboardAppService');
 jest.mock('../adapters/UserProfileAdapter');
 
-// Mock Date to control time-based tests
-const mockDate = new Date('2024-01-15T10:30:00');
-const originalDate = Date;
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../TimeService', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const actualMock = require('../__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-15T10:30:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../TimeService';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockTimeService = timeService as any;
 
 // Mock window properties
 const mockMatchMedia = {
@@ -29,15 +55,8 @@ describe('DashboardContextService', () => {
     jest.useFakeTimers();
     jest.spyOn(global, 'setInterval');
     
-    // Mock Date
-    global.Date = jest.fn((...args) => {
-      if (args.length === 0) {
-        return mockDate;
-      }
-      return new originalDate(...args);
-    }) as any;
-    global.Date.now = jest.fn(() => mockDate.getTime());
-    Object.setPrototypeOf(global.Date, originalDate);
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-15T10:30:00');
     
     // Mock window properties
     Object.defineProperty(window, 'innerWidth', {
@@ -73,9 +92,9 @@ describe('DashboardContextService', () => {
 
   afterEach(() => {
     service.destroy();
+    mockTimeService.destroy();
     jest.clearAllTimers();
     jest.useRealTimers();
-    global.Date = originalDate;
     addEventListenerSpy.mockRestore();
     removeEventListenerSpy.mockRestore();
   });
@@ -84,11 +103,9 @@ describe('DashboardContextService', () => {
     it('initializes with correct default context', () => {
       const context = service.getContext();
       
-      // Time will be formatted based on local timezone
-      expect(context.currentTime).toMatch(/\d{2}:\d{2}/);
+      expect(context.currentTime).toBe('10:30');
       expect(context.currentDate).toBe('January 15, 2024');
-      // Time of day depends on timezone
-      expect(['morning', 'afternoon', 'evening', 'night']).toContain(context.timeOfDay);
+      expect(context.timeOfDay).toBe('morning');
       expect(context.dayOfWeek).toBe('monday');
       expect(context.location.hasGPS).toBe(false);
       expect(context.weather.hasData).toBe(false);
@@ -127,9 +144,7 @@ describe('DashboardContextService', () => {
       testCases.forEach(({ hour, expected }) => {
         const testDate = new Date('2024-01-15');
         testDate.setHours(hour);
-        global.Date = jest.fn(() => testDate) as any;
-        global.Date.now = jest.fn(() => testDate.getTime());
-        Object.setPrototypeOf(global.Date, originalDate);
+        mockTimeService.setMockDate(testDate);
         
         const testService = new DashboardContextService();
         const context = testService.getContext();
@@ -337,8 +352,7 @@ describe('DashboardContextService', () => {
       expect(context.user.isAuthenticated).toBe(true);
       expect(context.user.name).toBe('Test User');
       expect(context.user.email).toBe('test@example.com');
-      // Date formatting may vary by locale
-      expect(context.user.memberSince).toMatch(/\d{1,2}\/\d{1,2}\/\d{4}/);
+      expect(context.user.memberSince).toBe('January 1, 2023');
       expect(context.user.profile).toEqual(userProfile);
       
       expect(userProfileAdapter.updateProfile).toHaveBeenCalledWith(userProfile, userData);
@@ -411,7 +425,7 @@ describe('DashboardContextService', () => {
       const context = service.getContext();
       expect(context.activity.recentActions).toContain('clicked button');
       expect(context.activity.activeComponents).toContain('Notes');
-      expect(context.activity.lastInteraction).toBe(mockDate.getTime());
+      expect(context.activity.lastInteraction).toBe(mockTimeService.getTimestamp());
     });
 
     it('adds component only once', () => {
@@ -424,12 +438,12 @@ describe('DashboardContextService', () => {
 
     it('filters old activities', () => {
       // Log an old activity
-      const oldTime = mockDate.getTime() - 11 * 60 * 1000; // 11 minutes ago
-      jest.spyOn(Date, 'now').mockReturnValueOnce(oldTime);
       service.logActivity('old action');
       
+      // Advance time by 11 minutes
+      mockTimeService.advanceTime(11 * 60 * 1000);
+      
       // Log a recent activity
-      jest.spyOn(Date, 'now').mockReturnValue(mockDate.getTime());
       service.logActivity('recent action');
       
       const context = service.getContext();
@@ -447,9 +461,9 @@ describe('DashboardContextService', () => {
       jest.advanceTimersByTime(60000);
 
       expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        currentTime: expect.stringMatching(/\d{2}:\d{2}/),
+        currentTime: '10:30',
         currentDate: 'January 15, 2024',
-        timeOfDay: expect.any(String),
+        timeOfDay: 'morning',
         dayOfWeek: 'monday',
       }));
     });
@@ -537,9 +551,9 @@ describe('DashboardContextService', () => {
       const contextString = service.getContextForPrompt();
 
       expect(contextString).toContain('CURRENT CONTEXT:');
-      expect(contextString).toContain('Current time:');
+      expect(contextString).toContain('Current time: 10:30');
       expect(contextString).toContain('Current date: January 15, 2024 (monday)');
-      expect(contextString).toContain('Time of day:');
+      expect(contextString).toContain('Time of day: morning');
       
       expect(contextString).toContain('LOCATION:');
       expect(contextString).toContain('Current location: New York, NY, USA');
@@ -578,15 +592,10 @@ describe('DashboardContextService', () => {
       const suggestions = service.generateSuggestions();
       
       const morningSuggestion = suggestions.find(s => s.id === 'morning-greeting');
-      // Morning suggestion only appears in morning time
-      const context = service.getContext();
-      if (context.timeOfDay === 'morning') {
-        expect(morningSuggestion).toBeDefined();
-        expect(morningSuggestion?.content).toContain('Good morning');
-        expect(morningSuggestion?.priority).toBe('medium');
-      } else {
-        expect(morningSuggestion).toBeUndefined();
-      }
+      // We're in morning time (10:30 AM)
+      expect(morningSuggestion).toBeDefined();
+      expect(morningSuggestion?.content).toContain('Good morning');
+      expect(morningSuggestion?.priority).toBe('medium');
     });
 
     it('generates cold weather suggestion', () => {
@@ -712,7 +721,7 @@ describe('DashboardContextService', () => {
       const mockAppData = {
         apps: new Map(),
         activeApps: [],
-        lastUpdated: Date.now(),
+        lastUpdated: mockTimeService.getTimestamp(),
       };
 
       // Get the callback passed to dashboardAppService.subscribe

@@ -5,6 +5,34 @@ import { dashboardContextService } from '../../services/DashboardContextService'
 import type { DashboardContext } from '../../services/DashboardContextService';
 import type { User } from '../../types/auth.types';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-01T14:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../../services/DynamicContextBuilder', () => ({
   DynamicContextBuilder: {
@@ -16,6 +44,7 @@ jest.mock('../../services/DashboardContextService', () => ({
   dashboardContextService: {
     getContext: jest.fn(),
     logActivity: jest.fn(),
+    getCurrentDateTime: jest.fn(() => new Date('2024-01-01T14:00:00')),
   },
 }));
 
@@ -28,17 +57,7 @@ describe('useSystemPrompt Hook', () => {
     },
   } as User;
 
-  const mockDashboardContext: DashboardContext = {
-    location: {
-      city: 'Santa Monica',
-      country: 'USA',
-    },
-    weather: null,
-    user: mockUser,
-    activities: [],
-    appStates: {},
-    lastUpdated: Date.now(),
-  };
+  let mockDashboardContext: DashboardContext;
 
   const defaultProps = {
     user: mockUser,
@@ -50,58 +69,108 @@ describe('useSystemPrompt Hook', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-01T14:00:00');
+    
+    // Set up mock dashboard context with current timestamp and timeOfDay
+    const currentDate = new Date(mockTimeService.getCurrentDate());
+    const hour = currentDate.getHours();
+    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    
+    mockDashboardContext = {
+      location: {
+        city: 'Santa Monica',
+        country: 'USA',
+      },
+      weather: null,
+      user: mockUser,
+      activities: [],
+      appStates: {},
+      lastUpdated: mockTimeService.getTimestamp(),
+      timeOfDay,
+    };
+    
     (dashboardContextService.getContext as jest.Mock).mockReturnValue(mockDashboardContext);
+    (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
     (DynamicContextBuilder.buildEnhancedPrompt as jest.Mock).mockReturnValue({
       enhancedPrompt: 'Enhanced prompt with context',
     });
   });
 
   afterEach(() => {
-    // Reset date mocking
-    jest.useRealTimers();
+    mockTimeService.destroy();
   });
 
   describe('timeOfDay calculation', () => {
     it('returns morning for hours before 12', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-01 09:00:00'));
+      mockTimeService.setMockDate('2024-01-01T09:00:00');
+      const morningContext = {
+        ...mockDashboardContext,
+        timeOfDay: 'morning',
+        lastUpdated: mockTimeService.getTimestamp(),
+      };
+      (dashboardContextService.getContext as jest.Mock).mockReturnValue(morningContext);
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
       
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      const props = { ...defaultProps, dashboardContext: morningContext };
+      const { result } = renderHook(() => useSystemPrompt(props));
       
       expect(result.current.timeOfDay).toBe('morning');
     });
 
     it('returns afternoon for hours 12-16', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-01 14:00:00'));
+      mockTimeService.setMockDate('2024-01-01T14:00:00');
+      const afternoonContext = {
+        ...mockDashboardContext,
+        timeOfDay: 'afternoon',
+        lastUpdated: mockTimeService.getTimestamp(),
+      };
+      (dashboardContextService.getContext as jest.Mock).mockReturnValue(afternoonContext);
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
       
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      const props = { ...defaultProps, dashboardContext: afternoonContext };
+      const { result } = renderHook(() => useSystemPrompt(props));
       
       expect(result.current.timeOfDay).toBe('afternoon');
     });
 
     it('returns evening for hours 17+', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-01 19:00:00'));
+      mockTimeService.setMockDate('2024-01-01T19:00:00');
+      const eveningContext = {
+        ...mockDashboardContext,
+        timeOfDay: 'evening',
+        lastUpdated: mockTimeService.getTimestamp(),
+      };
+      (dashboardContextService.getContext as jest.Mock).mockReturnValue(eveningContext);
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
       
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      const props = { ...defaultProps, dashboardContext: eveningContext };
+      const { result } = renderHook(() => useSystemPrompt(props));
       
       expect(result.current.timeOfDay).toBe('evening');
     });
 
     it('memoizes timeOfDay and does not recalculate', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-01 09:00:00'));
+      mockTimeService.setMockDate('2024-01-01T09:00:00');
+      const morningContext = {
+        ...mockDashboardContext,
+        timeOfDay: 'morning',
+        lastUpdated: mockTimeService.getTimestamp(),
+      };
+      (dashboardContextService.getContext as jest.Mock).mockReturnValue(morningContext);
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
       
-      const { result, rerender } = renderHook(() => useSystemPrompt(defaultProps));
+      const props = { ...defaultProps, dashboardContext: morningContext };
+      const { result, rerender } = renderHook(() => useSystemPrompt(props));
       
       expect(result.current.timeOfDay).toBe('morning');
       
-      // Advance time
-      jest.setSystemTime(new Date('2024-01-01 14:00:00'));
+      // Advance time but don't update context
+      mockTimeService.setMockDate('2024-01-01T14:00:00');
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
       rerender();
       
-      // Should still be morning (memoized)
+      // Should still be morning (memoized until context changes)
       expect(result.current.timeOfDay).toBe('morning');
     });
   });
@@ -158,8 +227,8 @@ describe('useSystemPrompt Hook', () => {
 
   describe('createSystemPrompt', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-01 14:00:00'));
+      mockTimeService.setMockDate('2024-01-01T14:00:00');
+      (dashboardContextService.getCurrentDateTime as jest.Mock).mockReturnValue(mockTimeService.getCurrentDate());
     });
 
     it('creates basic system prompt without user query', () => {

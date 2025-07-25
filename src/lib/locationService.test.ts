@@ -3,25 +3,60 @@ import { locationService } from './locationService';
 // Mock fetch
 global.fetch = jest.fn();
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('./logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../services/TimeService', () => {
+  const actualMock = jest.requireActual('../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock navigator.geolocation
 const mockGeolocation = {
   getCurrentPosition: jest.fn(),
 };
 
-Object.defineProperty(global.navigator, 'geolocation', {
-  value: mockGeolocation,
-  configurable: true,
-});
-
 describe('locationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
+    // Setup geolocation mock
+    Object.defineProperty(global.navigator, 'geolocation', {
+      value: mockGeolocation,
+      writable: true,
+      configurable: true,
+    });
+    
     // Reset console methods
     jest.spyOn(console, 'error').mockImplementation();
     jest.spyOn(console, 'warn').mockImplementation();
   });
 
   afterEach(() => {
+    mockTimeService.destroy();
     jest.restoreAllMocks();
   });
 
@@ -33,7 +68,7 @@ describe('locationService', () => {
           longitude: -74.0060,
           accuracy: 10,
         },
-        timestamp: Date.now(),
+        timestamp: mockTimeService.getTimestamp(),
       };
 
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
@@ -345,7 +380,7 @@ describe('locationService', () => {
           longitude: -74.0060,
           accuracy: 10,
         },
-        timestamp: Date.now(),
+        timestamp: mockTimeService.getTimestamp(),
       };
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success(mockPosition);
@@ -427,7 +462,7 @@ describe('locationService', () => {
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success({
           coords: { latitude: 40.7128, longitude: -74.0060, accuracy: 10 },
-          timestamp: Date.now(),
+          timestamp: mockTimeService.getTimestamp(),
         });
       });
 
@@ -446,7 +481,7 @@ describe('locationService', () => {
       mockGeolocation.getCurrentPosition.mockImplementation((success) => {
         success({
           coords: { latitude: 40.7128, longitude: -74.0060, accuracy: 10 },
-          timestamp: Date.now(),
+          timestamp: mockTimeService.getTimestamp(),
         });
       });
 

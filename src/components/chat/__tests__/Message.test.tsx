@@ -3,6 +3,34 @@ import { Message } from '../Message';
 import { toastService } from '../../../services/ToastService';
 import type { ChatMessage } from '../../../types/chat.types';
 
+// Mock the logger to prevent timeService usage during tests
+jest.mock('../../../lib/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+  logError: jest.fn(),
+  logInfo: jest.fn(),
+  logDebug: jest.fn(),
+}));
+
+// Mock TimeService with the actual mock implementation
+jest.mock('../../../services/TimeService', () => {
+  const actualMock = jest.requireActual('../../../services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
+// Import after mocking
+import { timeService } from '../../../services/TimeService';
+const mockTimeService = timeService as any;
+
 // Mock dependencies
 jest.mock('../../../services/ToastService', () => ({
   toastService: {
@@ -34,15 +62,22 @@ describe('Message Component', () => {
     id: 'test-123',
     role: 'user',
     content: 'Test message content',
-    timestamp: Date.now().toString(),
+    timestamp: mockTimeService.getTimestamp().toString(),
   };
 
   const mockOnMarkAsImportant = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset time to initial state
+    mockTimeService.setMockDate('2024-01-20T12:00:00');
+    
     (navigator.clipboard.writeText as jest.Mock).mockResolvedValue(undefined);
     mockShare.mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    mockTimeService.destroy();
   });
 
   describe('Chat Variant', () => {
@@ -134,7 +169,8 @@ describe('Message Component', () => {
         />,
       );
 
-      const timestamp = new Date(mockMessage.timestamp!).toLocaleTimeString();
+      // Since mockMessage.timestamp is a string of the timestamp, we need to parse it
+      const timestamp = new Date(parseInt(mockMessage.timestamp!)).toLocaleTimeString();
       expect(screen.getByText(timestamp)).toBeInTheDocument();
     });
 

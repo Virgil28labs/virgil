@@ -216,15 +216,74 @@ export class MyAppAdapter implements AppDataAdapter {
 
 ## Testing
 
-When testing components that use TimeService:
+### New Recommended Pattern (Phase 1 Migration)
+
+Use the comprehensive TimeService mock factory for consistent, controllable time in tests:
+
+```typescript
+import { setupTimeTest } from '../test-utils/timeTestUtils';
+
+// Mock TimeService
+jest.mock('../services/TimeService');
+
+// Create time test context
+const timeContext = setupTimeTest('2024-01-20T12:00:00');
+
+describe('MyComponent', () => {
+  beforeAll(() => {
+    // Apply mock to the imported timeService
+    const { timeService } = require('../services/TimeService');
+    Object.assign(timeService, timeContext.timeService);
+  });
+
+  afterEach(() => {
+    timeContext.cleanup();
+  });
+
+  it('handles time-based operations', () => {
+    // Advance time by 1 hour
+    timeContext.advanceTime(60 * 60 * 1000);
+    
+    // Set specific time
+    timeContext.setTime('2024-01-21T08:00:00');
+    
+    // Freeze time for consistent tests
+    timeContext.freezeTime();
+    
+    // Assert time-based expectations
+    timeContext.expectTimeAgo(oldDate, '2 hours ago');
+  });
+});
+```
+
+### Time Travel Utilities
+
+```typescript
+import { setupTimeTest, TimeTravel } from '../test-utils/timeTestUtils';
+
+const timeContext = setupTimeTest();
+const timeTravel = new TimeTravel(timeContext.timeService);
+
+// Jump forward/backward
+timeTravel.forward.hours(2);
+timeTravel.backward.days(7);
+
+// Jump to specific times
+timeTravel.to.morning();    // 8:00 AM
+timeTravel.to.evening();    // 7:00 PM
+timeTravel.to.startOfMonth();
+```
+
+### Legacy Pattern (For Quick Fixes)
 
 ```typescript
 // Mock the service
-jest.mock('../services/DashboardContextService', () => ({
-  dashboardContextService: {
+jest.mock('../services/TimeService', () => ({
+  timeService: {
     getCurrentDateTime: () => new Date('2024-01-20T12:00:00'),
     getLocalDate: () => '2024-01-20',
     formatDateToLocal: (date) => '2024-01-20',
+    getTimestamp: () => 1705752000000,
     // ... other methods
   }
 }));
