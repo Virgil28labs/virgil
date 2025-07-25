@@ -11,7 +11,7 @@ import type { AuthContextValue } from '../types/auth.types';
 import type { UserProfile } from '../hooks/useUserProfile';
 import { dashboardAppService, type DashboardAppData } from './DashboardAppService';
 import { userProfileAdapter } from './adapters/UserProfileAdapter';
-import { timeService } from './TimeService';
+import { timeServiceEnhanced as timeService } from './TimeServiceEnhanced';
 
 export interface DashboardContext {
   // Time context

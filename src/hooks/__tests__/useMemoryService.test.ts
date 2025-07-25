@@ -60,11 +60,11 @@ describe('useMemoryService Hook', () => {
   let mockMessage: ChatMessage;
   let mockMemoryData: any;
 
-  const defaultProps = {
+  const getDefaultProps = () => ({
     dispatch: mockDispatch,
     setError: mockSetError,
     dashboardContext: mockDashboardContext,
-  };
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -116,7 +116,7 @@ describe('useMemoryService Hook', () => {
 
   describe('initializeMemory', () => {
     it('initializes memory service and loads all data on mount', async () => {
-      renderHook(() => useMemoryService(defaultProps));
+      renderHook(() => useMemoryService(getDefaultProps()));
 
       await waitFor(() => {
         expect(memoryService.init).toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe('useMemoryService Hook', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       (memoryService.init as jest.Mock).mockRejectedValue(new Error('Init failed'));
 
-      renderHook(() => useMemoryService(defaultProps));
+      renderHook(() => useMemoryService(getDefaultProps()));
 
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -168,7 +168,7 @@ describe('useMemoryService Hook', () => {
       
       (memoryService.init as jest.Mock).mockReturnValue(initPromise);
 
-      renderHook(() => useMemoryService(defaultProps));
+      renderHook(() => useMemoryService(getDefaultProps()));
 
       // Should not load data until init completes
       expect(memoryService.getLastConversation).not.toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('useMemoryService Hook', () => {
       
       (memoryService.getRecentMessages as jest.Mock).mockResolvedValue(recentMessages);
 
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
 
       await act(async () => {
         await result.current.loadRecentMessages();
@@ -214,7 +214,12 @@ describe('useMemoryService Hook', () => {
     it('does not dispatch when no recent messages', async () => {
       (memoryService.getRecentMessages as jest.Mock).mockResolvedValue([]);
 
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
+
+      // Wait for initialization to complete
+      await waitFor(() => {
+        expect(mockDispatch).toHaveBeenCalled();
+      });
 
       // Clear dispatch calls from initialization
       mockDispatch.mockClear();
@@ -231,7 +236,7 @@ describe('useMemoryService Hook', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       (memoryService.getRecentMessages as jest.Mock).mockRejectedValue(new Error('Load failed'));
 
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
 
       await act(async () => {
         await result.current.loadRecentMessages();
@@ -248,7 +253,7 @@ describe('useMemoryService Hook', () => {
 
   describe('markAsImportant', () => {
     it('marks message as important with dashboard context', async () => {
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
 
       await act(async () => {
         await result.current.markAsImportant(mockMessage);
@@ -277,7 +282,7 @@ describe('useMemoryService Hook', () => {
     });
 
     it('marks message as important without dashboard context', async () => {
-      const propsWithoutContext = { ...defaultProps, dashboardContext: null };
+      const propsWithoutContext = { ...getDefaultProps(), dashboardContext: null };
       const { result } = renderHook(() => useMemoryService(propsWithoutContext));
 
       await act(async () => {
@@ -296,7 +301,7 @@ describe('useMemoryService Hook', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       (memoryService.markAsImportant as jest.Mock).mockRejectedValue(new Error('Save failed'));
 
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
 
       await act(async () => {
         await result.current.markAsImportant(mockMessage);
@@ -321,7 +326,7 @@ describe('useMemoryService Hook', () => {
       (memoryService.getMarkedMemories as jest.Mock).mockResolvedValue(updatedMemories);
       (memoryService.getContextForPrompt as jest.Mock).mockResolvedValue(updatedContext);
 
-      const { result } = renderHook(() => useMemoryService(defaultProps));
+      const { result } = renderHook(() => useMemoryService(getDefaultProps()));
 
       // Clear initial dispatch calls
       mockDispatch.mockClear();
@@ -345,7 +350,7 @@ describe('useMemoryService Hook', () => {
 
   describe('memoization', () => {
     it('memoizes initializeMemory function', () => {
-      const { result, rerender } = renderHook(() => useMemoryService(defaultProps));
+      const { result, rerender } = renderHook(() => useMemoryService(getDefaultProps()));
       
       const init1 = result.current.initializeMemory;
       
@@ -357,7 +362,7 @@ describe('useMemoryService Hook', () => {
     });
 
     it('memoizes loadRecentMessages function', () => {
-      const { result, rerender } = renderHook(() => useMemoryService(defaultProps));
+      const { result, rerender } = renderHook(() => useMemoryService(getDefaultProps()));
       
       const load1 = result.current.loadRecentMessages;
       
@@ -371,7 +376,7 @@ describe('useMemoryService Hook', () => {
     it('updates markAsImportant when dashboardContext changes', () => {
       const { result, rerender } = renderHook(
         (props) => useMemoryService(props),
-        { initialProps: defaultProps },
+        { initialProps: getDefaultProps() },
       );
       
       const mark1 = result.current.markAsImportant;
@@ -381,7 +386,7 @@ describe('useMemoryService Hook', () => {
         location: { city: 'New York', country: 'USA' },
       };
       
-      rerender({ ...defaultProps, dashboardContext: newContext });
+      rerender({ ...getDefaultProps(), dashboardContext: newContext });
       
       const mark2 = result.current.markAsImportant;
       
@@ -394,7 +399,7 @@ describe('useMemoryService Hook', () => {
       const initializeSpy = jest.fn();
       (memoryService.init as jest.Mock).mockImplementation(initializeSpy);
 
-      renderHook(() => useMemoryService(defaultProps));
+      renderHook(() => useMemoryService(getDefaultProps()));
 
       await waitFor(() => {
         expect(initializeSpy).toHaveBeenCalledTimes(1);
@@ -405,7 +410,7 @@ describe('useMemoryService Hook', () => {
       const initializeSpy = jest.fn();
       (memoryService.init as jest.Mock).mockImplementation(initializeSpy);
 
-      const { rerender } = renderHook(() => useMemoryService(defaultProps));
+      const { rerender } = renderHook(() => useMemoryService(getDefaultProps()));
 
       await waitFor(() => {
         expect(initializeSpy).toHaveBeenCalledTimes(1);

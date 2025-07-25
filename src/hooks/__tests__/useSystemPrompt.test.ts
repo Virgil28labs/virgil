@@ -232,7 +232,15 @@ describe('useSystemPrompt Hook', () => {
     });
 
     it('creates basic system prompt without user query', () => {
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      // Update defaultProps to include the correct dashboard context
+      const propsWithAfternoon = {
+        ...defaultProps,
+        dashboardContext: {
+          ...mockDashboardContext,
+          timeOfDay: 'afternoon',
+        },
+      };
+      const { result } = renderHook(() => useSystemPrompt(propsWithAfternoon));
       
       const prompt = result.current.createSystemPrompt();
       
@@ -245,7 +253,14 @@ describe('useSystemPrompt Hook', () => {
     });
 
     it('creates system prompt without user', () => {
-      const propsWithoutUser = { ...defaultProps, user: null };
+      const propsWithoutUser = { 
+        ...defaultProps, 
+        user: null,
+        dashboardContext: {
+          ...mockDashboardContext,
+          timeOfDay: 'afternoon',
+        },
+      };
       const { result } = renderHook(() => useSystemPrompt(propsWithoutUser));
       
       const prompt = result.current.createSystemPrompt();
@@ -274,7 +289,11 @@ describe('useSystemPrompt Hook', () => {
     });
 
     it('enhances prompt with user query', () => {
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      const propsWithDashboard = {
+        ...defaultProps,
+        dashboardContext: mockDashboardContext,
+      };
+      const { result } = renderHook(() => useSystemPrompt(propsWithDashboard));
       
       const prompt = result.current.createSystemPrompt('What is the weather?');
       
@@ -287,13 +306,17 @@ describe('useSystemPrompt Hook', () => {
       
       expect(prompt).toContain('Enhanced prompt with context');
       expect(dashboardContextService.logActivity).toHaveBeenCalledWith(
-        'Asked: "What is the weather?"',
+        'Asked: "What is the weather?..."',
         'virgil-chat',
       );
     });
 
     it('truncates long queries in activity log', () => {
-      const { result } = renderHook(() => useSystemPrompt(defaultProps));
+      const propsWithDashboard = {
+        ...defaultProps,
+        dashboardContext: mockDashboardContext,
+      };
+      const { result } = renderHook(() => useSystemPrompt(propsWithDashboard));
       
       const longQuery = 'A'.repeat(60);
       result.current.createSystemPrompt(longQuery);

@@ -15,7 +15,7 @@ export interface TimeUpdate {
 
 export class TimeService {
   private timeListeners: ((time: TimeUpdate) => void)[] = [];
-  private mainTimer?: NodeJS.Timeout;
+  protected mainTimer?: NodeJS.Timeout;
   
   // Memoized formatters for performance
   private timeFormatter: Intl.DateTimeFormat;
@@ -160,7 +160,7 @@ export class TimeService {
   /**
    * Start the internal timer for time updates
    */
-  private startTimer(): void {
+  protected startTimer(): void {
     // Update time listeners every second
     this.mainTimer = setInterval(() => {
       if (this.timeListeners.length > 0) {
