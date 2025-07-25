@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { Toast } from '../components/ToastNotification';
 import { toastService } from '../services/ToastService';
+import { timeService } from '../services/TimeService';
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -8,7 +9,7 @@ export function useToast() {
   const addToast = useCallback((
     toast: Omit<Toast, 'id'> | string,
   ) => {
-    const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    const id = timeService.getTimestamp().toString() + Math.random().toString(36).substr(2, 9);
     
     const newToast: Toast = typeof toast === 'string' 
       ? {

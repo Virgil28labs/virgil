@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { PhysicsBody, PhysicsConfig } from '../lib/physics';
 import { PhysicsEngine } from '../lib/physics';
+import { timeService } from '../services/TimeService';
 
 interface RaccoonPhysicsState {
   x: number;
@@ -125,7 +126,7 @@ export function useRaccoonPhysics({
     physicsEngine.current.applyDrag(physicsBody.current, newX, newY);
 
     // Track positions for throw velocity calculation
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     lastPositionsRef.current.push({ x: newX, y: newY, time: now });
     if (lastPositionsRef.current.length > 5) {
       lastPositionsRef.current.shift();
