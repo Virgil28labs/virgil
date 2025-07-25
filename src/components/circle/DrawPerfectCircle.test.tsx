@@ -37,7 +37,7 @@ const mockCanvasContext = {
 };
 
 // Mock HTMLCanvasElement
-HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext) as any;
+HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCanvasContext) as jest.MockedFunction<typeof HTMLCanvasElement.prototype.getContext>;
 
 // Mock getBoundingClientRect
 HTMLCanvasElement.prototype.getBoundingClientRect = jest.fn(() => ({
@@ -189,7 +189,8 @@ describe('DrawPerfectCircle', () => {
   it('handles mouse drawing events', async () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
-    const canvas = document.querySelector('canvas')!;
+    const canvas = document.querySelector('canvas');
+    if (!canvas) throw new Error('Canvas not found');
     
     // Simulate mouse down
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100 });
@@ -209,7 +210,8 @@ describe('DrawPerfectCircle', () => {
   it('handles touch drawing events', async () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
-    const canvas = document.querySelector('canvas')!;
+    const canvas = document.querySelector('canvas');
+    if (!canvas) throw new Error('Canvas not found');
     
     // Simulate touch start
     fireEvent.touchStart(canvas, {
@@ -256,7 +258,8 @@ describe('DrawPerfectCircle', () => {
   it('prevents default on mouse and touch events', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
     
-    const canvas = document.querySelector('canvas')!;
+    const canvas = document.querySelector('canvas');
+    if (!canvas) throw new Error('Canvas not found');
     
     const mouseDownEvent = new MouseEvent('mousedown', { 
       bubbles: true, 

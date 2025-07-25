@@ -10,8 +10,27 @@ interface AutocompleteOptions {
   locationRestriction?: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral;
 }
 
+// Extended Google Maps interfaces for newer API features
+interface ExtendedPlacePrediction {
+  placeId?: string;
+  mainText?: { text: string };
+  secondaryText?: { text: string };
+  toPlace?: () => ExtendedPlace;
+}
+
+interface ExtendedPlace {
+  placeId?: string;
+  location?: google.maps.LatLng;
+  viewport?: google.maps.LatLngBounds;
+  displayName?: string;
+  name?: string;
+  formattedAddress?: string;
+  formatted_address?: string;
+  fetchFields?: (options: { fields: string[] }) => Promise<void>;
+}
+
 interface PlaceSuggestion {
-  placePrediction: any; // google.maps.places.PlacePrediction - types not yet available
+  placePrediction: google.maps.places.AutocompletePrediction | ExtendedPlacePrediction;
   suggestion: {
     mainText: string;
     secondaryText: string;
@@ -59,14 +78,17 @@ export function useGooglePlacesAutocomplete(
       let formattedSuggestions: PlaceSuggestion[] = [];
       
       // Try new API first
-      if ((google.maps.places as any).AutocompleteSuggestion) {
+      if ((google.maps.places as unknown as { AutocompleteSuggestion?: unknown }).AutocompleteSuggestion) {
         
         try {
           // Create request object
-          // @ts-ignore - TypeScript types may not be updated yet
+          if (!sessionTokenRef.current) {
+            sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+          }
+          
           const request = {
             input,
-            sessionToken: sessionTokenRef.current!,
+            sessionToken: sessionTokenRef.current,
             ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
             ...(options.locationBias && { locationBias: options.locationBias }),
             ...(options.locationRestriction && { locationRestriction: options.locationRestriction }),
@@ -78,7 +100,7 @@ export function useGooglePlacesAutocomplete(
             await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
           // Transform suggestions to our format
-          formattedSuggestions = autocompleteSuggestions.map((suggestion: any) => ({
+          formattedSuggestions = autocompleteSuggestions.map((suggestion: { placePrediction: ExtendedPlacePrediction }) => ({
             placePrediction: suggestion.placePrediction,
             suggestion: {
               mainText: suggestion.placePrediction.mainText?.text || '',
@@ -94,9 +116,14 @@ export function useGooglePlacesAutocomplete(
         // Fallback to classic AutocompleteService
         
         const service = new google.maps.places.AutocompleteService();
+        
+        if (!sessionTokenRef.current) {
+          sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+        }
+        
         const request: google.maps.places.AutocompletionRequest = {
           input,
-          sessionToken: sessionTokenRef.current!,
+          sessionToken: sessionTokenRef.current,
           ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
           ...(options.types && { types: options.types }),
         };
@@ -115,7 +142,7 @@ export function useGooglePlacesAutocomplete(
         
         // Transform predictions to our format
         formattedSuggestions = predictions.map(prediction => ({
-          placePrediction: prediction as any,
+          placePrediction: prediction,
           suggestion: {
             mainText: prediction.structured_formatting?.main_text || prediction.description || '',
             secondaryText: prediction.structured_formatting?.secondary_text || '',

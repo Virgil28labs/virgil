@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react';
-import { createContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { locationService } from '../lib/locationService';
 import type { 
-  LocationContextValue, 
   LocationState, 
   LocationAction,
+  LocationContextValue,
 } from '../types/location.types';
 import { logger } from '../lib/logger';
 import { timeService } from '../services/TimeService';
+import { LocationContext } from './LocationContextTypes';
 
 /**
  * LocationContext - Location Services State Management
@@ -22,8 +23,6 @@ import { timeService } from '../services/TimeService';
  * - Permission state management
  * - Data caching with refresh intervals
  */
-
-export const LocationContext = createContext<LocationContextValue | undefined>(undefined);
 
 const locationReducer = (state: LocationState, action: LocationAction): LocationState => {
   switch (action.type) {
@@ -118,14 +117,14 @@ export function LocationProvider({ children }: LocationProviderProps) {
           });
         }, 500); // 500ms warm-up delay
       }
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       logger.error('Location fetch error', _error as Error, {
         component: 'LocationContext',
         action: 'updateLocationDataFromIP',
       });
       dispatch({ type: 'SET_ERROR', payload: _error.message });
     }
-  }, []);
+  }, [state.loading, state.lastUpdated, state.address]);
 
   const checkLocationPermission = useCallback(async (): Promise<() => void | undefined> => {
     if (!navigator.permissions) {
@@ -147,7 +146,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       return () => {
         permission.removeEventListener('change', handlePermissionChange);
       };
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'unavailable' });
       return () => {};
     }
@@ -158,7 +157,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       await locationService.getCurrentPosition();
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'granted' });
       await fetchLocationData(true);
-    } catch (_error: any) {
+    } catch (_error: unknown) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'denied' });
       dispatch({ type: 'SET_ERROR', payload: _error.message });
     }

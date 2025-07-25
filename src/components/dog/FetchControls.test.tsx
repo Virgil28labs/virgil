@@ -274,7 +274,7 @@ describe('FetchControls', () => {
 
     it('should handle invalid fetchCount gracefully', () => {
       // Force an invalid count through props
-      render(<FetchControls {...defaultProps} fetchCount={15 as any} />);
+      render(<FetchControls {...defaultProps} fetchCount={15 as unknown as 1 | 5 | 10} />);
 
       const countSelect = screen.getByLabelText('Count:') as HTMLSelectElement;
       // When an invalid value is provided to a controlled select,

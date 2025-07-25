@@ -3,6 +3,36 @@
  * Covers OpenAI, Anthropic, and other LLM providers
  */
 
+export interface StreamChunk {
+  text?: string;
+  error?: string;
+  done?: boolean;
+}
+
+export interface LLMStreamResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: Array<{
+    index: number;
+    delta: {
+      content?: string;
+      role?: string;
+    };
+    finish_reason?: string;
+  }>;
+}
+
+export interface LLMErrorResponse {
+  error: {
+    message: string;
+    type?: string;
+    code?: string;
+    status?: number;
+  };
+}
+
 export interface LLMMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;

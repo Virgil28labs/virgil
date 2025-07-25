@@ -18,7 +18,6 @@ const CameraControls: React.FC<CameraControlsProps> = ({
   cameraState,
   disabled = false,
 }) => {
-  const timerOptions = [null, 3, 5, 10];
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
@@ -47,10 +46,11 @@ const CameraControls: React.FC<CameraControlsProps> = ({
   }, [disabled, isCountingDown, cameraState.timer, onCapture]);
 
   const handleTimerClick = useCallback(() => {
+    const timerOptions = [null, 3, 5, 10];
     const currentIndex = timerOptions.indexOf(cameraState.timer);
     const nextIndex = (currentIndex + 1) % timerOptions.length;
     onSetTimer(timerOptions[nextIndex]);
-  }, [cameraState.timer, onSetTimer, timerOptions]);
+  }, [cameraState.timer, onSetTimer]);
 
   return (
     <div className="camera-controls">

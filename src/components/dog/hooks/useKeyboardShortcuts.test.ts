@@ -217,12 +217,12 @@ describe('useKeyboardShortcuts', () => {
     });
 
     it('should handle undefined shortcuts gracefully', () => {
-      const shortcuts = {
+      const shortcuts: Record<string, (() => void) | undefined> = {
         'Escape': undefined,
         'f': jest.fn(),
       };
       
-      renderHook(() => useKeyboardShortcuts(shortcuts as any));
+      renderHook(() => useKeyboardShortcuts(shortcuts));
 
       const escapeEvent = createKeyboardEvent('Escape');
       const fEvent = createKeyboardEvent('f');

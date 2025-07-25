@@ -1,5 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { timeService } from '../services/TimeService';
+
+// Extended Navigator interface for APIs not in standard TypeScript lib
+interface ExtendedNavigator extends Navigator {
+  connection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+  };
+  mozConnection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+  };
+  webkitConnection?: {
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+  };
+  getBattery?: () => Promise<{
+    level: number;
+    charging: boolean;
+  }>;
+  deviceMemory?: number;
+}
+
+// Permission name types
+type PermissionName = 'geolocation' | 'camera' | 'microphone' | 'notifications' | 'clipboard-read';
 
 interface DeviceInfo {
   // Location & Network
@@ -110,31 +137,32 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
   const [sessionStart] = useState(timeService.getTimestamp());
 
   // Check permission status
-  const checkPermission = async (name: string): Promise<PermissionState | 'unknown'> => {
+  const checkPermission = useCallback(async (name: PermissionName): Promise<PermissionState | 'unknown'> => {
     try {
       if ('permissions' in navigator) {
-        const result = await navigator.permissions.query({ name: name as any });
+        const result = await navigator.permissions.query({ name } as PermissionDescriptor);
         return result.state;
       }
     } catch {
       // Permission not supported or error
     }
     return 'unknown';
-  };
+  }, []);
 
   // Collect device information
-  const collectInfo = async () => {
+  const collectInfo = useCallback(async () => {
     const { device, os, browser } = parseUserAgent();
     
     // Get network information
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const extendedNavigator = navigator as ExtendedNavigator;
+    const connection = extendedNavigator.connection || extendedNavigator.mozConnection || extendedNavigator.webkitConnection;
     
     // Get battery info
     let batteryLevel = null;
     let batteryCharging = null;
     try {
-      if ('getBattery' in navigator) {
-        const battery = await (navigator as any).getBattery();
+      if ('getBattery' in navigator && extendedNavigator.getBattery) {
+        const battery = await extendedNavigator.getBattery();
         batteryLevel = Math.round(battery.level * 100);
         batteryCharging = battery.charging;
       }
@@ -173,7 +201,7 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       
       // Hardware
       cpu: navigator.hardwareConcurrency || 'N/A',
-      memory: (navigator as any).deviceMemory ? `${(navigator as any).deviceMemory} GB` : 'N/A',
+      memory: extendedNavigator.deviceMemory ? `${extendedNavigator.deviceMemory} GB` : 'N/A',
       
       // Network
       online: navigator.onLine,
@@ -201,10 +229,10 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
     };
     
     setDeviceInfo(info);
-  };
+  }, [ipLocation, sessionStart]);
 
   // Check all permissions
-  const checkAllPermissions = async () => {
+  const checkAllPermissions = useCallback(async () => {
     const newPermissions: PermissionStatus = {
       geolocation: await checkPermission('geolocation'),
       camera: await checkPermission('camera'),
@@ -213,7 +241,7 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       clipboard: await checkPermission('clipboard-read'),
     };
     setPermissions(newPermissions);
-  };
+  }, [checkPermission]);
 
   // Request specific permission
   const requestPermission = async (type: keyof PermissionStatus) => {
@@ -289,7 +317,7 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', handleResize);
     };
-  }, [ipLocation, sessionStart]);
+  }, [ipLocation, sessionStart, collectInfo, checkAllPermissions]);
 
   return { deviceInfo, permissions, requestPermission };
 };

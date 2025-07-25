@@ -22,7 +22,7 @@ interface UseMessageHandlingReturn {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleQuickAction: (action: string) => void;
-  loadingState: any;
+  loadingState: { isLoading: boolean; type: string } | null;
   inputRef: React.RefObject<HTMLInputElement | null>;
 }
 

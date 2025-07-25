@@ -48,9 +48,12 @@ class NasaApodService {
         const now = timeService.getTimestamp();
         
         // Restore valid cache entries
-        Object.entries(parsed).forEach(([key, value]: [string, any]) => {
-          if (value && value.timestamp && now - value.timestamp < CACHE_DURATION) {
-            this.cache.set(key, value);
+        Object.entries(parsed).forEach(([key, value]: [string, unknown]) => {
+          if (value && typeof value === 'object' && 'timestamp' in value && 'data' in value) {
+            const cacheEntry = value as { data: ApodImage; timestamp: number };
+            if (now - cacheEntry.timestamp < CACHE_DURATION) {
+              this.cache.set(key, cacheEntry);
+            }
           }
         });
       }
@@ -64,7 +67,7 @@ class NasaApodService {
    */
   private saveCacheToStorage(): void {
     try {
-      const cacheObject: Record<string, any> = {};
+      const cacheObject: Record<string, { data: ApodImage; timestamp: number }> = {};
       this.cache.forEach((value, key) => {
         cacheObject[key] = value;
       });

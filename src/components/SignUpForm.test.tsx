@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SignUpForm } from './SignUpForm';
 import { supabase } from '../lib/supabase';
+import { assertElement } from '../test-utils/domHelpers';
 
 // Mock supabase
 jest.mock('../lib/supabase');
@@ -45,7 +46,8 @@ describe('SignUpForm', () => {
     
     // Bypass HTML5 validation by calling submit directly
     const form = container.querySelector('form');
-    fireEvent.submit(form!);
+    const validForm = assertElement(form, 'Form not found');
+    fireEvent.submit(validForm);
     
     await waitFor(() => {
       expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();

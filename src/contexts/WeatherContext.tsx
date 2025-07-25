@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
+import { useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
@@ -11,6 +11,7 @@ import type {
   WeatherData,
   ForecastData, 
 } from '../types/weather.types';
+import { WeatherContext } from './WeatherContextTypes';
 
 /**
  * WeatherContext - Weather Data State Management
@@ -25,8 +26,6 @@ import type {
  * - Fallback to IP location if GPS unavailable
  * - Error handling and retry logic
  */
-
-const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 
 const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherState => {
   switch (action.type) {
@@ -111,7 +110,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
         }
         
         return;
-      } catch (_fallbackError: any) {
+      } catch (_fallbackError: unknown) {
         dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
         return;
       }
@@ -171,10 +170,11 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       }
 
       dispatch({ type: 'SET_WEATHER_DATA', payload: weatherData });
-    } catch (error: any) {
-      dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to fetch weather' });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch weather';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
     }
-  }, [coordinates, ipLocation]);
+  }, [coordinates, ipLocation, state.loading, state.lastUpdated]);
 
   const toggleUnit = useCallback((): void => {
     dispatch({ type: 'TOGGLE_UNIT' });
@@ -186,7 +186,10 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
 
   // Fetch weather when location becomes available and set up auto-refresh
   useEffect(() => {
-    if (!coordinates && !ipLocation?.city) return;
+    const hasGpsCoordinates = !!coordinates;
+    const hasIpCity = !!ipLocation?.city;
+    
+    if (!hasGpsCoordinates && !hasIpCity) return;
 
     // Initial fetch if we don't have recent data
     const timeSinceLastUpdate = timeService.getTimestamp() - (state.lastUpdated || 0);
@@ -201,7 +204,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     }, cacheExpiry); // 10 minutes
 
     return () => clearInterval(interval);
-  }, [!!coordinates, !!ipLocation?.city, state.loading, state.lastUpdated, fetchWeather]); // Boolean dependencies to prevent unnecessary effect runs
+  }, [coordinates, ipLocation?.city, state.loading, state.lastUpdated, fetchWeather]);
 
   // Convert temperature based on unit preference - memoized to prevent re-calculation
   const displayData = useMemo((): WeatherData | null => {
@@ -256,6 +259,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWeather(): WeatherContextType {
   const context = useContext(WeatherContext);
   if (!context) {

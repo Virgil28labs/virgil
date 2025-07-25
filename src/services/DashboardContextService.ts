@@ -52,7 +52,7 @@ export interface DashboardContext {
     name?: string;
     email?: string;
     memberSince?: string;
-    preferences?: Record<string, any>;
+    preferences?: Record<string, unknown>;
     profile?: UserProfile;
   };
   
@@ -314,7 +314,7 @@ export class DashboardContextService {
     this.notifyListeners();
   }
 
-  updateDeviceContext(deviceInfo: any): void {
+  updateDeviceContext(deviceInfo: unknown): void {
     if (!deviceInfo) {
       this.context.device = { hasData: false };
     } else {

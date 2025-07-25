@@ -36,8 +36,8 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   const [destination, setDestination] = useState(initialDestination);
   const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true);
   
-  const originInputRef = useRef<HTMLInputElement>(null!);
-  const destinationInputRef = useRef<HTMLInputElement>(null!);
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
   const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
 
@@ -167,11 +167,11 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   }, []);
 
   // Handle suggestion selection
-  const handleOriginSuggestionSelect = useCallback(async (suggestion: any) => {
+  const handleOriginSuggestionSelect = useCallback(async (suggestion: unknown) => {
     await selectOriginPlace(suggestion);
   }, [selectOriginPlace]);
 
-  const handleDestinationSuggestionSelect = useCallback(async (suggestion: any) => {
+  const handleDestinationSuggestionSelect = useCallback(async (suggestion: unknown) => {
     await selectDestinationPlace(suggestion);
   }, [selectDestinationPlace]);
 

@@ -1,4 +1,3 @@
-import React, { createContext } from 'react';
 import type { WeatherContextType } from '../../types/weather.types';
 
 // Mock implementation of useWeather hook
@@ -19,11 +18,3 @@ mockUseWeather.mockReturnValue({
 });
 
 export const useWeather = mockUseWeather;
-
-// Mock WeatherProvider component
-export const WeatherProvider = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
-};
-
-// Mock WeatherContext
-export const WeatherContext = createContext<WeatherContextType | undefined>(undefined);

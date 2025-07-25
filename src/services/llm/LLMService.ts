@@ -8,6 +8,7 @@ import type {
   LLMConfig,
   LLMServiceStats,
   LLMMessage,
+  StreamChunk,
 } from '../../types/llm.types';
 
 export class LLMService extends EventEmitter {
@@ -119,7 +120,7 @@ export class LLMService extends EventEmitter {
     }
   }
 
-  async *completeStream(options: Partial<LLMRequest>): AsyncGenerator<any, void, unknown> {
+  async *completeStream(options: Partial<LLMRequest>): AsyncGenerator<StreamChunk, void, unknown> {
     const { messages = [], model = this.config.defaultModel, temperature, maxTokens = 256, context = {}, provider = 'openai' } = options;
     
     try {
@@ -170,10 +171,10 @@ export class LLMService extends EventEmitter {
 
   private async makeRequestWithRetry(
     endpoint: string, 
-    body: any, 
+    body: unknown, 
     isStream: boolean = false, 
     attempt: number = 1,
-  ): Promise<any> {
+  ): Promise<Response | LLMResponse> {
     try {
       const response = await fetch(`${this.config.apiUrl}${endpoint}`, {
         method: 'POST',

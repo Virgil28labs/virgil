@@ -103,21 +103,21 @@ describe('imageUtils', () => {
         src: '',
         width: 100,
         height: 100,
-      } as any;
+      } as unknown as HTMLImageElement;
 
-      global.Image = jest.fn().mockImplementation(() => mockImage) as any;
+      global.Image = jest.fn().mockImplementation(() => mockImage) as unknown as typeof Image;
 
       // Mock canvas
       mockContext = {
         drawImage: jest.fn(),
-      } as any;
+      } as unknown as CanvasRenderingContext2D;
 
       mockCanvas = {
         width: 0,
         height: 0,
         getContext: jest.fn().mockReturnValue(mockContext),
         toBlob: jest.fn(),
-      } as any;
+      } as unknown as HTMLCanvasElement;
 
       createElementSpy = jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas);
 
@@ -130,7 +130,7 @@ describe('imageUtils', () => {
         writable: true,
       });
 
-      global.ClipboardItem = jest.fn() as any;
+      global.ClipboardItem = jest.fn() as unknown as typeof ClipboardItem;
     });
 
     afterEach(() => {
@@ -177,8 +177,8 @@ describe('imageUtils', () => {
 
     it('should fallback to URL copy when clipboard API is not available', async () => {
       // Remove clipboard write support
-      delete (navigator.clipboard as any).write;
-      global.ClipboardItem = undefined as any;
+      delete (navigator.clipboard as unknown as { write?: unknown }).write;
+      global.ClipboardItem = undefined as unknown as typeof ClipboardItem;
 
       // Mock image loading
       setTimeout(() => {

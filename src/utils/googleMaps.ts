@@ -47,8 +47,8 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
       });
 
       // Create global callback
-      (window as any).__googleMapsCallback = () => {
-        delete (window as any).__googleMapsCallback;
+      (window as Window & { __googleMapsCallback?: () => void }).__googleMapsCallback = () => {
+        delete (window as Window & { __googleMapsCallback?: () => void }).__googleMapsCallback;
       };
 
       script.src = `https://maps.googleapis.com/maps/api/js?${params}&v=beta`;

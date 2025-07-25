@@ -52,7 +52,7 @@ export interface CameraError {
   type: 'permission' | 'hardware' | 'browser' | 'storage' | 'network'
   message: string
   code?: string
-  details?: any
+  details?: unknown
 }
 
 export interface PhotoAction {

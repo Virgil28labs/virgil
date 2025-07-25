@@ -65,7 +65,7 @@ export function usePomodoro(defaultMinutes: number = 25) {
   // Initialize audio context
   useEffect(() => {
     if (!audioContextRef.current && typeof window !== 'undefined') {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
 
     return () => {

@@ -4,8 +4,14 @@ import { useDogGallery } from './hooks/useDogGallery';
 import type { DogImage, DogGalleryContextType } from '../../types';
 
 // Mock the components
+interface FetchControlsProps {
+  onFetch: () => void;
+  onBreedChange: (breed: string) => void;
+  onCountChange: (count: number) => void;
+}
+
 jest.mock('./FetchControls', () => ({
-  FetchControls: ({ onFetch, onBreedChange, onCountChange }: any) => (
+  FetchControls: ({ onFetch, onBreedChange, onCountChange }: FetchControlsProps) => (
     <div data-testid="fetch-controls">
       <button onClick={onFetch}>Fetch</button>
       <button onClick={() => onBreedChange('bulldog')}>Change Breed</button>
@@ -14,8 +20,14 @@ jest.mock('./FetchControls', () => ({
   ),
 }));
 
+interface DogGridProps {
+  dogs: DogImage[];
+  onImageClick: (url: string) => void;
+  onFavoriteToggle: (dog: DogImage) => void;
+}
+
 jest.mock('./DogGrid', () => ({
-  DogGrid: ({ dogs, onImageClick, onFavoriteToggle }: any) => (
+  DogGrid: ({ dogs, onImageClick, onFavoriteToggle }: DogGridProps) => (
     <div data-testid="dog-grid">
       {dogs.map((dog: DogImage) => (
         <div key={dog.id} data-testid={`dog-${dog.id}`}>
@@ -27,8 +39,16 @@ jest.mock('./DogGrid', () => ({
   ),
 }));
 
+interface DogImageStatesProps {
+  loading: boolean;
+  error: string | null;
+  dogsCount: number;
+  activeTab: string;
+  onSwitchToFetch?: () => void;
+}
+
 jest.mock('./DogImageStates', () => ({
-  DogImageStates: ({ loading, error, dogsCount, activeTab, onSwitchToFetch }: any) => (
+  DogImageStates: ({ loading, error, dogsCount, activeTab, onSwitchToFetch }: DogImageStatesProps) => (
     <div data-testid="dog-image-states">
       <div data-testid="loading">{loading.toString()}</div>
       <div data-testid="error">{error || 'no-error'}</div>

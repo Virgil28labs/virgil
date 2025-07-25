@@ -15,7 +15,7 @@ const GIPHY_API_BASE = import.meta.env.VITE_GIPHY_API_URL || 'https://api.giphy.
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 class GiphyService {
-  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private cache: Map<string, { data: GiphyImage[]; timestamp: number }> = new Map();
   private defaultParams = {
     limit: 25,
     rating: 'pg' as const,
@@ -54,7 +54,7 @@ class GiphyService {
   /**
    * Make authenticated API request to Giphy
    */
-  private async makeGiphyRequest(endpoint: string, params: Record<string, any> = {}): Promise<Response> {
+  private async makeGiphyRequest(endpoint: string, params: Record<string, unknown> = {}): Promise<Response> {
     if (!GIPHY_API_KEY || GIPHY_API_KEY === 'your_giphy_api_key_here') {
       throw new GiphyServiceError('Giphy API key not configured');
     }

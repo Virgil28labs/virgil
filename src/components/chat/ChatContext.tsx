@@ -1,9 +1,10 @@
-import React, { type ReactNode, createContext, useReducer, useCallback, useMemo } from 'react';
+import React, { type ReactNode, useReducer, useCallback, useMemo } from 'react';
 import type { ChatState, ChatAction } from './chatTypes';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
 import type { ChatMessage } from '../../types/chat.types';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
+import { ChatContext } from './ChatContextTypes';
 
 export interface ChatContextValue {
   state: ChatState;
@@ -19,8 +20,6 @@ export interface ChatContextValue {
   clearMessages: () => void;
   newChat: () => void;
 }
-
-export const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 interface ChatProviderProps {
   children: ReactNode;

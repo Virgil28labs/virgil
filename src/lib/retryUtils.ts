@@ -2,13 +2,15 @@
  * Utility functions for retrying failed operations with exponential backoff
  */
 
+import { hasStatusCode } from '../utils/errorUtils';
+
 interface RetryOptions {
   maxRetries?: number;
   initialDelay?: number;
   maxDelay?: number;
   backoffFactor?: number;
-  onRetry?: (attempt: number, error: any) => void;
-  shouldRetry?: (error: any) => boolean;
+  onRetry?: (attempt: number, error: unknown) => void;
+  shouldRetry?: (error: unknown) => boolean;
 }
 
 /**
@@ -27,7 +29,7 @@ export async function retryWithBackoff<T>(
     shouldRetry = () => true,
   } = options;
 
-  let lastError: any;
+  let lastError: unknown;
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -47,7 +49,7 @@ export async function retryWithBackoff<T>(
       );
       
       // Check if error has status code 429 and Retry-After header
-      if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
+      if (hasStatusCode(error) && error.status === 429) {
         // Use 60 seconds for rate limit errors
         delay = 60000;
       }

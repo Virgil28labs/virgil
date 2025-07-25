@@ -7,7 +7,7 @@ export const useCamera = () => {
   const cameraRef = useRef<{
     takePhoto: () => string;
     switchCamera: () => 'user' | 'environment';
-  } | null>(null);
+      } | null>(null);
   const [cameraState, setCameraState] = useState<CameraState>({
     isActive: false,
     isCapturing: false,

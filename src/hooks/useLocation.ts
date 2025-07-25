@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { LocationContext } from '../contexts/LocationContext';
+import { LocationContext } from '../contexts/LocationContextTypes';
 import type { LocationContextValue } from '../types/location.types';
 
 export function useLocation(): LocationContextValue {

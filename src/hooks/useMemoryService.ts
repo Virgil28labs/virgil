@@ -6,7 +6,7 @@ import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
 
 interface UseMemoryServiceProps {
-  dispatch: (action: any) => void;
+  dispatch: (action: unknown) => void;
   setError: (error: string | null) => void;
   dashboardContext: DashboardContext | null;
 }

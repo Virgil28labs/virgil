@@ -65,6 +65,11 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   const raccoonEmojis = ['🦝', '🐾', '🍃', '🌰', '🗑️', '🌙', '🐻', '🍯'];
   const weatherEmojis = ['⛅', '🌤️', '🌧️', '🌦️', '☀️', '🌩️', '❄️', '🌪️', '🌈'];
 
+  // Refs for function references (declared early)
+  const getRandomRaccoonEmojiRef = useRef<() => string>(() => '');
+  const getRandomWeatherEmojiRef = useRef<() => string>(() => '');
+  const startSleepingAnimationRef = useRef<() => void>(() => {});
+
   /**
    * Returns a random raccoon-related emoji for text bubble display
    * @returns {string} Random emoji from raccoonEmojis array
@@ -80,6 +85,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   const getRandomWeatherEmoji = () => {
     return weatherEmojis[Math.floor(Math.random() * weatherEmojis.length)];
   };
+
+  // Assign to refs for use in effects
+  getRandomRaccoonEmojiRef.current = getRandomRaccoonEmoji;
+  getRandomWeatherEmojiRef.current = getRandomWeatherEmoji;
 
   /**
    * Resets the sleep timer and records activity
@@ -115,7 +124,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
             setCharging(currentCharging => {
               if (!currentPickedUp && !currentDragging && !currentCharging && currentPos.y >= PHYSICS.GROUND_Y - 5) {
                 setIsSleeping(true);
-                startSleepingAnimation();
+                startSleepingAnimationRef.current();
               }
               return currentCharging;
             });
@@ -151,6 +160,9 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       });
     }, 2500);
   }, []);
+
+  // Assign to ref to avoid circular dependency
+  startSleepingAnimationRef.current = startSleepingAnimation;
 
   // Physics State
   const [position, setPosition] = useState<Position>({ x: 20, y: PHYSICS.GROUND_Y });
@@ -598,9 +610,9 @@ const RaccoonMascot = memo(function RaccoonMascot() {
                 if (uiElement.isPowerButton) {
                   setCurrentRaccoonEmoji('⚡');
                 } else if (uiElement.isWeatherWidget) {
-                  setCurrentRaccoonEmoji(getRandomWeatherEmoji());
+                  setCurrentRaccoonEmoji(getRandomWeatherEmojiRef.current());
                 } else {
-                  setCurrentRaccoonEmoji(getRandomRaccoonEmoji());
+                  setCurrentRaccoonEmoji(getRandomRaccoonEmojiRef.current());
                 }
               }
 
@@ -727,6 +739,15 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     isOnWall,
     charging,
     charge,
+    PHYSICS.GRAVITY,
+    PHYSICS.GROUND_Y,
+    PHYSICS.JUMP_FORCE,
+    PHYSICS.MAX_JUMPS,
+    PHYSICS.MOVE_SPEED,
+    PHYSICS.WALL_STICK_FORCE,
+    currentUIElement,
+    isRunning,
+    uiElements,
   ]);
 
   // Keep mascot within viewport bounds on resize
@@ -739,7 +760,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [PHYSICS.GROUND_Y]);
 
   // Handle keyboard controls
   useEffect(() => {
@@ -780,7 +801,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
-  }, [isPickedUp, charging, position.y]);
+  }, [isPickedUp, charging, position.y, PHYSICS.GROUND_Y, resetSleepTimer]);
 
   useEffect(() => {
     let chargeInterval: ReturnType<typeof setTimeout>;
@@ -790,7 +811,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }, 16);
     }
     return () => clearInterval(chargeInterval);
-  }, [charging, charge]);
+  }, [charging, charge, PHYSICS.CHARGE_MAX, PHYSICS.CHARGE_RATE]);
 
   // Initialize sleep timer and cleanup
   useEffect(() => {
@@ -806,7 +827,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
         clearInterval(sleepEmojiTimer.current);
       }
     };
-  }, []); // Only run on mount/unmount
+  }, [resetSleepTimer]); // Only run on mount/unmount
 
 
   const raccoonMascotStyles = `

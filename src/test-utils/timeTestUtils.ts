@@ -212,7 +212,7 @@ export function withTimezone(_timeService: MockTimeService, _timezone: string, f
     fn();
   } finally {
     // Restore original
-    (global as any).Intl.DateTimeFormat = originalFormat;
+    (global as unknown as { Intl: { DateTimeFormat: typeof Intl.DateTimeFormat } }).Intl.DateTimeFormat = originalFormat;
   }
 }
 

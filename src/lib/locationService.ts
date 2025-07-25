@@ -283,7 +283,7 @@ export const locationService = {
       );
     } catch (_error) {
       // Return null instead of throwing to allow graceful degradation
-      return null as any;
+      return null;
     }
   },
 

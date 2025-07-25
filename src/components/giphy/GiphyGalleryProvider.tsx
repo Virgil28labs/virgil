@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useReducer, useCallback, useEffect, memo } from 'react';
+import { createContext, useReducer, useCallback, useEffect, memo } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { 
   GiphyContextType, 
@@ -123,7 +123,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
     if (isOpen && state.trendingGifs.length === 0) {
       loadTrending();
     }
-  }, [isOpen]);
+  }, [isOpen, loadTrending, state.trendingGifs.length]);
 
   // Save favorites to localStorage whenever they change
   useEffect(() => {
@@ -264,15 +264,6 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
     </GiphyGalleryContext.Provider>
   );
 });
-
-// Custom hook to use the context
-export function useGiphyGallery(): GiphyContextType {
-  const context = useContext(GiphyGalleryContext);
-  if (context === undefined) {
-    throw new Error('useGiphyGallery must be used within a GiphyGalleryProvider');
-  }
-  return context;
-}
 
 // Export context for testing
 export { GiphyGalleryContext };

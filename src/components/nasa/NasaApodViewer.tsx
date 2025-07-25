@@ -123,7 +123,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     if (isOpen && !currentApod && !loading && !error) {
       loadApodByDate(selectedDate);
     }
-  }, [isOpen, selectedDate]); // Removed dependencies that could cause re-renders
+  }, [isOpen, selectedDate, currentApod, loading, error, loadApodByDate]);
 
   // Clear state when closed
   useEffect(() => {

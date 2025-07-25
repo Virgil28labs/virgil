@@ -156,7 +156,7 @@ describe('LoadingStates Component', () => {
     });
 
     it('handles invalid type gracefully', () => {
-      render(<LoadingStates variant="message" type={'invalid' as any} />);
+      render(<LoadingStates variant="message" type={'invalid' as unknown as 'thinking' | 'working'} />);
       
       expect(screen.getByText('Working...')).toBeInTheDocument();
       expect(screen.getByText('⏳')).toBeInTheDocument();

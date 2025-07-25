@@ -3,7 +3,7 @@
 import { timeService } from '../services/TimeService';
 
 interface PendingRequest {
-  promise: Promise<any>;
+  promise: Promise<unknown>;
   timestamp: number;
 }
 

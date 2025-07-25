@@ -1,157 +1,87 @@
 /**
- * API and Server Types
- * Shared between frontend and backend
+ * Common API response types
  */
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
+export interface APIResponse<T = unknown> {
   data?: T;
   error?: string;
-  message?: string;
   status?: number;
-}
-
-export interface ApiError {
-  error: string;
-  status: number;
   message?: string;
-  path?: string;
-  timestamp?: string;
 }
 
-// Chat API Types
-export interface ChatRequest {
-  messages: Array<{
-    role: 'user' | 'assistant' | 'system';
-    content: string;
-  }>;
-  model?: string;
-  temperature?: number;
-  max_tokens?: number;
-}
-
-export interface ChatResponse {
-  success: boolean;
-  message: {
-    role: 'assistant';
-    content: string;
-  };
-  usage?: {
-    total_tokens: number;
-    prompt_tokens: number;
-    completion_tokens: number;
-  };
-}
-
-// Health Check Types
-export interface HealthResponse {
-  status: 'healthy' | 'unhealthy';
-  service: string;
-  configured: boolean;
-  timestamp: string;
-}
-
-// Analytics Types
-export interface AnalyticsEventProperties {
-  category?: string;
-  action?: string;
-  label?: string;
-  value?: number;
-  [key: string]: string | number | boolean | undefined;
-}
-
-export interface AnalyticsEvent {
-  event: string;
-  userId?: string;
-  timestamp: string;
-  properties?: AnalyticsEventProperties;
-}
-
-export interface AnalyticsResponse {
-  success: boolean;
-  eventId: string;
-}
-
-// LLM API Types (for internal server use)
-export interface LLMCompleteRequest {
-  messages: Array<{
-    role: 'user' | 'assistant' | 'system';
-    content: string;
-  }>;
-  model: string;
+export interface WeatherAPIResponse {
   temperature: number;
-  maxTokens: number;
-  systemPrompt?: string;
-  context?: {
-    conversation_id?: string;
-    session_id?: string;
-    metadata?: Record<string, string | number | boolean>;
-  };
-  provider: string;
+  conditions: string;
+  humidity: number;
+  wind_speed: number;
+  pressure: number;
+  feels_like: number;
+  uv_index: number;
+  visibility: number;
+  icon: string;
+  description: string;
+  city?: string;
+  country?: string;
 }
 
-export interface LLMCompleteResponse {
-  content: string;
-  usage: {
-    total_tokens: number;
-    prompt_tokens: number;
-    completion_tokens: number;
+export interface ForecastAPIResponse {
+  list: Array<{
+    dt: number;
+    temp: {
+      min: number;
+      max: number;
+    };
+    weather: Array<{
+      main: string;
+      description: string;
+      icon: string;
+    }>;
+    humidity: number;
+    wind_speed: number;
+    pop: number;
+  }>;
+  city: {
+    name: string;
+    country: string;
   };
-  model: string;
-  finish_reason: string;
 }
 
-// Model Types
-export interface ModelInfo {
+export interface NasaAPODResponse {
+  date: string;
+  title: string;
+  explanation: string;
+  url: string;
+  hdurl?: string;
+  media_type: string;
+  copyright?: string;
+}
+
+export interface GiphyGifResponse {
   id: string;
-  name: string;
-  provider: string;
-  context_length: number;
-  description?: string;
-}
-
-export interface ModelsResponse {
-  success: boolean;
-  data: Record<string, string[]>;
-}
-
-// Token Count Types
-export interface TokenizeRequest {
-  text: string;
-  model?: string;
-}
-
-export interface TokenizeResponse {
-  success: boolean;
-  data: {
-    text: string;
-    model: string;
-    tokenCount: number;
+  title: string;
+  url: string;
+  images: {
+    original: {
+      url: string;
+      width: string;
+      height: string;
+    };
+    fixed_height: {
+      url: string;
+      width: string;
+      height: string;
+    };
+    preview_gif?: {
+      url: string;
+    };
   };
 }
 
-// Batch Request Types
-export interface BatchRequest {
-  requests: LLMCompleteRequest[];
-}
-
-export interface BatchResponse {
-  success: boolean;
-  data: Array<LLMCompleteResponse | { error: string }>;
-}
-
-// Rate Limiting Types
-export interface RateLimitInfo {
-  limit: number;
-  remaining: number;
-  reset: number;
-  retryAfter?: number;
-}
-
-// Request Context Types
-export interface RequestContext {
-  ip: string;
-  userAgent: string;
-  timestamp: number;
-  userId?: string;
+export interface LocationAPIResponse {
+  lat: number;
+  lon: number;
+  display_name: string;
+  city?: string;
+  state?: string;
+  country?: string;
 }

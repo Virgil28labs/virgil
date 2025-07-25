@@ -11,7 +11,7 @@ export { LLMService, llmService };
 export const complete = (options: Partial<LLMRequest>): Promise<LLMResponse> => 
   llmService.complete(options);
 
-export const completeStream = (options: Partial<LLMRequest>): AsyncGenerator<any, void, unknown> => 
+export const completeStream = (options: Partial<LLMRequest>): AsyncGenerator<unknown, void, unknown> => 
   llmService.completeStream(options);
 
 export const getModels = (): Promise<Record<string, string[]>> => 

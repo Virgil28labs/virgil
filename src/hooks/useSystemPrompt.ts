@@ -37,7 +37,7 @@ export function useSystemPrompt({
       return `${ctx.location.city}${ctx.location.country ? `, ${ctx.location.country}` : ''}`;
     }
     return null;
-  }, [dashboardContext]); // Re-compute when dashboard context changes
+  }, []); // No dependencies needed - we call service directly
 
   // Memoized static parts of system prompt
   const staticPromptParts = useMemo(() => {

@@ -199,7 +199,7 @@ export const useUserProfile = () => {
   }, [user]);
 
   // Update profile field
-  const updateField = useCallback((field: keyof UserProfile, value: any) => {
+  const updateField = useCallback((field: keyof UserProfile, value: unknown) => {
     // Sanitize text fields
     let sanitizedValue = value;
     if (typeof value === 'string' && field !== 'email' && field !== 'dateOfBirth') {

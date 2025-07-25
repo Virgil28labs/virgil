@@ -121,7 +121,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     try {
       const result = await Promise.race([
         new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-          geocoderRef.current!.geocode({ location: latLng }, (results, status) => {
+          if (!geocoderRef.current) {
+            reject(new Error('Geocoder not initialized'));
+            return;
+          }
+          geocoderRef.current.geocode({ location: latLng }, (results, status) => {
             if (status === 'OK' && results) {
               resolve(results);
             } else {
@@ -168,7 +172,11 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     
     try {
       const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
-        directionsServiceRef.current!.route(request, (result, status) => {
+        if (!directionsServiceRef.current) {
+          reject(new Error('DirectionsService not initialized'));
+          return;
+        }
+        directionsServiceRef.current.route(request, (result, status) => {
           if (status === 'OK' && result) {
             resolve(result);
           } else {
@@ -238,7 +246,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       });
       setError('Unable to calculate route. Please try again.');
     }
-  }, [departureTime]);
+  }, [departureTime, setRouteData]);
 
   // Handle route selection
   const handleRouteSelect = useCallback((index: number) => {
@@ -332,7 +340,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         }, 300);
       }
     }
-  }, [currentRoute, alternativeRoutes]);
+  }, [currentRoute, alternativeRoutes, setSelectedRouteIndex, setShowRouteOptions]);
 
   // Handle clear route
   const handleClearRoute = useCallback(() => {
@@ -340,7 +348,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     if (directionsRendererRef.current) {
       directionsRendererRef.current.setMap(null);
       directionsRendererRef.current.setMap(mapInstanceRef.current);
-      directionsRendererRef.current.setDirections({ routes: [] } as any);
+      directionsRendererRef.current.setDirections({ routes: [] } as google.maps.DirectionsResult);
     }
     
     // Clear alternative renderers
@@ -363,7 +371,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       mapInstanceRef.current.setCenter(currentLocation);
       mapInstanceRef.current.setZoom(14);
     }
-  }, [currentLocation]);
+  }, [currentLocation, clearRouteState]);
 
   // Handle toggle expand/collapse
   const handleToggleExpand = useCallback(() => {
@@ -385,7 +393,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       clearTimeout(autoCollapseTimerRef.current);
       autoCollapseTimerRef.current = null;
     }
-  }, []);
+  }, [setRouteInfoVisible]);
 
   // Handle traffic toggle
   const handleToggleTraffic = useCallback(() => {

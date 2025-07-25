@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
-import { GiphyGalleryProvider, useGiphyGallery } from './GiphyGalleryProvider';
+import { GiphyGalleryProvider } from './GiphyGalleryProvider';
+import { useGiphyGallery } from './useGiphyGallery';
 import { GiphyTabs } from './GiphyTabs';
 import { GiphySearchControls } from './GiphySearchControls';
 import { GiphyGrid } from './GiphyGrid';

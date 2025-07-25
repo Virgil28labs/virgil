@@ -23,7 +23,7 @@ interface CacheStats {
 export class ResponseCache {
   private ttl: number;
   private maxSize: number;
-  private cache: Map<string, CacheEntry<any>>;
+  private cache: Map<string, CacheEntry<unknown>>;
   private accessOrder: Map<string, number>;
   private hits: number;
   private misses: number;
@@ -37,7 +37,7 @@ export class ResponseCache {
     this.misses = 0;
   }
 
-  generateKey(data: any): string {
+  generateKey(data: unknown): string {
     // Simple string-based key generation
     return JSON.stringify(data);
   }

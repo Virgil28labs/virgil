@@ -243,7 +243,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
               <label>Date Range</label>
               <select 
                 value={filters.dateRange}
-                onChange={(e) => updateFilters({ dateRange: e.target.value as any })}
+                onChange={(e) => updateFilters({ dateRange: e.target.value as SearchFilters['dateRange'] })}
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -257,7 +257,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
               <label>Content Type</label>
               <select 
                 value={filters.contentType}
-                onChange={(e) => updateFilters({ contentType: e.target.value as any })}
+                onChange={(e) => updateFilters({ contentType: e.target.value as SearchFilters['contentType'] })}
               >
                 <option value="all">All Content</option>
                 <option value="memories">Memories Only</option>
@@ -269,7 +269,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
               <label>Sort By</label>
               <select 
                 value={filters.sortBy}
-                onChange={(e) => updateFilters({ sortBy: e.target.value as any })}
+                onChange={(e) => updateFilters({ sortBy: e.target.value as SearchFilters['sortBy'] })}
               >
                 <option value="recent">Most Recent</option>
                 <option value="oldest">Oldest First</option>

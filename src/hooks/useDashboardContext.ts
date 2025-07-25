@@ -2,7 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { dashboardContextService } from '../services/DashboardContextService';
 
 interface UseDashboardContextProps {
-  dispatch: (action: any) => void;
+  dispatch: (action: unknown) => void;
 }
 
 interface UseDashboardContextReturn {
