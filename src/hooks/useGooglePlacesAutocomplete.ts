@@ -221,9 +221,7 @@ export function useGooglePlacesAutocomplete(
             fields: options.fields || ['placeId', 'location', 'displayName', 'formattedAddress'],
           });
 
-          // Debug: Log the actual place object structure
-          // console.log('New API place object:', place);
-          // console.log('Available properties:', Object.keys(place));
+          // Debug: Log the actual place object structure if needed
 
           // Convert to PlaceResult format for compatibility with better error handling
           placeResult = {
@@ -236,8 +234,6 @@ export function useGooglePlacesAutocomplete(
             formatted_address: place.formattedAddress || place.formatted_address || undefined,
           };
 
-          // Log the converted result for debugging
-          // console.log('Converted PlaceResult:', placeResult);
         } catch (newApiError) {
           console.warn('New API failed, falling back to classic API:', newApiError);
           // Fall through to classic API
@@ -247,7 +243,6 @@ export function useGooglePlacesAutocomplete(
       // Use classic API if new API failed or isn't available
       if (!placeResult) {
         // Classic API - use PlacesService to get details
-        // console.log('Using classic API fallback');
         const service = new google.maps.places.PlacesService(document.createElement('div'));
         
         placeResult = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
@@ -257,7 +252,6 @@ export function useGooglePlacesAutocomplete(
               fields: options.fields || ['place_id', 'geometry', 'name', 'formatted_address'],
             },
             (place, status) => {
-              // console.log('Classic API response:', { place, status });
               if (status === google.maps.places.PlacesServiceStatus.OK && place) {
                 resolve(place);
               } else {

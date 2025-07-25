@@ -510,12 +510,7 @@ class NasaApodService {
   /**
    * Preload adjacent dates for faster navigation
    */
-  async preloadAdjacentDates(_currentDate: string): Promise<void> {
-    // Temporarily disabled to prevent rate limiting issues
-    // TODO: Re-enable once rate limiting is properly handled
-    return;
-    
-    /* Original implementation - to be restored later
+  async preloadAdjacentDates(currentDate: string): Promise<void> {
     const promises: Promise<ApodImage>[] = [];
     
     // Preload previous day
@@ -538,7 +533,6 @@ class NasaApodService {
     Promise.all(promises).catch(() => {
       // Silently handle preload failures
     });
-    */
   }
 }
 
