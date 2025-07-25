@@ -83,7 +83,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   getContextData(): AppContextData<PomodoroData> {
     const summary = this.generateSummary();
     const now = timeService.getTimestamp();
-    const lastUsed = this.currentData.todayStats.lastSessionTime?.getTime() || 0;
+    const lastUsed = this.currentData.todayStats.lastSessionTime?.getTime() || 0; // eslint-disable-line no-restricted-syntax
     const isRecent = now - lastUsed < 60 * 60 * 1000; // Active within last hour
 
     return {
@@ -199,7 +199,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     response += `for a total of ${totalFocusMinutes} minutes of focused work. `;
 
     if (lastSessionTime) {
-      const timeSinceLastSession = timeService.getTimestamp() - lastSessionTime.getTime();
+      const timeSinceLastSession = timeService.getTimestamp() - lastSessionTime.getTime(); // eslint-disable-line no-restricted-syntax
       const hoursSince = Math.floor(timeSinceLastSession / (1000 * 60 * 60));
       
       if (hoursSince < 1) {

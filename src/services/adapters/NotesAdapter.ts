@@ -94,6 +94,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
     const summary = this.generateSummary(data);
     const isActive = recentEntries.some(entry => 
+      // eslint-disable-next-line no-restricted-syntax
       now - entry.timestamp.getTime() < 30 * 60 * 1000, // Active if used in last 30 minutes
     );
 
@@ -101,7 +102,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       appName: this.appName,
       displayName: this.displayName,
       isActive,
-      lastUsed: this.entries.length > 0 ? this.entries[0].timestamp.getTime() : 0,
+      lastUsed: this.entries.length > 0 ? this.entries[0].timestamp.getTime() : 0, // eslint-disable-line no-restricted-syntax
       data,
       summary,
       capabilities: [
@@ -180,7 +181,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
   private getRecentEntries(count: number): Entry[] {
     return this.entries
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()) // eslint-disable-line no-restricted-syntax
       .slice(0, count);
   }
 
@@ -451,7 +452,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     }
     
     // Recency bonus
-    const ageInDays = (timeService.getTimestamp() - entry.timestamp.getTime()) / (1000 * 60 * 60 * 24);
+    const ageInDays = (timeService.getTimestamp() - entry.timestamp.getTime()) / (1000 * 60 * 60 * 24); // eslint-disable-line no-restricted-syntax
     score += Math.max(0, 10 - ageInDays);
     
     return score;

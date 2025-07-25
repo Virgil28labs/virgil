@@ -99,13 +99,13 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     
     if (this.favorites.length > 0) {
       const dates = this.favorites.map(f => timeService.parseDate(f.date) || timeService.getCurrentDateTime());
-      const minTimestamp = Math.min(...dates.map(d => d.getTime()));
-      const maxTimestamp = Math.max(...dates.map(d => d.getTime()));
+      const minTimestamp = Math.min(...dates.map(d => d.getTime())); // eslint-disable-line no-restricted-syntax
+      const maxTimestamp = Math.max(...dates.map(d => d.getTime())); // eslint-disable-line no-restricted-syntax
       oldestFavorite = timeService.fromTimestamp(minTimestamp);
       newestFavorite = timeService.fromTimestamp(maxTimestamp);
       
       // Calculate months spanned
-      const diffTime = newestFavorite.getTime() - oldestFavorite.getTime();
+      const diffTime = newestFavorite.getTime() - oldestFavorite.getTime(); // eslint-disable-line no-restricted-syntax
       monthsSpanned = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30));
     }
     

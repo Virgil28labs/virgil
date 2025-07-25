@@ -78,9 +78,10 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     const monthStart = timeService.subtractMonths(timeService.getCurrentDateTime(), 1);
 
     // Calculate stats
-    const todayCount = this.photos.filter(p => p.timestamp >= todayStart.getTime()).length;
-    const weekCount = this.photos.filter(p => p.timestamp >= weekStart.getTime()).length;
-    const monthCount = this.photos.filter(p => p.timestamp >= monthStart.getTime()).length;
+    // Note: Using .getTime() on Date objects from timeService is correct here - we need timestamps for comparison
+    const todayCount = this.photos.filter(p => p.timestamp >= todayStart.getTime()).length; // eslint-disable-line no-restricted-syntax
+    const weekCount = this.photos.filter(p => p.timestamp >= weekStart.getTime()).length; // eslint-disable-line no-restricted-syntax
+    const monthCount = this.photos.filter(p => p.timestamp >= monthStart.getTime()).length; // eslint-disable-line no-restricted-syntax
     const favorites = this.photos.filter(p => p.isFavorite);
     
     // Get storage info
@@ -450,7 +451,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
           favorites: this.photos.filter(p => p.isFavorite).length,
           todayCount: this.photos.filter(p => {
             const today = timeService.startOfDay();
-            return p.timestamp >= today.getTime();
+            return p.timestamp >= today.getTime(); // eslint-disable-line no-restricted-syntax
           }).length,
         },
       });

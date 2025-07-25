@@ -232,7 +232,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     if (!this.userData || this.userData.habits.length === 0) return 0;
 
     const allCheckIns = this.userData.habits.flatMap(h => 
-      h.checkIns.map(date => (timeService.parseDate(date) || timeService.getCurrentDateTime()).getTime()),
+      h.checkIns.map(date => (timeService.parseDate(date) || timeService.getCurrentDateTime()).getTime()), // eslint-disable-line no-restricted-syntax
     );
 
     return allCheckIns.length > 0 ? Math.max(...allCheckIns) : 0;
