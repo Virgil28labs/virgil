@@ -136,7 +136,11 @@ export class LLMService extends EventEmitter {
         },
         true,
       );
-      const reader = (response as Response).body!.getReader();
+      const body = (response as Response).body;
+      if (!body) {
+        throw new Error('Response body is null');
+      }
+      const reader = body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 

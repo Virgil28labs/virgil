@@ -386,7 +386,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
   private notifySubscribers(): void {
     if (this.profile) {
-      this.subscribers.forEach(callback => callback(this.profile!));
+      this.subscribers.forEach(callback => callback(this.profile));
     }
   }
 }
