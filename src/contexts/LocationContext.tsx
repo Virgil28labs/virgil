@@ -122,7 +122,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
         component: 'LocationContext',
         action: 'updateLocationDataFromIP',
       });
-      dispatch({ type: 'SET_ERROR', payload: _error.message });
+      dispatch({ type: 'SET_ERROR', payload: _error instanceof Error ? _error.message : 'Failed to fetch location' });
     }
   }, [state.loading, state.lastUpdated, state.address]);
 
@@ -159,7 +159,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       await fetchLocationData(true);
     } catch (_error: unknown) {
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: 'denied' });
-      dispatch({ type: 'SET_ERROR', payload: _error.message });
+      dispatch({ type: 'SET_ERROR', payload: _error instanceof Error ? _error.message : 'Failed to fetch location' });
     }
   }, [fetchLocationData]);
 

@@ -211,14 +211,14 @@ export const useUserProfile = () => {
     
     switch (field) {
       case 'email':
-        if (sanitizedValue && !validateEmail(sanitizedValue)) {
+        if (sanitizedValue && typeof sanitizedValue === 'string' && !validateEmail(sanitizedValue)) {
           errors.email = 'Please enter a valid email address';
         } else {
           delete errors.email;
         }
         break;
       case 'phone':
-        if (sanitizedValue && !validatePhone(sanitizedValue)) {
+        if (sanitizedValue && typeof sanitizedValue === 'string' && !validatePhone(sanitizedValue)) {
           errors.phone = 'Please enter a valid phone number';
         } else {
           delete errors.phone;
@@ -227,7 +227,7 @@ export const useUserProfile = () => {
       case 'dateOfBirth':
         // Validate date is not in the future
         if (sanitizedValue) {
-          const date = timeService.parseDate(sanitizedValue);
+          const date = timeService.parseDate(sanitizedValue as string);
           if (date && date > timeService.getCurrentDateTime()) {
             errors.dateOfBirth = 'Date cannot be in the future';
           } else {

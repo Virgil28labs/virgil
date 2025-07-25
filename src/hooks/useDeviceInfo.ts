@@ -28,7 +28,7 @@ interface ExtendedNavigator extends Navigator {
 // Permission name types
 type PermissionName = 'geolocation' | 'camera' | 'microphone' | 'notifications' | 'clipboard-read';
 
-interface DeviceInfo {
+export interface DeviceInfo {
   // Location & Network
   location: string
   ip: string

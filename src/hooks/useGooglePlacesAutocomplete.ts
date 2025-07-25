@@ -29,7 +29,7 @@ interface ExtendedPlace {
   fetchFields?: (options: { fields: string[] }) => Promise<void>;
 }
 
-interface PlaceSuggestion {
+export interface PlaceSuggestion {
   placePrediction: google.maps.places.AutocompletePrediction | ExtendedPlacePrediction;
   suggestion: {
     mainText: string;
@@ -46,7 +46,7 @@ interface UseGooglePlacesAutocompleteReturn {
 }
 
 export function useGooglePlacesAutocomplete(
-  inputRef: RefObject<HTMLInputElement>,
+  inputRef: RefObject<HTMLInputElement | null>,
   options: AutocompleteOptions = {},
   onPlaceSelect?: (place: google.maps.places.PlaceResult) => void,
 ): UseGooglePlacesAutocompleteReturn {
@@ -100,14 +100,22 @@ export function useGooglePlacesAutocomplete(
             await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
           // Transform suggestions to our format
-          formattedSuggestions = autocompleteSuggestions.map((suggestion: { placePrediction: ExtendedPlacePrediction }) => ({
-            placePrediction: suggestion.placePrediction,
-            suggestion: {
-              mainText: suggestion.placePrediction.mainText?.text || '',
-              secondaryText: suggestion.placePrediction.secondaryText?.text || '',
-              placeId: suggestion.placePrediction.placeId || '',
-            },
-          }));
+          formattedSuggestions = autocompleteSuggestions
+            .filter((suggestion: unknown) => {
+              const s = suggestion as { placePrediction: ExtendedPlacePrediction | null };
+              return s.placePrediction !== null;
+            })
+            .map((suggestion: unknown) => {
+              const s = suggestion as { placePrediction: ExtendedPlacePrediction };
+              return {
+                placePrediction: s.placePrediction,
+                suggestion: {
+                  mainText: s.placePrediction.mainText?.text || '',
+                  secondaryText: s.placePrediction.secondaryText?.text || '',
+                  placeId: s.placePrediction.placeId || '',
+                },
+              };
+            });
         } catch (_apiError) {
           // New API failed, will use fallback
           // Let it fall through to the fallback method
@@ -210,14 +218,14 @@ export function useGooglePlacesAutocomplete(
       let placeResult: google.maps.places.PlaceResult | undefined;
       
       // Try new API first if available
-      if (suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
+      if (suggestion.placePrediction && 'toPlace' in suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
         try {
           // Convert prediction to place
           // @ts-ignore - TypeScript types may not be updated yet
           const place = suggestion.placePrediction.toPlace();
           
           // Fetch place details with correct field names for new API
-          await place.fetchFields({
+          await place.fetchFields?.({
             fields: options.fields || ['placeId', 'location', 'displayName', 'formattedAddress'],
           });
 

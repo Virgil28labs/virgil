@@ -404,7 +404,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
   }
 
   subscribe(callback: (data: CameraData) => void): () => void {

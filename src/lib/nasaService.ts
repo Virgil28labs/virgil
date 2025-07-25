@@ -205,7 +205,7 @@ class NasaApodService {
           maxRetries: 3,
           initialDelay: 1000,
           onRetry: (attempt, error) => {
-            console.warn(`NASA APOD API retry ${attempt}:`, error.message);
+            console.warn(`NASA APOD API retry ${attempt}:`, error instanceof Error ? error.message : error);
           },
           shouldRetry: (error) => {
             // Don't retry rate limit errors (429) or client errors (4xx)

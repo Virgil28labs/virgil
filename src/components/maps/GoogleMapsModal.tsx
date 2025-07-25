@@ -348,7 +348,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
     if (directionsRendererRef.current) {
       directionsRendererRef.current.setMap(null);
       directionsRendererRef.current.setMap(mapInstanceRef.current);
-      directionsRendererRef.current.setDirections({ routes: [] } as google.maps.DirectionsResult);
+      directionsRendererRef.current.setDirections({ routes: [] } as unknown as google.maps.DirectionsResult);
     }
     
     // Clear alternative renderers

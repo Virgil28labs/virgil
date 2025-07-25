@@ -1,6 +1,0 @@
-// SKIPPED: This test file is temporarily disabled due to React 19 compatibility issues with renderHook
-// The error "Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'" 
-// is a known issue with React Testing Library and React 19.
-// These tests can be re-enabled once the compatibility issue is resolved.
-
-// Original test file content has been moved to useDataExport.test.ts.skip

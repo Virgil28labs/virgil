@@ -9,6 +9,7 @@ import type { LocationContextValue } from '../types/location.types';
 import type { WeatherContextType } from '../types/weather.types';
 import type { AuthContextValue } from '../types/auth.types';
 import type { UserProfile } from '../hooks/useUserProfile';
+import type { DeviceInfo } from '../hooks/useDeviceInfo';
 import { dashboardAppService, type DashboardAppData } from './DashboardAppService';
 import { userProfileAdapter } from './adapters/UserProfileAdapter';
 import { timeService } from './TimeService';
@@ -314,7 +315,7 @@ export class DashboardContextService {
     this.notifyListeners();
   }
 
-  updateDeviceContext(deviceInfo: unknown): void {
+  updateDeviceContext(deviceInfo: DeviceInfo): void {
     if (!deviceInfo) {
       this.context.device = { hasData: false };
     } else {

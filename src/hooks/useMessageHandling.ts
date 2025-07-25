@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react';
 import type React from 'react';
 import { chatService } from '../services/ChatService';
 import { memoryService } from '../services/MemoryService';
-import { useChatApi } from './useChatApi';
+import { useChatApi, type LoadingState } from './useChatApi';
 import type { ChatMessage } from '../types/chat.types';
 
 interface UseMessageHandlingProps {
@@ -22,7 +22,7 @@ interface UseMessageHandlingReturn {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleQuickAction: (action: string) => void;
-  loadingState: { isLoading: boolean; type: string } | null;
+  loadingState: LoadingState | null;
   inputRef: React.RefObject<HTMLInputElement | null>;
 }
 

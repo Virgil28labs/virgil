@@ -215,7 +215,7 @@ function VirgilChatbotInner() {
         onMarkAsImportant={markAsImportant}
         user={user}
         lastConversation={state.lastConversation}
-        loadingState={loadingState}
+        loadingState={loadingState || undefined}
       />
 
       <ChatInput

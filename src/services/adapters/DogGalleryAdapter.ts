@@ -354,7 +354,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
   }
 
   subscribe(callback: (data: DogGalleryData) => void): () => void {

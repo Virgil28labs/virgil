@@ -101,10 +101,10 @@ export class LLMService extends EventEmitter {
         model,
         provider,
         duration,
-        tokens: response.usage?.total_tokens,
+        tokens: 'usage' in response ? response.usage?.total_tokens : undefined,
       });
 
-      return response;
+      return response as LLMResponse;
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -136,7 +136,7 @@ export class LLMService extends EventEmitter {
         },
         true,
       );
-      const reader = response.body.getReader();
+      const reader = (response as Response).body!.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 

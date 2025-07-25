@@ -142,7 +142,7 @@ export class StorageService {
           callback(value);
         } catch {
           // Handle plain string values
-          callback(e.newValue);
+          callback(e.newValue as T);
         }
       }
     };

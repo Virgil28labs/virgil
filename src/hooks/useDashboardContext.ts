@@ -1,8 +1,10 @@
 import { useEffect, useCallback } from 'react';
+import type { Dispatch } from 'react';
 import { dashboardContextService } from '../services/DashboardContextService';
+import type { ChatAction } from '../components/chat/chatTypes';
 
 interface UseDashboardContextProps {
-  dispatch: (action: unknown) => void;
+  dispatch: Dispatch<ChatAction>;
 }
 
 interface UseDashboardContextReturn {

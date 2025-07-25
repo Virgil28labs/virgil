@@ -1,12 +1,14 @@
 import { useEffect, useCallback } from 'react';
+import type { Dispatch } from 'react';
 import { memoryService } from '../services/MemoryService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { timeService } from '../services/TimeService';
 import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
+import type { ChatAction } from '../components/chat/chatTypes';
 
 interface UseMemoryServiceProps {
-  dispatch: (action: unknown) => void;
+  dispatch: Dispatch<ChatAction>;
   setError: (error: string | null) => void;
   dashboardContext: DashboardContext | null;
 }

@@ -440,7 +440,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
   }
 
   subscribe(callback: (data: CircleGameData) => void): () => void {

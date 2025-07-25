@@ -51,7 +51,6 @@ jest.mock('./src/services/TimeService', () => {
 
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 import '@testing-library/jest-dom';
-import 'whatwg-fetch';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import './RouteInputBar.css';
 import { logger } from '../../lib/logger';
-import { useGooglePlacesAutocomplete } from '../../hooks/useGooglePlacesAutocomplete';
+import { useGooglePlacesAutocomplete, type PlaceSuggestion } from '../../hooks/useGooglePlacesAutocomplete';
 
 interface RouteInputBarProps {
   currentLocation: google.maps.LatLngLiteral | null
@@ -167,11 +167,11 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   }, []);
 
   // Handle suggestion selection
-  const handleOriginSuggestionSelect = useCallback(async (suggestion: unknown) => {
+  const handleOriginSuggestionSelect = useCallback(async (suggestion: PlaceSuggestion) => {
     await selectOriginPlace(suggestion);
   }, [selectOriginPlace]);
 
-  const handleDestinationSuggestionSelect = useCallback(async (suggestion: unknown) => {
+  const handleDestinationSuggestionSelect = useCallback(async (suggestion: PlaceSuggestion) => {
     await selectDestinationPlace(suggestion);
   }, [selectDestinationPlace]);
 

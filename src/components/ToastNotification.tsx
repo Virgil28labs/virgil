@@ -52,6 +52,13 @@ export const ToastNotification = memo(function ToastNotification({
 
   const currentStyle = typeStyles[type];
 
+  const handleDismiss = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => {
+      onDismiss(id);
+    }, 300);
+  }, [id, onDismiss]);
+
   useEffect(() => {
     // Trigger entrance animation
     const timer = setTimeout(() => setIsVisible(true), 10);
@@ -67,13 +74,6 @@ export const ToastNotification = memo(function ToastNotification({
     }
     return undefined;
   }, [duration, persistent, handleDismiss]);
-
-  const handleDismiss = useCallback(() => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      onDismiss(id);
-    }, 300);
-  }, [id, onDismiss]);
 
   return (
     <div

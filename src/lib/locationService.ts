@@ -244,7 +244,7 @@ export const locationService = {
     );
   },
 
-  async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number }> {
+  async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number } | null> {
     try {
       return await retryWithBackoff(
         async () => {

@@ -395,7 +395,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
   }
 
   subscribe(callback: (data: GiphyData) => void): () => void {

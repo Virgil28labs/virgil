@@ -490,7 +490,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
       }
     });
 
-    return results.sort((a, b) => b.relevance - a.relevance);
+    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
   }
 
   subscribe(callback: (data: RhythmMachineData) => void): () => void {

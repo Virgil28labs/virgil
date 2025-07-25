@@ -15,7 +15,7 @@ const GIPHY_API_BASE = import.meta.env.VITE_GIPHY_API_URL || 'https://api.giphy.
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 class GiphyService {
-  private cache: Map<string, { data: GiphyImage[]; timestamp: number }> = new Map();
+  private cache: Map<string, { data: { gifs: GiphyImage[]; totalCount: number; hasMore: boolean }; timestamp: number }> = new Map();
   private defaultParams = {
     limit: 25,
     rating: 'pg' as const,
@@ -104,7 +104,7 @@ class GiphyService {
           maxRetries: 2,
           initialDelay: 1000,
           onRetry: (attempt, error) => {
-            console.warn(`Giphy API retry ${attempt}:`, error.message);
+            console.warn(`Giphy API retry ${attempt}:`, error instanceof Error ? error.message : error);
           },
         },
       );
@@ -131,7 +131,7 @@ class GiphyService {
     }
 
     try {
-      const response = await this.makeGiphyRequest('/gifs/search', params);
+      const response = await this.makeGiphyRequest('/gifs/search', params as unknown as Record<string, unknown>);
       const data: GiphyApiResponse = await response.json();
 
       if (!data.data || !Array.isArray(data.data)) {
@@ -172,7 +172,7 @@ class GiphyService {
     }
 
     try {
-      const response = await this.makeGiphyRequest('/gifs/trending', params);
+      const response = await this.makeGiphyRequest('/gifs/trending', params as unknown as Record<string, unknown>);
       const data: GiphyApiResponse = await response.json();
 
       if (!data.data || !Array.isArray(data.data)) {
@@ -182,7 +182,7 @@ class GiphyService {
       const gifs = data.data.map(gif => this.transformGiphyGif(gif));
       const hasMore = gifs.length === (params.limit || this.defaultParams.limit);
 
-      const result = { gifs, hasMore };
+      const result = { gifs, totalCount: data.pagination?.total_count || gifs.length, hasMore };
 
       // Cache the result
       this.cache.set(cacheKey, {

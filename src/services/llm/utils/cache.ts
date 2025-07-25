@@ -60,7 +60,7 @@ export class ResponseCache {
     // Update access time for LRU
     this.accessOrder.set(key, timeService.getTimestamp());
     this.hits++;
-    return entry.value;
+    return entry.value as T;
   }
 
   async set<T>(key: string, value: T, ttl: number = this.ttl): Promise<void> {

@@ -118,6 +118,24 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
     favorites: loadFavoritesFromStorage(),
   });
 
+  // Load trending GIFs
+  const loadTrending = useCallback(async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: 'loading' });
+      
+      const result = await giphyService.getTrendingGifs({
+        limit: 50,
+        rating: state.rating,
+      });
+      
+      dispatch({ type: 'SET_TRENDING_GIFS', payload: result.gifs });
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load trending GIFs';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
+    }
+  }, [state.rating]);
+
   // Load trending GIFs when gallery opens
   useEffect(() => {
     if (isOpen && state.trendingGifs.length === 0) {
@@ -163,24 +181,6 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
     }
   }, [state.rating, state.offset]);
-
-  // Load trending GIFs
-  const loadTrending = useCallback(async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: 'loading' });
-      
-      const result = await giphyService.getTrendingGifs({
-        limit: 50,
-        rating: state.rating,
-      });
-      
-      dispatch({ type: 'SET_TRENDING_GIFS', payload: result.gifs });
-      
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load trending GIFs';
-      dispatch({ type: 'SET_ERROR', payload: errorMessage });
-    }
-  }, [state.rating]);
 
   // Load more results (for infinite scroll)
   const loadMore = useCallback(async () => {
