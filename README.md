@@ -1,17 +1,33 @@
 # Virgil
 
-A modern React/TypeScript application featuring an interactive physics-based raccoon mascot, weather integration, location services, and LLM chat capabilities.
+A sophisticated React/TypeScript web application that combines an AI-powered chatbot assistant with a comprehensive personal dashboard. Features include an interactive physics-based raccoon mascot, weather integration, location services, and multiple productivity tools, all designed with a local-first philosophy.
 
 ## ✨ Features
 
+### AI Assistant - Virgil
+- **Advanced Memory System**: Continuous conversation model with IndexedDB persistence
+- **Context Awareness**: Real-time integration of time, location, weather, and device data
+- **Dashboard Integration**: Unified access to all app data through intelligent adapters
+- **Smart Context Enhancement**: Dynamic relevance scoring for optimal AI responses
+
+### Dashboard Applications
+- **Notes**: Task management, journaling, and intelligent tagging system
+- **Pomodoro Timer**: Productivity tracking with session statistics
+- **Streak Tracker**: Habit monitoring with visual progress tracking
+- **Camera**: Photo gallery with metadata and favorites
+- **Dog Gallery**: Curated collection of favorite dog images
+- **NASA APOD**: Daily space images with explanations
+- **Giphy Gallery**: Animated GIF collection and favorites
+- **Perfect Circle Game**: Physics-based drawing challenge
+- **Rhythm Machine**: Interactive drum sequencer
+
+### Core Features
 - **Interactive Raccoon Mascot**: Physics-based character with collision detection, triple jump, wall sticking, and text interaction
 - **Weather Integration**: Real-time weather data with OpenWeatherMap API
 - **Location Services**: GPS coordinates and IP geolocation with street address display
-- **LLM Chat**: AI-powered chat functionality with backend proxy for security
 - **Secure Authentication**: Complete signup/login system powered by Supabase
-- **Dynamic UI Elements**: Animated power button with blue/pink states and responsive scaling
-- **Ultra-minimalist Design**: Clean, dark purple aesthetic with perfect viewport centering
 - **Progressive Web App**: Installable with offline support
+- **Local-First Architecture**: Privacy-focused with minimal cloud dependency
 
 ## 🎨 Design System
 
@@ -87,21 +103,41 @@ A modern React/TypeScript application featuring an interactive physics-based rac
 ### Tech Stack
 - **Frontend**: React 19.1, TypeScript 5.8, Vite 7.0, PWA
 - **Backend**: Express 5.1 (port 5002), Node.js
-- **Database**: Supabase (Auth + Data)
-- **Testing**: Jest, React Testing Library
-- **Styling**: CSS Modules, Tailwind CSS
+- **Database**: Supabase (Auth + User Profiles)
+- **Storage**: IndexedDB (Primary), localStorage (Settings)
+- **Testing**: Jest, React Testing Library (80%+ coverage target)
+- **Styling**: CSS Modules, Custom Design System
 
-### Two-Server Architecture
-1. **Frontend Server** (Port 3000): Vite-powered React application
-2. **Backend Server** (Port 5002): Express API for LLM proxy and sensitive operations
+### Service Architecture
+```
+VirgilChatbot (Main Component)
+├── ChatContext (State Management)
+├── MemoryService (IndexedDB Persistence)
+├── DashboardContextService (Environmental Data)
+├── DynamicContextBuilder (Query Enhancement)
+├── DashboardAppService (App Integration)
+└── LLMService (AI Communication)
+```
+
+### Storage Architecture
+- **Cloud (Supabase)**: Authentication and user profiles only
+- **IndexedDB**: Chat memories, photos, notes (local-first)
+- **localStorage**: App settings, favorites, preferences
+- **Memory Cache**: Performance optimization layer
 
 ### Project Structure
 ```
 src/                    # React frontend
 ├── components/         # Feature-based components
+│   ├── chat/          # Virgil AI assistant
+│   ├── notes/         # Notes app with adapters
+│   ├── camera/        # Photo management
+│   └── [apps]/        # Other dashboard apps
 ├── hooks/             # Custom React hooks
 ├── contexts/          # Global state (Auth, Location, Weather)
-├── services/          # API integrations
+├── services/          # Core services
+│   ├── adapters/      # App data adapters
+│   └── llm/           # LLM integration
 ├── types/             # TypeScript definitions
 └── utils/             # Helper functions
 
@@ -109,7 +145,7 @@ server/                 # Express backend
 ├── routes/            # API endpoints
 ├── middleware/        # Security, validation
 ├── services/          # Business logic
-└── config/            # Configuration
+└── types/             # Backend TypeScript types
 ```
 
 ## 🎯 User Experience
@@ -188,6 +224,16 @@ lsof -ti:5002 | xargs kill
 ```bash
 curl http://localhost:5002/api/health
 ```
+
+## 📚 Documentation
+
+- [System Summary](docs/VIRGIL_SYSTEM_SUMMARY.md) - Comprehensive overview of Virgil's architecture
+- [Memory Enhancement Plan](docs/VIRGIL_MEMORY_ENHANCEMENT_PLAN.md) - Roadmap for semantic memory features
+- [Supabase Vector Integration](docs/SUPABASE_VECTOR_INTEGRATION.md) - Detailed integration plan
+- [Storage Architecture](docs/STORAGE_ARCHITECTURE.md) - Complete storage system documentation
+- [Chatbot Architecture](docs/VIRGIL_CHATBOT_ARCHITECTURE.md) - AI assistant implementation details
+- [Database Memory Architecture](docs/VIRGIL_DATABASE_MEMORY_ARCHITECTURE.md) - Memory system deep dive
+- [Code Standards](CLAUDE.md) - Development excellence guidelines
 
 ---
 

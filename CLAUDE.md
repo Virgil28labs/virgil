@@ -87,6 +87,14 @@ server/           # Express backend
 ❌ TODOs in production
 ❌ Direct `new Date()` usage - use TimeService
 
+## Supabase MCP Integration
+- **Purpose**: Direct database management and queries via Claude
+- **Mode**: Full access enabled for development (all operations allowed)
+- **Usage**: Natural language for queries, schema changes, data operations
+- **Features**: All feature groups enabled (database, functions, storage, etc.)
+- **Note**: This is separate from the JS SDK used in the app
+- **Docs**: See `docs/SUPABASE_MCP_SETUP.md` for setup and examples
+
 ## The Standard
 Write code that's:
 - **Beautiful**: Others admire it
