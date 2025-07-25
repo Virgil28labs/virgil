@@ -2,6 +2,7 @@ import { memo, useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import './RhythmMachineViewer.css';
 import { rhythmService } from '../../services/rhythm';
 import type { RhythmPattern } from '../../services/rhythm';
+import { dashboardContextService } from '../../services/DashboardContextService';
 import { 
   DRUM_SOUNDS, 
   GENRE_TAGS, 
@@ -154,7 +155,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           osc.stop(now + 0.5);
           break;
           
-        case DrumType.SNARE:
+        case DrumType.SNARE: {
           // Noise for snare
           const noise = ctx.createBufferSource();
           const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
@@ -181,6 +182,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           noise.start(now);
           noise.stop(now + 0.2);
           break;
+        }
           
         case DrumType.HIHAT:
           osc.type = 'square';
@@ -200,7 +202,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           osc.stop(now + 0.3);
           break;
           
-        case DrumType.CLAP:
+        case DrumType.CLAP: {
           // Clap noise
           const clapNoise = ctx.createBufferSource();
           const clapBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
@@ -219,6 +221,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           clapNoise.start(now);
           clapNoise.stop(now + 0.1);
           break;
+        }
       }
       
     } catch (error) {
@@ -378,7 +381,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       pattern: JSON.parse(JSON.stringify(pattern)),
       description: genreInput,
       category,
-      timestamp: Date.now(),
+      timestamp: dashboardContextService.getTimeService().getCurrentDateTime().getTime(),
     };
     setSaveSlots(newSlots);
     localStorage.setItem('rhythmMachineSaveSlots', JSON.stringify(newSlots));
@@ -457,8 +460,6 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     }
   }, [isOpen, isPlaying]);
 
-  if (!isOpen) return null;
-
   // Memoize step indices for performance
   const stepIndices = useMemo(
     () => Array.from({ length: currentBarLength.steps }, (_, i) => i),
@@ -488,6 +489,8 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     await handleUserInteraction();
     togglePlayback();
   }, [handleUserInteraction, togglePlayback]);
+
+  if (!isOpen) return null;
 
   return (
     <div 

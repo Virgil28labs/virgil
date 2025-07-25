@@ -5,6 +5,7 @@
 
 import { logger } from '../lib/logger';
 import { createLocationMarker } from '../utils/googleMaps';
+import { dashboardContextService } from './DashboardContextService';
 
 export interface DirectionsRequestConfig {
   origin: string;
@@ -54,7 +55,7 @@ export class MapService {
       travelMode: config.travelMode || google.maps.TravelMode.DRIVING,
       provideRouteAlternatives: config.provideAlternatives ?? true,
       drivingOptions: {
-        departureTime: config.departureTime === 'now' ? new Date() : config.departureTime || new Date(),
+        departureTime: config.departureTime === 'now' ? dashboardContextService.getTimeService().getCurrentDateTime() : config.departureTime || dashboardContextService.getTimeService().getCurrentDateTime(),
         trafficModel: google.maps.TrafficModel.BEST_GUESS,
       },
     };

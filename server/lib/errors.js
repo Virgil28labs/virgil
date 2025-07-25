@@ -47,7 +47,8 @@ class RateLimitError extends AppError {
 }
 
 // Error handler middleware
-function errorHandler(err, req, res) {
+// eslint-disable-next-line no-unused-vars
+function errorHandler(err, _req, res, _next) {
   let error = err;
 
   // Convert non-AppError instances

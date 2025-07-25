@@ -59,7 +59,7 @@ app.use('/api/v1/elevation', elevationRoutes);
 app.use('/api/v1/rhythm', rhythmRoutes);
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   next(new NotFoundError(`Endpoint not found: ${req.path}`));
 });
 

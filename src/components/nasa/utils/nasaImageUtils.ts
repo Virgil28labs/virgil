@@ -1,6 +1,7 @@
 import type { ApodImage } from '../../../types/nasa.types';
 import { downloadImage } from '../../../utils/downloadUtils';
 import { logger } from '../../../lib/logger';
+import { dashboardContextService } from '../../../services/DashboardContextService';
 
 // Common event handler for stopping propagation
 export const stopEvent = (e: React.MouseEvent | React.SyntheticEvent) => {
@@ -95,7 +96,7 @@ export const copyApodToClipboard = async (apod: ApodImage): Promise<boolean> => 
 export const shareApod = async (apod: ApodImage): Promise<boolean> => {
   const shareData = {
     title: `NASA APOD: ${apod.title}`,
-    text: `Check out today's NASA Astronomy Picture of the Day: "${apod.title}" from ${new Date(apod.date).toLocaleDateString()}`,
+    text: `Check out today's NASA Astronomy Picture of the Day: "${apod.title}" from ${dashboardContextService.getTimeService().formatDateToLocal(apod.date)}`,
     url: `https://apod.nasa.gov/apod/ap${apod.date.substring(2).replace(/-/g, '')}.html`,
   };
 

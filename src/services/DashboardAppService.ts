@@ -7,6 +7,7 @@
  */
 
 import { logger } from '../lib/logger';
+import { timeService } from './TimeService';
 
 export interface AppContextData<T = any> {
   appName: string;
@@ -164,7 +165,7 @@ export class DashboardAppService {
     return {
       apps,
       activeApps,
-      lastUpdated: Date.now(),
+      lastUpdated: timeService.getTimestamp(),
     };
   }
 
@@ -610,7 +611,7 @@ export class DashboardAppService {
     const cached = this.cache.get(appName);
     if (!cached) return null;
     
-    if (Date.now() - cached.timestamp > this.CACHE_TTL) {
+    if (timeService.getTimestamp() - cached.timestamp > this.CACHE_TTL) {
       this.cache.delete(appName);
       return null;
     }
@@ -621,7 +622,7 @@ export class DashboardAppService {
   private setCacheData(appName: string, data: AppContextData): void {
     this.cache.set(appName, {
       data,
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     });
   }
 
