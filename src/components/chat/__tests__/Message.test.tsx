@@ -170,7 +170,7 @@ describe('Message Component', () => {
       );
 
       // Since mockMessage.timestamp is a string of the timestamp, we need to parse it
-      const timestamp = new Date(parseInt(mockMessage.timestamp!)).toLocaleTimeString();
+      const timestamp = timeService.getLocalDate(parseInt(mockMessage.timestamp!)).toLocaleTimeString();
       expect(screen.getByText(timestamp)).toBeInTheDocument();
     });
 

@@ -62,6 +62,7 @@ jest.mock('../TimeService', () => {
 
 // Import after mocking
 import { timeService } from '../TimeService';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockTimeService = timeService as any;
 
 describe('ChatService', () => {
@@ -222,7 +223,7 @@ describe('ChatService', () => {
       });
       expect(message.id).toMatch(/^\d+-user$/);
       expect(message.timestamp).toBeDefined();
-      expect(new Date(message.timestamp).getTime()).toBeLessThanOrEqual(mockTimeService.getTimestamp());
+      expect(parseInt(message.timestamp)).toBeLessThanOrEqual(mockTimeService.getTimestamp());
     });
   });
 

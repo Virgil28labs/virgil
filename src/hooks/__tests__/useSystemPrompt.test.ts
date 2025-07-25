@@ -44,7 +44,7 @@ jest.mock('../../services/DashboardContextService', () => ({
   dashboardContextService: {
     getContext: jest.fn(),
     logActivity: jest.fn(),
-    getCurrentDateTime: jest.fn(() => new Date('2024-01-01T14:00:00')),
+    getCurrentDateTime: jest.fn(),
   },
 }));
 
@@ -73,7 +73,7 @@ describe('useSystemPrompt Hook', () => {
     mockTimeService.setMockDate('2024-01-01T14:00:00');
     
     // Set up mock dashboard context with current timestamp and timeOfDay
-    const currentDate = new Date(mockTimeService.getCurrentDate());
+    const currentDate = mockTimeService.getCurrentDate();
     const hour = currentDate.getHours();
     const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
     

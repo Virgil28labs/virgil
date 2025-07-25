@@ -295,7 +295,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const date = timeService.parseDate(recent.date) || timeService.getCurrentDateTime();
     const timeAgo = this.getTimeAgo(timeService.fromTimestamp(recent.savedAt));
     
-    let response = `Your most recent space favorite is "${recent.title}" from ${date.toLocaleDateString()}, saved ${timeAgo}.`;
+    let response = `Your most recent space favorite is "${recent.title}" from ${timeService.formatDateToLocal(date)}, saved ${timeAgo}.`;
     
     if (data.favorites.recent.length > 1) {
       response += ' Recent favorites include:';
@@ -347,7 +347,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const oldest = this.favorites[this.favorites.length - 1];
     const date = timeService.parseDate(oldest.date) || timeService.getCurrentDateTime();
     
-    return `Your oldest NASA APOD favorite is "${oldest.title}" from ${date.toLocaleDateString()}. ${
+    return `Your oldest NASA APOD favorite is "${oldest.title}" from ${timeService.formatDateToLocal(date)}. ${
       data.stats.monthsSpanned > 6 
         ? `You've been collecting space images for over ${data.stats.monthsSpanned} months!` 
         : ''

@@ -354,10 +354,10 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
   private calculateAge(birthDate: Date): number {
     const today = timeService.getCurrentDateTime();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+    let age = timeService.getYear(today) - timeService.getYear(birthDate);
+    const monthDiff = timeService.getMonth(today) - timeService.getMonth(birthDate);
     
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (monthDiff < 0 || (monthDiff === 0 && timeService.getDay(today) < timeService.getDay(birthDate))) {
       age--;
     }
     

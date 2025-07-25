@@ -74,8 +74,8 @@ export const useUserProfile = () => {
     const date = timeService.parseDate(dob);
     if (!date) return '';
     
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
+    const day = timeService.getDay(date);
+    const month = timeService.getMonth(date);
     
     // Start with firstName + day
     let uniqueId = `${firstName}${day}`;

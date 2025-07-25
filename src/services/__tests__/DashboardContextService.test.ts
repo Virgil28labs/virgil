@@ -20,7 +20,7 @@ jest.mock('../../lib/logger', () => ({
 
 // Mock TimeService with the actual mock implementation
 jest.mock('../TimeService', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   const actualMock = require('../__mocks__/TimeService');
   const mockInstance = actualMock.createMockTimeService('2024-01-15T10:30:00');
   
@@ -142,9 +142,7 @@ describe('DashboardContextService', () => {
       ];
 
       testCases.forEach(({ hour, expected }) => {
-        const testDate = new Date('2024-01-15');
-        testDate.setHours(hour);
-        mockTimeService.setMockDate(testDate);
+        mockTimeService.setMockDate(`2024-01-15T${hour.toString().padStart(2, '0')}:00:00`);
         
         const testService = new DashboardContextService();
         const context = testService.getContext();

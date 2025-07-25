@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ConversationView } from '../ConversationView';
 import type { StoredConversation } from '../../../services/MemoryService';
 import type { ChatMessage } from '../../../types/chat.types';
+import { timeService } from '../../../services/TimeService';
 
 // Mock dependencies
 jest.mock('../../../hooks/useUserProfile', () => ({
@@ -14,7 +15,7 @@ jest.mock('../../../hooks/useUserProfile', () => ({
 }));
 
 jest.mock('../../../utils/dateFormatter', () => ({
-  formatTimestamp: (timestamp: number) => new Date(timestamp).toLocaleDateString(),
+  formatTimestamp: (timestamp: number) => timeService.getLocalDate(timestamp).toLocaleDateString(),
 }));
 
 jest.mock('../Message', () => ({
@@ -38,19 +39,19 @@ describe('ConversationView Component', () => {
       id: 'msg-1',
       role: 'user',
       content: 'Hello Virgil',
-      timestamp: (Date.now() - 1000).toString(),
+      timestamp: (timeService.getTimestamp() - 1000).toString(),
     },
     {
       id: 'msg-2',
       role: 'assistant',
       content: 'Hello! How can I help you?',
-      timestamp: Date.now().toString(),
+      timestamp: timeService.getTimestamp().toString(),
     },
   ];
 
   const mockConversation: StoredConversation = {
     id: 'test-conversation',
-    timestamp: Date.now(),
+    timestamp: timeService.getTimestamp(),
     messageCount: 2,
     messages: mockMessages,
     firstMessage: 'Hello Virgil',
@@ -75,7 +76,7 @@ describe('ConversationView Component', () => {
 
     expect(screen.getByText('Conversation History')).toBeInTheDocument();
     expect(screen.getByText('2 messages')).toBeInTheDocument();
-    expect(screen.getByText(new Date(mockConversation.timestamp).toLocaleDateString())).toBeInTheDocument();
+    expect(screen.getByText(timeService.getLocalDate(mockConversation.timestamp).toLocaleDateString())).toBeInTheDocument();
   });
 
   it('renders back button and handles click', () => {
@@ -223,7 +224,7 @@ describe('ConversationView Component', () => {
   it('handles empty conversation', () => {
     const emptyConversation: StoredConversation = {
       id: 'empty-conversation',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
       messageCount: 0,
       messages: [],
       firstMessage: '',
@@ -278,12 +279,12 @@ describe('ConversationView Component', () => {
       id: `msg-${i}`,
       role: i % 2 === 0 ? 'user' : 'assistant',
       content: `Message ${i}`,
-      timestamp: (Date.now() - (50 - i) * 1000).toString(),
+      timestamp: (timeService.getTimestamp() - (50 - i) * 1000).toString(),
     }));
 
     const longConversation: StoredConversation = {
       id: 'long-conversation',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
       messageCount: 50,
       messages: longMessages,
       firstMessage: 'Message 0',

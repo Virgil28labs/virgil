@@ -1,4 +1,8 @@
 import { logger, logError, logInfo, logDebug } from '../logger';
+import { timeService } from '../../services/TimeService';
+
+// Cast to access mock methods
+const mockTimeService = timeService as any;
 
 // Mock console methods
 const originalConsole = {
@@ -13,7 +17,6 @@ describe('Logger', () => {
   let consoleInfoSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
   let consoleErrorSpy: jest.SpyInstance;
-  let dateNowSpy: jest.SpyInstance;
 
   beforeEach(() => {
     // Mock console methods
@@ -22,8 +25,8 @@ describe('Logger', () => {
     consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     
-    // Mock Date for consistent timestamps
-    dateNowSpy = jest.spyOn(Date.prototype, 'toISOString').mockReturnValue('2024-01-15T10:30:00.000Z');
+    // Set consistent timestamp for tests
+    mockTimeService.setMockDate('2024-01-15T10:30:00.000Z');
     
     // Reset import.meta.env
     Object.defineProperty(import.meta.env, 'DEV', {
@@ -38,7 +41,6 @@ describe('Logger', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    dateNowSpy.mockRestore();
   });
 
   afterAll(() => {

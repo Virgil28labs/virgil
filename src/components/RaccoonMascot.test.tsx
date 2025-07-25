@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { RaccoonMascot } from './RaccoonMascot';
 import { useLocation } from '../contexts/LocationContext';
 import type { LocationContextValue } from '../types/location.types';
+import { timeService } from '../services/TimeService';
 
 // Mock LocationContext
 jest.mock('../contexts/LocationContext', () => ({
@@ -27,7 +28,7 @@ Object.defineProperty(window, 'innerHeight', {
 
 // Mock requestAnimationFrame
 const mockRequestAnimationFrame = (callback: (time: number) => void) => {
-  setTimeout(() => callback(Date.now()), 16); // 60fps
+  setTimeout(() => callback(timeService.getTimestamp()), 16); // 60fps
   return 1;
 };
 global.requestAnimationFrame = mockRequestAnimationFrame as any;

@@ -21,6 +21,34 @@ Object.defineProperty(globalThis, 'import', {
   configurable: true,
 });
 
+// Mock IndexedDB globally to prevent "indexedDB is not defined" errors
+global.indexedDB = {
+  open: jest.fn(() => ({
+    result: {
+      createObjectStore: jest.fn(),
+      transaction: jest.fn(),
+      close: jest.fn(),
+    },
+    onsuccess: null,
+    onerror: null,
+    onupgradeneeded: null,
+  })),
+  deleteDatabase: jest.fn(),
+  databases: jest.fn(() => Promise.resolve([])),
+  cmp: jest.fn(),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any;
+
+// Mock TimeService globally for all tests
+jest.mock('./src/services/TimeService', () => {
+  const actualMock = jest.requireActual('./src/services/__mocks__/TimeService');
+  const mockInstance = actualMock.createMockTimeService('2024-01-20T12:00:00');
+  return {
+    timeService: mockInstance,
+    TimeService: jest.fn(() => mockInstance),
+  };
+});
+
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 import '@testing-library/jest-dom';
 import 'whatwg-fetch';

@@ -5,6 +5,7 @@ import { dashboardContextService } from '../../services/DashboardContextService'
 import { DynamicContextBuilder } from '../../services/DynamicContextBuilder';
 import { chatService } from '../../services/ChatService';
 import type { DashboardContext } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 
 // Mock scrollIntoView which is not available in jsdom
 global.Element.prototype.scrollIntoView = jest.fn();
@@ -87,7 +88,7 @@ describe('VirgilChatbot', () => {
       activeComponents: [],
       recentActions: [],
       timeSpentInSession: 300000,
-      lastInteraction: Date.now(),
+      lastInteraction: timeService.getTimestamp(),
     },
     environment: {
       isOnline: true,
@@ -300,7 +301,7 @@ describe('VirgilChatbot', () => {
   it('should handle marking messages as important', async () => {
     (memoryService.markAsImportant as jest.Mock).mockResolvedValue(undefined);
     (memoryService.getMarkedMemories as jest.Mock).mockResolvedValue([
-      { id: '1', content: 'Important message', context: 'Test context', timestamp: Date.now() },
+      { id: '1', content: 'Important message', context: 'Test context', timestamp: timeService.getTimestamp() },
     ]);
     (memoryService.getContextForPrompt as jest.Mock).mockResolvedValue('Updated context');
     

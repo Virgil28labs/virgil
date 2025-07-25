@@ -160,6 +160,42 @@ export default [
           selector: 'CallExpression[callee.property.name="getTime"]:not([callee.object.name="timeService"])',
           message: 'Consider using timeService.getTimestamp() for current time or appropriate TimeService methods. See src/services/TimeService.md',
         },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleDateString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatDateToLocal(date, options) instead of date.toLocaleDateString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleTimeString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatTimeToLocal(date, options) instead of date.toLocaleTimeString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatDateTimeToLocal(date, options) instead of date.toLocaleString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getFullYear"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getYear(date) instead of date.getFullYear(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getMonth"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getMonth(date) instead of date.getMonth(). Note: TimeService returns 1-12, not 0-11. See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getDate"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getDay(date) instead of date.getDate(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getHours"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getHours(date) instead of date.getHours(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getMinutes"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getMinutes(date) instead of date.getMinutes(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getSeconds"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getSeconds(date) instead of date.getSeconds(). See src/services/TimeService.md',
+        },
       ],
     },
   },
@@ -310,6 +346,42 @@ export default [
         {
           selector: 'CallExpression[callee.property.name="getTime"]:not([callee.object.name="timeService"])',
           message: 'Consider using timeService.getTimestamp() for current time or appropriate TimeService methods. See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleDateString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatDateToLocal(date, options) instead of date.toLocaleDateString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleTimeString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatTimeToLocal(date, options) instead of date.toLocaleTimeString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toLocaleString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.formatDateTimeToLocal(date, options) instead of date.toLocaleString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getFullYear"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getYear(date) instead of date.getFullYear(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getMonth"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getMonth(date) instead of date.getMonth(). Note: TimeService returns 1-12, not 0-11. See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getDate"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getDay(date) instead of date.getDate(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getHours"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getHours(date) instead of date.getHours(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getMinutes"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getMinutes(date) instead of date.getMinutes(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getSeconds"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.getSeconds(date) instead of date.getSeconds(). See src/services/TimeService.md',
         },
       ],
     },

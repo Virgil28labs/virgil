@@ -110,7 +110,7 @@ describe('LocationContext', () => {
       timestamp: mockTimeService.getTimestamp(),
     });
     mockLocationService.getCurrentPosition.mockResolvedValue(
-      createMockCoordinates(mockTimeService.getTimestamp())
+      createMockCoordinates(mockTimeService.getTimestamp()),
     );
     mockLocationService.getAddressFromCoordinates.mockResolvedValue(mockAddress);
     mockLocationService.getIpLocation.mockResolvedValue(mockIpLocation);

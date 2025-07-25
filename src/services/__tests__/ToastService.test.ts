@@ -1,4 +1,8 @@
 import { toastService } from '../ToastService';
+import { timeService } from '../TimeService';
+
+// Cast to access mock methods
+const mockTimeService = timeService as any;
 
 describe('ToastService', () => {
   let mockListener: jest.Mock;
@@ -321,11 +325,13 @@ describe('ToastService', () => {
     });
 
     it('returns unique loading IDs', () => {
-      jest.spyOn(Date, 'now')
-        .mockReturnValueOnce(1000)
-        .mockReturnValueOnce(2000);
-        
+      // Set initial time
+      mockTimeService.setMockDate('2024-01-20T12:00:00');
+      
       const id1 = toastService.loading('First');
+      
+      // Advance time to ensure different timestamp
+      mockTimeService.advanceTime(1000);
       const id2 = toastService.loading('Second');
       
       expect(id1).not.toBe(id2);

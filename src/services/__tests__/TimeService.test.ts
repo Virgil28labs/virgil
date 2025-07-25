@@ -1,3 +1,6 @@
+// Unmock TimeService to test the actual implementation
+jest.unmock('../TimeService');
+
 import { TimeService } from '../TimeService';
 
 describe('TimeService', () => {

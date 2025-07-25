@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { ChatProvider, useChatContext } from '../ChatContext';
 import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
 import type { ChatMessage } from '../../../types/chat.types';
+import { timeService } from '../../../services/TimeService';
 
 // Mock StorageService
 jest.mock('../../../services/StorageService', () => ({
@@ -163,7 +164,7 @@ describe('ChatContext', () => {
           id: 'msg-1',
           role: 'user',
           content: 'Hello',
-          timestamp: Date.now().toString(),
+          timestamp: timeService.getTimestamp().toString(),
         };
 
         act(() => {
@@ -177,7 +178,7 @@ describe('ChatContext', () => {
           id: 'msg-2',
           role: 'assistant',
           content: 'Hi there!',
-          timestamp: Date.now().toString(),
+          timestamp: timeService.getTimestamp().toString(),
         };
 
         act(() => {
@@ -261,13 +262,13 @@ describe('ChatContext', () => {
             id: 'msg-1',
             role: 'user',
             content: 'Hello',
-            timestamp: Date.now().toString(),
+            timestamp: timeService.getTimestamp().toString(),
           });
           result.current.addMessage({
             id: 'msg-2',
             role: 'assistant',
             content: 'Hi!',
-            timestamp: Date.now().toString(),
+            timestamp: timeService.getTimestamp().toString(),
           });
         });
 
@@ -293,7 +294,7 @@ describe('ChatContext', () => {
             id: 'msg-1',
             role: 'user',
             content: 'Hello',
-            timestamp: Date.now().toString(),
+            timestamp: timeService.getTimestamp().toString(),
           });
           result.current.setError('Some error');
           result.current.setInput('Some input');

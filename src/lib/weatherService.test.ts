@@ -167,8 +167,6 @@ describe('weatherService', () => {
 
       expect(result).toEqual(updatedWeatherData);
       expect(mockDedupeFetch).toHaveBeenCalledTimes(2);
-
-      jest.spyOn(Date, 'now').mockRestore();
     });
 
     it('handles API errors with JSON response', async () => {

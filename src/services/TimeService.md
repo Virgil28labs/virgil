@@ -5,6 +5,13 @@ TimeService is Virgil's single source of truth for all date/time operations. It 
 
 **Key Rule**: Never use `new Date()` directly in components. Always use TimeService methods.
 
+## Performance Optimizations
+- **Memoized Formatters**: All `Intl.DateTimeFormat` instances are created once and reused
+- **Smart Caching**: Local date cached for 60 seconds to reduce repeated calculations
+- **Pre-calculated Constants**: Common time durations (minute, hour, day) are static constants
+- **Efficient Loops**: Uses `for...of` instead of `forEach` for better performance
+- **Optimized Date Arithmetic**: Time-based calculations use milliseconds directly
+
 ## Quick Reference
 
 ### Import

@@ -41,12 +41,12 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
     const isToday = timeService.isSameDay(time, now);
     
     if (isToday) {
-      return time.toLocaleTimeString('en-US', { 
+      return timeService.formatTimeToLocal(time, { 
         hour: 'numeric', 
         minute: '2-digit', 
       });
     } else {
-      return time.toLocaleDateString('en-US', { 
+      return timeService.formatDateToLocal(time, { 
         month: 'short', 
         day: 'numeric',
         hour: 'numeric', 
@@ -86,12 +86,7 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   // Get current datetime string for input
   const getCurrentDateTimeString = () => {
     const now = selectedTime === 'now' ? timeService.getCurrentDateTime() : selectedTime;
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return timeService.formatForDateTimeInput(now);
   };
   
   // Get min/max date strings for the picker

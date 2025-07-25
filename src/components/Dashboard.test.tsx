@@ -4,6 +4,7 @@ import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from '../contexts/LocationContext';
 import type { PermissionStatus } from '../types/location.types';
+import { timeService } from '../services/TimeService';
 
 // Mock contexts
 jest.mock('../contexts/AuthContext');
@@ -51,7 +52,7 @@ const mockAuthValue = {
 };
 
 const mockLocationValue = {
-  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: Date.now() },
+  coordinates: { latitude: 40.7128, longitude: -74.0060, accuracy: 10, timestamp: timeService.getTimestamp() },
   address: {
     street: '123 Main St',
     house_number: '123',
@@ -70,7 +71,7 @@ const mockLocationValue = {
   loading: false,
   error: null,
   permissionStatus: 'granted' as PermissionStatus,
-  lastUpdated: Date.now(),
+  lastUpdated: timeService.getTimestamp(),
   hasLocation: true,
   fetchLocationData: jest.fn(),
   requestLocationPermission: jest.fn(),

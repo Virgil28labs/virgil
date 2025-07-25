@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Weather } from './Weather';
 import { useWeather } from '../contexts/WeatherContext';
+import { timeService } from '../services/TimeService';
 
 // Mock the weather context and service
 jest.mock('../contexts/WeatherContext');
@@ -78,7 +79,7 @@ describe('Weather', () => {
       timezone: -28800,
       cityName: 'New York, NY',
       country: 'US',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     mockUseWeather.mockReturnValue({
@@ -91,7 +92,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now(),
+      lastUpdated: timeService.getTimestamp(),
     });
 
     render(<Weather />);
@@ -151,7 +152,7 @@ describe('Weather', () => {
       timezone: -28800,
       cityName: 'San Francisco, CA',
       country: 'US',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     mockUseWeather.mockReturnValue({
@@ -164,7 +165,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now(),
+      lastUpdated: timeService.getTimestamp(),
     });
 
     const { container } = render(<Weather />);
@@ -202,7 +203,7 @@ describe('Weather', () => {
       timezone: -28800,
       cityName: 'Seattle, WA',
       country: 'US',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     mockUseWeather.mockReturnValue({
@@ -215,7 +216,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now(),
+      lastUpdated: timeService.getTimestamp(),
     });
 
     render(<Weather />);
@@ -247,7 +248,7 @@ describe('Weather', () => {
       timezone: -28800,
       cityName: '',  // Empty location
       country: 'US',
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     mockUseWeather.mockReturnValue({
@@ -260,7 +261,7 @@ describe('Weather', () => {
       hasWeather: true,
       fetchWeather: jest.fn(),
       clearError: jest.fn(),
-      lastUpdated: Date.now(),
+      lastUpdated: timeService.getTimestamp(),
     });
 
     render(<Weather />);
