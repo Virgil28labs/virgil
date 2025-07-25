@@ -26,7 +26,7 @@ export interface LLMApiRequest {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   provider: string;
 }
 

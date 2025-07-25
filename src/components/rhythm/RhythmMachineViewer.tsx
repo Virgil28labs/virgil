@@ -2,7 +2,7 @@ import React, { memo, useEffect, useCallback, useState, useRef, useMemo } from '
 import './RhythmMachineViewer.css';
 import { rhythmService } from '../../services/rhythm';
 import type { RhythmPattern } from '../../services/rhythm';
-import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import { 
   DRUM_SOUNDS, 
   GENRE_TAGS, 
@@ -381,7 +381,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       pattern: JSON.parse(JSON.stringify(pattern)),
       description: genreInput,
       category,
-      timestamp: dashboardContextService.getTimeService().getCurrentDateTime().getTime(),
+      timestamp: timeService.getTimestamp(),
     };
     setSaveSlots(newSlots);
     localStorage.setItem('rhythmMachineSaveSlots', JSON.stringify(newSlots));

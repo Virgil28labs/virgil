@@ -10,7 +10,7 @@ export interface LLMRequest {
   temperature: number;
   maxTokens: number;
   systemPrompt?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   provider: string;
   stream?: boolean;
 }

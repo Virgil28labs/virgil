@@ -5,6 +5,7 @@ import { ConversationView } from './ConversationView';
 import { AdvancedMemorySearch } from './AdvancedMemorySearch';
 import type { ChatMessage } from '../../types/chat.types';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import './memory-modals.css';
 
 interface MemoryModalProps {
@@ -114,7 +115,7 @@ const MemoryModal = memo(function MemoryModal({
   const handleMarkAsImportantFromDetail = useCallback(async (message: ChatMessage) => {
     setIsLoading(true);
     try {
-      const context = `From conversation on ${new Date().toLocaleDateString()}`;
+      const context = `From conversation on ${timeService.formatDateToLocal(timeService.getCurrentDateTime())}`;
       await memoryService.markAsImportant(message.id, message.content, context);
       
       const updatedMemories = await memoryService.getMarkedMemories();

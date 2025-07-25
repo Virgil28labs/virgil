@@ -10,6 +10,7 @@ import type { UserHabitsData } from '../../types/habit.types';
 import { logger } from '../../lib/logger';
 import { StorageService, STORAGE_KEYS } from '../StorageService';
 import { dashboardContextService } from '../DashboardContextService';
+import { timeService } from '../TimeService';
 
 interface StreakData {
   habits: {
@@ -173,7 +174,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     if (!this.userData) return [];
 
     const activityMap = new Map<string, { habits: Set<string>; habitNames: string[] }>();
-    const today = new Date();
+    const today = timeService.getCurrentDateTime();
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 7);
 

@@ -5,6 +5,7 @@ import type {
 } from '../types/nasa.types';
 import { retryWithBackoff } from './retryUtils';
 import { dashboardContextService } from '../services/DashboardContextService';
+import { timeService } from '../services/TimeService';
 
 // Environment-configurable API settings
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
@@ -432,7 +433,7 @@ class NasaApodService {
   private isDateInRange(dateString: string): boolean {
     const date = new Date(dateString);
     const firstDate = new Date(FIRST_APOD_DATE);
-    const today = new Date();
+    const today = timeService.getCurrentDateTime();
     
     return date >= firstDate && date <= today;
   }
@@ -451,7 +452,7 @@ class NasaApodService {
    */
   private getRandomHistoricalDate(): string {
     const firstDate = new Date(FIRST_APOD_DATE);
-    const today = new Date();
+    const today = timeService.getCurrentDateTime();
     const timeDiff = today.getTime() - firstDate.getTime();
     const randomTime = Math.random() * timeDiff;
     const randomDate = new Date(firstDate.getTime() + randomTime);

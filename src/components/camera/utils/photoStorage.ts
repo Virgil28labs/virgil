@@ -1,5 +1,6 @@
 import type { SavedPhoto, PhotoStorageOptions } from '../../../types/camera.types';
 import { CameraUtils } from './cameraUtils';
+import { logger } from '../../../lib/logger';
 
 export class PhotoStorage {
   private static readonly PHOTOS_KEY = 'virgil_camera_photos';
@@ -430,7 +431,10 @@ export class PhotoStorage {
         try {
           const photos = JSON.parse(localStoragePhotos) as SavedPhoto[];
           if (photos.length > 0) {
-            console.log(`Migrating ${photos.length} photos from localStorage to IndexedDB...`);
+            logger.info(`Migrating ${photos.length} photos from localStorage to IndexedDB...`, {
+              component: 'PhotoStorage',
+              action: 'migrateFromLocalStorage',
+            });
             
             const db = await this.ensureDB();
             
@@ -451,7 +455,11 @@ export class PhotoStorage {
               });
               
               transaction.oncomplete = () => {
-                console.log(`Successfully migrated ${migratedCount} photos to IndexedDB`);
+                logger.info(`Successfully migrated ${migratedCount} photos to IndexedDB`, {
+                  component: 'PhotoStorage',
+                  action: 'migrateFromLocalStorage',
+                  metadata: { count: migratedCount },
+                });
                 // Remove photos from localStorage after successful migration
                 localStorage.removeItem(this.PHOTOS_KEY);
                 resolve();

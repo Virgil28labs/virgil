@@ -59,7 +59,7 @@ export interface PhotoAction {
   type: 'capture' | 'save' | 'delete' | 'favorite' | 'share' | 'edit' | 'export'
   photoId?: string
   photoIds?: string[]
-  data?: any
+  data?: unknown
 }
 
 export interface CameraModalProps {

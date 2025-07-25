@@ -9,6 +9,7 @@ import type { AppDataAdapter, AppContextData, AggregateableData } from '../Dashb
 import { PhotoStorage } from '../../components/camera/utils/photoStorage';
 import type { SavedPhoto } from '../../types/camera.types';
 import { logger } from '../../lib/logger';
+import { timeService } from '../TimeService';
 
 interface CameraData {
   photos: {
@@ -72,11 +73,11 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   }
 
   getContextData(): AppContextData<CameraData> {
-    const todayStart = new Date();
+    const todayStart = timeService.getCurrentDateTime();
     todayStart.setHours(0, 0, 0, 0);
-    const weekStart = new Date();
+    const weekStart = timeService.getCurrentDateTime();
     weekStart.setDate(weekStart.getDate() - 7);
-    const monthStart = new Date();
+    const monthStart = timeService.getCurrentDateTime();
     monthStart.setMonth(monthStart.getMonth() - 1);
 
     // Calculate stats
@@ -459,7 +460,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         metadata: {
           favorites: this.photos.filter(p => p.isFavorite).length,
           todayCount: this.photos.filter(p => {
-            const today = new Date();
+            const today = timeService.getCurrentDateTime();
             today.setHours(0, 0, 0, 0);
             return p.timestamp >= today.getTime();
           }).length,

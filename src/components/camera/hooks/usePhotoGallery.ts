@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { PhotoGalleryState, SavedPhoto } from '../../../types/camera.types';
 import { usePhotos } from './usePhotos';
-import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
 
 export const usePhotoGallery = () => {
   const {
@@ -129,7 +129,7 @@ export const usePhotoGallery = () => {
         currentPhotos = currentPhotos.filter(photo => photo.isFavorite);
         break;
       case 'recent': {
-        const oneDayAgo = dashboardContextService.getTimeService().getCurrentDateTime().getTime() - (24 * 60 * 60 * 1000);
+        const oneDayAgo = timeService.getTimestamp() - (24 * 60 * 60 * 1000);
         currentPhotos = currentPhotos.filter(photo => photo.timestamp > oneDayAgo);
         break;
       }

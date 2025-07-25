@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Modal } from '../common/Modal';
+import { timeService } from '../../services/TimeService';
 import { 
   loadGoogleMaps, 
   createLocationMarker, 
@@ -160,7 +161,7 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       travelMode: google.maps.TravelMode.DRIVING,
       provideRouteAlternatives: true,
       drivingOptions: {
-        departureTime: depTime === 'now' ? new Date() : depTime,
+        departureTime: depTime === 'now' ? timeService.getCurrentDateTime() : depTime,
         trafficModel: google.maps.TrafficModel.BEST_GUESS,
       },
     };

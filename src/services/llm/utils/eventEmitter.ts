@@ -1,6 +1,6 @@
 import { logger } from '../../../lib/logger';
 
-type EventListener<T = any> = (data: T) => void;
+type EventListener<T = unknown> = (data: T) => void;
 type UnsubscribeFunction = () => void;
 
 export class EventEmitter {
@@ -10,7 +10,7 @@ export class EventEmitter {
     this.events = {};
   }
 
-  on<T = any>(event: string, listener: EventListener<T>): UnsubscribeFunction {
+  on<T = unknown>(event: string, listener: EventListener<T>): UnsubscribeFunction {
     if (!this.events[event]) {
       this.events[event] = [];
     }
@@ -20,7 +20,7 @@ export class EventEmitter {
     return () => this.off(event, listener);
   }
 
-  off<T = any>(event: string, listenerToRemove: EventListener<T>): void {
+  off<T = unknown>(event: string, listenerToRemove: EventListener<T>): void {
     if (!this.events[event]) return;
     
     this.events[event] = this.events[event].filter(
@@ -28,13 +28,13 @@ export class EventEmitter {
     );
   }
 
-  emit<T = any>(event: string, data: T): void {
+  emit<T = unknown>(event: string, data: T): void {
     if (!this.events[event]) return;
     
     this.events[event].forEach(listener => {
       try {
         listener(data);
-      } catch (error: any) {
+      } catch (error) {
         logger.error(`Error in event listener for ${event}`, error as Error, {
           component: 'EventEmitter',
           action: 'emit',
@@ -44,7 +44,7 @@ export class EventEmitter {
     });
   }
 
-  once<T = any>(event: string, listener: EventListener<T>): void {
+  once<T = unknown>(event: string, listener: EventListener<T>): void {
     const onceWrapper = (data: T) => {
       listener(data);
       this.off(event, onceWrapper);

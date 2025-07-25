@@ -72,7 +72,7 @@ const localStorageMock = {
   length: 0,
   key: jest.fn(),
 };
-global.localStorage = localStorageMock as any;
+global.localStorage = localStorageMock as Storage;
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -83,7 +83,7 @@ const sessionStorageMock = {
   length: 0,
   key: jest.fn(),
 };
-global.sessionStorage = sessionStorageMock as any;
+global.sessionStorage = sessionStorageMock as Storage;
 
 // Mock navigator.geolocation
 const geolocationMock = {
@@ -91,12 +91,15 @@ const geolocationMock = {
   watchPosition: jest.fn(),
   clearWatch: jest.fn(),
 };
-(global.navigator as any).geolocation = geolocationMock;
+Object.defineProperty(global.navigator, 'geolocation', {
+  value: geolocationMock,
+  writable: true,
+});
 
 // Mock crypto.getRandomValues (needed for Supabase)
 Object.defineProperty(global, 'crypto', {
   value: {
-    getRandomValues: (arr: any[]) => {
+    getRandomValues: (arr: Uint8Array) => {
       for (let i = 0; i < arr.length; i++) {
         arr[i] = Math.floor(Math.random() * 256);
       }
@@ -116,7 +119,7 @@ if (typeof TextEncoder === 'undefined') {
       }
       return encoded;
     }
-  } as any;
+  } as typeof TextEncoder;
 }
 
 if (typeof TextDecoder === 'undefined') {
@@ -124,7 +127,7 @@ if (typeof TextDecoder === 'undefined') {
     decode(input: Uint8Array): string {
       return String.fromCharCode(...Array.from(input));
     }
-  } as any;
+  } as typeof TextDecoder;
 }
 
 // Mock console methods to reduce noise in tests

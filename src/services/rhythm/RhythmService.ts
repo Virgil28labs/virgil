@@ -1,5 +1,5 @@
 import { logger } from '../../lib/logger';
-import { dashboardContextService } from '../DashboardContextService';
+import { timeService } from '../TimeService';
 
 export interface RhythmPattern {
   pattern: boolean[][]; // 5 drums x N steps
@@ -136,7 +136,7 @@ export class RhythmService {
       description,
       barLength,
       style,
-      generated: dashboardContextService.getTimeService().getCurrentDateTime().toISOString(),
+      generated: timeService.getCurrentDateTime().toISOString(),
       fallback: true,
     };
   }

@@ -3,7 +3,7 @@ import { EventEmitter } from '../utils/eventEmitter';
 export class LLMService extends EventEmitter {
   private activeRequests: Map<string, { startTime: number }>;
 
-  constructor(_config: any = {}) {
+  constructor(_config: Record<string, unknown> = {}) {
     super();
     // Config is used for initialization only
     this.activeRequests = new Map();

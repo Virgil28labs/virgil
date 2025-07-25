@@ -1,4 +1,5 @@
 import type { MouseEvent, SyntheticEvent } from 'react';
+import { timeService } from '../../../services/TimeService';
 
 // Common event handler for stopping propagation
 export const stopEvent = (e: MouseEvent | SyntheticEvent) => {
@@ -14,7 +15,7 @@ export const downloadImage = async (url: string, breed: string) => {
   
   const a = document.createElement('a');
   a.href = objectUrl;
-  a.download = `doggo-${breed}-${new Date().getTime()}.jpg`;
+  a.download = `doggo-${breed}-${timeService.getTimestamp()}.jpg`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

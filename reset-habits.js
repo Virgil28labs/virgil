@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Reset Habit Tracker Data
 // Run this in your browser console while on the Virgil app
 

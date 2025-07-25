@@ -8,6 +8,7 @@
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 import { dashboardContextService } from '../DashboardContextService';
+import { timeService } from '../TimeService';
 
 interface PomodoroData {
   isActive: boolean;
@@ -214,7 +215,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   }
 
   private getFocusRecommendation(): string {
-    const hour = new Date().getHours();
+    const hour = timeService.getCurrentDateTime().getHours();
     const { sessionsCompleted } = this.currentData.todayStats;
 
     // Morning recommendation
@@ -301,7 +302,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   completeSession(minutes: number): void {
     this.currentData.todayStats.sessionsCompleted++;
     this.currentData.todayStats.totalFocusMinutes += minutes;
-    this.currentData.todayStats.lastSessionTime = new Date();
+    this.currentData.todayStats.lastSessionTime = timeService.getCurrentDateTime();
     this.saveTodayStats();
     
     this.currentData.isRunning = false;

@@ -10,9 +10,9 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export interface ApiRequest extends Request {
-  body: any;
-  query: any;
-  params: any;
+  body: unknown;
+  query: Record<string, string | string[] | undefined>;
+  params: Record<string, string>;
 }
 
 export interface ApiResponse extends Response {

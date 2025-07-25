@@ -1,5 +1,5 @@
 import type { Toast } from '../components/ToastNotification';
-import { dashboardContextService } from './DashboardContextService';
+import { timeService } from './TimeService';
 
 type ToastEventListener = (toast: Omit<Toast, 'id'>) => void;
 
@@ -133,7 +133,7 @@ class ToastService {
    * Show loading toast for long operations
    */
   loading(message: string, options?: Partial<Omit<Toast, 'id' | 'type' | 'message'>>): string {
-    const loadingId = `loading-${dashboardContextService.getTimeService().getCurrentDateTime().getTime()}`;
+    const loadingId = `loading-${timeService.getTimestamp()}`;
     this.emit({
       type: 'info',
       message: `⏳ ${message}`,

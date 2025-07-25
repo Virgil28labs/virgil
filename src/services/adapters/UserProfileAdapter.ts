@@ -8,6 +8,7 @@
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import type { UserProfile } from '../../hooks/useUserProfile';
 import type { AuthContextValue } from '../../types/auth.types';
+import { timeService } from '../TimeService';
 
 export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   readonly appName = 'userProfile';
@@ -352,7 +353,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   }
 
   private calculateAge(birthDate: Date): number {
-    const today = new Date();
+    const today = timeService.getCurrentDateTime();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     
