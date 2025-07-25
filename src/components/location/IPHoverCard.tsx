@@ -8,6 +8,7 @@
 import React, { memo, useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { IpLocation } from '../../types/location.types';
+import { timeService } from '../../services/TimeService';
 
 interface IpHoverCardProps {
   ipLocation: IpLocation;
@@ -38,9 +39,10 @@ const IPHoverCard = memo(function IPHoverCard({
     }
     
     try {
-      const date = new Date(ipLocation.timezone_details.current_time);
+      const date = timeService.parseDate(ipLocation.timezone_details.current_time);
+      if (!date) return { time: 'N/A', isNight: false };
       const hours = date.getHours();
-      const timeStr = date.toLocaleTimeString('en-US', {
+      const timeStr = timeService.formatTimeToLocal(date, {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,

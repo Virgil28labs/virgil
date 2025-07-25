@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { timeService } from '../../services/TimeService';
 import './TrafficIndicator.css';
 
 interface TrafficIndicatorProps {
@@ -27,7 +28,7 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
     // In a real implementation, you would analyze traffic data from the map
     // For now, we'll simulate it based on time of day
     const updateTrafficLevel = () => {
-      const hour = new Date().getHours();
+      const hour = timeService.getCurrentDateTime().getHours();
       
       // Rush hour patterns
       if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {

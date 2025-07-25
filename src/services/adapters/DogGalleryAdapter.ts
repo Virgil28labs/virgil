@@ -7,7 +7,7 @@
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
-
+import { timeService } from '../TimeService';
 interface DogImage {
   url: string;
   breed: string;
@@ -57,7 +57,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       } else {
         this.favorites = [];
       }
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch dog favorites', error as Error, {
@@ -69,7 +69,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshData();
     }
   }
@@ -103,7 +103,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       breed: dog.breed,
       id: dog.id,
       // Estimate added time based on position (newer items first)
-      addedAt: Date.now() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
+      addedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
     const data: DogGalleryData = {
@@ -126,7 +126,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       appName: this.appName,
       displayName: this.displayName,
       isActive,
-      lastUsed: isActive ? Date.now() : 0,
+      lastUsed: isActive ? timeService.getTimestamp() : 0,
       data,
       summary,
       capabilities: [

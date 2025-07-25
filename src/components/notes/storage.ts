@@ -6,6 +6,7 @@
 import type { Entry } from './types';
 import { NotesError, ErrorType } from './types';
 import { STORAGE_CONFIG } from './constants';
+import { timeService } from '../../services/TimeService';
 
 /**
  * Handles all IndexedDB operations for notes storage
@@ -109,7 +110,7 @@ class NotesStorage {
         request.onsuccess = () => {
           const entries = request.result.map(entry => ({
             ...entry,
-            timestamp: new Date(entry.timestamp),
+            timestamp: timeService.parseDate(entry.timestamp) || timeService.getCurrentDateTime(),
           }));
           resolve(entries);
         };
@@ -154,7 +155,7 @@ class NotesStorage {
         const store = transaction.objectStore(STORAGE_CONFIG.STORE_NAME);
         const request = store.add({
           ...entry,
-          timestamp: entry.timestamp.toISOString(),
+          timestamp: timeService.toISOString(entry.timestamp),
         });
 
         request.onsuccess = () => resolve();
@@ -191,7 +192,7 @@ class NotesStorage {
         const store = transaction.objectStore(STORAGE_CONFIG.STORE_NAME);
         const request = store.put({
           ...entry,
-          timestamp: entry.timestamp.toISOString(),
+          timestamp: timeService.toISOString(entry.timestamp),
         });
 
         request.onsuccess = () => resolve();
@@ -290,7 +291,7 @@ class NotesStorage {
         request.onsuccess = () => {
           const entries = request.result.map(entry => ({
             ...entry,
-            timestamp: new Date(entry.timestamp),
+            timestamp: timeService.parseDate(entry.timestamp) || timeService.getCurrentDateTime(),
           }));
           resolve(entries);
         };
@@ -324,7 +325,7 @@ class NotesStorage {
       const allEntries = await this.getAllEntries();
       
       return allEntries.filter(entry => {
-        const entryDate = new Date(entry.timestamp);
+        const entryDate = entry.timestamp instanceof Date ? entry.timestamp : timeService.parseDate(entry.timestamp) || timeService.getCurrentDateTime();
         return entryDate >= start && entryDate <= end;
       });
     } catch (error) {

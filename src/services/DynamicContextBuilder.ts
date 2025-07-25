@@ -7,6 +7,7 @@
 
 import type { DashboardContext, ContextualSuggestion } from './DashboardContextService';
 import { dashboardAppService } from './DashboardAppService';
+import { timeService } from './TimeService';
 
 export interface ContextRelevance {
   timeContext: number;      // 0-1 relevance score
@@ -316,9 +317,11 @@ export class DynamicContextBuilder {
     
     // Personal info
     if (user.profile?.dateOfBirth) {
-      const birthDate = new Date(user.profile.dateOfBirth);
-      const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-      userContext += `\nAge: ${age} years old`;
+      const birthDate = timeService.parseDate(user.profile.dateOfBirth);
+      if (birthDate) {
+        const age = Math.floor((timeService.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+        userContext += `\nAge: ${age} years old`;
+      }
     }
     
     if (user.profile?.gender) {

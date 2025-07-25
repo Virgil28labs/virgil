@@ -45,7 +45,7 @@ class NasaApodService {
       const storedCache = localStorage.getItem('nasa-apod-cache');
       if (storedCache) {
         const parsed = JSON.parse(storedCache);
-        const now = Date.now();
+        const now = timeService.getTimestamp();
         
         // Restore valid cache entries
         Object.entries(parsed).forEach(([key, value]: [string, any]) => {
@@ -106,7 +106,7 @@ class NasaApodService {
    * Throttle requests to prevent hitting rate limits
    */
   private async throttleRequest(): Promise<void> {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const timeSinceLastRequest = now - this.lastRequestTime;
     
     if (timeSinceLastRequest < this.minRequestInterval) {
@@ -114,7 +114,7 @@ class NasaApodService {
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
     
-    this.lastRequestTime = Date.now();
+    this.lastRequestTime = timeService.getTimestamp();
   }
 
   /**
@@ -248,7 +248,7 @@ class NasaApodService {
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -269,7 +269,7 @@ class NasaApodService {
         // Cache the result
         this.cache.set(cacheKey, {
           data: apodImage,
-          timestamp: Date.now(),
+          timestamp: timeService.getTimestamp(),
         });
         
         // Save cache to localStorage
@@ -423,16 +423,17 @@ class NasaApodService {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateString)) return false;
     
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date.getTime());
+    const date = timeService.parseDate(dateString);
+    return date !== null;
   }
 
   /**
    * Utility: Check if date is within available range
    */
   private isDateInRange(dateString: string): boolean {
-    const date = new Date(dateString);
-    const firstDate = new Date(FIRST_APOD_DATE);
+    const date = timeService.parseDate(dateString);
+    if (!date) return false;
+    const firstDate = timeService.parseDate(FIRST_APOD_DATE) || timeService.getCurrentDateTime();
     const today = timeService.getCurrentDateTime();
     
     return date >= firstDate && date <= today;
@@ -442,22 +443,22 @@ class NasaApodService {
    * Utility: Add days to a date string
    */
   private addDays(dateString: string, days: number): string {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + days);
-    return date.toISOString().split('T')[0];
+    const date = timeService.parseDate(dateString) || timeService.getCurrentDateTime();
+    const newDate = timeService.addDays(date, days);
+    return timeService.toISODateString(newDate);
   }
 
   /**
    * Utility: Get a random historical date
    */
   private getRandomHistoricalDate(): string {
-    const firstDate = new Date(FIRST_APOD_DATE);
+    const firstDate = timeService.parseDate(FIRST_APOD_DATE) || timeService.getCurrentDateTime();
     const today = timeService.getCurrentDateTime();
     const timeDiff = today.getTime() - firstDate.getTime();
     const randomTime = Math.random() * timeDiff;
-    const randomDate = new Date(firstDate.getTime() + randomTime);
+    const randomDate = timeService.fromTimestamp(firstDate.getTime() + randomTime);
     
-    return randomDate.toISOString().split('T')[0];
+    return timeService.toISODateString(randomDate);
   }
 
   /**
@@ -498,7 +499,7 @@ class NasaApodService {
     return {
       remaining: this.rateLimitInfo.remaining,
       limit: this.rateLimitInfo.limit,
-      reset: this.rateLimitInfo.reset ? new Date(this.rateLimitInfo.reset) : null,
+      reset: this.rateLimitInfo.reset ? timeService.fromTimestamp(this.rateLimitInfo.reset) : null,
       percentage,
     };
   }

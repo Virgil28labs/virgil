@@ -9,6 +9,7 @@ import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 import type { Entry, TagType, ActionType } from '../../components/notes/types';
 import { notesStorage } from '../../components/notes/storage';
+import { timeService } from '../TimeService';
 
 interface NotesData {
   totalNotes: number;
@@ -48,7 +49,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   private async refreshData(): Promise<void> {
     try {
       this.entries = await notesStorage.getAllEntries();
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch notes data', error as Error, {
@@ -60,13 +61,13 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   }
 
   private async ensureFreshData(): Promise<void> {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       await this.refreshData();
     }
   }
 
   getContextData(): AppContextData<NotesData> {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const taskStats = this.calculateTaskStats();
     const recentEntries = this.getRecentEntries(5);
     
@@ -204,12 +205,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   }
 
   private getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    return `${Math.floor(seconds / 86400)}d ago`;
+    return timeService.getTimeAgo(date);
   }
 
   canAnswer(query: string): boolean {
@@ -455,7 +451,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     }
     
     // Recency bonus
-    const ageInDays = (Date.now() - entry.timestamp.getTime()) / (1000 * 60 * 60 * 24);
+    const ageInDays = (timeService.getTimestamp() - entry.timestamp.getTime()) / (1000 * 60 * 60 * 24);
     score += Math.max(0, 10 - ageInDays);
     
     return score;

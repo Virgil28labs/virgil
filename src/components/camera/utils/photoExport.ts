@@ -1,12 +1,13 @@
 import type { SavedPhoto, ExportOptions } from '../../../types/camera.types';
 import { CameraUtils } from './cameraUtils';
 import { PhotoStorage } from './photoStorage';
+import { timeService } from '../../../services/TimeService';
 
 export class PhotoExport {
   static async exportAsJson(photos: SavedPhoto[], options: ExportOptions): Promise<void> {
     try {
       const exportData = await PhotoStorage.exportPhotos(photos);
-      const filename = options.filename || `virgil_photos_${Date.now()}.json`;
+      const filename = options.filename || `virgil_photos_${timeService.getTimestamp()}.json`;
       
       const blob = new Blob([exportData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -35,14 +36,14 @@ export class PhotoExport {
           dataUrl: options.includeMetadata ? photo.dataUrl : undefined,
         })),
         metadata: options.includeMetadata ? {
-          exportDate: new Date().toISOString(),
+          exportDate: timeService.toISOString(),
           totalPhotos: photos.length,
           favoriteCount: photos.filter(p => p.isFavorite).length,
         } : undefined,
       };
       
       const jsonData = JSON.stringify(exportData, null, 2);
-      const filename = options.filename || `virgil_photos_${Date.now()}.json`;
+      const filename = options.filename || `virgil_photos_${timeService.getTimestamp()}.json`;
       
       const blob = new Blob([jsonData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

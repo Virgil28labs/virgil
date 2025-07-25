@@ -7,6 +7,7 @@ import {
   stopEvent, 
 } from './utils/nasaImageUtils';
 import { logger } from '../../lib/logger';
+import { timeService } from '../../services/TimeService';
 
 interface NasaApodGalleryProps {
   favorites: ApodImage[]
@@ -175,7 +176,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
             <div className="nasa-apod-gallery-info">
               <h4 className="nasa-apod-gallery-title">{apod.title}</h4>
               <p className="nasa-apod-gallery-date">
-                {new Date(apod.date).toLocaleDateString('en-US', {
+                {timeService.formatDateToLocal(timeService.parseDate(apod.date) || timeService.getCurrentDateTime(), {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',

@@ -1,6 +1,7 @@
 import type { SavedPhoto, PhotoStorageOptions } from '../../../types/camera.types';
 import { CameraUtils } from './cameraUtils';
 import { logger } from '../../../lib/logger';
+import { timeService } from '../../../services/TimeService';
 
 export class PhotoStorage {
   private static readonly PHOTOS_KEY = 'virgil_camera_photos';
@@ -302,7 +303,7 @@ export class PhotoStorage {
     try {
       const exportData = {
         version: this.CURRENT_VERSION,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
         photos,
         totalPhotos: photos.length,
         totalSize: photos.reduce((sum, photo) => sum + (photo.size || 0), 0),
@@ -402,7 +403,7 @@ export class PhotoStorage {
     
     try {
       const photos = await this.getAllPhotos();
-      const cutoffTime = Date.now() - (options.cleanupAfterDays * 24 * 60 * 60 * 1000);
+      const cutoffTime = timeService.getTimestamp() - (options.cleanupAfterDays * 24 * 60 * 60 * 1000);
       
       const photosToDelete = photos.filter(photo => 
         photo.timestamp <= cutoffTime && !photo.isFavorite,

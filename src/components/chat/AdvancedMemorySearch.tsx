@@ -1,6 +1,7 @@
-import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
+import { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import type { MarkedMemory, StoredConversation } from '../../services/MemoryService';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import './memory-modals.css';
 
 interface SearchFilters {
@@ -94,14 +95,15 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           break;
         case 'custom':
           if (filters.customStartDate) {
-            startTime = new Date(filters.customStartDate).getTime();
+            startTime = timeService.parseDate(filters.customStartDate)?.getTime() || 0;
           }
           break;
       }
 
       let endTime = now;
       if (filters.dateRange === 'custom' && filters.customEndDate) {
-        endTime = new Date(filters.customEndDate).getTime() + (24 * 60 * 60 * 1000);
+        const endDate = timeService.parseDate(filters.customEndDate);
+        endTime = endDate ? timeService.addDays(endDate, 1).getTime() : now;
       }
 
       filteredMemories = filteredMemories.filter(memory =>

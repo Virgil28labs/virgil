@@ -3,6 +3,7 @@ import { createContext, useContext, useReducer, useEffect, useCallback, useMemo 
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from './LocationContext';
 import { logger } from '../lib/logger';
+import { timeService } from '../services/TimeService';
 import type { 
   WeatherContextType, 
   WeatherState, 
@@ -37,7 +38,7 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
         data: action.payload,
         loading: false, 
         error: null,
-        lastUpdated: Date.now(),
+        lastUpdated: timeService.getTimestamp(),
       };
     case 'SET_FORECAST_DATA':
       return { 
@@ -84,7 +85,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
 
     // Check cache validity (10 minutes)
     const cacheExpiry = 10 * 60 * 1000;
-    const isCacheValid = state.lastUpdated && (Date.now() - state.lastUpdated) < cacheExpiry;
+    const isCacheValid = state.lastUpdated && (timeService.getTimestamp() - state.lastUpdated) < cacheExpiry;
 
     if (!forceRefresh && isCacheValid) {
       return;
@@ -188,7 +189,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
     if (!coordinates && !ipLocation?.city) return;
 
     // Initial fetch if we don't have recent data
-    const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0);
+    const timeSinceLastUpdate = timeService.getTimestamp() - (state.lastUpdated || 0);
     const cacheExpiry = 10 * 60 * 1000;
     if (!state.loading && timeSinceLastUpdate > cacheExpiry) {
       fetchWeather();

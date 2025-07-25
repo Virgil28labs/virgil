@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { timeService } from '../services/TimeService';
 
 interface DeviceInfo {
   // Location & Network
@@ -106,7 +107,7 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
     notifications: 'unknown',
     clipboard: 'unknown',
   });
-  const [sessionStart] = useState(Date.now());
+  const [sessionStart] = useState(timeService.getTimestamp());
 
   // Check permission status
   const checkPermission = async (name: string): Promise<PermissionState | 'unknown'> => {
@@ -185,11 +186,11 @@ export const useDeviceInfo = (ipLocation?: { city?: string; ip?: string }) => {
       batteryCharging,
       
       // Session
-      localTime: new Date().toLocaleTimeString(),
+      localTime: timeService.formatTimeToLocal(timeService.getCurrentDateTime()),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       language: navigator.language,
       tabVisible: !document.hidden,
-      sessionDuration: Math.floor((Date.now() - sessionStart) / 1000),
+      sessionDuration: Math.floor((timeService.getTimestamp() - sessionStart) / 1000),
       
       // Browser Features
       cookiesEnabled: navigator.cookieEnabled,

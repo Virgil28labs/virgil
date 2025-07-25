@@ -2,8 +2,8 @@ import { memo, useCallback } from 'react';
 import type { StoredConversation } from '../../services/MemoryService';
 import type { ChatMessage } from '../../types/chat.types';
 import { useUserProfile } from '../../hooks/useUserProfile';
-import { formatTimestamp } from '../../utils/dateFormatter';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import { Message } from './Message';
 import './memory-modals.css';
 
@@ -23,7 +23,7 @@ const ConversationView = memo(function ConversationView({
   const handleExportConversation = useCallback(() => {
     const now = dashboardContextService.getCurrentDateTime();
     const conversationData = {
-      exportedAt: now.toISOString(),
+      exportedAt: timeService.toISOString(now),
       conversation: {
         timestamp: conversation.timestamp,
         messageCount: conversation.messageCount,
@@ -36,7 +36,7 @@ const ConversationView = memo(function ConversationView({
     const a = document.createElement('a');
     a.href = url;
     // Format conversation timestamp as local date for filename
-    const conversationDate = new Date(conversation.timestamp);
+    const conversationDate = timeService.fromTimestamp(conversation.timestamp);
     const dateStr = dashboardContextService.formatDateToLocal(conversationDate);
     a.download = `conversation-${dateStr}.json`;
     a.click();
@@ -61,7 +61,7 @@ const ConversationView = memo(function ConversationView({
               <span role="img" aria-label="messages">💬</span> {conversation.messageCount} messages
             </span>
             <span className="stat-item">
-              <span role="img" aria-label="time">🕐</span> {formatTimestamp(conversation.timestamp)}
+              <span role="img" aria-label="time">🕐</span> {timeService.formatDateTimeToLocal(timeService.fromTimestamp(conversation.timestamp))}
             </span>
           </div>
         </div>

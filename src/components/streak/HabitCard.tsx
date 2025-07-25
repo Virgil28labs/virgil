@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from 'react';
 import type { Habit } from '../../types/habit.types';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 
 interface HabitCardProps {
   habit: Habit
@@ -136,8 +137,7 @@ export const HabitCard = memo(function HabitCard({
         
           <div className="streak-dots habit-streak-dots">
             {Array.from({ length: 7 }, (_, i) => {
-              const date = new Date();
-              date.setDate(date.getDate() - (6 - i));
+              const date = timeService.subtractDays(timeService.getCurrentDateTime(), 6 - i);
               const dateStr = dashboardContextService.formatDateToLocal(date);
               const isToday = i === 6;
               const isChecked = isToday ? checkedToday : habit.checkIns.includes(dateStr);
@@ -146,7 +146,7 @@ export const HabitCard = memo(function HabitCard({
                 <div
                   key={dateStr}
                   className="streak-dot-wrapper"
-                  title={`${date.toLocaleDateString('en-US', { weekday: 'short' })} - ${isChecked ? 'Completed' : 'Missed'}`}
+                  title={`${new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)} - ${isChecked ? 'Completed' : 'Missed'}`}
                 >
                   <div 
                     className={`

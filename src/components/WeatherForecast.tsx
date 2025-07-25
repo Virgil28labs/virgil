@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import type { ForecastData } from '../types/weather.types';
+import { timeService } from '../services/TimeService';
 
 interface WeatherForecastProps {
   forecast: ForecastData;
@@ -18,9 +19,9 @@ export const WeatherForecast = memo(function WeatherForecast({
     // Parse date string as local date (not UTC)
     // dateString format: "YYYY-MM-DD"
     const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day); // month is 0-indexed
+    const date = timeService.createDate(year, month - 1, day); // month is 0-indexed
     // Always return 3-letter day abbreviation in uppercase
-    return date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    return timeService.formatDateToLocal(date, { weekday: 'short' }).toUpperCase();
   };
 
   const getWeatherEmoji = (conditionId?: number): string => {

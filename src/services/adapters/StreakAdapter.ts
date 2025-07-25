@@ -67,7 +67,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
       };
       this.userData = StorageService.get<UserHabitsData>(this.STORAGE_KEY, defaultData);
       if (this.userData && this.userData.habits.length > 0) {
-        this.lastFetchTime = Date.now();
+        this.lastFetchTime = timeService.getTimestamp();
       }
     } catch (error) {
       logger.error('Failed to load habit data', error as Error, {
@@ -78,7 +78,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.loadUserData();
     }
   }
@@ -175,12 +175,11 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
     const activityMap = new Map<string, { habits: Set<string>; habitNames: string[] }>();
     const today = timeService.getCurrentDateTime();
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(today.getDate() - 7);
+    const sevenDaysAgo = timeService.subtractDays(today, 7);
 
     this.userData.habits.forEach(habit => {
       habit.checkIns.forEach(checkInDate => {
-        const date = new Date(checkInDate);
+        const date = timeService.parseDate(checkInDate) || timeService.getCurrentDateTime();
         if (date >= sevenDaysAgo) {
           if (!activityMap.has(checkInDate)) {
             activityMap.set(checkInDate, { habits: new Set(), habitNames: [] });
@@ -233,7 +232,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     if (!this.userData || this.userData.habits.length === 0) return 0;
 
     const allCheckIns = this.userData.habits.flatMap(h => 
-      h.checkIns.map(date => new Date(date).getTime()),
+      h.checkIns.map(date => (timeService.parseDate(date) || timeService.getCurrentDateTime()).getTime()),
     );
 
     return allCheckIns.length > 0 ? Math.max(...allCheckIns) : 0;

@@ -1,3 +1,5 @@
+import { timeService } from '../TimeService';
+
 interface CacheOptions {
   ttl?: number;
   maxSize?: number;
@@ -48,7 +50,7 @@ export class ResponseCache {
       return null;
     }
 
-    if (Date.now() > entry.expiresAt) {
+    if (timeService.getTimestamp() > entry.expiresAt) {
       this.cache.delete(key);
       this.accessOrder.delete(key);
       this.misses++;
@@ -56,7 +58,7 @@ export class ResponseCache {
     }
 
     // Update access time for LRU
-    this.accessOrder.set(key, Date.now());
+    this.accessOrder.set(key, timeService.getTimestamp());
     this.hits++;
     return entry.value;
   }
@@ -69,11 +71,11 @@ export class ResponseCache {
 
     this.cache.set(key, {
       value,
-      expiresAt: Date.now() + (ttl * 1000),
-      createdAt: Date.now(),
+      expiresAt: timeService.getTimestamp() + (ttl * 1000),
+      createdAt: timeService.getTimestamp(),
     });
     
-    this.accessOrder.set(key, Date.now());
+    this.accessOrder.set(key, timeService.getTimestamp());
   }
 
   private evictLRU(): void {
@@ -119,7 +121,7 @@ export class ResponseCache {
 
   // Clean up expired entries
   cleanup(): number {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     let cleaned = 0;
 
     for (const [key, entry] of this.cache.entries()) {

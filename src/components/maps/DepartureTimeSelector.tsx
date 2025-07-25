@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './DepartureTimeSelector.css';
+import { timeService } from '../../services/TimeService';
 
 interface DepartureTimeSelectorProps {
   selectedTime: Date | 'now'
@@ -36,8 +37,8 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
     }
     
     const time = selectedTime;
-    const now = new Date();
-    const isToday = time.toDateString() === now.toDateString();
+    const now = timeService.getCurrentDateTime();
+    const isToday = timeService.isSameDay(time, now);
     
     if (isToday) {
       return time.toLocaleTimeString('en-US', { 
@@ -56,16 +57,17 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   
   // Quick time options
   const handleQuickOption = (minutes: number) => {
-    const newTime = new Date();
-    newTime.setMinutes(newTime.getMinutes() + minutes);
+    const newTime = timeService.addMinutes(timeService.getCurrentDateTime(), minutes);
     onTimeChange(newTime);
     setShowDropdown(false);
   };
   
   // Quick date options
   const handleQuickDate = (daysOffset: number, hour: number = 9) => {
-    const newTime = new Date();
-    newTime.setDate(newTime.getDate() + daysOffset);
+    let newTime = timeService.getCurrentDateTime();
+    if (daysOffset !== 0) {
+      newTime = timeService.addDays(newTime, daysOffset);
+    }
     newTime.setHours(hour, 0, 0, 0);
     onTimeChange(newTime);
     setShowDropdown(false);
@@ -73,8 +75,8 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   
   // Handle custom date/time input
   const handleCustomTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = new Date(e.target.value);
-    if (!isNaN(newTime.getTime())) {
+    const newTime = timeService.parseDate(e.target.value);
+    if (newTime) {
       onTimeChange(newTime);
       setShowCustomPicker(false);
       setShowDropdown(false);
@@ -83,7 +85,7 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   
   // Get current datetime string for input
   const getCurrentDateTimeString = () => {
-    const now = selectedTime === 'now' ? new Date() : selectedTime;
+    const now = selectedTime === 'now' ? timeService.getCurrentDateTime() : selectedTime;
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -94,15 +96,13 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   
   // Get min/max date strings for the picker
   const getMinDateTimeString = () => {
-    const minDate = new Date();
-    minDate.setFullYear(minDate.getFullYear() - 1); // Allow up to 1 year in the past
-    return minDate.toISOString().slice(0, 16);
+    const minDate = timeService.addYears(timeService.getCurrentDateTime(), -1); // Allow up to 1 year in the past
+    return timeService.toISOString(minDate).slice(0, 16);
   };
   
   const getMaxDateTimeString = () => {
-    const maxDate = new Date();
-    maxDate.setFullYear(maxDate.getFullYear() + 1); // Allow up to 1 year in the future
-    return maxDate.toISOString().slice(0, 16);
+    const maxDate = timeService.addYears(timeService.getCurrentDateTime(), 1); // Allow up to 1 year in the future
+    return timeService.toISOString(maxDate).slice(0, 16);
   };
   
   return (

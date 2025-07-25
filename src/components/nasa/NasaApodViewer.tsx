@@ -8,6 +8,7 @@ import { NasaApodImageView } from './NasaApodImageView';
 import { NasaApodModal } from './NasaApodModal';
 import './NasaApodViewer.css';
 import { logger } from '../../lib/logger';
+import { timeService } from '../../services/TimeService';
 
 export const NasaApodViewer = memo(function NasaApodViewer({ 
   isOpen, 
@@ -19,7 +20,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
   const [error, setError] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>(() => 
-    initialDate || new Date().toISOString().split('T')[0],
+    initialDate || timeService.toISODateString(),
   );
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<NasaTabType>('browse');
@@ -66,7 +67,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
 
   // Load today's APOD (convenience function)
   const loadTodaysApod = useCallback(async () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = timeService.toISODateString();
     await loadApodByDate(today);
   }, [loadApodByDate]);
 
@@ -197,7 +198,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
                       value={selectedDate}
                       onChange={handleDateChange}
                       min="1995-06-16"
-                      max={new Date().toISOString().split('T')[0]}
+                      max={timeService.toISODateString()}
                       disabled={loading}
                       aria-label="Select APOD date"
                     />

@@ -7,6 +7,7 @@ import type {
   LocationAction,
 } from '../types/location.types';
 import { logger } from '../lib/logger';
+import { timeService } from '../services/TimeService';
 
 /**
  * LocationContext - Location Services State Management
@@ -36,7 +37,7 @@ const locationReducer = (state: LocationState, action: LocationAction): Location
         ipLocation: action.payload.ipLocation ?? state.ipLocation,
         loading: false, 
         error: null,
-        lastUpdated: Date.now(),
+        lastUpdated: timeService.getTimestamp(),
         initialized: true,
       };
     case 'SET_ERROR':
@@ -76,7 +77,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
     }
 
     const cacheExpiry = 5 * 60 * 1000;
-    const isCacheValid = state.lastUpdated && (Date.now() - state.lastUpdated) < cacheExpiry;
+    const isCacheValid = state.lastUpdated && (timeService.getTimestamp() - state.lastUpdated) < cacheExpiry;
 
     if (!forceRefresh && isCacheValid) {
       return;
@@ -183,7 +184,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       state.permissionStatus === 'unknown'
     ) {
       // Check state internally to avoid dependency
-      const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0);
+      const timeSinceLastUpdate = timeService.getTimestamp() - (state.lastUpdated || 0);
       const cacheExpiry = 5 * 60 * 1000;
       if (!state.loading && timeSinceLastUpdate > cacheExpiry) {
         fetchLocationData();

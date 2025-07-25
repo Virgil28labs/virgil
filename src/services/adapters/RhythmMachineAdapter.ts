@@ -7,7 +7,7 @@
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
-
+import { timeService } from '../TimeService';
 interface SavedPattern {
   pattern: boolean[][];
   description: string;
@@ -67,7 +67,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
       } else {
         this.saveSlots = [null, null, null, null, null];
       }
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch rhythm patterns', error as Error, {
@@ -79,7 +79,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshData();
     }
   }
@@ -350,7 +350,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     }
 
     const recent = data.patterns.recent[0];
-    const date = new Date(recent.timestamp);
+    const date = timeService.fromTimestamp(recent.timestamp);
     const timeAgo = this.getTimeAgo(date);
     
     let response = `Your most recent pattern is a ${recent.bars}-bar ${recent.category} beat: "${recent.description}", created ${timeAgo}`;
@@ -454,15 +454,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   }
 
   private getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
-    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} weeks ago`;
-    
-    return date.toLocaleDateString();
+    return timeService.getTimeAgo(date);
   }
 
   async search(query: string): Promise<any[]> {

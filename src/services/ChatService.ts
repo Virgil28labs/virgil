@@ -8,6 +8,7 @@ import type { ChatMessage } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { dashboardAppService } from './DashboardAppService';
 import { dashboardContextService } from './DashboardContextService';
+import { timeService } from './TimeService';
 
 export interface ChatApiRequest {
   model: string;
@@ -121,7 +122,7 @@ export class ChatService {
       id: `${dashboardContextService.getTimestamp()}-assistant`,
       role: 'assistant',
       content,
-      timestamp: now.toISOString(),
+      timestamp: timeService.toISOString(now),
     };
   }
 
@@ -134,7 +135,7 @@ export class ChatService {
       id: `${dashboardContextService.getTimestamp()}-user`,
       role: 'user',
       content,
-      timestamp: now.toISOString(),
+      timestamp: timeService.toISOString(now),
     };
   }
 
@@ -147,7 +148,7 @@ export class ChatService {
       id: `${dashboardContextService.getTimestamp()}-fallback`,
       role: 'assistant',
       content: "I'm having trouble connecting right now. Please try again in a moment!",
-      timestamp: now.toISOString(),
+      timestamp: timeService.toISOString(now),
     };
   }
 

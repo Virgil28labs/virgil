@@ -11,6 +11,7 @@
 
 import { StorageService } from './StorageService';
 import { indexedDBService } from './IndexedDBService';
+import { timeService } from './TimeService';
 
 interface StorageMetrics {
   localStorage: {
@@ -408,7 +409,7 @@ export class StorageMonitor {
           slowOperations.push({
             operation,
             duration,
-            timestamp: Date.now() - (durations.length - index) * 1000, // Approximate
+            timestamp: timeService.getTimestamp() - (durations.length - index) * 1000, // Approximate
           });
         }
       });
@@ -435,7 +436,7 @@ export class StorageMonitor {
     const memoryResult = await indexedDBService.getAll('VirgilMemory', 'conversations');
     if (memoryResult.success && memoryResult.data) {
       const oldConversations = (memoryResult.data as any[]).filter(conv => {
-        const age = Date.now() - (conv.timestamp || 0);
+        const age = timeService.getTimestamp() - (conv.timestamp || 0);
         return age > 30 * 24 * 60 * 60 * 1000; // 30 days
       });
       

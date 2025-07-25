@@ -8,6 +8,7 @@ import type { Entry } from './types';
 import { NotesError, ErrorType } from './types';
 import { notesStorage } from './storage';
 import { processEntryWithAI, shouldProcessContent } from './aiService';
+import { timeService } from '../../services/TimeService';
 import { extractTasksFromContent, mergeTasksWithAI, toggleTaskAtIndex } from './utils/taskUtils';
 
 /**
@@ -68,7 +69,7 @@ export const useNotesStore = () => {
     // Create new entry
     const newEntry: Entry = {
       id: crypto.randomUUID(),
-      timestamp: new Date(),
+      timestamp: timeService.getCurrentDateTime(),
       content,
       tags: [],
       tasks: extractTasksFromContent(content),

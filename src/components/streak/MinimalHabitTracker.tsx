@@ -3,6 +3,7 @@ import { useHabits } from '../../hooks/useHabits';
 import { HabitCard } from './HabitCard';
 import { AddHabitForm } from './AddHabitForm';
 import './MinimalHabitTracker.css';
+import { timeService } from '../../services/TimeService';
 
 interface MinimalHabitTrackerProps {
   isOpen: boolean
@@ -89,7 +90,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             className="stat best-streak-stat"
             data-start-date={
               stats.bestStreakStartDate 
-                ? `Started ${new Date(stats.bestStreakStartDate).toLocaleDateString('en-US', { 
+                ? `Started ${timeService.formatDateToLocal(timeService.parseDate(stats.bestStreakStartDate) || timeService.getCurrentDateTime(), { 
                   month: 'short', 
                   day: 'numeric', 
                 })}`

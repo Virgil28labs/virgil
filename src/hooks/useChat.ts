@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useLLM } from './useLLM';
+import { timeService } from '../services/TimeService';
 import type {
   ChatMessage,
   ChatHookOptions,
@@ -37,7 +38,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
 
   // Generate unique message ID
   const generateMessageId = useCallback(() => {
-    return `msg-${Date.now()}-${++messageIdCounter.current}`;
+    return `msg-${timeService.getTimestamp()}-${++messageIdCounter.current}`;
   }, []);
 
   // Validate message content
@@ -53,7 +54,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       id: generateMessageId(),
       role,
       content,
-      timestamp: new Date().toISOString(),
+      timestamp: timeService.toISOString(),
     };
 
     setMessages(prev => [...prev, message]);
@@ -108,7 +109,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
       id: assistantMessageId,
       role: 'assistant',
       content: '',
-      timestamp: new Date().toISOString(),
+      timestamp: timeService.toISOString(),
       streaming: true,
     };
     
@@ -211,7 +212,7 @@ export function useChat(systemPrompt?: string, config: ChatHookOptions = {}): Us
     const exportData = {
       systemPrompt,
       messages: messages.filter(msg => msg.role !== 'system'),
-      exportedAt: new Date().toISOString(),
+      exportedAt: timeService.toISOString(),
       summary: getConversationSummary(),
     };
 

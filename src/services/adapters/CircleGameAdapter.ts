@@ -7,6 +7,7 @@
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
+import { timeService } from '../TimeService';
 
 interface CircleGameData {
   scores: {
@@ -75,7 +76,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       const savedLastPlay = localStorage.getItem(this.LAST_PLAY_KEY);
       this.lastPlayTime = savedLastPlay ? parseInt(savedLastPlay, 10) : 0;
       
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch circle game data', error as Error, {
@@ -90,7 +91,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshData();
     }
   }
@@ -294,7 +295,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     let response = `You've attempted to draw perfect circles ${this.attempts} time${this.attempts !== 1 ? 's' : ''}`;
     
     if (this.lastPlayTime) {
-      const timeAgo = this.getTimeAgo(new Date(this.lastPlayTime));
+      const timeAgo = this.getTimeAgo(timeService.fromTimestamp(this.lastPlayTime));
       response += `, last played ${timeAgo}`;
     }
     
@@ -405,15 +406,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   }
 
   private getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
-    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} weeks ago`;
-    
-    return date.toLocaleDateString();
+    return timeService.getTimeAgo(date);
   }
 
   async search(query: string): Promise<any[]> {

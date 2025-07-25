@@ -1,6 +1,7 @@
 import { ResponseCache } from './utils/cache';
 import { RateLimiter } from './utils/rateLimit';
 import { EventEmitter } from './utils/eventEmitter';
+import { timeService } from '../TimeService';
 import type {
   LLMRequest,
   LLMResponse,
@@ -76,7 +77,7 @@ export class LLMService extends EventEmitter {
 
     try {
       // Track active request
-      this.activeRequests.set(requestId, { startTime: Date.now() });
+      this.activeRequests.set(requestId, { startTime: timeService.getTimestamp() });
       this.emit('request-start', { requestId, model, provider });
 
       // Make request with retry logic
@@ -93,7 +94,7 @@ export class LLMService extends EventEmitter {
 
       // Track completion
       const requestInfo = this.activeRequests.get(requestId);
-      const duration = requestInfo ? Date.now() - requestInfo.startTime : 0;
+      const duration = requestInfo ? timeService.getTimestamp() - requestInfo.startTime : 0;
       this.emit('request-complete', {
         requestId,
         model,
@@ -245,7 +246,7 @@ export class LLMService extends EventEmitter {
   }
 
   private generateRequestId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${timeService.getTimestamp()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   async getModels(): Promise<Record<string, string[]>> {

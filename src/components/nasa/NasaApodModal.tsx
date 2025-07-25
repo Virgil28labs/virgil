@@ -7,6 +7,7 @@ import {
   shareApod, 
 } from './utils/nasaImageUtils';
 import { logger } from '../../lib/logger';
+import { timeService } from '../../services/TimeService';
 
 interface NasaApodModalProps {
   favorites: ApodImage[]
@@ -177,7 +178,7 @@ export const NasaApodModal = memo(function NasaApodModal({
         <div className="nasa-apod-modal-info">
           <h3 className="nasa-apod-modal-title">{currentApod.title}</h3>
           <p className="nasa-apod-modal-date">
-            {new Date(currentApod.date).toLocaleDateString('en-US', {
+            {timeService.formatDateToLocal(timeService.parseDate(currentApod.date) || timeService.getCurrentDateTime(), {
               weekday: 'long',
               year: 'numeric',
               month: 'long',

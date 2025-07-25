@@ -6,6 +6,7 @@ import type {
 } from '../types/habit.types';
 import { StorageService, STORAGE_KEYS } from '../services/StorageService';
 import { dashboardContextService } from '../services/DashboardContextService';
+import { timeService } from '../services/TimeService';
 
 const STORAGE_KEY = STORAGE_KEYS.VIRGIL_HABITS;
 const MAX_HABITS = 10;
@@ -58,11 +59,8 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
 const canCheckInToday = (lastCheckIn: string | null): boolean => {
   if (!lastCheckIn) return true;
   
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const lastDate = new Date(lastCheckIn);
-  lastDate.setHours(0, 0, 0, 0);
+  const today = timeService.startOfDay();
+  const lastDate = timeService.startOfDay(timeService.parseDate(lastCheckIn) || timeService.getCurrentDateTime());
   
   return today.getTime() > lastDate.getTime();
 };
@@ -72,15 +70,12 @@ const calculateStreak = (checkIns: string[]): number => {
   if (!checkIns.length) return 0;
   
   const sortedDates = [...checkIns].sort((a, b) => 
-    new Date(b).getTime() - new Date(a).getTime(),
+    (timeService.parseDate(b) || timeService.getCurrentDateTime()).getTime() - (timeService.parseDate(a) || timeService.getCurrentDateTime()).getTime(),
   );
   
   let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const mostRecent = new Date(sortedDates[0]);
-  mostRecent.setHours(0, 0, 0, 0);
+  const today = timeService.startOfDay();
+  const mostRecent = timeService.startOfDay(timeService.parseDate(sortedDates[0]) || timeService.getCurrentDateTime());
   
   // Calculate days since most recent check-in
   const daysSinceLastCheckIn = Math.floor((today.getTime() - mostRecent.getTime()) / (1000 * 60 * 60 * 24));
@@ -90,11 +85,8 @@ const calculateStreak = (checkIns: string[]): number => {
   
   // Count consecutive days from most recent check-in
   for (let i = 0; i < sortedDates.length; i++) {
-    const checkDate = new Date(sortedDates[i]);
-    checkDate.setHours(0, 0, 0, 0);
-    
-    const expectedDate = new Date(mostRecent);
-    expectedDate.setDate(mostRecent.getDate() - i);
+    const checkDate = timeService.startOfDay(timeService.parseDate(sortedDates[i]) || timeService.getCurrentDateTime());
+    const expectedDate = timeService.subtractDays(mostRecent, i);
     
     if (checkDate.getTime() === expectedDate.getTime()) {
       streak++;
@@ -146,14 +138,14 @@ export const useHabits = () => {
     }
     
     const newHabit: Habit = {
-      id: `habit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `habit-${timeService.getTimestamp()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
       emoji,
       streak: 0,
       longestStreak: 0,
       lastCheckIn: null,
       checkIns: [],
-      createdAt: new Date().toISOString(),
+      createdAt: timeService.toISOString(),
     };
     
     setUserData(prev => ({
@@ -243,9 +235,8 @@ export const useHabits = () => {
           
         case 'perfect-week': {
           const recentPerfectDays = perfectDays.filter(day => {
-            const dayDate = new Date(day);
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            const dayDate = timeService.parseDate(day) || timeService.getCurrentDateTime();
+            const weekAgo = timeService.subtractDays(timeService.getCurrentDateTime(), 7);
             return dayDate >= weekAgo;
           }).length;
           progress = Math.min(100, (recentPerfectDays / achievement.requirement.value) * 100);
@@ -263,7 +254,7 @@ export const useHabits = () => {
         ...achievement,
         progress,
         unlockedAt: unlocked && !achievement.unlockedAt 
-          ? new Date().toISOString() 
+          ? timeService.toISOString() 
           : achievement.unlockedAt,
       };
     });
@@ -386,8 +377,8 @@ export const useHabits = () => {
     
     // Find the longest consecutive streak
     for (let i = 1; i < sortedCheckIns.length; i++) {
-      const prevDate = new Date(sortedCheckIns[i - 1]);
-      const currDate = new Date(sortedCheckIns[i]);
+      const prevDate = timeService.parseDate(sortedCheckIns[i - 1]) || timeService.getCurrentDateTime();
+      const currDate = timeService.parseDate(sortedCheckIns[i]) || timeService.getCurrentDateTime();
       const daysDiff = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
       
       if (daysDiff === 1) {

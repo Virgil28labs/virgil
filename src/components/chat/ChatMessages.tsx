@@ -5,6 +5,7 @@ import { Skeleton } from '../ui/skeleton';
 import type { User } from '../../types/auth.types';
 import { FormattedText } from '../../utils/textFormatter';
 import { LoadingStates } from './LoadingStates';
+import { timeService } from '../../services/TimeService';
 import './chat-interface.css';
 
 interface ChatMessagesProps {
@@ -78,7 +79,7 @@ const ChatMessages = memo(function ChatMessages({
         {lastConversation ? (
           <>
             Welcome back, {user?.user_metadata?.name || 'there'}! 
-            {lastConversation.timestamp && (Date.now() - lastConversation.timestamp) < 24 * 60 * 60 * 1000 && (
+            {lastConversation.timestamp && (timeService.getTimestamp() - lastConversation.timestamp) < 24 * 60 * 60 * 1000 && (
               <> I remember our chat about "{lastConversation.firstMessage}"</>
             )}
           </>

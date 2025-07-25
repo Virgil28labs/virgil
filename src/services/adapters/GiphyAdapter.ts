@@ -7,7 +7,7 @@
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
-
+import { timeService } from '../TimeService';
 interface GiphyImage {
   id: string;
   url: string;
@@ -71,7 +71,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       } else {
         this.favorites = [];
       }
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch Giphy favorites', error as Error, {
@@ -83,7 +83,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshData();
     }
   }
@@ -125,7 +125,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       id: gif.id,
       title: gif.title || 'Untitled GIF',
       rating: gif.rating,
-      savedAt: Date.now() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
+      savedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
     const data: GiphyData = {
@@ -150,7 +150,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       appName: this.appName,
       displayName: this.displayName,
       isActive,
-      lastUsed: isActive ? Date.now() : 0,
+      lastUsed: isActive ? timeService.getTimestamp() : 0,
       data,
       summary,
       capabilities: [

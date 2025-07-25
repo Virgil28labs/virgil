@@ -1,3 +1,5 @@
+import { timeService } from '../../TimeService';
+
 interface RateLimiterOptions {
   maxRequests?: number;
   windowMs?: number;
@@ -23,7 +25,7 @@ export class RateLimiter {
   }
 
   checkLimit(): boolean {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
     
     // Remove old requests outside the window
@@ -40,7 +42,7 @@ export class RateLimiter {
   }
 
   getRemainingRequests(): number {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
     this.requests = this.requests.filter(time => time > windowStart);
     
@@ -54,11 +56,11 @@ export class RateLimiter {
     
     // Get the oldest request time
     const oldestRequest = Math.min(...this.requests);
-    return new Date(oldestRequest + this.windowMs);
+    return timeService.fromTimestamp(oldestRequest + this.windowMs);
   }
 
   getStats(): RateLimiterStats {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
     this.requests = this.requests.filter(time => time > windowStart);
     

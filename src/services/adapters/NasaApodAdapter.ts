@@ -7,7 +7,7 @@
 
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
-
+import { timeService } from '../TimeService';
 interface StoredApod {
   id: string;
   date: string;
@@ -67,7 +67,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
       } else {
         this.favorites = [];
       }
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch NASA favorites', error as Error, {
@@ -79,7 +79,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
   }
 
   private ensureFreshData(): void {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshData();
     }
   }
@@ -98,9 +98,11 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     let monthsSpanned = 0;
     
     if (this.favorites.length > 0) {
-      const dates = this.favorites.map(f => new Date(f.date));
-      oldestFavorite = new Date(Math.min(...dates.map(d => d.getTime())));
-      newestFavorite = new Date(Math.max(...dates.map(d => d.getTime())));
+      const dates = this.favorites.map(f => timeService.parseDate(f.date) || timeService.getCurrentDateTime());
+      const minTimestamp = Math.min(...dates.map(d => d.getTime()));
+      const maxTimestamp = Math.max(...dates.map(d => d.getTime()));
+      oldestFavorite = timeService.fromTimestamp(minTimestamp);
+      newestFavorite = timeService.fromTimestamp(maxTimestamp);
       
       // Calculate months spanned
       const diffTime = newestFavorite.getTime() - oldestFavorite.getTime();
@@ -290,15 +292,15 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     }
 
     const recent = data.favorites.recent[0];
-    const date = new Date(recent.date);
-    const timeAgo = this.getTimeAgo(new Date(recent.savedAt));
+    const date = timeService.parseDate(recent.date) || timeService.getCurrentDateTime();
+    const timeAgo = this.getTimeAgo(timeService.fromTimestamp(recent.savedAt));
     
     let response = `Your most recent space favorite is "${recent.title}" from ${date.toLocaleDateString()}, saved ${timeAgo}.`;
     
     if (data.favorites.recent.length > 1) {
       response += ' Recent favorites include:';
       data.favorites.recent.slice(0, 3).forEach(fav => {
-        response += `\n• ${fav.title} (${new Date(fav.date).toLocaleDateString()})`;
+        response += `\n• ${fav.title} (${timeService.formatDateToLocal(timeService.parseDate(fav.date) || timeService.getCurrentDateTime())})`;
       });
     }
 
@@ -321,7 +323,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     if (matchingFavorites.length <= 3) {
       response += ':';
       matchingFavorites.forEach(fav => {
-        response += `\n• "${fav.title}" from ${new Date(fav.date).toLocaleDateString()}`;
+        response += `\n• "${fav.title}" from ${timeService.formatDateToLocal(timeService.parseDate(fav.date) || timeService.getCurrentDateTime())}`;
       });
     } else {
       response += ', including:';
@@ -343,7 +345,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     }
 
     const oldest = this.favorites[this.favorites.length - 1];
-    const date = new Date(oldest.date);
+    const date = timeService.parseDate(oldest.date) || timeService.getCurrentDateTime();
     
     return `Your oldest NASA APOD favorite is "${oldest.title}" from ${date.toLocaleDateString()}. ${
       data.stats.monthsSpanned > 6 
@@ -366,7 +368,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     if (videoFavorites.length <= 3) {
       response += ':';
       videoFavorites.forEach(fav => {
-        response += `\n• "${fav.title}" from ${new Date(fav.date).toLocaleDateString()}`;
+        response += `\n• "${fav.title}" from ${timeService.formatDateToLocal(timeService.parseDate(fav.date) || timeService.getCurrentDateTime())}`;
       });
     } else {
       response += '.';
@@ -399,15 +401,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
   }
 
   private getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
-    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} weeks ago`;
-    
-    return date.toLocaleDateString();
+    return timeService.getTimeAgo(date);
   }
 
   async search(query: string): Promise<any[]> {

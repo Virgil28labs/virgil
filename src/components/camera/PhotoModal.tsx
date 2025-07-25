@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import type { PhotoModalProps } from '../../types/camera.types';
 import { PhotoActions } from './PhotoActions';
+import { timeService } from '../../services/TimeService';
 
 export const PhotoModal: React.FC<PhotoModalProps> = ({
   photo,
@@ -209,12 +210,12 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
         {/* Photo Info */}
         <div className="photo-modal-info">
           <div className="photo-modal-title">
-            {photo.name || `Photo ${new Date(photo.timestamp).toLocaleDateString()}`}
+            {photo.name || `Photo ${timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}`}
           </div>
           
           <div className="photo-modal-metadata">
             <span className="photo-timestamp">
-              {new Date(photo.timestamp).toLocaleString()}
+              {timeService.formatDateTimeToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
             
             {photo.size && (

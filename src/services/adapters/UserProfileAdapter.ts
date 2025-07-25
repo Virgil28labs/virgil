@@ -36,7 +36,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       appName: this.appName,
       displayName: this.displayName,
       isActive: true, // Always active when user is logged in
-      lastUsed: Date.now(),
+      lastUsed: timeService.getTimestamp(),
       data: this.profile || this.getEmptyProfile(),
       summary: this.generateSummary(),
       capabilities: [
@@ -152,9 +152,9 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     // Birthday/age queries
     if (lowerQuery.includes('birthday') || lowerQuery.includes('birth') || lowerQuery.includes('age')) {
       if (this.profile.dateOfBirth) {
-        const birthDate = new Date(this.profile.dateOfBirth);
+        const birthDate = timeService.parseDate(this.profile.dateOfBirth) || timeService.getCurrentDateTime();
         const age = this.calculateAge(birthDate);
-        const formattedDate = birthDate.toLocaleDateString('en-US', {
+        const formattedDate = timeService.formatDateToLocal(birthDate, {
           month: 'long',
           day: 'numeric',
           year: 'numeric',
@@ -293,7 +293,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     // Personal info
     const personalInfo: string[] = [];
     if (this.profile.dateOfBirth) {
-      const age = this.calculateAge(new Date(this.profile.dateOfBirth));
+      const age = this.calculateAge(timeService.parseDate(this.profile.dateOfBirth) || timeService.getCurrentDateTime());
       personalInfo.push(`${age} years old`);
     }
     if (this.profile.gender) {

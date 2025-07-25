@@ -129,7 +129,7 @@ export class DashboardContextService {
   private onlineHandler?: () => void;
   private offlineHandler?: () => void;
   constructor() {
-    this.sessionStartTime = Date.now();
+    this.sessionStartTime = timeService.getTimestamp();
     this.context = this.getInitialContext();
     this.startPeriodicUpdates();
     this.subscribeToDashboardApps();
@@ -155,7 +155,7 @@ export class DashboardContextService {
         activeComponents: [],
         recentActions: [],
         timeSpentInSession: 0,
-        lastInteraction: Date.now(),
+        lastInteraction: timeService.getTimestamp(),
       },
       environment: {
         isOnline: navigator.onLine,
@@ -298,7 +298,7 @@ export class DashboardContextService {
       isAuthenticated: !!userData.user,
       name: userData.user?.user_metadata?.name,
       email: userData.user?.email,
-      memberSince: userData.user?.created_at ? new Date(userData.user.created_at).toLocaleDateString() : undefined,
+      memberSince: userData.user?.created_at ? this.formatDateToLocal(timeService.parseDate(userData.user.created_at) || this.getCurrentDateTime()) : undefined,
       profile: userProfile,
     };
     
@@ -378,11 +378,11 @@ export class DashboardContextService {
 
   private startPeriodicUpdates(): void {
     // Initialize last minute update timestamp
-    this.lastMinuteUpdate = Date.now();
+    this.lastMinuteUpdate = timeService.getTimestamp();
     
     // Context update timer (runs every minute)
     this.mainTimer = setInterval(() => {
-      const now = Date.now();
+      const now = timeService.getTimestamp();
       
       // Update dashboard context every minute
       if (now - this.lastMinuteUpdate >= 60000) {
@@ -484,9 +484,11 @@ export class DashboardContextService {
         contextParts.push(`- Phone: ${ctx.user.profile.phone}`);
       }
       if (ctx.user.profile?.dateOfBirth) {
-        const birthDate = new Date(ctx.user.profile.dateOfBirth);
-        const age = Math.floor((this.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-        contextParts.push(`- Age: ${age} years old (born ${birthDate.toLocaleDateString()})`);
+        const birthDate = timeService.parseDate(ctx.user.profile.dateOfBirth);
+        if (birthDate) {
+          const age = Math.floor((this.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+          contextParts.push(`- Age: ${age} years old (born ${this.formatDateToLocal(birthDate)})`);
+        }
       }
       if (ctx.user.profile?.gender) {
         contextParts.push(`- Gender: ${ctx.user.profile.gender}`);

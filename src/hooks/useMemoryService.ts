@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { memoryService } from '../services/MemoryService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
+import { timeService } from '../services/TimeService';
 import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
 import type { MarkedMemory, StoredConversation } from '../services/MemoryService';
@@ -66,7 +67,7 @@ export function useMemoryService({
   // Mark message as important
   const markAsImportant = useCallback(async (message: ChatMessage) => {
     try {
-      let context = `From conversation on ${new Date().toLocaleDateString()}`;
+      let context = `From conversation on ${timeService.formatDateToLocal(timeService.getCurrentDateTime())}`;
       if (dashboardContext) {
         context = DynamicContextBuilder.createContextSummary(dashboardContext);
       }

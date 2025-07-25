@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, memo } from 'react';
+import { useEffect, useCallback, memo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import type { ModelOption } from '../types/chat.types';
 import { useFocusManagement } from '../hooks/useFocusManagement';

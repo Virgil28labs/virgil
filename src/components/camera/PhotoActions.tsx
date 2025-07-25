@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import type { SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';
+import { timeService } from '../../services/TimeService';
 
 interface PhotoActionsProps {
   photo: SavedPhoto
@@ -148,14 +149,14 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
           <div className="metadata-item">
             <span className="metadata-label">Date:</span>
             <span className="metadata-value">
-              {new Date(photo.timestamp).toLocaleDateString()}
+              {timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
           
           <div className="metadata-item">
             <span className="metadata-label">Time:</span>
             <span className="metadata-value">
-              {new Date(photo.timestamp).toLocaleTimeString()}
+              {timeService.formatTimeToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
           

@@ -61,7 +61,7 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
 
     // Sort by timestamp (newest first)
     return filtered.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      b.timestamp.getTime() - a.timestamp.getTime(),
     );
   }, [entries, activeFilter, activeActionFilter, searchQuery]);
 

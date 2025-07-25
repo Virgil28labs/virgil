@@ -1,8 +1,9 @@
-import React, { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { FormattedText } from '../../utils/textFormatter';
 import { toastService } from '../../services/ToastService';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import './message-components.css';
 
 interface MessageProps {
@@ -61,7 +62,7 @@ const Message = memo(function Message({
       role: message.role,
       content: message.content,
       timestamp: message.timestamp || dashboardContextService.getTimestamp(),
-      exportedAt: now.toISOString(),
+      exportedAt: timeService.toISOString(now),
     };
 
     const blob = new Blob([JSON.stringify(messageData, null, 2)], { 
@@ -142,7 +143,11 @@ const Message = memo(function Message({
         <span className="message-role">{message.role === 'user' ? userNickname : 'Virgil'}</span>
         {message.timestamp && (
           <span className="message-timestamp">
-            {new Date(message.timestamp).toLocaleTimeString()}
+            {new Intl.DateTimeFormat('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            }).format(timeService.parseDate(message.timestamp) || timeService.getCurrentDateTime())}
           </span>
         )}
       </div>

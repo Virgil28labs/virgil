@@ -1,6 +1,7 @@
 import type { WeatherData, ForecastData } from '../types/weather.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
+import { timeService } from '../services/TimeService';
 
 const BACKEND_API_BASE = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -19,7 +20,7 @@ class WeatherService {
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -69,7 +70,7 @@ class WeatherService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: weatherData,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return weatherData;
@@ -88,7 +89,7 @@ class WeatherService {
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -122,7 +123,7 @@ class WeatherService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: weatherData,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return weatherData;
@@ -141,7 +142,7 @@ class WeatherService {
     
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -191,7 +192,7 @@ class WeatherService {
       // Cache the result
       this.forecastCache.set(cacheKey, {
         data: forecastData,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return forecastData;
@@ -210,7 +211,7 @@ class WeatherService {
     
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -244,7 +245,7 @@ class WeatherService {
       // Cache the result
       this.forecastCache.set(cacheKey, {
         data: forecastData,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return forecastData;

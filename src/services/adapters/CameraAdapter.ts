@@ -55,7 +55,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   private async refreshData(): Promise<void> {
     try {
       this.photos = await PhotoStorage.getAllPhotos();
-      this.lastFetchTime = Date.now();
+      this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
       logger.error('Failed to fetch camera photos', error as Error, {
@@ -67,18 +67,15 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   }
 
   private async ensureFreshData(): Promise<void> {
-    if (Date.now() - this.lastFetchTime > this.CACHE_DURATION) {
+    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
       await this.refreshData();
     }
   }
 
   getContextData(): AppContextData<CameraData> {
-    const todayStart = timeService.getCurrentDateTime();
-    todayStart.setHours(0, 0, 0, 0);
-    const weekStart = timeService.getCurrentDateTime();
-    weekStart.setDate(weekStart.getDate() - 7);
-    const monthStart = timeService.getCurrentDateTime();
-    monthStart.setMonth(monthStart.getMonth() - 1);
+    const todayStart = timeService.startOfDay();
+    const weekStart = timeService.subtractDays(timeService.getCurrentDateTime(), 7);
+    const monthStart = timeService.subtractMonths(timeService.getCurrentDateTime(), 1);
 
     // Calculate stats
     const todayCount = this.photos.filter(p => p.timestamp >= todayStart.getTime()).length;
@@ -118,8 +115,8 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         todayCount,
         weekCount,
         monthCount,
-        oldestPhoto: this.photos.length > 0 ? new Date(this.photos[this.photos.length - 1].timestamp) : undefined,
-        newestPhoto: this.photos.length > 0 ? new Date(this.photos[0].timestamp) : undefined,
+        oldestPhoto: this.photos.length > 0 ? timeService.fromTimestamp(this.photos[this.photos.length - 1].timestamp) : undefined,
+        newestPhoto: this.photos.length > 0 ? timeService.fromTimestamp(this.photos[0].timestamp) : undefined,
       },
     };
 
@@ -243,7 +240,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     }
 
     const mostRecent = data.photos.recent[0];
-    const timeAgo = this.getTimeAgo(new Date(mostRecent.timestamp));
+    const timeAgo = this.getTimeAgo(timeService.fromTimestamp(mostRecent.timestamp));
     
     let response = `Your most recent photo was taken ${timeAgo}`;
     
@@ -277,7 +274,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     if (recent.length > 0) {
       response += ' Recent favorites:';
       recent.forEach(photo => {
-        const timeAgo = this.getTimeAgo(new Date(photo.timestamp));
+        const timeAgo = this.getTimeAgo(timeService.fromTimestamp(photo.timestamp));
         response += `\n• Photo from ${timeAgo}`;
         if (photo.name) {
           response += ` ("${photo.name}")`;
@@ -369,15 +366,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   }
 
   private getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
-    if (seconds < 2592000) return `${Math.floor(seconds / 604800)} weeks ago`;
-    
-    return date.toLocaleDateString();
+    return timeService.getTimeAgo(date);
   }
 
   async search(query: string): Promise<any[]> {
@@ -406,7 +395,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         results.push({
           id: photo.id,
           type: 'photo',
-          name: photo.name || `Photo from ${new Date(photo.timestamp).toLocaleDateString()}`,
+          name: photo.name || `Photo from ${timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}`,
           timestamp: photo.timestamp,
           isFavorite: photo.isFavorite,
           relevance,
@@ -460,8 +449,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         metadata: {
           favorites: this.photos.filter(p => p.isFavorite).length,
           todayCount: this.photos.filter(p => {
-            const today = timeService.getCurrentDateTime();
-            today.setHours(0, 0, 0, 0);
+            const today = timeService.startOfDay();
             return p.timestamp >= today.getTime();
           }).length,
         },

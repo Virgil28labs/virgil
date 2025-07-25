@@ -16,34 +16,87 @@ import { dashboardContextService } from '../services/DashboardContextService';
 import { timeService } from '../services/TimeService';
 ```
 
-### Common Use Cases
+### API Reference
 
-#### Get Current Date/Time
+### Basic Date/Time Methods
 ```typescript
-// Using timeService directly (recommended)
-const now = timeService.getCurrentDateTime();
-const timestamp = timeService.getTimestamp();
-const today = timeService.getLocalDate(); // "2024-01-20"
+// Get current values
+const now = timeService.getCurrentDateTime();          // Current Date object
+const timestamp = timeService.getTimestamp();          // Milliseconds since epoch
+const today = timeService.getLocalDate();              // "2024-01-20" (YYYY-MM-DD)
+const time = timeService.getCurrentTime();             // "14:30" (24-hour format)
+const date = timeService.getCurrentDate();             // "January 20, 2024"
+const day = timeService.getDayOfWeek();                // "monday"
+const period = timeService.getTimeOfDay();             // "morning" | "afternoon" | "evening" | "night"
 
-// Or through dashboardContextService (backward compatible)
-const now = dashboardContextService.getCurrentDateTime();
-const timestamp = dashboardContextService.getTimestamp();
-const today = dashboardContextService.getLocalDate(); // "2024-01-20"
+// Format dates
+const dateStr = timeService.formatDateToLocal(date);   // "2024-01-20" (YYYY-MM-DD)
+const display = timeService.formatDate(date);          // "January 20, 2024"
 ```
 
-#### Format Dates
+### Date Arithmetic
 ```typescript
-// Format any date to YYYY-MM-DD (for filenames, keys, etc.)
-const dateStr = dashboardContextService.formatDateToLocal(myDate);
-
-// Format for display (January 20, 2024)
-const displayDate = dashboardContextService.formatDate(myDate);
+// Add/subtract time periods
+const tomorrow = timeService.addDays(today, 1);
+const yesterday = timeService.subtractDays(today, 1);
+const nextMonth = timeService.addMonths(today, 1);
+const lastMonth = timeService.subtractMonths(today, 1);
+const later = timeService.addHours(now, 2);
+const earlier = timeService.subtractHours(now, 2);
 ```
 
-#### Subscribe to Time Updates
+### Date Manipulation
 ```typescript
-// Subscribe to real-time updates (1-second precision)
-const unsubscribe = dashboardContextService.subscribeToTimeUpdates(({ currentTime, currentDate, dateObject }) => {
+// Get boundaries
+const dayStart = timeService.startOfDay(date);         // 00:00:00.000
+const dayEnd = timeService.endOfDay(date);             // 23:59:59.999
+const weekStart = timeService.startOfWeek(date);       // Monday 00:00:00.000
+const weekEnd = timeService.endOfWeek(date);           // Sunday 23:59:59.999
+const monthStart = timeService.startOfMonth(date);     // 1st at 00:00:00.000
+const monthEnd = timeService.endOfMonth(date);         // Last day at 23:59:59.999
+```
+
+### Date Comparison
+```typescript
+// Check relationships
+const isToday = timeService.isToday(date);
+const isSame = timeService.isSameDay(date1, date2);
+const days = timeService.getDaysBetween(start, end);   // Number of days
+const hours = timeService.getHoursDifference(start, end); // Number of hours
+```
+
+### Relative Time Formatting
+```typescript
+// Human-readable time differences
+const ago = timeService.getTimeAgo(pastDate);          // "2 hours ago"
+const relative = timeService.getRelativeTime(date);    // "in 3 days" or "2 hours ago"
+```
+
+### ISO String Helpers
+```typescript
+// ISO format conversions
+const iso = timeService.toISOString(date);             // "2024-01-20T14:30:00.000Z"
+const isoDate = timeService.toISODateString(date);     // "2024-01-20" (UTC)
+```
+
+### Form Input Helpers
+```typescript
+// Format for HTML inputs
+const dateInput = timeService.formatForDateInput(date);     // "2024-01-20"
+const dateTimeInput = timeService.formatForDateTimeInput(date); // "2024-01-20T14:30"
+```
+
+### Validation & Parsing
+```typescript
+// Safe date handling
+const isValid = timeService.isValidDate(value);        // Type guard
+const parsed = timeService.parseDate(dateString);      // Date | null
+```
+
+### Subscribe to Time Updates
+```typescript
+// Real-time updates (1-second precision)
+const unsubscribe = timeService.subscribeToTimeUpdates(({ currentTime, currentDate, dateObject }) => {
   // currentTime: "14:30" (24-hour format)
   // currentDate: "January 20, 2024"
   // dateObject: Date object
@@ -51,12 +104,74 @@ const unsubscribe = dashboardContextService.subscribeToTimeUpdates(({ currentTim
 
 // Don't forget to cleanup!
 useEffect(() => {
-  const unsubscribe = dashboardContextService.subscribeToTimeUpdates(callback);
+  const unsubscribe = timeService.subscribeToTimeUpdates(callback);
   return unsubscribe;
 }, []);
 ```
 
-## Examples
+## Common Use Cases
+
+## Migration Examples
+
+### Cache Expiry Checks
+```typescript
+// ❌ OLD:
+if (Date.now() - this.lastFetchTime > this.CACHE_DURATION)
+
+// ✅ NEW:
+if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION)
+```
+
+### Date Arithmetic
+```typescript
+// ❌ OLD:
+const weekAgo = new Date();
+weekAgo.setDate(weekAgo.getDate() - 7);
+
+// ✅ NEW:
+const weekAgo = timeService.subtractDays(timeService.getCurrentDateTime(), 7);
+```
+
+### Start of Day
+```typescript
+// ❌ OLD:
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+// ✅ NEW:
+const today = timeService.startOfDay();
+```
+
+### Time Ago Formatting
+```typescript
+// ❌ OLD:
+const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+if (seconds < 60) return 'just now';
+// ... complex logic
+
+// ✅ NEW:
+const timeAgo = timeService.getTimeAgo(date);
+```
+
+### ISO Date Strings
+```typescript
+// ❌ OLD:
+const dateStr = new Date().toISOString().split('T')[0];
+
+// ✅ NEW:
+const dateStr = timeService.toISODateString();
+```
+
+### Date Validation
+```typescript
+// ❌ OLD:
+const date = new Date(dateString);
+if (!isNaN(date.getTime())) { /* valid */ }
+
+// ✅ NEW:
+const date = timeService.parseDate(dateString);
+if (date) { /* valid */ }
+```
 
 ### Creating Date-Based Keys
 ```typescript
@@ -64,7 +179,7 @@ useEffect(() => {
 const key = `stats-${new Date().toISOString().split('T')[0]}`;
 
 // ✅ DO this instead:
-const key = `stats-${dashboardContextService.getLocalDate()}`;
+const key = `stats-${timeService.getLocalDate()}`;
 ```
 
 ### Formatting Timestamps for Display
@@ -73,7 +188,7 @@ const key = `stats-${dashboardContextService.getLocalDate()}`;
 const formatted = new Date(timestamp).toLocaleString();
 
 // ✅ DO this instead:
-const formatted = dashboardContextService.formatDate(new Date(timestamp));
+const formatted = timeService.formatDate(new Date(timestamp));
 ```
 
 ### Working with Timezones

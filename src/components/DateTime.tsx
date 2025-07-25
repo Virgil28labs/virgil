@@ -1,5 +1,6 @@
 import { useState, useEffect, memo, useMemo } from 'react';
 import { TimezoneWidget } from './timezone';
+import { timeService } from '../services/TimeService';
 
 /**
  * DateTime Component
@@ -10,11 +11,11 @@ import { TimezoneWidget } from './timezone';
  * Memoized and optimized to prevent unnecessary parent re-renders
  */
 export const DateTime = memo(function DateTime() {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentTime, setCurrentTime] = useState<Date>(timeService.getCurrentDateTime());
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentTime(timeService.getCurrentDateTime());
     }, 1000);
 
     return () => clearInterval(timer);
@@ -22,20 +23,16 @@ export const DateTime = memo(function DateTime() {
 
   // Memoize formatters to prevent recreation on every render
   const formatters = useMemo(() => ({
-    time: (date: Date): string => date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }),
-    date: (date: Date): string => date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }),
-    day: (date: Date): string => date.toLocaleDateString('en-US', {
-      weekday: 'long',
-    }).toLowerCase(),
+    time: (date: Date): string => {
+      return timeService.formatTimeToLocal(date, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+    },
+    date: (_date: Date): string => timeService.formatDate(_date),
+    day: (_date: Date): string => timeService.getDayOfWeek(),
   }), []);
 
   return (

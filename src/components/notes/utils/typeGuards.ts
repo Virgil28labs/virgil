@@ -5,6 +5,7 @@
 
 import type { Entry, Task, TagType, ActionType } from '../types';
 import { NotesError, ErrorType } from '../types';
+import { timeService } from '../../../services/TimeService';
 
 /**
  * Checks if a value is a valid Entry
@@ -118,8 +119,7 @@ export function toValidDate(value: unknown): Date | null {
   }
   
   if (typeof value === 'string' || typeof value === 'number') {
-    const date = new Date(value);
-    return !isNaN(date.getTime()) ? date : null;
+    return timeService.parseDate(value.toString());
   }
   
   return null;

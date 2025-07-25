@@ -1,5 +1,7 @@
 // Common validation utilities
 
+import { timeService } from '../../services/TimeService';
+
 /**
  * Validate email address
  */
@@ -40,8 +42,7 @@ export function isValidZipCode(zip: string): boolean {
  * Validate date string
  */
 export function isValidDate(dateString: string): boolean {
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
+  return timeService.isValidDate(dateString);
 }
 
 /**

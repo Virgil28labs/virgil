@@ -3,6 +3,8 @@
  * Provides consistent logging across the application with environment awareness
  */
 
+import { timeService } from '../services/TimeService';
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogContext {
@@ -16,7 +18,7 @@ class Logger {
   private isTest = import.meta.env.MODE === 'test';
 
   private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
-    const timestamp = new Date().toISOString();
+    const timestamp = timeService.toISOString();
     const contextStr = context ? ` [${context.component || 'App'}${context.action ? `:${context.action}` : ''}]` : '';
     return `[${timestamp}] [${level.toUpperCase()}]${contextStr} ${message}`;
   }

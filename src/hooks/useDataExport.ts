@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import type { ChatMessage } from '../types/chat.types';
 import type { User } from '../types/auth.types';
 import { dashboardContextService } from '../services/DashboardContextService';
+import { timeService } from '../services/TimeService';
 
 interface UseDataExportProps {
   user: User | null;
@@ -16,7 +17,7 @@ export function useDataExport({ user, messages }: UseDataExportProps): UseDataEx
   const handleExportMessages = useCallback(() => {
     const now = dashboardContextService.getCurrentDateTime();
     const chatData = {
-      exportedAt: now.toISOString(),
+      exportedAt: timeService.toISOString(now),
       user: user?.user_metadata?.name || 'Unknown',
       messages: messages,
       totalMessages: messages.length,

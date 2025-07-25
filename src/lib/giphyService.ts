@@ -7,6 +7,7 @@ import type {
 } from '../types/giphy.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
+import { timeService } from '../services/TimeService';
 
 // Environment-configurable API settings
 const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
@@ -125,7 +126,7 @@ class GiphyService {
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -146,7 +147,7 @@ class GiphyService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: result,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return result;
@@ -166,7 +167,7 @@ class GiphyService {
     
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
       return cached.data;
     }
 
@@ -186,7 +187,7 @@ class GiphyService {
       // Cache the result
       this.cache.set(cacheKey, {
         data: result,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
       });
 
       return result;

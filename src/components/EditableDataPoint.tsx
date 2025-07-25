@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { timeService } from '../services/TimeService';
 
 interface EditableDataPointProps {
   icon: string
@@ -70,8 +71,8 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
         // Parse date string as local date by adding time component
         // This prevents timezone shifting when displaying dates
         const [year, month, day] = value.split('-').map(Number);
-        const date = new Date(year, month - 1, day); // month is 0-indexed
-        return date.toLocaleDateString('en-US', {
+        const date = timeService.createDate(year, month - 1, day); // month is 0-indexed
+        return timeService.formatDateToLocal(date, {
           month: 'short',
           day: 'numeric',
           year: 'numeric',

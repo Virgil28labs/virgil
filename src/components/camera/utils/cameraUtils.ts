@@ -1,4 +1,5 @@
 import type { CameraError, CameraSettings } from '../../../types/camera.types';
+import { timeService } from '../../../services/TimeService';
 
 export class CameraUtils {
   static async checkCameraPermission(): Promise<boolean> {
@@ -93,7 +94,7 @@ export class CameraUtils {
   }
 
   static generatePhotoId(): string {
-    return `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `photo_${timeService.getTimestamp()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   static compressImage(dataUrl: string, quality: number = 0.8): Promise<string> {
@@ -231,8 +232,8 @@ export class CameraUtils {
   }
 
   static formatTimestamp(timestamp: number): string {
-    const date = new Date(timestamp);
-    const now = new Date();
+    const date = timeService.fromTimestamp(timestamp);
+    const now = timeService.getCurrentDateTime();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
@@ -248,7 +249,7 @@ export class CameraUtils {
   }
 
   static generatePhotoName(timestamp: number): string {
-    const date = new Date(timestamp);
+    const date = timeService.fromTimestamp(timestamp);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');

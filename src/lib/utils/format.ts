@@ -1,5 +1,7 @@
 // Common formatting utilities
 
+import { timeService } from '../../services/TimeService';
+
 /**
  * Format a number with commas for thousands
  */
@@ -11,16 +13,16 @@ export function formatNumber(num: number): string {
  * Format a date to a readable string
  */
 export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString(undefined, options);
+  const dateObj = typeof date === 'string' ? timeService.parseDate(date) || timeService.getCurrentDateTime() : date;
+  return timeService.formatDateToLocal(dateObj, options);
 }
 
 /**
  * Format a time to a readable string
  */
 export function formatTime(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleTimeString(undefined, options);
+  const dateObj = typeof date === 'string' ? timeService.parseDate(date) || timeService.getCurrentDateTime() : date;
+  return timeService.formatTimeToLocal(dateObj, options);
 }
 
 /**

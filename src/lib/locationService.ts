@@ -5,6 +5,7 @@ import type {
   LocationData,
 } from '../types/location.types';
 import { retryWithBackoff } from './retryUtils';
+import { timeService } from '../services/TimeService';
 
 // ipwho.is API response type
 interface IpWhoResponse {
@@ -289,7 +290,7 @@ export const locationService = {
   async getQuickLocation(): Promise<LocationData> {
     // Fast IP-only location for immediate weather display
     const locationData: LocationData = {
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     try {
@@ -310,7 +311,7 @@ export const locationService = {
 
   async getFullLocationData(existingIpLocation?: IpLocation): Promise<LocationData> {
     const locationData: LocationData = {
-      timestamp: Date.now(),
+      timestamp: timeService.getTimestamp(),
     };
 
     // If we already have IP location, use it; otherwise fetch it

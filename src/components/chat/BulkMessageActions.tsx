@@ -1,7 +1,8 @@
-import React, { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import { toastService } from '../../services/ToastService';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { timeService } from '../../services/TimeService';
 import './chat-interface.css';
 
 interface BulkMessageActionsProps {
@@ -56,7 +57,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
     try {
       const now = dashboardContextService.getCurrentDateTime();
       const exportData = {
-        exportedAt: now.toISOString(),
+        exportedAt: timeService.toISOString(now),
         messageCount: selectedMessageData.length,
         messages: selectedMessageData.map(msg => ({
           id: msg.id,

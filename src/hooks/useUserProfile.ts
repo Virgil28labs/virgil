@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { timeService } from '../services/TimeService';
 
 export interface UserAddress {
   street: string
@@ -70,8 +71,8 @@ export const useUserProfile = () => {
     if (!fullName || !dob) return '';
     
     const firstName = fullName.split(' ')[0];
-    const date = new Date(dob);
-    if (isNaN(date.getTime())) return '';
+    const date = timeService.parseDate(dob);
+    if (!date) return '';
     
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -226,8 +227,8 @@ export const useUserProfile = () => {
       case 'dateOfBirth':
         // Validate date is not in the future
         if (sanitizedValue) {
-          const date = new Date(sanitizedValue);
-          if (date > new Date()) {
+          const date = timeService.parseDate(sanitizedValue);
+          if (date && date > timeService.getCurrentDateTime()) {
             errors.dateOfBirth = 'Date cannot be in the future';
           } else {
             delete errors.dateOfBirth;

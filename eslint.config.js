@@ -11,60 +11,6 @@ import react from 'eslint-plugin-react';
 export default [
   { ignores: ['dist', 'coverage', 'node_modules'] },
   js.configs.recommended,
-  // Server files (Node.js)
-  {
-    files: ['server/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: {
-        ...globals.node,
-        process: 'readonly',
-      },
-      sourceType: 'commonjs',
-    },
-    rules: {
-      // Airbnb-style rules for Node.js
-      'comma-dangle': ['error', 'always-multiline'],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always'],
-      'indent': ['error', 2],
-      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
-      'object-curly-spacing': ['error', 'always'],
-      'array-bracket-spacing': ['error', 'never'],
-      'space-before-function-paren': ['error', {
-        anonymous: 'always',
-        named: 'never',
-        asyncArrow: 'always',
-      }],
-      'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
-      'no-trailing-spaces': 'error',
-      'comma-spacing': ['error', { before: false, after: true }],
-      'key-spacing': ['error', { beforeColon: false, afterColon: true }],
-      'space-infix-ops': 'error',
-      'eol-last': ['error', 'always'],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      }],
-      'prefer-const': 'error',
-      'no-var': 'error',
-      'object-shorthand': ['error', 'always'],
-      'prefer-template': 'error',
-      'prefer-destructuring': ['error', { object: true, array: false }],
-      'no-param-reassign': ['error', { props: false }],
-      'arrow-body-style': ['error', 'as-needed'],
-      'arrow-parens': ['error', 'as-needed'],
-      'arrow-spacing': ['error', { before: true, after: true }],
-      'no-duplicate-imports': 'error',
-      // TimeService enforcement
-      'no-restricted-syntax': ['warn', {
-        selector: 'NewExpression[callee.name="Date"]',
-        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
-      }],
-    },
-  },
   // Script files (Node.js ESM)
   {
     files: ['scripts/**/*.js'],
@@ -194,10 +140,25 @@ export default [
       'import/prefer-default-export': 'off',
       'import/extensions': 'off',
       // TimeService enforcement
-      'no-restricted-syntax': ['warn', {
-        selector: 'NewExpression[callee.name="Date"]',
-        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
-      }],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'NewExpression[callee.name="Date"]',
+          message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.object.name="Date"][callee.property.name="now"]',
+          message: 'Use timeService.getTimestamp() instead of Date.now(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toISOString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.toISOString(date) instead of date.toISOString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getTime"]:not([callee.object.name="timeService"])',
+          message: 'Consider using timeService.getTimestamp() for current time or appropriate TimeService methods. See src/services/TimeService.md',
+        },
+      ],
     },
   },
   // Jest environment for test files
@@ -223,40 +184,6 @@ export default [
       globals: {
         ...globals.node,
       },
-    },
-  },
-  // Server TypeScript files
-  {
-    files: ['server/**/*.ts'],
-    languageOptions: {
-      parser: parser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: './server/tsconfig.json',
-      },
-      globals: {
-        ...globals.node,
-        process: 'readonly',
-        NodeJS: 'readonly',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
-    },
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      }],
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'comma-dangle': ['error', 'always-multiline'],
-      'quotes': ['error', 'single'],
-      'semi': ['error', 'always'],
-      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
     },
   },
   {
@@ -380,10 +307,126 @@ export default [
       'react/prop-types': 'off', // TypeScript handles this
       'import/prefer-default-export': 'off',
       // TimeService enforcement
-      'no-restricted-syntax': ['warn', {
-        selector: 'NewExpression[callee.name="Date"]',
-        message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'NewExpression[callee.name="Date"]',
+          message: 'Use TimeService (dashboardContextService or timeService) instead of direct new Date() usage. See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.object.name="Date"][callee.property.name="now"]',
+          message: 'Use timeService.getTimestamp() instead of Date.now(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="toISOString"]:not([callee.object.name="timeService"])',
+          message: 'Use timeService.toISOString(date) instead of date.toISOString(). See src/services/TimeService.md',
+        },
+        {
+          selector: 'CallExpression[callee.property.name="getTime"]:not([callee.object.name="timeService"])',
+          message: 'Consider using timeService.getTimestamp() for current time or appropriate TimeService methods. See src/services/TimeService.md',
+        },
+      ],
+    },
+  },
+  // Service Worker files - allow direct Date usage for cache management and performance monitoring
+  {
+    files: ['public/sw.js', '**/sw.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+    rules: {
+      'no-console': 'off', // Service workers need console for debugging
+      // Allow direct Date usage in service workers - legitimate for cache expiration and performance monitoring
+      'no-restricted-syntax': 'off',
+    },
+  },
+  // Server files (Node.js) - MUST come last to override previous configurations
+  {
+    files: ['server/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+      },
+      sourceType: 'commonjs',
+    },
+    rules: {
+      // Airbnb-style rules for Node.js
+      'comma-dangle': ['error', 'always-multiline'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+      'indent': ['error', 2],
+      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
+      'object-curly-spacing': ['error', 'always'],
+      'array-bracket-spacing': ['error', 'never'],
+      'space-before-function-paren': ['error', {
+        anonymous: 'always',
+        named: 'never',
+        asyncArrow: 'always',
       }],
+      'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0 }],
+      'no-trailing-spaces': 'error',
+      'comma-spacing': ['error', { before: false, after: true }],
+      'key-spacing': ['error', { beforeColon: false, afterColon: true }],
+      'space-infix-ops': 'error',
+      'eol-last': ['error', 'always'],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'object-shorthand': ['error', 'always'],
+      'prefer-template': 'error',
+      'prefer-destructuring': ['error', { object: true, array: false }],
+      'no-param-reassign': ['error', { props: false }],
+      'arrow-body-style': ['error', 'as-needed'],
+      'arrow-parens': ['error', 'as-needed'],
+      'arrow-spacing': ['error', { before: true, after: true }],
+      'no-duplicate-imports': 'error',
+      // Allow direct Date usage in server files - legitimate for Node.js performance monitoring, logging, cache expiration
+      'no-restricted-syntax': 'off',
+    },
+  },
+  // Server TypeScript files - MUST come last to override previous configurations
+  {
+    files: ['server/**/*.ts'],
+    languageOptions: {
+      parser: parser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: './server/tsconfig.json',
+      },
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+        NodeJS: 'readonly',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'comma-dangle': ['error', 'always-multiline'],
+      'quotes': ['error', 'single'],
+      'semi': ['error', 'always'],
+      'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
+      // Allow direct Date usage in server files - legitimate for Node.js performance monitoring, logging, cache expiration
+      'no-restricted-syntax': 'off',
     },
   },
 ];
