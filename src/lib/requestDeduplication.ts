@@ -1,5 +1,7 @@
 // Optimized request deduplication utility to prevent duplicate API calls
 
+import { timeService } from '../services/TimeService';
+
 interface PendingRequest {
   promise: Promise<any>;
   timestamp: number;
@@ -36,7 +38,7 @@ class RequestDeduplicator {
    */
   async dedupeFetch(url: string, options?: RequestInit): Promise<Response> {
     const key = this.createHash(url, options);
-    const now = Date.now();
+    const now = timeService.getTimestamp();
 
     // Periodic cleanup instead of every request
     if (now - this.lastCleanup > this.cleanupInterval) {

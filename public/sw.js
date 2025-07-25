@@ -126,6 +126,6 @@ self.addEventListener('sync', (event) => {
 
 async function handleBackgroundSync() {
   // Handle offline actions when back online
-  /* eslint-disable-next-line no-console */
+   
   console.log('Background sync triggered');
 }

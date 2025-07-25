@@ -454,9 +454,9 @@ class NasaApodService {
   private getRandomHistoricalDate(): string {
     const firstDate = timeService.parseDate(FIRST_APOD_DATE) || timeService.getCurrentDateTime();
     const today = timeService.getCurrentDateTime();
-    const timeDiff = today.getTime() - firstDate.getTime();
+    const timeDiff = today.getTime() - firstDate.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: calculating time difference
     const randomTime = Math.random() * timeDiff;
-    const randomDate = timeService.fromTimestamp(firstDate.getTime() + randomTime);
+    const randomDate = timeService.fromTimestamp(firstDate.getTime() + randomTime); // eslint-disable-line no-restricted-syntax -- Valid use: calculating timestamp
     
     return timeService.toISODateString(randomDate);
   }

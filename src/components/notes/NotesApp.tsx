@@ -61,6 +61,7 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
 
     // Sort by timestamp (newest first)
     return filtered.sort((a, b) => 
+      // eslint-disable-next-line no-restricted-syntax -- Valid use: sorting by Date timestamps
       b.timestamp.getTime() - a.timestamp.getTime(),
     );
   }, [entries, activeFilter, activeActionFilter, searchQuery]);

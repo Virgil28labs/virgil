@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 import { registerServiceWorker, unregisterServiceWorker, setupNetworkMonitoring, cacheRequest, getCachedResponse } from './serviceWorker';
 import type { ServiceWorkerConfig } from './serviceWorker';
 
@@ -95,10 +95,10 @@ describe('ServiceWorker', () => {
     });
 
     // Mock console
-    /* eslint-disable no-console */
+     
     console.log = jest.fn();
     console.error = jest.fn();
-    /* eslint-enable no-console */
+     
 
     // Mock caches
     Object.defineProperty(global, 'caches', {
@@ -143,10 +143,10 @@ describe('ServiceWorker', () => {
       configurable: true,
     });
     global.fetch = originalFetch;
-    /* eslint-disable no-console */
+     
     console.log = originalConsole.log;
     console.error = originalConsole.error;
-    /* eslint-enable no-console */
+     
   });
 
   describe('registerServiceWorker', () => {

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { dedupeFetch } from '../../../lib/requestDeduplication';
+import { timeService } from '../../../services/TimeService';
 
 // Environment-configurable API endpoints
 const DOG_API = import.meta.env.VITE_DOG_API_URL || 'https://dog.ceo/api';
@@ -74,7 +75,7 @@ export const useDogApi = () => {
       const newDogs: DogImage[] = urls.map((url: string, index: number) => ({
         url,
         breed: breed || extractBreedFromUrl(url),
-        id: `${Date.now()}-${index}`,
+        id: `${timeService.getTimestamp()}-${index}`,
       }));
       
       setDogs(newDogs);

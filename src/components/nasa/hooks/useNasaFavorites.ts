@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
 import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
+import { timeService } from '../../../services/TimeService';
 
 // Simplified APOD for storage (reduce localStorage usage)
 interface StoredApod {
@@ -24,7 +25,7 @@ const apodToStored = (apod: ApodImage): StoredApod => ({
   mediaType: apod.mediaType,
   explanation: apod.explanation,
   copyright: apod.copyright,
-  savedAt: Date.now(),
+  savedAt: timeService.getTimestamp(),
 });
 
 const storedToApod = (stored: StoredApod): ApodImage => ({

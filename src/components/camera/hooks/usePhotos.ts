@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { SavedPhoto } from '../../../types/camera.types';
 import { PhotoStorage } from '../utils/photoStorage';
 import { CameraUtils } from '../utils/cameraUtils';
+import { timeService } from '../../../services/TimeService';
 
 export const usePhotos = () => {
   const [photos, setPhotos] = useState<SavedPhoto[]>([]);
@@ -34,7 +35,7 @@ export const usePhotos = () => {
       
       const photo = await PhotoStorage.savePhoto({
         dataUrl,
-        timestamp: Date.now(),
+        timestamp: timeService.getTimestamp(),
         isFavorite: false,
         name,
       });

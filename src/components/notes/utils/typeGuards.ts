@@ -114,7 +114,7 @@ export function toValidatedArray<T>(
  * Ensures a value is a valid Date
  */
 export function toValidDate(value: unknown): Date | null {
-  if (value instanceof Date && !isNaN(value.getTime())) {
+  if (value instanceof Date && !isNaN(value.getTime())) { // eslint-disable-line no-restricted-syntax -- Valid use: checking if Date is valid
     return value;
   }
   

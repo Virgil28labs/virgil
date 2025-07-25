@@ -5,6 +5,8 @@
  * City-first approach for better user experience.
  */
 
+import { timeService } from '../../services/TimeService';
+
 export interface TimezoneInfo {
   timezone: string
   city: string
@@ -313,7 +315,7 @@ export function getTimezoneInfo(timezone: string): TimezoneInfo | undefined {
  * Generate unique ID for selected timezone
  */
 export function generateTimezoneId(): string {
-  return `timezone_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `timezone_${timeService.getTimestamp()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**

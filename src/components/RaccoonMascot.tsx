@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useLocation } from '../contexts/LocationContext';
+import { timeService } from '../services/TimeService';
 
 // Type definitions for the component
 interface Position {
@@ -84,7 +85,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    * Resets the sleep timer and records activity
    */
   const resetSleepTimer = useCallback(() => {
-    lastActivityTime.current = Date.now();
+    lastActivityTime.current = timeService.getTimestamp();
     
     // Clear existing sleep timer
     if (sleepTimer.current) {
@@ -175,7 +176,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   // Sleeping Animation State
   const [isSleeping, setIsSleeping] = useState<boolean>(false);
   const [sleepingEmojis, setSleepingEmojis] = useState<Array<{ id: number; delay: number }>>([]);
-  const lastActivityTime = useRef<number>(Date.now());
+  const lastActivityTime = useRef<number>(timeService.getTimestamp());
   const sleepTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sleepEmojiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEmojiCounter = useRef<number>(0);
@@ -251,7 +252,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    * Optimized with caching and memoization
    */
   const detectUIElements = useCallback((): UIElement[] => {
-    const now = Date.now();
+    const now = timeService.getTimestamp();
     const currentHash = createDOMHash();
     const cache = uiElementsCache.current;
 

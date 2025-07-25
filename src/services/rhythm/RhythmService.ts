@@ -136,7 +136,7 @@ export class RhythmService {
       description,
       barLength,
       style,
-      generated: timeService.getCurrentDateTime().toISOString(),
+      generated: timeService.toISOString(timeService.getCurrentDateTime()),
       fallback: true,
     };
   }

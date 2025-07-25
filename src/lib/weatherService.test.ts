@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 import { weatherService } from './weatherService';
 import { dedupeFetch } from './requestDeduplication';
 import type { WeatherData } from '../types/weather.types';

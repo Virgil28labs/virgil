@@ -29,6 +29,8 @@ export default [
       'indent': ['error', 2],
       'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
       'no-console': 'off', // Scripts can use console
+      // Allow direct Date usage in scripts - legitimate for benchmarking and monitoring
+      'no-restricted-syntax': 'off',
     },
   },
   {
@@ -159,22 +161,6 @@ export default [
           message: 'Consider using timeService.getTimestamp() for current time or appropriate TimeService methods. See src/services/TimeService.md',
         },
       ],
-    },
-  },
-  // Jest environment for test files
-  {
-    files: ['**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}', '**/jest.setup.ts', '**/test-utils.tsx', '**/__mocks__/**/*.{js,jsx,ts,tsx}'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.jest,
-      },
-    },
-    rules: {
-      'no-console': 'off',
-      'import/no-extraneous-dependencies': 'off',
-      // Allow direct Date usage in tests
-      'no-restricted-syntax': 'off',
     },
   },
   // Node.js environment for CommonJS files
@@ -342,6 +328,14 @@ export default [
       'no-restricted-syntax': 'off',
     },
   },
+  // TimeService.ts - Allow direct Date usage in the centralized time management service
+  {
+    files: ['src/services/TimeService.ts'],
+    rules: {
+      // Allow direct Date usage in TimeService - it's the centralized time management service
+      'no-restricted-syntax': 'off',
+    },
+  },
   // Server files (Node.js) - MUST come last to override previous configurations
   {
     files: ['server/**/*.js'],
@@ -426,6 +420,22 @@ export default [
       'semi': ['error', 'always'],
       'max-len': ['error', { code: 100, ignoreUrls: true, ignoreStrings: true }],
       // Allow direct Date usage in server files - legitimate for Node.js performance monitoring, logging, cache expiration
+      'no-restricted-syntax': 'off',
+    },
+  },
+  // Jest environment for test files - MUST come last to override ALL previous configurations
+  {
+    files: ['**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}', '**/jest.setup.ts', '**/test-utils.tsx', '**/__mocks__/**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+      'import/no-extraneous-dependencies': 'off',
+      // Allow direct Date usage in tests - legitimate for mocking and time control
       'no-restricted-syntax': 'off',
     },
   },

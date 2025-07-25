@@ -486,7 +486,7 @@ export class DashboardContextService {
       if (ctx.user.profile?.dateOfBirth) {
         const birthDate = timeService.parseDate(ctx.user.profile.dateOfBirth);
         if (birthDate) {
-          const age = Math.floor((this.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+          const age = Math.floor((this.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)); // eslint-disable-line no-restricted-syntax -- Valid use: calculating age from birthDate
           contextParts.push(`- Age: ${age} years old (born ${this.formatDateToLocal(birthDate)})`);
         }
       }

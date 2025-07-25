@@ -319,7 +319,7 @@ export class DynamicContextBuilder {
     if (user.profile?.dateOfBirth) {
       const birthDate = timeService.parseDate(user.profile.dateOfBirth);
       if (birthDate) {
-        const age = Math.floor((timeService.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+        const age = Math.floor((timeService.getTimestamp() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)); // eslint-disable-line no-restricted-syntax -- Valid use: calculating age from birthDate
         userContext += `\nAge: ${age} years old`;
       }
     }
