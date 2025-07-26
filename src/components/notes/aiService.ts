@@ -9,6 +9,7 @@ import { LLMService } from '../../services/llm';
 import { detectTags, detectActionType, validateTags, validateActionType } from './utils/tagPatterns';
 import { extractFallbackTasks } from './utils/taskUtils';
 import { AI_CONFIG, TAG_DESCRIPTIONS, ACTION_DESCRIPTIONS } from './constants';
+import { logger } from '../../lib/logger';
 
 const llmService = new LLMService();
 
@@ -87,7 +88,10 @@ export async function processEntryWithAI(content: string): Promise<AIResponse | 
   }
 
   // Log the error but don't throw - use fallback instead
-  console.error('AI processing failed after retries:', lastError);
+  logger.error('AI processing failed after retries', lastError as Error, {
+    component: 'aiService',
+    action: 'processEntryWithAI',
+  });
   
   // Return fallback response
   return {

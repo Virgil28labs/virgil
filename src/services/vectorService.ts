@@ -1,3 +1,5 @@
+import { logger } from '../lib/logger';
+
 interface VectorSearchResult {
   id: string;
   content: string;
@@ -29,7 +31,10 @@ class VectorService {
       const data = await response.json();
       return data.id;
     } catch (error) {
-      console.error('Vector store error:', error);
+      logger.error('Vector store error', error as Error, {
+        component: 'VectorService',
+        action: 'store',
+      });
       throw error;
     }
   }
@@ -52,7 +57,10 @@ class VectorService {
       const data = await response.json();
       return data.results || [];
     } catch (error) {
-      console.error('Vector search error:', error);
+      logger.error('Vector search error', error as Error, {
+        component: 'VectorService',
+        action: 'search',
+      });
       throw error;
     }
   }
@@ -63,7 +71,10 @@ class VectorService {
       const data = await response.json();
       return data.healthy || false;
     } catch (error) {
-      console.error('Vector health check error:', error);
+      logger.error('Vector health check error', error as Error, {
+        component: 'VectorService',
+        action: 'isHealthy',
+      });
       return false;
     }
   }
@@ -74,7 +85,10 @@ class VectorService {
       const data = await response.json();
       return data.count || 0;
     } catch (error) {
-      console.error('Vector count error:', error);
+      logger.error('Vector count error', error as Error, {
+        component: 'VectorService',
+        action: 'getCount',
+      });
       return 0;
     }
   }

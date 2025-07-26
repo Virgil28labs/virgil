@@ -82,8 +82,8 @@ const relative = timeService.getRelativeTime(date);    // "in 3 days" or "2 hour
 ### ISO String Helpers
 ```typescript
 // ISO format conversions
-const iso = timeService.toISOString(date);             // "2024-01-20T14:30:00.000Z"
-const isoDate = timeService.toISODateString(date);     // "2024-01-20" (UTC)
+const iso = timeService.toISOString(date);             // "2024-01-20T14:30:00.000Z" (UTC)
+const isoDate = timeService.toISODateString(date);     // "2024-01-20" (local timezone)
 ```
 
 ### Form Input Helpers

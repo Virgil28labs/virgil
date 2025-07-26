@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
+import { useContext, useReducer, useEffect, useCallback, useMemo, createContext } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
@@ -11,7 +11,8 @@ import type {
   WeatherData,
   ForecastData, 
 } from '../types/weather.types';
-import { WeatherContext } from './WeatherContextTypes';
+
+export const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 
 /**
  * WeatherContext - Weather Data State Management

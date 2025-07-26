@@ -8,6 +8,7 @@ import type {
   GridConfig, 
   DrawingConfig, 
 } from './types';
+import { logger } from '../../lib/logger';
 
 // Game configuration constants
 const EVALUATION_CONFIG: CircleEvaluationParams = {
@@ -48,7 +49,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       const saved = localStorage.getItem('perfectCircleBestScore');
       return saved ? parseInt(saved, 10) : 0;
     } catch (error) {
-      console.warn('Failed to load best score from localStorage:', error);
+      logger.error('Failed to load best score from localStorage', error as Error, {
+        component: 'DrawPerfectCircle',
+        action: 'loadBestScore',
+      });
       return 0;
     }
   });
@@ -57,7 +61,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       const saved = localStorage.getItem('perfectCircleAttempts');
       return saved ? parseInt(saved, 10) : 0;
     } catch (error) {
-      console.warn('Failed to load attempts from localStorage:', error);
+      logger.error('Failed to load attempts from localStorage', error as Error, {
+        component: 'DrawPerfectCircle',
+        action: 'loadAttempts',
+      });
       return 0;
     }
   });
@@ -325,7 +332,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     try {
       localStorage.setItem('perfectCircleAttempts', newAttempts.toString());
     } catch (error) {
-      console.warn('Failed to save attempts to localStorage:', error);
+      logger.error('Failed to save attempts to localStorage', error as Error, {
+        component: 'DrawPerfectCircle',
+        action: 'saveAttempts',
+      });
     }
     
     if (evaluation.score > bestScore) {
@@ -333,7 +343,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       try {
         localStorage.setItem('perfectCircleBestScore', evaluation.score.toString());
       } catch (error) {
-        console.warn('Failed to save best score to localStorage:', error);
+        logger.error('Failed to save best score to localStorage', error as Error, {
+          component: 'DrawPerfectCircle',
+          action: 'saveBestScore',
+        });
       }
     }
   }, [isDrawing, result, points, evaluateCircle, attempts, bestScore]);

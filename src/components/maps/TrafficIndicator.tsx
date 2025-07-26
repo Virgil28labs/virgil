@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { timeService } from '../../services/TimeService';
 import './maps.css';
 
@@ -10,11 +10,11 @@ interface TrafficIndicatorProps {
 
 type TrafficLevel = 'light' | 'moderate' | 'heavy' | 'unknown'
 
-export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
+export const TrafficIndicator = memo(function TrafficIndicator({
   map,
   isTrafficEnabled,
   onToggleTraffic,
-}) => {
+}: TrafficIndicatorProps) {
   const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>('unknown');
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -145,4 +145,4 @@ export const TrafficIndicator: React.FC<TrafficIndicatorProps> = ({
       <span className="traffic-label">{getTrafficLabel()}</span>
     </button>
   );
-};
+});

@@ -7,6 +7,7 @@ import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { EditableDataPoint } from './EditableDataPoint';
 import { SelectDataPoint } from './SelectDataPoint';
+import { logger } from '../lib/logger';
 
 interface UserProfileViewerProps {
   isOpen: boolean;
@@ -84,7 +85,10 @@ export const UserProfileViewer = memo(function UserProfileViewer({
     setIsSigningOut(true);
     const { error } = await signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error', error as Error, {
+        component: 'UserProfileViewer',
+        action: 'signOut',
+      });
     }
     setIsSigningOut(false);
   }, [signOut, isSigningOut]);

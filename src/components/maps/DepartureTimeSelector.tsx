@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect , memo } from 'react';
 import './maps.css';
 import { timeService } from '../../services/TimeService';
 
@@ -8,11 +8,11 @@ interface DepartureTimeSelectorProps {
   isCompact?: boolean
 }
 
-export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
+export const DepartureTimeSelector = memo(function DepartureTimeSelector({
   selectedTime,
   onTimeChange,
   isCompact = false,
-}) => {
+}: DepartureTimeSelectorProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,7 +68,9 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
     if (daysOffset !== 0) {
       newTime = timeService.addDays(newTime, daysOffset);
     }
-    newTime.setHours(hour, 0, 0, 0);
+    // Use TimeService methods instead of direct manipulation
+    newTime = timeService.startOfDay(newTime);
+    newTime = timeService.addHours(newTime, hour);
     onTimeChange(newTime);
     setShowDropdown(false);
   };
@@ -92,12 +94,12 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
   // Get min/max date strings for the picker
   const getMinDateTimeString = () => {
     const minDate = timeService.addYears(timeService.getCurrentDateTime(), -1); // Allow up to 1 year in the past
-    return timeService.toISOString(minDate).slice(0, 16);
+    return timeService.formatForDateTimeInput(minDate);
   };
   
   const getMaxDateTimeString = () => {
     const maxDate = timeService.addYears(timeService.getCurrentDateTime(), 1); // Allow up to 1 year in the future
-    return timeService.toISOString(maxDate).slice(0, 16);
+    return timeService.formatForDateTimeInput(maxDate);
   };
   
   return (
@@ -169,4 +171,4 @@ export const DepartureTimeSelector: React.FC<DepartureTimeSelectorProps> = ({
       )}
     </div>
   );
-};
+});

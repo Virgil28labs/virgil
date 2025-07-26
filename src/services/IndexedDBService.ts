@@ -9,6 +9,8 @@
  * - Cross-database transactions
  */
 
+import { logger } from '../lib/logger';
+
 interface DBConfig {
   name: string;
   version: number;
@@ -85,6 +87,11 @@ export class IndexedDBService {
       this.pendingConnections.delete(dbName);
       return db;
     } catch (error) {
+      logger.error('Failed to get database connection', error as Error, {
+        component: 'IndexedDBService',
+        action: 'getDatabase',
+        metadata: { dbName },
+      });
       this.pendingConnections.delete(dbName);
       throw error;
     }
@@ -162,6 +169,11 @@ export class IndexedDBService {
         };
       } catch (error) {
         if (attempt === retries) {
+          logger.error('Operation failed after all retries', error as Error, {
+            component: 'IndexedDBService',
+            action: 'executeWithRetry',
+            metadata: { attempt, retries },
+          });
           return {
             success: false,
             error: error instanceof Error ? error : new Error(String(error)),
@@ -362,6 +374,10 @@ export class IndexedDBService {
       const estimate = await navigator.storage.estimate();
       return { success: true, data: estimate };
     } catch (error) {
+      logger.error('Failed to get storage estimate', error as Error, {
+        component: 'IndexedDBService',
+        action: 'getStorageEstimate',
+      });
       return {
         success: false,
         error: error instanceof Error ? error : new Error('Failed to get storage estimate'),

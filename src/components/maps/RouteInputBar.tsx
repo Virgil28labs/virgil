@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
 import './maps.css';
 import { logger } from '../../lib/logger';
 import { useGooglePlacesAutocomplete, type PlaceSuggestion } from '../../hooks/useGooglePlacesAutocomplete';
@@ -14,7 +14,7 @@ interface RouteInputBarProps {
   onClearRoute?: () => void
 }
 
-export const RouteInputBar: React.FC<RouteInputBarProps> = ({
+export const RouteInputBar = memo(function RouteInputBar({
   currentLocation,
   currentAddress,
   onRouteRequest,
@@ -22,7 +22,7 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
   onDestinationSelect,
   hasRoute = false,
   onClearRoute,
-}) => {
+}: RouteInputBarProps) {
   // Memoize last destination to avoid localStorage calls on every render
   const initialDestination = useMemo(() => {
     try {
@@ -295,4 +295,4 @@ export const RouteInputBar: React.FC<RouteInputBarProps> = ({
       <div className="route-connection-line" />
     </div>
   );
-};
+});

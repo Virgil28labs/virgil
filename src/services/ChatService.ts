@@ -9,6 +9,7 @@ import { dedupeFetch } from '../lib/requestDeduplication';
 import { dashboardAppService } from './DashboardAppService';
 import { dashboardContextService } from './DashboardContextService';
 import { timeService } from './TimeService';
+import { logger } from '../lib/logger';
 
 export interface ChatApiRequest {
   model: string;
@@ -100,6 +101,11 @@ export class ChatService {
 
       return this.createAssistantMessage(data.message.content);
     } catch (error) {
+      logger.error('Failed to send chat message', error as Error, { 
+        component: 'ChatService', 
+        action: 'sendMessage',
+        metadata: { model, messageLength: userMessage.length },
+      });
       // Re-throw with a user-friendly message
       if (error instanceof Error) {
         throw error;

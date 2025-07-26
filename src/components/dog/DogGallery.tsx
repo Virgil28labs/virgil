@@ -4,7 +4,7 @@ import { useDogGallery } from './hooks/useDogGallery';
 import { DogGalleryTabs } from './DogGalleryTabs';
 import { DogGalleryContent } from './DogGalleryContent';
 import { ImageModal } from './ImageModal';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import type { DogGalleryProps } from '../../types';
 import './DogGallery.css';
 
@@ -23,11 +23,23 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
   const displayDogs = state.activeTab === 'fetch' ? dogs : favorites;
 
   // Keyboard shortcuts
-  useKeyboardShortcuts({
-    'Escape': state.selectedImageIndex !== null ? () => setSelectedImageIndex(null) : onClose,
-    'f': () => setActiveTab('fetch'),
-    'g': () => setActiveTab('gallery'),
-  }, isOpen);
+  useKeyboardShortcuts([
+    {
+      key: 'Escape',
+      handler: state.selectedImageIndex !== null ? () => setSelectedImageIndex(null) : onClose,
+      description: state.selectedImageIndex !== null ? 'Close image' : 'Close gallery',
+    },
+    {
+      key: 'f',
+      handler: () => setActiveTab('fetch'),
+      description: 'Go to fetch tab',
+    },
+    {
+      key: 'g', 
+      handler: () => setActiveTab('gallery'),
+      description: 'Go to gallery tab',
+    },
+  ], { enabled: isOpen });
 
   if (!isOpen) return null;
 

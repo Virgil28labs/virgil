@@ -3,6 +3,8 @@
  * Script loader and helper functions for Google Maps integration
  */
 
+import { logger } from '../lib/logger';
+
 let googleMapsPromise: Promise<typeof google> | null = null;
 
 export interface LoadGoogleMapsOptions {
@@ -82,6 +84,10 @@ export async function loadGoogleMaps(options: LoadGoogleMapsOptions): Promise<ty
       document.head.appendChild(script);
     } catch (error) {
       googleMapsPromise = null;
+      logger.error('Failed to load Google Maps script', error as Error, {
+        component: 'googleMaps',
+        action: 'loadGoogleMaps',
+      });
       reject(error);
     }
   });

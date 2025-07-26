@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 
 interface SelectDataPointProps {
   icon: string
@@ -11,7 +11,7 @@ interface SelectDataPointProps {
   className?: string
 }
 
-export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
+export const SelectDataPoint = memo(function SelectDataPoint({
   icon,
   label,
   value,
@@ -20,7 +20,7 @@ export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
   allowCustom = true,
   placeholder = 'Not set',
   className = '',
-}) => {
+}: SelectDataPointProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customValue, setCustomValue] = useState('');
@@ -160,4 +160,4 @@ export const SelectDataPoint: React.FC<SelectDataPointProps> = ({
       )}
     </div>
   );
-};
+});

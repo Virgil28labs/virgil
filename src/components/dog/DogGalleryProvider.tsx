@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { useReducer, useCallback, useEffect, memo } from 'react';
+import { useReducer, useCallback, useEffect, memo, createContext } from 'react';
 import { useDogApi } from './hooks/useDogApi';
 import { useDogFavorites } from './hooks/useDogFavorites';
 import type { DogGalleryContextType, DogGalleryState, TabType } from '../../types';
-import { DogGalleryContext } from './DogGalleryContextTypes';
+
+export const DogGalleryContext = createContext<DogGalleryContextType | undefined>(undefined);
 
 // Action types for the reducer
 type DogGalleryAction =

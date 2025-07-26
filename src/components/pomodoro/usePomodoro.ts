@@ -1,4 +1,5 @@
 import { useReducer, useEffect, useRef, useCallback } from 'react';
+import { logger } from '../../lib/logger';
 
 // State types
 interface TimerState {
@@ -95,7 +96,10 @@ export function usePomodoro(defaultMinutes: number = 25) {
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + duration / 1000);
     } catch (error) {
-      console.error('Error playing sound:', error);
+      logger.error('Error playing sound', error as Error, {
+        component: 'usePomodoro',
+        action: 'playSound',
+      });
     }
   }, [state.soundEnabled]);
 

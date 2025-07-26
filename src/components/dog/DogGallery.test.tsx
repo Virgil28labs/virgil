@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { DogGallery } from './DogGallery';
 import { useDogApi } from './hooks/useDogApi';
 import { useDogFavorites } from './hooks/useDogFavorites';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import type { DogImage } from './hooks/useDogApi';
 
 // Mock hooks
 jest.mock('./hooks/useDogApi');
 jest.mock('./hooks/useDogFavorites');
-jest.mock('./hooks/useKeyboardShortcuts');
+jest.mock('../../hooks/useKeyboardShortcuts');
 
 // Mock components
 jest.mock('./FetchControls', () => ({
@@ -369,12 +369,21 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={jest.fn()} />);
 
       expect(mockUseKeyboardShortcuts).toHaveBeenCalledWith(
-        expect.objectContaining({
-          'Escape': expect.any(Function),
-          'f': expect.any(Function),
-          'g': expect.any(Function),
-        }),
-        true,
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: 'Escape',
+            handler: expect.any(Function),
+          }),
+          expect.objectContaining({
+            key: 'f',
+            handler: expect.any(Function),
+          }),
+          expect.objectContaining({
+            key: 'g',
+            handler: expect.any(Function),
+          }),
+        ]),
+        expect.objectContaining({ enabled: true }),
       );
     });
 
@@ -383,7 +392,8 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={onClose} />);
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0];
-      shortcuts['Escape']?.();
+      const escapeShortcut = shortcuts.find((s: any) => s.key === 'Escape');
+      escapeShortcut?.handler();
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -398,7 +408,8 @@ describe('DogGallery', () => {
       
       // Use f shortcut
       act(() => {
-        shortcuts['f']?.();
+        const fShortcut = shortcuts.find((s: any) => s.key === 'f');
+        fShortcut?.handler();
       });
 
       // Should be back on fetch tab
@@ -410,7 +421,8 @@ describe('DogGallery', () => {
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0];
       act(() => {
-        shortcuts['g']?.();
+        const gShortcut = shortcuts.find((s: any) => s.key === 'g');
+        gShortcut?.handler();
       });
 
       expect(screen.getByRole('tab', { name: /Favorites/i })).toHaveClass('doggo-sanctuary-tab active');

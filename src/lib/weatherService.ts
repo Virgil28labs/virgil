@@ -2,6 +2,7 @@ import type { WeatherData, ForecastData } from '../types/weather.types';
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 import { timeService } from '../services/TimeService';
+import { logger } from './logger';
 
 const BACKEND_API_BASE = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -74,7 +75,12 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch weather data by coordinates', error as Error, {
+        component: 'WeatherService',
+        action: 'getWeatherByCoordinates',
+        metadata: { lat, lon },
+      });
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -126,7 +132,12 @@ class WeatherService {
       });
 
       return weatherData;
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch weather data by city', error as Error, {
+        component: 'WeatherService',
+        action: 'getWeatherByCity',
+        metadata: { city, country },
+      });
       throw new Error('Failed to fetch weather data');
     }
   }
@@ -194,7 +205,12 @@ class WeatherService {
       });
 
       return forecastData;
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch forecast data by coordinates', error as Error, {
+        component: 'WeatherService',
+        action: 'getForecastByCoordinates',
+        metadata: { lat, lon },
+      });
       throw new Error('Failed to fetch forecast data');
     }
   }
@@ -246,7 +262,12 @@ class WeatherService {
       });
 
       return forecastData;
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch forecast data by city', error as Error, {
+        component: 'WeatherService',
+        action: 'getForecastByCity',
+        metadata: { city, country },
+      });
       throw new Error('Failed to fetch forecast data');
     }
   }

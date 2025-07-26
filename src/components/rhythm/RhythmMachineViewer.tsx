@@ -1,8 +1,9 @@
 import { memo, useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import './RhythmMachineViewer.css';
-import { rhythmService } from '../../services/rhythm';
-import type { RhythmPattern } from '../../services/rhythm';
+import { rhythmService } from '../../services/rhythm/RhythmService';
+import type { RhythmPattern } from '../../services/rhythm/RhythmService';
 import { timeService } from '../../services/TimeService';
+import { logger } from '../../lib/logger';
 import { 
   DRUM_SOUNDS, 
   GENRE_TAGS, 
@@ -108,7 +109,10 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         setAudioInitialized(true);
         // Audio initialization successful
       } catch (error) {
-        console.error('Failed to initialize audio context:', error);
+        logger.error('Failed to initialize audio context', error as Error, {
+          component: 'RhythmMachineViewer',
+          action: 'initializeAudio',
+        });
         setAudioInitialized(false);
       }
     }
@@ -225,7 +229,11 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       }
       
     } catch (error) {
-      console.error(`Failed to create ${sound.name} sound:`, error);
+      logger.error(`Failed to create ${sound.name} sound`, error as Error, {
+        component: 'RhythmMachineViewer',
+        action: 'createDrumSound',
+        drumType: sound.name,
+      });
     }
   }, [handleUserInteraction]);
 
@@ -333,7 +341,11 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       }
       
     } catch (error) {
-      console.error('Pattern generation failed:', error);
+      logger.error('Pattern generation failed', error as Error, {
+        component: 'RhythmMachineViewer',
+        action: 'generateAIPattern',
+        description: genreInput.trim() || 'random',
+      });
       
       // Fallback pattern generation is handled by the backend
     } finally {

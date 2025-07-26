@@ -9,6 +9,8 @@
  * - Migration utilities
  */
 
+import { logger } from '../lib/logger';
+
 export class StorageService {
   /**
    * Gets a value from localStorage with automatic JSON parsing
@@ -30,7 +32,7 @@ export class StorageService {
         return item as unknown as T;
       }
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      logger.error(`Error reading localStorage key "${key}"`, error as Error, { component: 'StorageService', action: 'get' });
       return defaultValue;
     }
   }
@@ -43,7 +45,7 @@ export class StorageService {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
+      logger.error(`Error setting localStorage key "${key}"`, error as Error, { component: 'StorageService', action: 'set' });
     }
   }
 
@@ -54,7 +56,7 @@ export class StorageService {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error);
+      logger.error(`Error removing localStorage key "${key}"`, error as Error, { component: 'StorageService', action: 'remove' });
     }
   }
 
@@ -76,7 +78,7 @@ export class StorageService {
     try {
       localStorage.clear();
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
+      logger.error('Error clearing localStorage', error as Error, { component: 'StorageService', action: 'clear' });
     }
   }
 
@@ -114,7 +116,7 @@ export class StorageService {
         return value;
       }
     } catch (error) {
-      console.error(`Error migrating localStorage key "${key}":`, error);
+      logger.error(`Error migrating localStorage key "${key}"`, error as Error, { component: 'StorageService', action: 'migrate' });
       return defaultValue;
     }
   }

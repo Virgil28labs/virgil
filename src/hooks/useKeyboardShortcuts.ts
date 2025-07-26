@@ -1,179 +1,150 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 
-interface KeyboardShortcut {
-  key: string;
-  ctrlKey?: boolean;
-  shiftKey?: boolean;
-  altKey?: boolean;
-  metaKey?: boolean;
-  action: () => void;
-  description: string;
-  preventDefault?: boolean;
+interface Shortcut {
+  /** Key to listen for */
+  key: string
+  /** Required modifier keys */
+  modifiers?: ('ctrl' | 'cmd' | 'alt' | 'shift')[]
+  /** Handler function */
+  handler: () => void
+  /** Whether to prevent default behavior */
+  preventDefault?: boolean
+  /** Description for documentation */
+  description?: string
+  /** Scope for the shortcut */
+  scope?: 'global' | 'input' | 'modal'
 }
 
 interface UseKeyboardShortcutsOptions {
-  shortcuts: KeyboardShortcut[];
-  enabled?: boolean;
-  scope?: 'global' | 'input' | 'modal';
+  /** Whether shortcuts are enabled */
+  enabled?: boolean
+  /** Element to attach listeners to */
+  target?: HTMLElement | null
+  /** Default scope for all shortcuts */
+  defaultScope?: 'global' | 'input' | 'modal'
 }
 
 /**
- * Hook for managing keyboard shortcuts with accessibility support
+ * Hook for managing keyboard shortcuts
+ * Handles cross-platform modifier keys and prevents conflicts
  */
-export function useKeyboardShortcuts({
-  shortcuts,
-  enabled = true,
-  scope = 'global',
-}: UseKeyboardShortcutsOptions) {
+export function useKeyboardShortcuts(
+  shortcuts: Shortcut[],
+  options: UseKeyboardShortcutsOptions = {},
+) {
+  const { enabled = true, target, defaultScope = 'global' } = options;
+  const shortcutsRef = useRef(shortcuts);
+  
+  // Update shortcuts ref when they change
+  useEffect(() => {
+    shortcutsRef.current = shortcuts;
+  }, [shortcuts]);
+
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!enabled) return;
 
-    // Check if we should ignore the shortcut based on scope
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const target = event.target as HTMLElement;
     const isInputElement = target.tagName === 'INPUT' || 
                           target.tagName === 'TEXTAREA' || 
                           target.contentEditable === 'true';
+    
+    for (const shortcut of shortcutsRef.current) {
+      // Check scope
+      const scope = shortcut.scope || defaultScope;
+      if (scope === 'input' && !isInputElement) continue;
+      if (scope === 'modal' && !target.closest('[role="dialog"]')) continue;
+      
+      // Check if key matches
+      if (event.key.toLowerCase() !== shortcut.key.toLowerCase()) continue;
 
-    if (scope === 'input' && !isInputElement) return;
-    if (scope === 'modal' && !target.closest('[role="dialog"]')) return;
+      // Check modifiers
+      const modifiers = shortcut.modifiers || [];
+      const hasCtrl = modifiers.includes('ctrl');
+      const hasCmd = modifiers.includes('cmd');
+      const hasAlt = modifiers.includes('alt');
+      const hasShift = modifiers.includes('shift');
 
-    // Find matching shortcut
-    const matchingShortcut = shortcuts.find(shortcut => {
-      const keyMatch = shortcut.key.toLowerCase() === event.key.toLowerCase();
-      const ctrlMatch = !!shortcut.ctrlKey === event.ctrlKey;
-      const shiftMatch = !!shortcut.shiftKey === event.shiftKey;
-      const altMatch = !!shortcut.altKey === event.altKey;
-      const metaMatch = !!shortcut.metaKey === event.metaKey;
+      // Handle cmd/ctrl based on platform
+      const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
+      
+      const modifiersMatch =
+        (!hasCtrl && !hasCmd || (hasCtrl && event.ctrlKey) || (hasCmd && event.metaKey) || ((hasCtrl || hasCmd) && ctrlOrCmd)) &&
+        (!hasAlt || event.altKey) &&
+        (!hasShift || event.shiftKey) &&
+        // Ensure no extra modifiers are pressed
+        (hasCtrl || hasCmd || !ctrlOrCmd) &&
+        (hasAlt || !event.altKey) &&
+        (hasShift || !event.shiftKey);
 
-      return keyMatch && ctrlMatch && shiftMatch && altMatch && metaMatch;
-    });
-
-    if (matchingShortcut) {
-      if (matchingShortcut.preventDefault !== false) {
-        event.preventDefault();
+      if (modifiersMatch) {
+        if (shortcut.preventDefault !== false) {
+          event.preventDefault();
+        }
+        shortcut.handler();
+        break;
       }
-      matchingShortcut.action();
     }
-  }, [shortcuts, enabled, scope]);
+  }, [enabled, defaultScope]);
 
   useEffect(() => {
-    if (!enabled) return;
+    const targetElement = target || document;
+    
+    targetElement.addEventListener('keydown', handleKeyDown as EventListener);
+    return () => targetElement.removeEventListener('keydown', handleKeyDown as EventListener);
+  }, [handleKeyDown, target]);
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown, enabled]);
-
-  return shortcuts;
+  // Return shortcut info for display
+  return {
+    shortcuts: shortcuts.map(s => ({
+      key: s.key,
+      modifiers: s.modifiers || [],
+      description: s.description || '',
+    })),
+  };
 }
 
-// Predefined shortcuts for the chat application
-export const CHAT_SHORTCUTS: KeyboardShortcut[] = [
-  {
-    key: 'Enter',
-    ctrlKey: true,
-    action: () => {
-      // Send message (will be overridden by specific implementations)
-    },
-    description: 'Send message',
-  },
-  {
-    key: 'k',
-    ctrlKey: true,
-    action: () => {
-      // Focus search (will be overridden by specific implementations)
-    },
-    description: 'Focus search',
-  },
-  {
-    key: 'm',
-    ctrlKey: true,
-    action: () => {
-      // Open memory modal (will be overridden by specific implementations)
-    },
-    description: 'Open memory modal',
-  },
-  {
-    key: 'n',
-    ctrlKey: true,
-    action: () => {
-      // New conversation (will be overridden by specific implementations)
-    },
-    description: 'Start new conversation',
-  },
-  {
-    key: 'Escape',
-    action: () => {
-      // Close modal/dropdown (will be overridden by specific implementations)
-    },
-    description: 'Close modal or dropdown',
-  },
-  {
-    key: '/',
-    action: () => {
-      // Focus search (will be overridden by specific implementations)
-    },
-    description: 'Focus search',
-    preventDefault: false,
-  },
-];
+/**
+ * Format keyboard shortcut for display
+ * Handles platform-specific modifier keys
+ */
+export function formatShortcut(
+  key: string,
+  modifiers?: ('ctrl' | 'cmd' | 'alt' | 'shift')[],
+): string {
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const parts: string[] = [];
 
-export const MEMORY_MODAL_SHORTCUTS: KeyboardShortcut[] = [
-  {
-    key: 'Escape',
-    action: () => {
-      // Close memory modal (will be overridden by specific implementations)
-    },
-    description: 'Close memory modal',
-  },
-  {
-    key: 'f',
-    ctrlKey: true,
-    action: () => {
-      // Focus search in modal (will be overridden by specific implementations)
-    },
-    description: 'Focus search',
-  },
-  {
-    key: 'e',
-    ctrlKey: true,
-    action: () => {
-      // Export data (will be overridden by specific implementations)
-    },
-    description: 'Export all data',
-  },
-];
+  if (modifiers) {
+    if (modifiers.includes('ctrl') || modifiers.includes('cmd')) {
+      parts.push(isMac ? '⌘' : 'Ctrl');
+    }
+    if (modifiers.includes('alt')) {
+      parts.push(isMac ? '⌥' : 'Alt');
+    }
+    if (modifiers.includes('shift')) {
+      parts.push(isMac ? '⇧' : 'Shift');
+    }
+  }
 
-export const MESSAGE_SHORTCUTS: KeyboardShortcut[] = [
-  {
-    key: 'c',
-    altKey: true,
-    action: () => {
-      // Copy message (will be overridden by specific implementations)
-    },
-    description: 'Copy message',
-  },
-  {
-    key: 'i',
-    altKey: true,
-    action: () => {
-      // Mark as important (will be overridden by specific implementations)
-    },
-    description: 'Mark as important',
-  },
-  {
-    key: 's',
-    altKey: true,
-    action: () => {
-      // Share message (will be overridden by specific implementations)
-    },
-    description: 'Share message',
-  },
-  {
-    key: 'q',
-    altKey: true,
-    action: () => {
-      // Quote message (will be overridden by specific implementations)
-    },
-    description: 'Quote message',
-  },
-];
+  // Format special keys
+  const formattedKey = key.length === 1 
+    ? key.toUpperCase() 
+    : key.charAt(0).toUpperCase() + key.slice(1);
+  
+  parts.push(formattedKey);
+  
+  return parts.join(isMac ? '' : '+');
+}
+
+/**
+ * Common shortcut patterns
+ */
+export const COMMON_SHORTCUTS = {
+  SAVE: { key: 's', modifiers: ['cmd', 'ctrl'] as const },
+  SEARCH: { key: 'k', modifiers: ['cmd', 'ctrl'] as const },
+  NEW: { key: 'n', modifiers: ['cmd', 'ctrl'] as const },
+  CLOSE: { key: 'Escape', modifiers: [] as const },
+  SUBMIT: { key: 'Enter', modifiers: ['cmd', 'ctrl'] as const },
+  SETTINGS: { key: ',', modifiers: ['cmd', 'ctrl'] as const },
+} as const;

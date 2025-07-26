@@ -2,6 +2,7 @@ import type { ChatMessage } from '../types/chat.types';
 import { toastService } from './ToastService';
 import { dashboardContextService } from './DashboardContextService';
 import { timeService } from './TimeService';
+import { logger } from '../lib/logger';
 
 export interface StoredConversation {
   id: string;
@@ -81,7 +82,7 @@ export class MemoryService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Failed to get continuous conversation:', error);
+      logger.error('Failed to get continuous conversation', error as Error, { component: 'MemoryService', action: 'getContinuousConversation' });
       toastService.memoryError('load', error as Error);
       return null;
     }
@@ -175,7 +176,7 @@ export class MemoryService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Failed to save conversation:', error);
+      logger.error('Failed to save conversation', error as Error, { component: 'MemoryService', action: 'saveConversation' });
       // Reset caches on error to maintain consistency
       this.recentMessagesCache = [];
       this.conversationMetaCache = null;
@@ -227,7 +228,7 @@ export class MemoryService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Failed to mark memory as important:', error);
+      logger.error('Failed to mark memory as important', error as Error, { component: 'MemoryService', action: 'markAsImportant' });
       // Reset memories cache on error
       this.memoriesCache = null;
       this.invalidateContextCache();
@@ -272,7 +273,7 @@ export class MemoryService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Failed to get marked memories:', error);
+      logger.error('Failed to get marked memories', error as Error, { component: 'MemoryService', action: 'getMarkedMemories' });
       toastService.memoryError('load', error as Error);
       return [];
     }
@@ -376,7 +377,7 @@ export class MemoryService {
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Failed to forget memory:', error);
+      logger.error('Failed to forget memory', error as Error, { component: 'MemoryService', action: 'forgetMemory' });
       // Reset cache on error to maintain consistency
       this.memoriesCache = null;
       this.invalidateContextCache();
@@ -394,7 +395,7 @@ export class MemoryService {
       toastService.memorySuccess('export');
       return { conversations, memories };
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data', error as Error, { component: 'MemoryService', action: 'exportAllData' });
       toastService.memoryError('export', error as Error);
       throw error;
     }
@@ -428,7 +429,7 @@ export class MemoryService {
       
       toastService.memorySuccess('clear');
     } catch (error) {
-      console.error('Failed to clear all data:', error);
+      logger.error('Failed to clear all data', error as Error, { component: 'MemoryService', action: 'clearAllData' });
       // Still reset caches even if DB operation failed for consistency
       this.recentMessagesCache = [];
       this.contextCache = '';

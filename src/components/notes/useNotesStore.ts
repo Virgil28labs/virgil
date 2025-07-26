@@ -10,6 +10,7 @@ import { notesStorage } from './storage';
 import { processEntryWithAI, shouldProcessContent } from './aiService';
 import { timeService } from '../../services/TimeService';
 import { extractTasksFromContent, mergeTasksWithAI, toggleTaskAtIndex } from './utils/taskUtils';
+import { logger } from '../../lib/logger';
 
 /**
  * Main store hook for the notes application
@@ -40,7 +41,10 @@ export const useNotesStore = () => {
         const storedEntries = await notesStorage.getAllEntries();
         setEntries(storedEntries);
       } catch (error) {
-        console.error('Failed to load entries:', error);
+        logger.error('Failed to load entries', error as Error, {
+          component: 'useNotesStore',
+          action: 'loadEntries',
+        });
         setError(
           error instanceof NotesError 
             ? error 
@@ -110,11 +114,17 @@ export const useNotesStore = () => {
             try {
               await notesStorage.updateEntry(updatedEntry);
             } catch (storageError) {
-              console.error('Failed to save AI updates:', storageError);
+              logger.error('Failed to save AI updates', storageError as Error, {
+                component: 'useNotesStore',
+                action: 'saveAIUpdates',
+              });
             }
           }
         }).catch(aiError => {
-          console.error('AI processing failed:', aiError);
+          logger.error('AI processing failed', aiError as Error, {
+            component: 'useNotesStore',
+            action: 'processWithAI',
+          });
         }).finally(() => {
           // Remove from processing set
           setProcessingIds(prev => {
@@ -125,7 +135,10 @@ export const useNotesStore = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to save entry:', error);
+      logger.error('Failed to save entry', error as Error, {
+        component: 'useNotesStore',
+        action: 'saveEntry',
+      });
       
       // Rollback optimistic update
       setEntries(prev => prev.filter(e => e.id !== newEntry.id));
@@ -165,7 +178,10 @@ export const useNotesStore = () => {
       try {
         await notesStorage.updateEntry({ ...entry, ...updates, isEdited: true });
       } catch (error) {
-        console.error('Failed to update entry:', error);
+        logger.error('Failed to update entry', error as Error, {
+          component: 'useNotesStore',
+          action: 'updateEntry',
+        });
         
         // Rollback optimistic update
         setEntries(prev => 
@@ -214,7 +230,10 @@ export const useNotesStore = () => {
     try {
       await notesStorage.deleteEntry(id);
     } catch (error) {
-      console.error('Failed to delete entry:', error);
+      logger.error('Failed to delete entry', error as Error, {
+        component: 'useNotesStore',
+        action: 'deleteEntry',
+      });
       
       // Rollback if we have the entry
       if (entryToDelete) {

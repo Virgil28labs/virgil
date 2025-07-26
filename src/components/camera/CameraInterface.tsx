@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback , memo } from 'react';
 import { Camera } from 'react-camera-pro';
 import type { CameraControlsProps } from '../../types/camera.types';
 import { useCamera } from './hooks/useCamera';
@@ -133,11 +133,11 @@ const CameraControls: React.FC<CameraControlsProps> = ({
   );
 };
 
-export const CameraInterface: React.FC<CameraInterfaceProps> = ({
+export const CameraInterface = memo(function CameraInterface({
   onPhotoCapture,
   onError,
   className = '',
-}) => {
+}: CameraInterfaceProps) {
   const {
     cameraRef,
     cameraState,
@@ -278,4 +278,4 @@ export const CameraInterface: React.FC<CameraInterfaceProps> = ({
       />
     </div>
   );
-};
+});

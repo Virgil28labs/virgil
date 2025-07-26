@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const os = require('os');
+const logger = require('../lib/logger');
 
 /**
  * GET /api/v1/health
@@ -137,7 +138,7 @@ async function checkOpenAI() {
     const hasKey = !!(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 10);
     return hasKey;
   } catch (error) {
-    console.warn('OpenAI configuration check failed:', error.message);
+    logger.warn('OpenAI configuration check failed:', error.message);
     return false;
   }
 }
@@ -164,7 +165,7 @@ function checkCache() {
 
     return retrieved === testValue;
   } catch (error) {
-    console.warn('Cache check failed:', error.message);
+    logger.warn('Cache check failed:', error.message);
     return false;
   }
 }
@@ -185,7 +186,7 @@ function checkQueue() {
 
     return true;
   } catch (error) {
-    console.warn('Queue check failed:', error.message);
+    logger.warn('Queue check failed:', error.message);
     return false;
   }
 }

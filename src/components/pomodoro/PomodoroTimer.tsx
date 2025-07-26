@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../ui/button';
 import { usePomodoro } from './usePomodoro';
@@ -13,7 +13,7 @@ interface PomodoroTimerProps {
 const PRESET_TIMES = [5, 10, 25];
 const DEFAULT_MINUTES = 25;
 
-export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose }) => {
+export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
   const { 
     state, 
     progress, 
@@ -115,4 +115,4 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({ isOpen, onClose })
       </div>
     </Modal>
   );
-};
+});

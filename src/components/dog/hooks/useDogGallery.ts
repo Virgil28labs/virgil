@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DogGalleryContext } from '../DogGalleryContextTypes';
+import { DogGalleryContext } from '../DogGalleryProvider';
 import type { DogGalleryContextType } from '../../../types';
 
 export function useDogGallery(): DogGalleryContextType {

@@ -6,7 +6,7 @@
 import { useState, useCallback, useMemo, memo } from 'react';
 import type { Entry } from './types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { formatRelativeTime } from './utils/dateUtils';
+import { timeService } from '../../services/TimeService';
 import './notes.css';
 
 interface NotesEntryProps {
@@ -33,7 +33,7 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Format timestamp
-  const formattedTime = useMemo(() => formatRelativeTime(entry.timestamp), [entry.timestamp]);
+  const formattedTime = useMemo(() => timeService.getTimeAgo(entry.timestamp), [entry.timestamp]);
 
   // Parse content to render checkboxes
   const renderedContent = useMemo(() => {

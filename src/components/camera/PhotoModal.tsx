@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect , memo } from 'react';
 import type { PhotoModalProps } from '../../types/camera.types';
 import { PhotoActions } from './PhotoActions';
 import { timeService } from '../../services/TimeService';
 
-export const PhotoModal: React.FC<PhotoModalProps> = ({
+export const PhotoModal = memo(function PhotoModal({
   photo,
   isOpen,
   onClose,
@@ -12,7 +12,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   onFavoriteToggle,
   onDelete,
   onShare,
-}) => {
+}: PhotoModalProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -252,4 +252,4 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
       </div>
     </div>
   );
-};
+});

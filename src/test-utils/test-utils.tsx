@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import type { RenderOptions } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import { AllTheProviders } from './AllTheProviders';
+import { timeService } from '../services/TimeService';
 
 // Mock user for testing
 export const mockUser = {
@@ -43,7 +44,7 @@ export const mockWeatherContextValue = {
     windSpeed: 10,
     icon: '01d',
     location: 'New York, NY',
-    lastUpdated: new Date().toISOString(),
+    lastUpdated: timeService.toISOString(),
   },
   weatherLoading: false,
   weatherError: null,

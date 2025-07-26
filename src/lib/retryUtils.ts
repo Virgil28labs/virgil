@@ -3,6 +3,7 @@
  */
 
 import { hasStatusCode } from '../utils/errorUtils';
+import { logger } from './logger';
 
 interface RetryOptions {
   maxRetries?: number;
@@ -39,6 +40,13 @@ export async function retryWithBackoff<T>(
       
       // Check if we should retry this error
       if (!shouldRetry(error) || attempt === maxRetries) {
+        if (attempt === maxRetries) {
+          logger.error('Operation failed after all retries', error as Error, {
+            component: 'retryUtils',
+            action: 'retryWithBackoff',
+            metadata: { attempt, maxRetries },
+          });
+        }
         throw error;
       }
       

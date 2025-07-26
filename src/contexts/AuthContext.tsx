@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { AuthContextValue } from '../types/auth.types';
 import { logger } from '../lib/logger';
-import { AuthContext } from './AuthContextTypes';
+
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 /**
  * Authentication Context for Virgil

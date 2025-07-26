@@ -6,6 +6,7 @@
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import { NotesError, ErrorType } from './types';
+import { logger } from '../../lib/logger';
 import './notes.css';
 
 interface Props {
@@ -46,7 +47,11 @@ export class NotesErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error('Notes Error Boundary caught:', error, errorInfo);
+    logger.error('Notes Error Boundary caught error', error, {
+      component: 'NotesErrorBoundary',
+      action: 'componentDidCatch',
+      errorInfo: errorInfo.componentStack,
+    });
     
     // Update state with error info
     this.setState({

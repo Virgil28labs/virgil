@@ -6,6 +6,7 @@ import { timeService } from '../services/TimeService';
 import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
 import type { ChatAction } from '../components/chat/chatTypes';
+import { logger } from '../lib/logger';
 
 interface UseMemoryServiceProps {
   dispatch: Dispatch<ChatAction>;
@@ -48,7 +49,10 @@ export function useMemoryService({
         },
       });
     } catch (error) {
-      console.error('Failed to initialize memory service:', error);
+      logger.error('Failed to initialize memory service', error as Error, {
+        component: 'useMemoryService',
+        action: 'initialize',
+      });
     }
   }, [dispatch]);
 
@@ -61,7 +65,10 @@ export function useMemoryService({
         dispatch({ type: 'SET_MESSAGES', payload: recentMessages });
       }
     } catch (error) {
-      console.error('Failed to load recent messages:', error);
+      logger.error('Failed to load recent messages', error as Error, {
+        component: 'useMemoryService',
+        action: 'loadRecentMessages',
+      });
     }
   }, [dispatch]);
 
@@ -86,7 +93,11 @@ export function useMemoryService({
         },
       });
     } catch (error) {
-      console.error('Failed to mark message as important:', error);
+      logger.error('Failed to mark message as important', error as Error, {
+        component: 'useMemoryService',
+        action: 'markAsImportant',
+        messageId: message.id,
+      });
       setError('Unable to save memory. Please try again.');
     }
   }, [dashboardContext, dispatch, setError]);

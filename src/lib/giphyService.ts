@@ -8,6 +8,7 @@ import type {
 import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 import { timeService } from '../services/TimeService';
+import { logger } from './logger';
 
 // Environment-configurable API settings
 const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
@@ -24,7 +25,10 @@ class GiphyService {
 
   constructor() {
     if (!GIPHY_API_KEY || GIPHY_API_KEY === 'your_giphy_api_key_here') {
-      console.warn('Giphy API key not configured. Please add VITE_GIPHY_API_KEY to your .env file');
+      logger.warn('Giphy API key not configured. Please add VITE_GIPHY_API_KEY to your .env file', undefined, {
+        component: 'GiphyService',
+        action: 'constructor',
+      });
     }
   }
 
@@ -104,7 +108,11 @@ class GiphyService {
           maxRetries: 2,
           initialDelay: 1000,
           onRetry: (attempt, error) => {
-            console.warn(`Giphy API retry ${attempt}:`, error instanceof Error ? error.message : error);
+            logger.warn(`Giphy API retry ${attempt}: ${error instanceof Error ? error.message : error}`, undefined, {
+              component: 'GiphyService',
+              action: 'makeGiphyRequest',
+              metadata: { attempt, endpoint },
+            });
           },
         },
       );
@@ -114,6 +122,11 @@ class GiphyService {
       if (error instanceof GiphyServiceError) {
         throw error;
       }
+      logger.error('Failed to connect to Giphy API', error as Error, {
+        component: 'GiphyService',
+        action: 'makeGiphyRequest',
+        metadata: { endpoint },
+      });
       throw new GiphyServiceError(`Failed to connect to Giphy API: ${error}`);
     }
   }
@@ -155,6 +168,11 @@ class GiphyService {
       if (error instanceof GiphyServiceError) {
         throw error;
       }
+      logger.error('GIF search failed', error as Error, {
+        component: 'GiphyService',
+        action: 'searchGifs',
+        metadata: { query: params.q, limit: params.limit, offset: params.offset },
+      });
       throw new GiphyServiceError(`Search failed: ${error}`);
     }
   }
@@ -195,6 +213,11 @@ class GiphyService {
       if (error instanceof GiphyServiceError) {
         throw error;
       }
+      logger.error('Failed to fetch trending GIFs', error as Error, {
+        component: 'GiphyService',
+        action: 'getTrendingGifs',
+        metadata: { limit: params.limit, offset: params.offset },
+      });
       throw new GiphyServiceError(`Trending fetch failed: ${error}`);
     }
   }
@@ -224,6 +247,11 @@ class GiphyService {
       
       window.URL.revokeObjectURL(url);
     } catch (error) {
+      logger.error('Failed to download GIF', error as Error, {
+        component: 'GiphyService',
+        action: 'downloadGif',
+        metadata: { gifId: gif.id },
+      });
       throw new GiphyServiceError(`Download failed: ${error}`);
     }
   }
@@ -236,7 +264,11 @@ class GiphyService {
       await navigator.clipboard.writeText(gif.originalUrl);
       return true;
     } catch (error) {
-      console.warn('Clipboard write failed:', error);
+      logger.warn('Clipboard write failed', error as Error, {
+        component: 'GiphyService',
+        action: 'copyGifUrl',
+        metadata: { gifId: gif.id },
+      });
       
       // Fallback: try to copy using execCommand (deprecated but still works in some browsers)
       try {

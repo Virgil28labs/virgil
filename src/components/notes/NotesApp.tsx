@@ -4,7 +4,7 @@ import { NotesInput } from './NotesInput';
 import { NotesList } from './NotesList';
 import { NotesFilter } from './NotesFilter';
 import { useNotesStore } from './useNotesStore';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { NotesErrorBoundary } from './NotesErrorBoundary';
 import type { FilterType, ActionFilterType, TagType } from './types';
 import './notes.css';

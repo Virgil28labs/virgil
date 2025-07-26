@@ -4,6 +4,7 @@ import { dashboardContextService } from '../services/DashboardContextService';
 import { vectorMemoryService } from '../services/VectorMemoryService';
 import type { DashboardContext, ContextualSuggestion } from '../services/DashboardContextService';
 import type { User } from '../types/auth.types';
+import { logger } from '../lib/logger';
 
 interface UseSystemPromptProps {
   user: User | null;
@@ -63,7 +64,10 @@ export function useSystemPrompt({
           systemPrompt += `\n\nMemory:${enhancedMemoryContext}`;
         }
       } catch (error) {
-        console.error('Failed to get enhanced memory context:', error);
+        logger.error('Failed to get enhanced memory context', error as Error, {
+          component: 'useSystemPrompt',
+          action: 'getEnhancedContext',
+        });
         // Fall back to regular memory context
         if (memoryContext) {
           systemPrompt += `\n\nMemory:${memoryContext}`;

@@ -1,5 +1,6 @@
 import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
+import { logger } from '../../lib/logger';
 
 interface Props {
   children: ReactNode
@@ -23,7 +24,11 @@ export class CircleErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Circle game error:', error, errorInfo);
+    logger.error('Circle game error', error, {
+      component: 'CircleErrorBoundary',
+      action: 'componentDidCatch',
+      errorInfo: errorInfo.componentStack,
+    });
   }
 
   public override render() {

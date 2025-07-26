@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import { timeService } from '../services/TimeService';
+import { logger } from '../lib/logger';
 
 export interface UserAddress {
   street: string
@@ -132,7 +133,7 @@ export const useUserProfile = () => {
           setProfile(prev => ({ ...prev, uniqueId: newUniqueId }));
         }
       } catch (error) {
-        console.error('Error loading profile:', error);
+        logger.error('Error loading profile', error as Error, { component: 'useUserProfile', action: 'loadProfile' });
       } finally {
         setLoading(false);
       }
@@ -181,7 +182,7 @@ export const useUserProfile = () => {
         // Verify the save by fetching the updated user
         const { error: verifyError } = await supabase.auth.getUser();
         if (verifyError) {
-          console.error('Error verifying profile save:', verifyError);
+          logger.error('Error verifying profile save', verifyError as Error, { component: 'useUserProfile', action: 'verifyProfileSave' });
         } else {
           // Profile saved successfully
         }
@@ -190,7 +191,7 @@ export const useUserProfile = () => {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
       } catch (error) {
-        console.error('Error saving profile:', error);
+        logger.error('Error saving profile', error as Error, { component: 'useUserProfile', action: 'saveProfile' });
         skipNextLoadRef.current = false;
       } finally {
         setSaving(false);
@@ -311,7 +312,10 @@ export const useUserProfile = () => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (error) {
-      console.error('Error saving profile:', error);
+      logger.error('Error saving profile', error as Error, {
+        component: 'useUserProfile',
+        action: 'saveProfile',
+      });
       skipNextLoadRef.current = false;
     } finally {
       setSaving(false);

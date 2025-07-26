@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 interface PhotoGalleryTabsProps {
   activeTab: 'camera' | 'gallery' | 'favorites'
@@ -7,12 +7,12 @@ interface PhotoGalleryTabsProps {
   favoriteCount: number
 }
 
-export const PhotoGalleryTabs: React.FC<PhotoGalleryTabsProps> = ({
+export const PhotoGalleryTabs = memo(function PhotoGalleryTabs({
   activeTab,
   onTabChange,
   photoCount,
   favoriteCount,
-}) => {
+}: PhotoGalleryTabsProps) {
   const tabs = [
     {
       id: 'camera' as const,
@@ -52,4 +52,4 @@ export const PhotoGalleryTabs: React.FC<PhotoGalleryTabsProps> = ({
       ))}
     </div>
   );
-};
+});

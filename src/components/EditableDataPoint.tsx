@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { timeService } from '../services/TimeService';
 
 interface EditableDataPointProps {
@@ -12,7 +12,7 @@ interface EditableDataPointProps {
   className?: string
 }
 
-export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
+export const EditableDataPoint = memo(function EditableDataPoint({
   icon,
   label,
   value,
@@ -21,7 +21,7 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
   placeholder = 'Not set',
   readOnly = false,
   className = '',
-}) => {
+}: EditableDataPointProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -119,4 +119,4 @@ export const EditableDataPoint: React.FC<EditableDataPointProps> = ({
       )}
     </div>
   );
-};
+});

@@ -1,4 +1,5 @@
 // Service Worker registration and management utilities
+import { logger } from './logger';
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -58,7 +59,10 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
       };
     })
     .catch((error) => {
-      console.error('Service worker registration failed:', error);
+      logger.error('Service worker registration failed', error as Error, {
+        component: 'serviceWorker',
+        action: 'register',
+      });
     });
 }
 
@@ -82,7 +86,10 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
       }
     })
     .catch((error) => {
-      console.error('Service worker fetch failed:', error);
+      logger.error('Service worker fetch failed', error as Error, {
+        component: 'serviceWorker',
+        action: 'checkValid',
+      });
     });
 }
 
@@ -93,7 +100,10 @@ export function unregisterServiceWorker() {
         registration.unregister();
       })
       .catch((error) => {
-        console.error('Service worker unregistration failed:', error);
+        logger.error('Service worker unregistration failed', error as Error, {
+          component: 'serviceWorker',
+          action: 'unregister',
+        });
       });
   }
 }

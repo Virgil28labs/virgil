@@ -5,6 +5,7 @@ import { memoryService } from '../services/MemoryService';
 import { vectorMemoryService } from '../services/VectorMemoryService';
 import { useChatApi, type LoadingState } from './useChatApi';
 import type { ChatMessage } from '../types/chat.types';
+import { logger } from '../lib/logger';
 
 interface UseMessageHandlingProps {
   selectedModel: string;
@@ -51,7 +52,10 @@ export function useMessageHandling({
         // Also store in vector memory
         await vectorMemoryService.storeMessageWithEmbedding(message);
       } catch (error) {
-        console.error('Failed to save assistant message:', error);
+        logger.error('Failed to save assistant message', error as Error, {
+          component: 'useMessageHandling',
+          action: 'saveAssistantMessage',
+        });
       }
       
       setTimeout(() => inputRef.current?.focus(), 0);
@@ -76,7 +80,10 @@ export function useMessageHandling({
       // Also store in vector memory
       await vectorMemoryService.storeMessageWithEmbedding(userMessage);
     } catch (error) {
-      console.error('Failed to save user message:', error);
+      logger.error('Failed to save user message', error as Error, {
+        component: 'useMessageHandling',
+        action: 'saveUserMessage',
+      });
     }
     
     setTimeout(() => inputRef.current?.focus(), 0);

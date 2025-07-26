@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect , memo } from 'react';
 
 interface ModalProps {
   isOpen: boolean
@@ -9,14 +9,14 @@ interface ModalProps {
   size?: 'small' | 'medium' | 'large' | 'extra-large'
 }
 
-export const Modal: React.FC<ModalProps> = ({ 
+export const Modal = memo(function Modal({ 
   isOpen, 
   onClose, 
   title, 
   children, 
   className = '',
   size = 'medium', 
-}) => {
+}: ModalProps) {
   // Handle escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -62,4 +62,4 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
-};
+});

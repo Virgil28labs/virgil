@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback , memo } from 'react';
 import { PhotoGalleryTabs } from './PhotoGalleryTabs';
 import { PhotoGrid } from './PhotoGrid';
 import { CameraInterface } from './CameraInterface';
@@ -138,10 +138,10 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
   );
 };
 
-export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
+export const PhotoGallery = memo(function PhotoGallery({
   onPhotoSelect,
   onError,
-}) => {
+}: PhotoGalleryProps) {
   const {
     galleryState,
     loading,
@@ -277,4 +277,4 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
       </div>
     </div>
   );
-};
+});

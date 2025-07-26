@@ -6,6 +6,7 @@ import type {
 } from '../types/location.types';
 import { retryWithBackoff } from './retryUtils';
 import { timeService } from '../services/TimeService';
+import { logger } from './logger';
 
 // ipwho.is API response type
 interface IpWhoResponse {
@@ -79,8 +80,12 @@ export const locationService = {
             try {
               const highAccuracyCoords = await this.getHighAccuracyPosition();
               resolve(highAccuracyCoords);
-            } catch {
+            } catch (error) {
               // If high accuracy fails, use the low accuracy result
+              logger.warn('Failed to get high accuracy position, using low accuracy', error as Error, {
+                component: 'locationService',
+                action: 'getCurrentPosition',
+              });
               resolve(coords);
             }
           } else {
@@ -281,8 +286,13 @@ export const locationService = {
           },
         },
       );
-    } catch (_error) {
+    } catch (error) {
       // Return null instead of throwing to allow graceful degradation
+      logger.error('Failed to get elevation data', error as Error, {
+        component: 'locationService',
+        action: 'getElevation',
+        metadata: { latitude, longitude },
+      });
       return null;
     }
   },
@@ -302,8 +312,12 @@ export const locationService = {
       if (ipLocation?.city) {
         locationData.address = this.createAddressFromIpLocation(ipLocation);
       }
-    } catch (_error) {
+    } catch (error) {
       // Return empty location data on error
+      logger.error('Failed to get quick location', error as Error, {
+        component: 'locationService',
+        action: 'getQuickLocation',
+      });
     }
 
     return locationData;
@@ -333,8 +347,12 @@ export const locationService = {
       if (gpsResult.address) {
         locationData.address = gpsResult.address;
       }
-    } catch (_error) {
+    } catch (error) {
       // GPS is optional, continue without it
+      logger.warn('Failed to get GPS location data', error as Error, {
+        component: 'locationService',
+        action: 'getFullLocationData',
+      });
     }
 
     // If we have no GPS but have IP location, create a basic address from IP data
@@ -349,7 +367,11 @@ export const locationService = {
     try {
       // Call without IP parameter to get caller's location
       return await this.getIpLocation();
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch IP location data', error as Error, {
+        component: 'locationService',
+        action: 'fetchIpLocationData',
+      });
       return undefined;
     }
   },
@@ -369,6 +391,11 @@ export const locationService = {
         result.address = addressResult.value;
       } else {
         // Address lookup failed - non-critical, continue without address
+        logger.warn('Address lookup failed', addressResult.reason as Error, {
+          component: 'locationService',
+          action: 'fetchGPSLocationData',
+          metadata: { coords },
+        });
       }
       
       if (elevationResult.status === 'fulfilled' && elevationResult.value) {
@@ -383,7 +410,11 @@ export const locationService = {
       }
       
       return result;
-    } catch (_error) {
+    } catch (error) {
+      logger.error('Failed to fetch GPS location data', error as Error, {
+        component: 'locationService',
+        action: 'fetchGPSLocationData',
+      });
       return {};
     }
   },

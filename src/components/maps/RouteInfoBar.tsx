@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { DepartureTimeSelector } from './DepartureTimeSelector';
 import './maps.css';
 
@@ -14,7 +14,7 @@ interface RouteInfoBarProps {
   onDepartureTimeChange?: (time: Date | 'now') => void
 }
 
-export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
+export const RouteInfoBar = memo(function RouteInfoBar({
   route,
   alternativeRoutes = [],
   onRouteSelect,
@@ -24,7 +24,7 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
   onClose,
   departureTime = 'now',
   onDepartureTimeChange,
-}) => {
+}: RouteInfoBarProps) {
   if (!route) return null;
 
   const leg = route.legs[0];
@@ -190,4 +190,4 @@ export const RouteInfoBar: React.FC<RouteInfoBarProps> = ({
       </div>
     </div>
   );
-};
+});

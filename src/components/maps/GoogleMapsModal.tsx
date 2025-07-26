@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo , memo } from 'react';
 import { Modal } from '../common/Modal';
 import { timeService } from '../../services/TimeService';
 import { 
@@ -16,12 +16,12 @@ import { useRouteState } from '../../hooks/useRouteState';
 import './maps.css';
 import { logger } from '../../lib/logger';
 
-export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
+export const GoogleMapsModal = memo(function GoogleMapsModal({
   isOpen,
   onClose,
   coordinates,
   address,
-}) => {
+}: GoogleMapsModalProps) {
   // DOM refs
   const mapRef = useRef<HTMLDivElement>(null);
   
@@ -617,4 +617,4 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
       </div>
     </Modal>
   );
-};
+});

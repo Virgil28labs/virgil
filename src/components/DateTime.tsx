@@ -1,5 +1,5 @@
 import { useState, useEffect, memo, useMemo } from 'react';
-import { TimezoneWidget } from './timezone';
+import { TimezoneWidget } from './timezone/TimezoneWidget';
 import { timeService } from '../services/TimeService';
 
 /**

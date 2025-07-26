@@ -177,8 +177,8 @@ export class MockTimeService {
   }
 
   toISODateString(date?: Date): string {
-    const dateStr = (date || this.mockDate).toISOString();
-    return dateStr.split('T')[0];
+    // Match the real TimeService behavior - use local timezone
+    return this.formatDateToLocal(date || this.mockDate);
   }
 
   // Date Boundaries

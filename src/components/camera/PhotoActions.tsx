@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback , memo } from 'react';
 import type { SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';
@@ -13,13 +13,13 @@ interface PhotoActionsProps {
   className?: string
 }
 
-export const PhotoActions: React.FC<PhotoActionsProps> = ({
+export const PhotoActions = memo(function PhotoActions({
   photo,
   onFavoriteToggle,
   onDelete,
   onClose,
   className = '',
-}) => {
+}: PhotoActionsProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -218,4 +218,4 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
       </div>
     </div>
   );
-};
+});

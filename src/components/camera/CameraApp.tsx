@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect , memo } from 'react';
 import { PhotoGallery } from './PhotoGallery';
 import { PhotoModal } from './PhotoModal';
 import { usePhotoGallery } from './hooks/usePhotoGallery';
@@ -6,7 +6,7 @@ import { useToast } from '../../hooks/useToast';
 import type { CameraModalProps, SavedPhoto } from '../../types/camera.types';
 import './Camera.css';
 
-export const CameraApp: React.FC<CameraModalProps> = ({ isOpen, onClose }) => {
+export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModalProps) {
   const { addToast } = useToast();
   const [selectedPhoto, setSelectedPhoto] = useState<SavedPhoto | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -193,4 +193,4 @@ export const CameraApp: React.FC<CameraModalProps> = ({ isOpen, onClose }) => {
       />
     </>
   );
-};
+});

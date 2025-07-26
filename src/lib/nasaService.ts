@@ -6,6 +6,7 @@ import type {
 import { retryWithBackoff } from './retryUtils';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { timeService } from '../services/TimeService';
+import { logger } from './logger';
 
 // Environment-configurable API settings
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
@@ -30,7 +31,7 @@ class NasaApodService {
 
   constructor() {
     if (!NASA_API_KEY || NASA_API_KEY === 'your_nasa_api_key_here') {
-      console.warn('NASA API key not configured. Using DEMO_KEY with limited requests per hour.');
+      logger.warn('NASA API key not configured. Using DEMO_KEY with limited requests per hour.', { component: 'NasaApodService', action: 'constructor' });
     }
     
     // Load cache from localStorage
@@ -58,7 +59,7 @@ class NasaApodService {
         });
       }
     } catch (error) {
-      console.warn('Failed to load NASA APOD cache from localStorage:', error);
+      logger.warn('Failed to load NASA APOD cache from localStorage', { component: 'NasaApodService', action: 'loadCacheFromStorage', metadata: { error } });
     }
   }
 
@@ -73,7 +74,7 @@ class NasaApodService {
       });
       localStorage.setItem('nasa-apod-cache', JSON.stringify(cacheObject));
     } catch (error) {
-      console.warn('Failed to save NASA APOD cache to localStorage:', error);
+      logger.warn('Failed to save NASA APOD cache to localStorage', { component: 'NasaApodService', action: 'saveCacheToStorage', metadata: { error } });
     }
   }
 
@@ -143,7 +144,7 @@ class NasaApodService {
       if (this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null) {
         const percentage = (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100;
         if (percentage < 20) {
-          console.warn(`NASA API rate limit warning: ${this.rateLimitInfo.remaining}/${this.rateLimitInfo.limit} requests remaining`);
+          logger.warn(`NASA API rate limit warning: ${this.rateLimitInfo.remaining}/${this.rateLimitInfo.limit} requests remaining`, { component: 'NasaApodService', action: 'updateRateLimitInfo' });
         }
       }
     } catch (_error) {
@@ -205,7 +206,7 @@ class NasaApodService {
           maxRetries: 3,
           initialDelay: 1000,
           onRetry: (attempt, error) => {
-            console.warn(`NASA APOD API retry ${attempt}:`, error instanceof Error ? error.message : error);
+            logger.warn(`NASA APOD API retry ${attempt}`, { component: 'NasaApodService', action: 'fetchSingleDay', metadata: { error: error instanceof Error ? error.message : error } });
           },
           shouldRetry: (error) => {
             // Don't retry rate limit errors (429) or client errors (4xx)
@@ -402,7 +403,7 @@ class NasaApodService {
       await navigator.clipboard.writeText(shareData.url);
       return true;
     } catch (error) {
-      console.warn('Clipboard write failed:', error);
+      logger.warn('Clipboard write failed', { component: 'NasaApodService', action: 'copyToClipboard', metadata: { error } });
       
       // Fallback: try to copy using execCommand
       try {
@@ -472,7 +473,7 @@ class NasaApodService {
     try {
       localStorage.removeItem('nasa-apod-cache');
     } catch (error) {
-      console.warn('Failed to clear NASA APOD cache from localStorage:', error);
+      logger.warn('Failed to clear NASA APOD cache from localStorage', { component: 'NasaApodService', action: 'clearCache', metadata: { error } });
     }
   }
 

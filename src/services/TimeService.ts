@@ -383,12 +383,13 @@ export class TimeService {
   }
 
   /**
-   * Get ISO date string (YYYY-MM-DD) in UTC
+   * Get ISO date string (YYYY-MM-DD) in LOCAL timezone
    * @param date Date to convert (optional, defaults to now)
-   * @returns ISO date string (e.g., "2024-01-15")
+   * @returns ISO date string in local timezone (e.g., "2024-01-15")
    */
   toISODateString(date?: Date): string {
-    return this.toISOString(date).split('T')[0];
+    // Use formatDateToLocal to get local date instead of UTC
+    return this.formatDateToLocal(date || new Date());
   }
 
   // ==========================================

@@ -2,6 +2,7 @@ import { ResponseCache } from './utils/cache';
 import { RateLimiter } from './utils/rateLimit';
 import { EventEmitter } from './utils/eventEmitter';
 import { timeService } from '../TimeService';
+import { logger } from '../../lib/logger';
 import type {
   LLMRequest,
   LLMResponse,
@@ -108,6 +109,11 @@ export class LLMService extends EventEmitter {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Failed to complete LLM request', error as Error, {
+        component: 'LLMService',
+        action: 'complete',
+        metadata: { requestId, model, provider },
+      });
       this.emit('request-error', {
         requestId,
         error: errorMessage,
@@ -160,14 +166,24 @@ export class LLMService extends EventEmitter {
             try {
               const parsed = JSON.parse(data);
               yield parsed;
-            } catch {
+            } catch (parseError) {
               // Skip invalid JSON
+              logger.warn('Failed to parse stream chunk', parseError as Error, {
+                component: 'LLMService',
+                action: 'completeStream',
+                metadata: { line },
+              });
             }
           }
         }
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Failed to complete stream request', error as Error, {
+        component: 'LLMService',
+        action: 'completeStream',
+        metadata: { model, provider },
+      });
       this.emit('stream-error', { error: errorMessage });
       throw error;
     }
@@ -210,12 +226,22 @@ export class LLMService extends EventEmitter {
       const retryDelay = this.config?.retryDelay ?? 1000;
       if (error instanceof Error && attempt < maxRetries && this.isRetryableError(error)) {
         const delay = retryDelay * Math.pow(2, attempt - 1);
+        logger.warn(`LLM request retry attempt ${attempt}`, error, {
+          component: 'LLMService',
+          action: 'makeRequestWithRetry',
+          metadata: { endpoint, attempt, delay },
+        });
         this.emit('retry', { attempt, delay, error: error.message });
         
         await new Promise(resolve => setTimeout(resolve, delay));
         return this.makeRequestWithRetry(endpoint, body, isStream, attempt + 1);
       }
 
+      logger.error('LLM request failed after all retries', error as Error, {
+        component: 'LLMService',
+        action: 'makeRequestWithRetry',
+        metadata: { endpoint, attempt, maxRetries },
+      });
       throw error;
     }
   }
@@ -262,6 +288,10 @@ export class LLMService extends EventEmitter {
       const data = await response.json();
       return data.data || {};
     } catch (error) {
+      logger.error('Failed to fetch models', error as Error, {
+        component: 'LLMService',
+        action: 'getModels',
+      });
       this.emit('error', { error: String(error) });
       return {};
     }
@@ -279,8 +309,13 @@ export class LLMService extends EventEmitter {
       
       const data = await response.json();
       return data.data?.tokenCount || 0;
-    } catch {
+    } catch (error) {
       // Fallback to estimation
+      logger.warn('Failed to count tokens, using estimation', error as Error, {
+        component: 'LLMService',
+        action: 'countTokens',
+        metadata: { model, textLength: text.length },
+      });
       return Math.ceil(text.length / 4);
     }
   }
