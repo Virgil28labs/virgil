@@ -444,7 +444,15 @@ export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({
         }
         
         if (!mounted || !mapRef.current || !window.google?.maps?.ControlPosition) {
-          console.error('Google Maps not properly initialized');
+          logger.error('Google Maps not properly initialized', undefined, {
+            component: 'GoogleMapsModal',
+            action: 'initMap',
+            metadata: {
+              mounted,
+              hasMapRef: !!mapRef.current,
+              hasGoogleMaps: !!window.google?.maps?.ControlPosition,
+            },
+          });
           return;
         }
         

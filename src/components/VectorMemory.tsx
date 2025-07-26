@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { vectorService } from '../services/vectorService';
 import type { VectorSearchResult } from '../services/vectorService';
+import { logger } from '../lib/logger';
 
 export const VectorMemory = () => {
   const [text, setText] = useState('');
@@ -31,7 +32,15 @@ export const VectorMemory = () => {
       setMessage(`✅ Stored successfully with ID: ${id}`);
       await loadMemoryCount(); // Refresh count
     } catch (error) {
-      console.error('Store failed:', error);
+      logger.error(
+        'Store failed',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'VectorMemory',
+          action: 'handleStore',
+          metadata: { textLength: text.length },
+        },
+      );
       setMessage('❌ Store failed: ' + (error as Error).message);
     } finally {
       setLoading(false);
@@ -50,7 +59,15 @@ export const VectorMemory = () => {
       setResults(searchResults);
       setMessage(`Found ${searchResults.length} similar memories`);
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error(
+        'Search failed',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'VectorMemory',
+          action: 'handleSearch',
+          metadata: { queryLength: text.length },
+        },
+      );
       setMessage('❌ Search failed: ' + (error as Error).message);
     } finally {
       setLoading(false);

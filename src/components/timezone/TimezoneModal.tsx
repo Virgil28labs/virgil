@@ -8,6 +8,7 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { TimezoneSearch } from './TimezoneSearch';
 import { useTimezones, useTimezoneFormatters } from './useTimezones';
+import { logger } from '../../lib/logger';
 
 interface TimezoneModalProps {
   isOpen: boolean
@@ -94,7 +95,11 @@ const TimezoneModal = memo(function TimezoneModal({
     const success = addTimezone(timezone);
     if (!success) {
       // Could show error message here
-      console.warn('Failed to add timezone:', timezone);
+      logger.warn('Failed to add timezone', {
+        component: 'TimezoneModal',
+        action: 'handleAddTimezone',
+        metadata: { timezone },
+      });
     }
   }, [addTimezone]);
 

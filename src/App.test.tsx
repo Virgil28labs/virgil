@@ -16,19 +16,16 @@ jest.mock('./components/Dashboard', () => ({
   Dashboard: () => <div data-testid="dashboard">Dashboard</div>,
 }));
 
-// Mock contexts
-jest.mock('./contexts/AuthContext', () => {
-  const mockUseAuth = jest.fn(() => ({
-    user: null,
-    loading: false,
-    signOut: jest.fn(),
-  }));
-  
-  return {
-    AuthProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    useAuth: mockUseAuth,
-  };
-});
+// Mock the useAuth hook
+const mockUseAuth = jest.fn();
+jest.mock('./hooks/useAuth', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
+// Mock AuthContext to just render children
+jest.mock('./contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
+}));
 
 jest.mock('./contexts/LocationContext', () => ({
   LocationProvider: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -48,6 +45,12 @@ jest.mock('./hooks/useToast', () => ({
 describe('App Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset auth state to default
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      signOut: jest.fn(),
+    });
   });
 
   it('renders without crashing', () => {
@@ -69,8 +72,7 @@ describe('App Component', () => {
 
   it('renders dashboard when user is logged in', () => {
     // Mock authenticated user
-    const useAuthMock = jest.requireMock('./contexts/AuthContext').useAuth;
-    useAuthMock.mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: { id: '123', email: 'test@example.com' },
       loading: false,
       signOut: jest.fn(),
@@ -81,8 +83,7 @@ describe('App Component', () => {
   });
 
   it('shows loading skeleton when auth is loading', () => {
-    const useAuthMock = jest.requireMock('./contexts/AuthContext').useAuth;
-    useAuthMock.mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: null,
       loading: true,
       signOut: jest.fn(),
@@ -93,8 +94,7 @@ describe('App Component', () => {
   });
 
   it('renders chatbot for authenticated users', async () => {
-    const useAuthMock = jest.requireMock('./contexts/AuthContext').useAuth;
-    useAuthMock.mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: { id: '123', email: 'test@example.com' },
       loading: false,
       signOut: jest.fn(),

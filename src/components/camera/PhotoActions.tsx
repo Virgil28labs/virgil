@@ -3,6 +3,7 @@ import type { SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';
 import { timeService } from '../../services/TimeService';
+import { logger } from '../../lib/logger';
 
 interface PhotoActionsProps {
   photo: SavedPhoto
@@ -32,7 +33,15 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
       const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
       await CameraUtils.downloadPhoto(photo.dataUrl, filename);
     } catch (error) {
-      console.error('Error downloading photo:', error);
+      logger.error(
+        'Error downloading photo',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'PhotoActions',
+          action: 'handleDownload',
+          metadata: { photoId: photo.id },
+        },
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -43,7 +52,15 @@ export const PhotoActions: React.FC<PhotoActionsProps> = ({
       setIsProcessing(true);
       await PhotoExport.shareSinglePhoto(photo);
     } catch (error) {
-      console.error('Error sharing photo:', error);
+      logger.error(
+        'Error sharing photo',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'PhotoActions',
+          action: 'handleShare',
+          metadata: { photoId: photo.id },
+        },
+      );
       // Fallback to download if share is not supported
       handleDownload();
     } finally {

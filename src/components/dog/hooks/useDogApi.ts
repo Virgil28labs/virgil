@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { dedupeFetch } from '../../../lib/requestDeduplication';
 import { timeService } from '../../../services/TimeService';
+import { logger } from '../../../lib/logger';
 
 // Environment-configurable API endpoints
 const DOG_API = import.meta.env.VITE_DOG_API_URL || 'https://dog.ceo/api';
@@ -85,7 +86,11 @@ export const useDogApi = () => {
         return;
       }
       
-      console.warn('Dog API fetch failed:', error);
+      logger.warn('Dog API fetch failed', {
+        component: 'useDogApi',
+        action: 'fetchDogs',
+        metadata: { error, breed },
+      });
       setError('Unable to fetch dogs. Please try again.');
       setDogs([]);
     } finally {
@@ -107,7 +112,11 @@ export const useDogApi = () => {
       setBreeds(breedList);
       
     } catch (error) {
-      console.warn('Failed to fetch breeds:', error);
+      logger.warn('Failed to fetch breeds', {
+        component: 'useDogApi',
+        action: 'fetchBreeds',
+        metadata: { error },
+      });
       setBreeds([]);
     }
   }, [fetchWithTimeout]);

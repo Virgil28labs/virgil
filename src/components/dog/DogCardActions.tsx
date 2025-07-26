@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback } from 'react';
 import type { DogImage } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
+import { logger } from '../../lib/logger';
 
 interface DogCardActionsProps {
   dog: DogImage
@@ -17,7 +18,15 @@ export const DogCardActions = memo(function DogCardActions({ dog }: DogCardActio
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download image:', error);
+      logger.error(
+        'Failed to download image',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'DogCardActions',
+          action: 'handleDownload',
+          metadata: { imageUrl: dog.url, breed: dog.breed },
+        },
+      );
     }
   }, [dog.url, dog.breed]);
 
@@ -28,7 +37,15 @@ export const DogCardActions = memo(function DogCardActions({ dog }: DogCardActio
       setShowCopied(true);
       setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy image:', error);
+      logger.error(
+        'Failed to copy image',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'DogCardActions',
+          action: 'handleCopy',
+          metadata: { imageUrl: dog.url },
+        },
+      );
     }
   }, [dog.url]);
 

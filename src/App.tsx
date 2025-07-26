@@ -15,6 +15,7 @@ import { Skeleton } from './components/ui/skeleton';
 import { ToastContainer } from './components/ToastNotification';
 import { useToast } from './hooks/useToast';
 import { StorageMigration } from './services/StorageMigration';
+import { logger } from './lib/logger';
 
 // Configure styled-components to filter out problematic props
 const shouldForwardProp = (propName: string) => {
@@ -84,7 +85,14 @@ function App(): React.ReactElement {
   // Run storage migrations on app startup
   useEffect(() => {
     StorageMigration.runMigrations().catch(error => {
-      console.error('Storage migration failed:', error);
+      logger.error(
+        'Storage migration failed',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'App',
+          action: 'runMigrations',
+        },
+      );
     });
   }, []);
 

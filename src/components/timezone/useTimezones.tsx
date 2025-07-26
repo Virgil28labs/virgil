@@ -10,6 +10,7 @@ import { DateTime } from 'luxon';
 import type { SelectedTimezone } from './timezoneData';
 import { getDefaultTimezones, generateTimezoneId, getTimezoneInfo } from './timezoneData';
 import { dashboardContextService } from '../../services/DashboardContextService';
+import { logger } from '../../lib/logger';
 
 export interface TimezoneWithTime extends SelectedTimezone {
   currentTime: DateTime
@@ -56,7 +57,11 @@ function loadTimezonesFromStorage(): SelectedTimezone[] {
     // Sort by order and return
     return parsed.sort((a, b) => a.order - b.order);
   } catch (error) {
-    console.warn('Failed to load timezones from localStorage:', error);
+    logger.warn('Failed to load timezones from localStorage', {
+      component: 'useTimezones',
+      action: 'loadFromStorage',
+      metadata: { error },
+    });
     return getDefaultTimezones();
   }
 }
@@ -68,7 +73,11 @@ function saveTimezonesToStorage(timezones: SelectedTimezone[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(timezones));
   } catch (error) {
-    console.warn('Failed to save timezones to localStorage:', error);
+    logger.warn('Failed to save timezones to localStorage', {
+      component: 'useTimezones',
+      action: 'saveToStorage',
+      metadata: { error },
+    });
   }
 }
 
@@ -112,7 +121,11 @@ export function useTimezones(): UseTimezonesReturn {
           isValid: timeInZone.isValid,
         };
       } catch (error) {
-        console.warn(`Invalid timezone: ${tz.timezone}`, error);
+        logger.warn(`Invalid timezone: ${tz.timezone}`, {
+          component: 'useTimezones',
+          action: 'updateTimezonesWithTime',
+          metadata: { timezone: tz.timezone, error },
+        });
         return {
           ...tz,
           currentTime: currentDateTime,
@@ -140,7 +153,11 @@ export function useTimezones(): UseTimezonesReturn {
         return false;
       }
     } catch (error) {
-      console.warn(`Invalid timezone: ${timezone}`, error);
+      logger.warn(`Invalid timezone: ${timezone}`, {
+        component: 'useTimezones',
+        action: 'addTimezone',
+        metadata: { timezone, error },
+      });
       return false;
     }
 

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { ImageModal } from './ImageModal';
 import { downloadImage, copyImageToClipboard } from './utils/imageUtils';
 import type { DogImage } from './hooks/useDogApi';
+import { logger } from '../../lib/logger';
 
 // Mock imageUtils
 jest.mock('./utils/imageUtils', () => ({
@@ -12,6 +13,16 @@ jest.mock('./utils/imageUtils', () => ({
   }),
   downloadImage: jest.fn(),
   copyImageToClipboard: jest.fn(),
+}));
+
+// Mock logger
+jest.mock('../../lib/logger', () => ({
+  logger: {
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+    debug: jest.fn(),
+  },
 }));
 
 const mockDownloadImage = downloadImage as jest.MockedFunction<typeof downloadImage>;
@@ -175,8 +186,9 @@ describe('ImageModal', () => {
 
     it('should handle download error', async () => {
       const user = userEvent.setup();
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockDownloadImage.mockRejectedValueOnce(new Error('Download failed'));
+      const mockLoggerError = logger.error as jest.Mock;
+      mockLoggerError.mockClear();
 
       render(<ImageModal {...defaultProps} />);
 
@@ -184,10 +196,18 @@ describe('ImageModal', () => {
       await user.click(downloadButton);
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to download image:', expect.any(Error));
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'Failed to download image',
+          expect.any(Error),
+          expect.objectContaining({
+            component: 'ImageModal',
+            action: 'handleDownload',
+            metadata: expect.objectContaining({
+              imageUrl: 'https://example.com/dog2.jpg',
+            }),
+          }),
+        );
       });
-
-      consoleSpy.mockRestore();
     });
 
     it('should copy image URL', async () => {
@@ -204,8 +224,9 @@ describe('ImageModal', () => {
 
     it('should handle copy error', async () => {
       const user = userEvent.setup();
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockCopyImageToClipboard.mockRejectedValueOnce(new Error('Copy failed'));
+      const mockLoggerError = logger.error as jest.Mock;
+      mockLoggerError.mockClear();
 
       render(<ImageModal {...defaultProps} />);
 
@@ -213,10 +234,18 @@ describe('ImageModal', () => {
       await user.click(copyButton);
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to copy image:', expect.any(Error));
+        expect(mockLoggerError).toHaveBeenCalledWith(
+          'Failed to copy image',
+          expect.any(Error),
+          expect.objectContaining({
+            component: 'ImageModal',
+            action: 'handleCopy',
+            metadata: expect.objectContaining({
+              imageUrl: 'https://example.com/dog2.jpg',
+            }),
+          }),
+        );
       });
-
-      consoleSpy.mockRestore();
     });
   });
 

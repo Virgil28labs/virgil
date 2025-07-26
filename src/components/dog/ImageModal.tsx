@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useCallback, useState } from 'react';
 import type { ImageModalProps } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
+import { logger } from '../../lib/logger';
 
 export const ImageModal = memo(function ImageModal({ 
   dogs, 
@@ -40,7 +41,15 @@ export const ImageModal = memo(function ImageModal({
       setShowDownloaded(true);
       setTimeout(() => setShowDownloaded(false), 2000);
     } catch (error) {
-      console.error('Failed to download image:', error);
+      logger.error(
+        'Failed to download image',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'ImageModal',
+          action: 'handleDownload',
+          metadata: { imageUrl: currentDog?.url },
+        },
+      );
     }
   }, [currentDog]);
 
@@ -53,7 +62,15 @@ export const ImageModal = memo(function ImageModal({
       setShowCopied(true);
       setTimeout(() => setShowCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy image:', error);
+      logger.error(
+        'Failed to copy image',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'ImageModal',
+          action: 'handleCopy',
+          metadata: { imageUrl: currentDog?.url },
+        },
+      );
     }
   }, [currentDog]);
 
