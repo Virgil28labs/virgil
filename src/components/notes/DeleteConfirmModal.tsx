@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import './DeleteConfirmModal.css';
+import './notes.css';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean

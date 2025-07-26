@@ -6,7 +6,7 @@
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import { NotesError, ErrorType } from './types';
-import './NotesErrorBoundary.css';
+import './notes.css';
 
 interface Props {
   children: ReactNode

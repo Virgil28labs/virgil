@@ -88,30 +88,29 @@ async function performStartupChecks() {
     // Initialize cache
     const { cache } = require('./middleware/cache');
     if (cache) {
-      /* eslint-disable-next-line no-console */
-      console.log('✅ Cache service initialized');
+
+      logger.info('✅ Cache service initialized');
     } else {
 
-      console.warn('⚠️  Cache service not available');
+      logger.warn('⚠️  Cache service not available');
     }
 
     // Initialize queue
     const { RequestQueue } = require('./services/queue');
     if (RequestQueue) {
-      /* eslint-disable-next-line no-console */
-      console.log('✅ Queue service initialized');
+
+      logger.info('✅ Queue service initialized');
     } else {
 
-      console.warn('⚠️  Queue service not available');
+      logger.warn('⚠️  Queue service not available');
     }
 
   } catch (error) {
 
-    console.warn('⚠️  Service initialization warnings:', error.message);
+    logger.warn('⚠️  Service initialization warnings:', error.message);
   }
 
-  /* eslint-disable-next-line no-console */
-  console.log('✅ Startup checks completed');
+  logger.info('✅ Startup checks completed');
 }
 
 // Start server with proper initialization
@@ -120,26 +119,26 @@ async function startServer() {
     await performStartupChecks();
 
     const server = app.listen(PORT, () => {
-      /* eslint-disable no-console */
-      console.log(`🚀 Virgil LLM Server running on port ${PORT}`);
-      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🏥 Health check: http://localhost:${PORT}/api/v1/health`);
-      console.log(`⚡ Ready check: http://localhost:${PORT}/api/v1/health/ready`);
-      console.log('📋 Available endpoints:');
-      console.log('  POST /api/v1/llm/complete - Text completion');
-      console.log('  POST /api/v1/llm/stream - Streaming completion');
-      console.log('  POST /api/v1/chat - Secure chat endpoint');
-      console.log('  GET /api/v1/health - Health check');
-      console.log('  POST /api/v1/analytics/track - Analytics tracking');
-      console.log('  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates');
-      console.log('  GET /api/v1/weather/city/:city - Weather by city');
-      console.log('  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates');
-      console.log('  POST /api/v1/rhythm/generate - AI-powered rhythm generation');
-      console.log('  POST /api/v1/vector/store - Store text with embedding');
-      console.log('  POST /api/v1/vector/search - Search similar texts');
-      console.log('  GET /api/v1/vector/health - Vector service health check');
-      console.log('🎯 Server ready to accept connections');
-      /* eslint-enable no-console */
+
+      logger.info(`🚀 Virgil LLM Server running on port ${PORT}`);
+      logger.info(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`🏥 Health check: http://localhost:${PORT}/api/v1/health`);
+      logger.info(`⚡ Ready check: http://localhost:${PORT}/api/v1/health/ready`);
+      logger.info('📋 Available endpoints:');
+      logger.info('  POST /api/v1/llm/complete - Text completion');
+      logger.info('  POST /api/v1/llm/stream - Streaming completion');
+      logger.info('  POST /api/v1/chat - Secure chat endpoint');
+      logger.info('  GET /api/v1/health - Health check');
+      logger.info('  POST /api/v1/analytics/track - Analytics tracking');
+      logger.info('  GET /api/v1/weather/coordinates/:lat/:lon - Weather by coordinates');
+      logger.info('  GET /api/v1/weather/city/:city - Weather by city');
+      logger.info('  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates');
+      logger.info('  POST /api/v1/rhythm/generate - AI-powered rhythm generation');
+      logger.info('  POST /api/v1/vector/store - Store text with embedding');
+      logger.info('  POST /api/v1/vector/search - Search similar texts');
+      logger.info('  GET /api/v1/vector/health - Vector service health check');
+      logger.info('🎯 Server ready to accept connections');
+
     });
 
     return server;
@@ -162,12 +161,12 @@ startServer().then(srv => {
 
 // Graceful shutdown
 const gracefulShutdown = () => {
-  /* eslint-disable no-console */
-  console.log('🛑 Received shutdown signal, closing server gracefully...');
+
+  logger.info('🛑 Received shutdown signal, closing server gracefully...');
 
   if (server) {
     server.close(() => {
-      console.log('✅ Server closed');
+      logger.info('✅ Server closed');
       process.exit(0);
     });
 
@@ -177,10 +176,10 @@ const gracefulShutdown = () => {
       process.exit(1);
     }, 10000);
   } else {
-    console.log('⚠️  Server not yet initialized, exiting immediately');
+    logger.warn('⚠️  Server not yet initialized, exiting immediately');
     process.exit(0);
   }
-  /* eslint-enable no-console */
+
 };
 
 process.on('SIGTERM', gracefulShutdown);

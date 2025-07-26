@@ -13,7 +13,7 @@ import { RouteInputBar } from './RouteInputBar';
 import { RouteInfoBar } from './RouteInfoBar';
 import { TrafficIndicator } from './TrafficIndicator';
 import { useRouteState } from '../../hooks/useRouteState';
-import './GoogleMapsModal.css';
+import './maps.css';
 import { logger } from '../../lib/logger';
 
 export const GoogleMapsModal: React.FC<GoogleMapsModalProps> = ({

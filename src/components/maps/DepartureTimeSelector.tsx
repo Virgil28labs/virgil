@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './DepartureTimeSelector.css';
+import './maps.css';
 import { timeService } from '../../services/TimeService';
 
 interface DepartureTimeSelectorProps {

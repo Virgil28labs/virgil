@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import type { FilterType, ActionFilterType } from './types';
 import { DOMAIN_FILTERS, ACTION_FILTERS } from './constants';
-import './NotesFilter.css';
+import './notes.css';
 
 interface NotesFilterProps {
   /** Currently active filter */

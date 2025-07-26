@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { INPUT_PLACEHOLDERS, UI_CONFIG } from './constants';
-import './NotesInput.css';
+import './notes.css';
 
 interface NotesInputProps {
   /** Callback when a note is submitted */

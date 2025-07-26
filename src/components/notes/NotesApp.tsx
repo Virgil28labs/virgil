@@ -7,7 +7,7 @@ import { useNotesStore } from './useNotesStore';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { NotesErrorBoundary } from './NotesErrorBoundary';
 import type { FilterType, ActionFilterType, TagType } from './types';
-import './NotesApp.css';
+import './notes.css';
 
 interface NotesAppProps {
   isOpen: boolean

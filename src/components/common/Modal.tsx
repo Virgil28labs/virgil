@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react';
-import './Modal.css';
 
 interface ModalProps {
   isOpen: boolean

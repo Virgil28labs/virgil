@@ -256,7 +256,10 @@ export class PhotoStorage {
         };
       });
     } catch (error) {
-      console.error('Error deleting photos:', error);
+      logger.error('Error deleting photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'deletePhotos',
+      });
       throw new Error('Failed to delete photos');
     }
   }
@@ -271,7 +274,10 @@ export class PhotoStorage {
       
       return updatedPhoto?.isFavorite || false;
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      logger.error('Error toggling favorite', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'toggleFavorite',
+      });
       throw new Error('Failed to toggle favorite');
     }
   }
@@ -300,7 +306,10 @@ export class PhotoStorage {
         favoriteCount,
       };
     } catch (error) {
-      console.error('Error getting storage info:', error);
+      logger.error('Error getting storage info', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'getStorageInfo',
+      });
       return {
         totalPhotos: 0,
         totalSize: 0,
@@ -322,12 +331,18 @@ export class PhotoStorage {
 
         request.onsuccess = () => resolve();
         request.onerror = () => {
-          console.error('Error clearing photos:', request.error);
+          logger.error('Error clearing photos', request.error || new Error('Unknown clear error'), {
+            component: 'PhotoStorage',
+            action: 'clearAllPhotos',
+          });
           reject(new Error('Failed to clear photos'));
         };
       });
     } catch (error) {
-      console.error('Error clearing photos:', error);
+      logger.error('Error clearing photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'clearAllPhotos',
+      });
       throw new Error('Failed to clear photos');
     }
   }
@@ -344,7 +359,10 @@ export class PhotoStorage {
       
       return JSON.stringify(exportData, null, 2);
     } catch (error) {
-      console.error('Error exporting photos:', error);
+      logger.error('Error exporting photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'exportPhotos',
+      });
       throw new Error('Failed to export photos');
     }
   }
@@ -387,12 +405,18 @@ export class PhotoStorage {
         };
         
         transaction.onerror = () => {
-          console.error('Error importing photos:', transaction.error);
+          logger.error('Error importing photos', transaction.error || new Error('Unknown import error'), {
+            component: 'PhotoStorage',
+            action: 'importPhotos',
+          });
           reject(new Error('Failed to import photos'));
         };
       });
     } catch (error) {
-      console.error('Error importing photos:', error);
+      logger.error('Error importing photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'importPhotos',
+      });
       throw new Error('Failed to import photos');
     }
   }
@@ -405,7 +429,10 @@ export class PhotoStorage {
       const saved = JSON.parse(data) as Partial<PhotoStorageOptions>;
       return { ...this.DEFAULT_OPTIONS, ...saved };
     } catch (error) {
-      console.error('Error loading storage options:', error);
+      logger.error('Error loading storage options', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'getStorageOptions',
+      });
       return this.DEFAULT_OPTIONS;
     }
   }
@@ -416,7 +443,10 @@ export class PhotoStorage {
       const updated = { ...current, ...options };
       localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(updated));
     } catch (error) {
-      console.error('Error saving storage options:', error);
+      logger.error('Error saving storage options', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'saveStorageOptions',
+      });
     }
   }
 
@@ -484,7 +514,11 @@ export class PhotoStorage {
                   migratedCount++;
                 };
                 request.onerror = () => {
-                  console.warn(`Failed to migrate photo ${photo.id}:`, request.error);
+                  logger.warn(`Failed to migrate photo ${photo.id}`, {
+                    component: 'PhotoStorage',
+                    action: 'migrateFromLocalStorage',
+                    metadata: { photoId: photo.id, error: request.error },
+                  });
                 };
               });
               
@@ -500,20 +534,29 @@ export class PhotoStorage {
               };
               
               transaction.onerror = () => {
-                console.error('Migration transaction failed:', transaction.error);
+                logger.error('Migration transaction failed', transaction.error || new Error('Unknown transaction error'), {
+                  component: 'PhotoStorage',
+                  action: 'migrateFromLocalStorage',
+                });
                 reject(transaction.error);
               };
             });
           }
         } catch (error) {
-          console.error('Error parsing photos from localStorage:', error);
+          logger.error('Error parsing photos from localStorage', error instanceof Error ? error : new Error(String(error)), {
+            component: 'PhotoStorage',
+            action: 'migrateFromLocalStorage',
+          });
         }
       }
       
       // Update version
       localStorage.setItem(this.VERSION_KEY, this.CURRENT_VERSION);
     } catch (error) {
-      console.error('Error during migration:', error);
+      logger.error('Error during migration', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'migrateData',
+      });
     }
   }
 }

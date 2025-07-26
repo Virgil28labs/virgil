@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Import Virgil Design System */
+@import "./styles/variables.css";
+@import "./styles/animations.css";
+@import "./styles/modal.css";
+@import "./styles/components.css";
+
 /* Theme configuration for Tailwind v4 */
 @theme {
   --color-brand-dark-purple: #2D2640;

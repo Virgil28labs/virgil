@@ -6,6 +6,7 @@ import type { VectorSearchResult } from './vectorService';
 import { timeService } from './TimeService';
 import { dashboardContextService } from './DashboardContextService';
 import { DynamicContextBuilder } from './DynamicContextBuilder';
+import { logger } from '../lib/logger';
 
 export interface VectorMemory {
   id: string;
@@ -38,7 +39,10 @@ export class VectorMemoryService extends MemoryService {
     try {
       this.isVectorServiceHealthy = await vectorService.isHealthy();
     } catch (error) {
-      console.error('Vector service health check failed:', error);
+      logger.error('Vector service health check failed', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'checkHealth',
+      });
       this.isVectorServiceHealthy = false;
     }
   }
@@ -70,7 +74,10 @@ export class VectorMemoryService extends MemoryService {
       // Log activity
       dashboardContextService.logActivity('Stored semantic memory', 'vector-memory');
     } catch (error) {
-      console.error('Failed to store message with embedding:', error);
+      logger.error('Failed to store message with embedding', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'storeMessage',
+      });
       // Don't show error to user - this is a background operation
     }
   }
@@ -88,7 +95,10 @@ export class VectorMemoryService extends MemoryService {
       
       return results.map(result => this.parseVectorResult(result));
     } catch (error) {
-      console.error('Failed to search similar memories:', error);
+      logger.error('Failed to search similar memories', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'searchSimilar',
+      });
       toastService.error('Unable to search memories');
       return [];
     }
@@ -127,7 +137,10 @@ export class VectorMemoryService extends MemoryService {
 
       return enhancedContext;
     } catch (error) {
-      console.error('Failed to get enhanced context:', error);
+      logger.error('Failed to get enhanced context', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'getEnhancedContext',
+      });
       // Fall back to regular context
       return this.getContextForPrompt();
     }
@@ -152,7 +165,10 @@ export class VectorMemoryService extends MemoryService {
 
       toastService.success(`Synced ${markedMemories.length} memories`);
     } catch (error) {
-      console.error('Failed to sync memories:', error);
+      logger.error('Failed to sync memories', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'syncMemories',
+      });
       toastService.error('Unable to sync memories');
     }
   }
@@ -165,7 +181,10 @@ export class VectorMemoryService extends MemoryService {
       const count = await vectorService.getCount();
       return { count, healthy: this.isVectorServiceHealthy };
     } catch (error) {
-      console.error('Failed to get vector memory stats:', error);
+      logger.error('Failed to get vector memory stats', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'getStats',
+      });
       return { count: 0, healthy: false };
     }
   }

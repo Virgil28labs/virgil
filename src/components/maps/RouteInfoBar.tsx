@@ -1,6 +1,6 @@
 import React from 'react';
 import { DepartureTimeSelector } from './DepartureTimeSelector';
-import './RouteInfoBar.css';
+import './maps.css';
 
 interface RouteInfoBarProps {
   route: google.maps.DirectionsRoute | null

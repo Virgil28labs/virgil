@@ -1,0 +1,519 @@
+/* ========================================
+   VIRGIL NOTES APP STYLES
+   All styles for the Notes application
+   ======================================== */
+
+/* Notes App Container */
+.notes-modal .modal-content {
+  background: var(--brand-dark-purple);
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem;
+  gap: 1.5rem;
+}
+
+.notes-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notes-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(178, 165, 193, 0.3) transparent;
+}
+
+/* Notes Input */
+.notes-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notes-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  background: rgba(245, 245, 245, 0.05);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  border-radius: var(--radius-large);
+  padding: 0.75rem 1rem;
+  transition: all var(--transition-normal);
+}
+
+.notes-input-wrapper:hover {
+  background: rgba(245, 245, 245, 0.08);
+  border-color: rgba(178, 165, 193, 0.3);
+}
+
+.notes-input-wrapper.focused {
+  background: rgba(245, 245, 245, 0.1);
+  border-color: var(--brand-accent-purple);
+  box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.1);
+  transform: translateY(-1px);
+}
+
+.notes-input-icon {
+  font-size: 1.2rem;
+  margin-right: 0.75rem;
+  margin-top: 0.1rem;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.notes-input-wrapper.focused .notes-input-icon {
+  opacity: 1;
+}
+
+.notes-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--brand-light-gray);
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+  min-height: 1.5rem;
+  max-height: 120px;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.notes-input::placeholder {
+  color: rgba(178, 165, 193, 0.6);
+  transition: color var(--transition-normal);
+}
+
+.notes-input-wrapper.focused .notes-input::placeholder {
+  color: rgba(178, 165, 193, 0.8);
+}
+
+.notes-submit-button {
+  background: var(--brand-accent-purple);
+  color: var(--brand-light-gray);
+  border: none;
+  border-radius: var(--radius-medium);
+  padding: 0.4rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  opacity: 0.9;
+}
+
+.notes-submit-button:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(108, 59, 170, 0.3);
+}
+
+.notes-submit-button:active {
+  transform: translateY(0);
+}
+
+.notes-input-hint {
+  font-size: 0.75rem;
+  color: rgba(178, 165, 193, 0.5);
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.notes-input-form:hover .notes-input-hint,
+.notes-input-wrapper.focused ~ .notes-input-hint {
+  opacity: 1;
+}
+
+/* Notes Filter */
+.notes-filter-container {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.notes-search-wrapper {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.notes-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(178, 165, 193, 0.5);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.notes-search-wrapper:focus-within .notes-search-icon {
+  color: var(--brand-accent-purple);
+}
+
+.notes-search-input {
+  width: 100%;
+  background: rgba(245, 245, 245, 0.05);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  border-radius: var(--radius-medium);
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  color: var(--brand-light-gray);
+  outline: none;
+  transition: all var(--transition-fast);
+  font-size: 0.95rem;
+}
+
+.notes-search-input::placeholder {
+  color: rgba(178, 165, 193, 0.5);
+}
+
+.notes-search-input:focus {
+  background: rgba(245, 245, 245, 0.08);
+  border-color: var(--brand-accent-purple);
+  box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.1);
+}
+
+.notes-filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.notes-filter-button {
+  background: rgba(245, 245, 245, 0.05);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  color: rgba(178, 165, 193, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.notes-filter-button:hover {
+  background: rgba(245, 245, 245, 0.1);
+  border-color: rgba(178, 165, 193, 0.3);
+  color: var(--brand-light-gray);
+}
+
+.notes-filter-button.active {
+  background: var(--brand-accent-purple);
+  border-color: var(--brand-accent-purple);
+  color: var(--brand-light-gray);
+}
+
+.notes-filter-button.active:hover {
+  background: rgba(108, 59, 170, 0.9);
+}
+
+.notes-result-count {
+  font-size: 0.875rem;
+  color: rgba(178, 165, 193, 0.6);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Notes List */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notes-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: rgba(178, 165, 193, 0.5);
+}
+
+.notes-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.notes-empty-text {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.notes-empty-hint {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Notes Entry */
+.notes-entry {
+  background: rgba(245, 245, 245, 0.03);
+  border: 1px solid rgba(178, 165, 193, 0.15);
+  border-radius: var(--radius-large);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  animation: fadeInScale 300ms ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.notes-entry:hover {
+  background: rgba(245, 245, 245, 0.05);
+  border-color: rgba(178, 165, 193, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notes-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.notes-entry-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notes-entry-text {
+  color: var(--brand-light-gray);
+  line-height: 1.5;
+  margin: 0;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.notes-entry-timestamp {
+  font-size: 0.75rem;
+  color: rgba(178, 165, 193, 0.5);
+  white-space: nowrap;
+}
+
+.notes-entry-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.notes-entry:hover .notes-entry-actions {
+  opacity: 1;
+}
+
+.notes-action-button {
+  background: transparent;
+  border: none;
+  color: rgba(178, 165, 193, 0.6);
+  padding: 0.25rem;
+  cursor: pointer;
+  border-radius: var(--radius-small);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notes-action-button:hover {
+  color: var(--brand-light-gray);
+  background: rgba(245, 245, 245, 0.1);
+}
+
+.notes-action-button.delete:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm-modal .modal-panel {
+  max-width: 400px;
+}
+
+.delete-confirm-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.delete-confirm-icon {
+  font-size: 3rem;
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.delete-confirm-message {
+  color: var(--brand-light-gray);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.delete-confirm-submessage {
+  color: rgba(178, 165, 193, 0.7);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.delete-confirm-button {
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius-medium);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  outline: none;
+}
+
+.delete-confirm-button.cancel {
+  background: rgba(245, 245, 245, 0.1);
+  color: var(--brand-light-gray);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+}
+
+.delete-confirm-button.cancel:hover {
+  background: rgba(245, 245, 245, 0.15);
+  border-color: rgba(178, 165, 193, 0.3);
+}
+
+.delete-confirm-button.delete {
+  background: #ff6b6b;
+  color: white;
+}
+
+.delete-confirm-button.delete:hover {
+  background: #ff5252;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+/* Notes Error Boundary */
+.notes-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.notes-error-icon {
+  font-size: 3rem;
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.notes-error-title {
+  font-size: 1.5rem;
+  color: var(--brand-light-gray);
+  margin-bottom: 0.5rem;
+}
+
+.notes-error-message {
+  color: rgba(178, 165, 193, 0.8);
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.notes-error-button {
+  background: var(--brand-accent-purple);
+  color: var(--brand-light-gray);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-medium);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.notes-error-button:hover {
+  background: rgba(108, 59, 170, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(108, 59, 170, 0.3);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .notes-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .notes-input-wrapper {
+    padding: 0.625rem 0.875rem;
+  }
+  
+  .notes-input-icon {
+    font-size: 1.1rem;
+    margin-right: 0.625rem;
+  }
+  
+  .notes-input {
+    font-size: 0.95rem;
+  }
+  
+  .notes-input-hint {
+    font-size: 0.7rem;
+  }
+  
+  .notes-filter-container {
+    gap: 0.5rem;
+  }
+  
+  .notes-search-input {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.875rem 0.5rem 2.25rem;
+  }
+  
+  .notes-filter-button {
+    font-size: 0.8rem;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .notes-list {
+    gap: 0.5rem;
+  }
+  
+  .notes-entry {
+    padding: 0.875rem;
+  }
+  
+  .notes-entry-text {
+    font-size: 0.95rem;
+  }
+  
+  .notes-entry-timestamp {
+    font-size: 0.7rem;
+  }
+}

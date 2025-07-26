@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { timeService } from '../../services/TimeService';
-import './TrafficIndicator.css';
+import './maps.css';
 
 interface TrafficIndicatorProps {
   map: google.maps.Map | null

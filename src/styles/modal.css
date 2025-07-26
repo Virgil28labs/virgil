@@ -1,5 +1,9 @@
-/* Modal.css - Common modal styles */
+/* ========================================
+   VIRGIL MODAL SYSTEM
+   Shared modal styles for all app modals
+   ======================================== */
 
+/* Base Modal Styles */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -49,7 +53,7 @@
   }
 }
 
-/* Size variants */
+/* Size Variants */
 .modal-small {
   width: 90%;
   max-width: 400px;
@@ -72,7 +76,7 @@
   max-height: 900px;
 }
 
-/* Header */
+/* Modal Header */
 .modal-header {
   display: flex;
   align-items: center;
@@ -110,14 +114,35 @@
   background: rgba(245, 245, 245, 0.1);
 }
 
-/* Content */
+/* Modal Content */
 .modal-content {
   flex: 1;
   overflow-y: auto;
   position: relative;
 }
 
-/* Responsive */
+/* Specialized Modal Content Variants */
+.modal-content-dark {
+  background: var(--brand-dark-purple);
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content-padded {
+  padding: 1.5rem;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(178, 165, 193, 0.1);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .modal-backdrop {
     align-items: flex-end;
@@ -145,4 +170,38 @@
       transform: translateY(0);
     }
   }
+}
+
+/* Specific Modal Style Modifiers */
+
+/* Notes Modal */
+.notes-modal .modal-content {
+  background: var(--brand-dark-purple);
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm-modal .modal-panel {
+  max-width: 400px;
+}
+
+/* Maps Modal */
+.maps-modal .modal-content {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Gallery Modals */
+.gallery-modal .modal-content {
+  background: transparent;
+  padding: 0;
+}
+
+/* Chat Modal */
+.chat-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }

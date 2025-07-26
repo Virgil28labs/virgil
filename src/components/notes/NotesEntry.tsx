@@ -7,7 +7,7 @@ import { useState, useCallback, useMemo, memo } from 'react';
 import type { Entry } from './types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { formatRelativeTime } from './utils/dateUtils';
-import './NotesEntry.css';
+import './notes.css';
 
 interface NotesEntryProps {
   entry: Entry

@@ -95,9 +95,12 @@ export function useGooglePlacesAutocomplete(
           };
           
           // Fetch suggestions using the new API
-          // @ts-ignore - TypeScript types may not be updated yet
           const { suggestions: autocompleteSuggestions } = 
-            await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+            await (google.maps.places as unknown as {
+              AutocompleteSuggestion: {
+                fetchAutocompleteSuggestions: (request: unknown) => Promise<{ suggestions: unknown[] }>
+              }
+            }).AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
 
           // Transform suggestions to our format
           formattedSuggestions = autocompleteSuggestions
@@ -221,8 +224,7 @@ export function useGooglePlacesAutocomplete(
       if (suggestion.placePrediction && 'toPlace' in suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
         try {
           // Convert prediction to place
-          // @ts-ignore - TypeScript types may not be updated yet
-          const place = suggestion.placePrediction.toPlace();
+          const place = suggestion.placePrediction.toPlace() as ExtendedPlace;
           
           // Fetch place details with correct field names for new API
           await place.fetchFields?.({
@@ -243,7 +245,11 @@ export function useGooglePlacesAutocomplete(
           };
 
         } catch (newApiError) {
-          console.warn('New API failed, falling back to classic API:', newApiError);
+          logger.warn('New API failed, falling back to classic API', {
+            component: 'useGooglePlacesAutocomplete',
+            action: 'selectPlace',
+            metadata: { error: newApiError },
+          });
           // Fall through to classic API
         }
       }

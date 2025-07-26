@@ -1,6 +1,6 @@
 import type { Entry } from './types';
 import { NotesEntry } from './NotesEntry';
-import './NotesList.css';
+import './notes.css';
 
 interface NotesListProps {
   entries: Entry[]

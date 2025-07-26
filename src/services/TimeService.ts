@@ -180,8 +180,8 @@ export class TimeService {
           for (const callback of this.timeListeners) {
             try {
               callback(timeUpdate);
-            } catch (error) {
-              console.error('Error in time update callback:', error);
+            } catch (_error) {
+              // Silent fail for callback errors to prevent cascade failures
             }
           }
         }

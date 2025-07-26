@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import './RouteInputBar.css';
+import './maps.css';
 import { logger } from '../../lib/logger';
 import { useGooglePlacesAutocomplete, type PlaceSuggestion } from '../../hooks/useGooglePlacesAutocomplete';
 
