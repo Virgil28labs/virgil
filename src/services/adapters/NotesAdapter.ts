@@ -1,6 +1,6 @@
 /**
  * NotesAdapter - Dashboard App Adapter for Notes Application
- * 
+ *
  * Provides unified access to notes data for Virgil AI assistant,
  * enabling intelligent responses about user's notes, tasks, and reflections.
  */
@@ -35,7 +35,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   readonly appName = 'notes';
   readonly displayName = 'Notes';
   readonly icon = '📝';
-  
+
   private entries: Entry[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -70,7 +70,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     const now = timeService.getTimestamp();
     const taskStats = this.calculateTaskStats();
     const recentEntries = this.getRecentEntries(5);
-    
+
     const data: NotesData = {
       totalNotes: this.entries.length,
       recentNotes: recentEntries.map(entry => ({
@@ -84,16 +84,16 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       taskCount: taskStats,
       tagDistribution: this.calculateTagDistribution(),
       actionTypeDistribution: this.calculateActionTypeDistribution(),
-      lastUpdate: this.entries.length > 0 
-        ? this.entries.reduce((latest, entry) => 
-          entry.timestamp > latest ? entry.timestamp : latest, 
+      lastUpdate: this.entries.length > 0
+        ? this.entries.reduce((latest, entry) =>
+          entry.timestamp > latest ? entry.timestamp : latest,
         this.entries[0].timestamp,
         )
         : null,
     };
 
     const summary = this.generateSummary(data);
-    const isActive = recentEntries.some(entry => 
+    const isActive = recentEntries.some(entry =>
       // eslint-disable-next-line no-restricted-syntax
       now - entry.timestamp.getTime() < 30 * 60 * 1000, // Active if used in last 30 minutes
     );
@@ -187,15 +187,15 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
   private generateSummary(data: NotesData): string {
     const parts: string[] = [];
-    
+
     if (data.totalNotes > 0) {
       parts.push(`${data.totalNotes} notes`);
     }
-    
+
     if (data.taskCount.pending > 0) {
       parts.push(`${data.taskCount.pending} pending tasks`);
     }
-    
+
     if (data.recentNotes.length > 0) {
       const lastNote = data.recentNotes[0];
       const timeAgo = this.getTimeAgo(lastNote.timestamp);
@@ -212,7 +212,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -275,13 +275,13 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
   private getTaskResponse(_query: string): string {
     const taskStats = this.calculateTaskStats();
-    
+
     if (taskStats.total === 0) {
       return "You don't have any tasks in your notes yet.";
     }
 
     const pendingTasks = this.entries
-      .flatMap(entry => 
+      .flatMap(entry =>
         entry.tasks
           .filter(task => !task.completed)
           .map(task => ({ task, entry })),
@@ -302,7 +302,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
   private getRecentNotesResponse(): string {
     const recent = this.getRecentEntries(3);
-    
+
     if (recent.length === 0) {
       return "You haven't created any notes yet.";
     }
@@ -321,14 +321,14 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   private getTagResponse(query: string): string {
     const distribution = this.calculateTagDistribution();
     const tags: TagType[] = ['work', 'health', 'money', 'people', 'growth', 'life'];
-    
+
     // Check for specific tag
     const requestedTag = tags.find(tag => query.includes(tag));
     if (requestedTag && distribution[requestedTag] > 0) {
       const taggedEntries = this.entries
         .filter(entry => entry.tags.includes(requestedTag))
         .slice(0, 3);
-      
+
       let response = `You have ${distribution[requestedTag]} notes tagged with "${requestedTag}"`;
       if (taggedEntries.length > 0) {
         response += '. Recent ones:\n';
@@ -364,7 +364,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     }
 
     const searchTerm = searchMatch[1].toLowerCase();
-    const matches = this.entries.filter(entry => 
+    const matches = this.entries.filter(entry =>
       entry.content.toLowerCase().includes(searchTerm),
     );
 
@@ -394,15 +394,15 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     }
 
     let response = `You have ${data.totalNotes} notes`;
-    
+
     if (data.taskCount.pending > 0) {
       response += ` with ${data.taskCount.pending} pending tasks`;
     }
-    
+
     if (data.recentNotes.length > 0) {
       const lastNote = data.recentNotes[0];
       response += `. Your last note was ${this.getTimeAgo(lastNote.timestamp)}`;
-      
+
       if (lastNote.actionType) {
         response += ` (${lastNote.actionType})`;
       }
@@ -414,9 +414,9 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
 
   async search(query: string): Promise<unknown[]> {
     await this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
-    const matches = this.entries.filter(entry => 
+    const matches = this.entries.filter(entry =>
       entry.content.toLowerCase().includes(lowerQuery) ||
       entry.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
       (entry.actionType && entry.actionType.toLowerCase().includes(lowerQuery)),
@@ -436,39 +436,39 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
   private calculateRelevance(entry: Entry, query: string): number {
     let score = 0;
     const lowerContent = entry.content.toLowerCase();
-    
+
     // Content matches
     const contentMatches = (lowerContent.match(new RegExp(query, 'g')) || []).length;
     score += contentMatches * 10;
-    
+
     // Tag matches
     if (entry.tags.some(tag => tag.toLowerCase().includes(query))) {
       score += 20;
     }
-    
+
     // Action type matches
     if (entry.actionType && entry.actionType.toLowerCase().includes(query)) {
       score += 15;
     }
-    
+
     // Recency bonus
     const ageInDays = (timeService.getTimestamp() - entry.timestamp.getTime()) / (1000 * 60 * 60 * 24); // eslint-disable-line no-restricted-syntax
     score += Math.max(0, 10 - ageInDays);
-    
+
     return score;
   }
 
   subscribe(callback: (data: NotesData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up periodic refresh
     const intervalId = setInterval(() => {
       this.refreshData();
     }, 30000); // Refresh every 30 seconds
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);

@@ -14,9 +14,9 @@ interface UserProfileViewerProps {
   onClose: () => void;
 }
 
-export const UserProfileViewer = memo(function UserProfileViewer({ 
-  isOpen, 
-  onClose, 
+export const UserProfileViewer = memo(function UserProfileViewer({
+  isOpen,
+  onClose,
 }: UserProfileViewerProps) {
   const { user, signOut } = useAuth();
   const { ipLocation } = useLocation();
@@ -78,10 +78,9 @@ export const UserProfileViewer = memo(function UserProfileViewer({
     onEscape: onClose,
   });
 
-
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
-    
+
     setIsSigningOut(true);
     const { error } = await signOut();
     if (error) {
@@ -100,15 +99,15 @@ export const UserProfileViewer = memo(function UserProfileViewer({
   return (
     <>
       <div className="profile-backdrop" onClick={onClose} aria-hidden="true" />
-      <div 
-        ref={containerRef as React.RefObject<HTMLDivElement>} 
-        className="user-profile-viewer" 
-        role="dialog" 
+      <div
+        ref={containerRef as React.RefObject<HTMLDivElement>}
+        className="user-profile-viewer"
+        role="dialog"
         aria-modal="true"
         aria-label="User Profile"
       >
         <div className="profile-viewer-header">
-          <button 
+          <button
             className="profile-close-btn"
             onClick={onClose}
             aria-label="Close profile viewer"
@@ -120,13 +119,13 @@ export const UserProfileViewer = memo(function UserProfileViewer({
             <div className="profile-avatar-container">
               <div className="profile-avatar-small">
                 {user?.user_metadata?.avatarUrl ? (
-                  <img 
-                    src={user.user_metadata.avatarUrl} 
-                    alt="Profile avatar" 
+                  <img
+                    src={user.user_metadata.avatarUrl}
+                    alt="Profile avatar"
                     className="avatar-image"
                   />
-                ) : profile.fullName ? 
-                  profile.fullName.charAt(0).toUpperCase() : 
+                ) : profile.fullName ?
+                  profile.fullName.charAt(0).toUpperCase() :
                   '👤'}
               </div>
               <svg className="profile-completion-ring" viewBox="0 0 36 36">
@@ -157,7 +156,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
             </div>
           </div>
         </div>
-      
+
         <div className="profile-tabs" role="tablist">
           <button
             role="tab"
@@ -182,7 +181,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
             Virgil
           </button>
         </div>
-      
+
         <div className="profile-viewer-content">
           {activeTab === 'user' ? (
             <div
@@ -303,7 +302,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                       <h4>Address</h4>
                       <div className="card-header-actions">
                         <span className="card-icon">🏠</span>
-                        <button 
+                        <button
                           className="address-expand-btn"
                           aria-expanded={showAddress}
                           aria-label={showAddress ? 'Hide address' : 'Show address'}
@@ -360,7 +359,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
 
                   {/* Actions */}
                   <div className="profile-actions-container">
-                    <button 
+                    <button
                       className={`profile-action-btn signout ${isSigningOut ? 'signing-out' : ''}`}
                       onClick={handleSignOut}
                       data-keyboard-nav
@@ -526,7 +525,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                   <div className="virgil-data-section">
                     <h4>🔐 Permissions</h4>
                     <div className="permission-grid">
-                      <button 
+                      <button
                         className={`permission-btn ${permissions.geolocation}`}
                         onClick={() => requestPermission('geolocation')}
                         disabled={permissions.geolocation === 'granted'}
@@ -535,7 +534,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         <span className="perm-name">Location</span>
                         {permissions.geolocation === 'granted' && <span className="check">✓</span>}
                       </button>
-                      <button 
+                      <button
                         className={`permission-btn ${permissions.camera}`}
                         onClick={() => requestPermission('camera')}
                         disabled={permissions.camera === 'granted'}
@@ -544,7 +543,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         <span className="perm-name">Camera</span>
                         {permissions.camera === 'granted' && <span className="check">✓</span>}
                       </button>
-                      <button 
+                      <button
                         className={`permission-btn ${permissions.microphone}`}
                         onClick={() => requestPermission('microphone')}
                         disabled={permissions.microphone === 'granted'}
@@ -553,7 +552,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         <span className="perm-name">Microphone</span>
                         {permissions.microphone === 'granted' && <span className="check">✓</span>}
                       </button>
-                      <button 
+                      <button
                         className={`permission-btn ${permissions.notifications}`}
                         onClick={() => requestPermission('notifications')}
                         disabled={permissions.notifications === 'granted'}
@@ -562,7 +561,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         <span className="perm-name">Notifications</span>
                         {permissions.notifications === 'granted' && <span className="check">✓</span>}
                       </button>
-                      <button 
+                      <button
                         className={`permission-btn ${permissions.clipboard}`}
                         onClick={() => requestPermission('clipboard')}
                         disabled={permissions.clipboard === 'granted'}

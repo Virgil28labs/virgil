@@ -20,11 +20,11 @@ const LoadingStates = memo(function LoadingStates({
 
   const getLoadingText = () => {
     if (message) return message;
-    
+
     if (variant === 'typing') {
       return 'Virgil is thinking...';
     }
-    
+
     switch (type) {
       case 'generating':
         return 'Generating response...';
@@ -87,11 +87,11 @@ const LoadingStates = memo(function LoadingStates({
             <span className="loading-icon">{getLoadingIcon()}</span>
             <span className="loading-text">{getLoadingText()}</span>
           </div>
-          
+
           {progress !== undefined && (
             <div className="loading-progress">
               <div className="progress-bar">
-                <div 
+                <div
                   className="progress-fill"
                   style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
                 />
@@ -99,7 +99,7 @@ const LoadingStates = memo(function LoadingStates({
               <span className="progress-text">{Math.round(progress)}%</span>
             </div>
           )}
-          
+
           <div className="loading-animation">
             <div className="pulse-dot pulse-1" />
             <div className="pulse-dot pulse-2" />

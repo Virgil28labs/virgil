@@ -15,14 +15,14 @@ export class EventEmitter {
       this.events[event] = [];
     }
     this.events[event].push(listener as EventListener);
-    
+
     // Return unsubscribe function
     return () => this.off(event, listener);
   }
 
   off<T = unknown>(event: string, listenerToRemove: EventListener<T>): void {
     if (!this.events[event]) return;
-    
+
     this.events[event] = this.events[event].filter(
       listener => listener !== listenerToRemove,
     );
@@ -30,7 +30,7 @@ export class EventEmitter {
 
   emit<T = unknown>(event: string, data: T): void {
     if (!this.events[event]) return;
-    
+
     this.events[event].forEach(listener => {
       try {
         listener(data);
@@ -49,7 +49,7 @@ export class EventEmitter {
       listener(data);
       this.off(event, onceWrapper);
     };
-    
+
     this.on(event, onceWrapper);
   }
 

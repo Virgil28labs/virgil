@@ -96,14 +96,14 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
             >
               Select All
             </button>
-            
+
             <button
               className="gallery-action-btn clear-selection-btn"
               onClick={onClearSelection}
             >
               Clear ({selectedCount})
             </button>
-            
+
             {selectedCount > 0 && (
               <>
                 <button
@@ -113,7 +113,7 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
                   <span className="btn-icon">❤️</span>
                   Favorite
                 </button>
-                
+
                 <button
                   className="gallery-action-btn unfavorite-btn"
                   onClick={() => onBulkFavorite(false)}
@@ -121,7 +121,7 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
                   <span className="btn-icon">🤍</span>
                   Unfavorite
                 </button>
-                
+
                 <button
                   className="gallery-action-btn delete-btn"
                   onClick={onBulkDelete}
@@ -197,11 +197,11 @@ export const PhotoGallery = memo(function PhotoGallery({
 
   const handleBulkDeleteConfirm = useCallback(async () => {
     if (galleryState.selectedPhotos.size === 0) return;
-    
+
     const confirmed = window.confirm(
       `Are you sure you want to delete ${galleryState.selectedPhotos.size} photo${galleryState.selectedPhotos.size > 1 ? 's' : ''}?`,
     );
-    
+
     if (confirmed) {
       const deletedCount = await handleBulkDelete();
       if (deletedCount > 0) {
@@ -212,7 +212,7 @@ export const PhotoGallery = memo(function PhotoGallery({
 
   const handleBulkFavoriteAction = useCallback(async (makeFavorite: boolean) => {
     if (galleryState.selectedPhotos.size === 0) return;
-    
+
     await handleBulkFavorite(makeFavorite);
     setIsSelectionMode(false);
   }, [galleryState.selectedPhotos.size, handleBulkFavorite]);

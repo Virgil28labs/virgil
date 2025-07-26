@@ -4,7 +4,7 @@ import { StorageService } from '../services/StorageService';
 /**
  * Custom hook for localStorage with automatic JSON serialization
  * Uses StorageService for consistent storage access
- * 
+ *
  * @param key - The localStorage key
  * @param initialValue - The initial value if nothing is stored
  * @returns [value, setValue, removeValue] tuple

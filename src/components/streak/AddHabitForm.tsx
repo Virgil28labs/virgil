@@ -8,7 +8,6 @@ interface AddHabitFormProps {
   onCancel: () => void
 }
 
-
 export const AddHabitForm = memo(function AddHabitForm({
   onAdd,
   onCancel,
@@ -26,12 +25,12 @@ export const AddHabitForm = memo(function AddHabitForm({
   // Auto-suggest emoji based on habit name
   const suggestedEmoji = useMemo(() => {
     if (!name.trim()) return '🎯';
-    
+
     const lowercaseName = name.toLowerCase();
     const match = EMOJI_DATABASE.find(({ keywords }) =>
       keywords.some(keyword => lowercaseName.includes(keyword)),
     );
-    
+
     return match?.emoji || '🎯';
   }, [name]);
 
@@ -67,8 +66,8 @@ export const AddHabitForm = memo(function AddHabitForm({
   }, [emoji, showSuggestions]);
 
   return (
-    <form 
-      className="add-habit-form" 
+    <form
+      className="add-habit-form"
       onSubmit={handleSubmit}
       onKeyDown={handleKeyDown}
     >
@@ -82,7 +81,7 @@ export const AddHabitForm = memo(function AddHabitForm({
           maxLength={30}
           className="habit-name-input"
         />
-        
+
         <button
           type="button"
           className={`emoji-picker-button ${displayEmoji ? 'has-emoji' : 'empty'}`}
@@ -93,7 +92,7 @@ export const AddHabitForm = memo(function AddHabitForm({
           {displayEmoji}
         </button>
       </div>
-      
+
       <div className="form-actions">
         <button
           type="button"
@@ -110,7 +109,7 @@ export const AddHabitForm = memo(function AddHabitForm({
           Create Habit
         </button>
       </div>
-      
+
       {showSuggestions && (
         <div className="suggestions-wrapper">
           <EmojiSuggestions
@@ -120,7 +119,7 @@ export const AddHabitForm = memo(function AddHabitForm({
           />
         </div>
       )}
-      
+
       {showEmojiPicker && (
         <EmojiPicker
           onSelect={handleEmojiSelect}

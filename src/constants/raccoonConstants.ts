@@ -42,7 +42,11 @@ export const ANIMATION_TIMINGS = {
   SPARKLE_DURATION: 1000, // 1 second
   PICKUP_DROP_DELAY: 2000, // 2 seconds
   TARGET_FPS: 60,
+  DOUBLE_CLICK_DELAY: 300, // 300ms for double click detection
 } as const;
+
+// Timing constants (alias for backwards compatibility)
+export const TIMING_CONSTANTS = ANIMATION_TIMINGS;
 
 // Raccoon dimensions
 export const RACCOON_SIZE = {

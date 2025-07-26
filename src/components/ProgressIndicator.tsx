@@ -34,9 +34,9 @@ export const ProgressIndicator = memo(function ProgressIndicator({
     return (
       <div style={{ width: '100%', maxWidth: '300px' }}>
         {label && (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             marginBottom: '8px',
             fontSize: '0.875rem',
             color: 'var(--brand-light-gray)',
@@ -79,7 +79,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
     return (
       <div style={{ textAlign: 'center' }}>
         {label && (
-          <div style={{ 
+          <div style={{
             marginBottom: '16px',
             fontSize: '0.875rem',
             color: 'var(--brand-light-gray)',
@@ -118,7 +118,7 @@ export const ProgressIndicator = memo(function ProgressIndicator({
   return (
     <div style={{ textAlign: 'center' }}>
       {label && (
-        <div style={{ 
+        <div style={{
           marginBottom: '16px',
           fontSize: '0.875rem',
           color: 'var(--brand-light-gray)',
@@ -223,7 +223,7 @@ if (typeof document !== 'undefined') {
       }
     }
   `;
-  
+
   if (!document.querySelector('[data-progress-styles]')) {
     style.setAttribute('data-progress-styles', 'true');
     document.head.appendChild(style);

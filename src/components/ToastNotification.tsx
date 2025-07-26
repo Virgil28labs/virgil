@@ -18,9 +18,9 @@ interface ToastNotificationProps {
   onDismiss: (id: string) => void;
 }
 
-export const ToastNotification = memo(function ToastNotification({ 
-  toast, 
-  onDismiss, 
+export const ToastNotification = memo(function ToastNotification({
+  toast,
+  onDismiss,
 }: ToastNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -107,7 +107,7 @@ export const ToastNotification = memo(function ToastNotification({
         >
           {currentStyle.icon}
         </div>
-        
+
         <div style={{ flex: 1, minWidth: 0 }}>
           {title && (
             <div
@@ -128,7 +128,7 @@ export const ToastNotification = memo(function ToastNotification({
           >
             {message}
           </div>
-          
+
           {action && (
             <button
               onClick={action.onClick}
@@ -149,7 +149,7 @@ export const ToastNotification = memo(function ToastNotification({
             </button>
           )}
         </div>
-        
+
         <button
           onClick={handleDismiss}
           style={{
@@ -167,7 +167,7 @@ export const ToastNotification = memo(function ToastNotification({
           ×
         </button>
       </div>
-      
+
       {!persistent && duration > 0 && (
         <div
           style={{
@@ -243,7 +243,7 @@ if (typeof document !== 'undefined') {
       }
     }
   `;
-  
+
   if (!document.querySelector('[data-toast-styles]')) {
     style.setAttribute('data-toast-styles', 'true');
     document.head.appendChild(style);

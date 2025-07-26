@@ -118,7 +118,7 @@ export function sanitizeInput(input: string): string {
  */
 export function isValidCreditCard(cardNumber: string): boolean {
   const digits = cardNumber.replace(/\D/g, '');
-  
+
   if (digits.length < 13 || digits.length > 19) {
     return false;
   }

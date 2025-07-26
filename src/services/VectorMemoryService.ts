@@ -22,7 +22,7 @@ export class VectorMemoryService extends MemoryService {
   private isVectorServiceHealthy = false;
   private readonly MIN_MESSAGE_LENGTH = 50; // Minimum chars to store as vector
   private readonly CONTEXT_SEARCH_LIMIT = 5; // Number of memories to retrieve for context
-  
+
   constructor() {
     super();
     this.checkVectorServiceHealth();
@@ -64,13 +64,13 @@ export class VectorMemoryService extends MemoryService {
     try {
       // Create context string
       const context = this.createMessageContext(message);
-      
+
       // Combine message content with context for better embedding
       const contentWithContext = `${message.content}\n[Context: ${context}]`;
-      
+
       // Store in vector database
       await vectorService.store(contentWithContext);
-      
+
       // Log activity
       dashboardContextService.logActivity('Stored semantic memory', 'vector-memory');
     } catch (error) {
@@ -92,7 +92,7 @@ export class VectorMemoryService extends MemoryService {
 
     try {
       const results = await vectorService.search(query, limit);
-      
+
       return results.map(result => this.parseVectorResult(result));
     } catch (error) {
       logger.error('Failed to search similar memories', error instanceof Error ? error : new Error(String(error)), {
@@ -116,14 +116,14 @@ export class VectorMemoryService extends MemoryService {
     try {
       // Get semantically similar memories
       const similarMemories = await this.searchSimilarMemories(userQuery, this.CONTEXT_SEARCH_LIMIT);
-      
+
       if (similarMemories.length === 0) {
         return this.getContextForPrompt();
       }
 
       // Build enhanced context
       let enhancedContext = '\n\nRelevant memories:\n';
-      
+
       similarMemories.forEach((memory, index) => {
         const relevance = memory.similarity ? `(${Math.round(memory.similarity * 100)}% relevant)` : '';
         enhancedContext += `${index + 1}. ${memory.content} ${relevance}\n`;
@@ -156,7 +156,7 @@ export class VectorMemoryService extends MemoryService {
 
     try {
       const markedMemories = await this.getMarkedMemories();
-      
+
       for (const memory of markedMemories) {
         // Check if already synced (could track this with a flag)
         const contentWithContext = `${memory.content}\n[Context: ${memory.context}]`;
@@ -221,9 +221,9 @@ export class VectorMemoryService extends MemoryService {
     // Need to convert timestamp to Date for formatting
     // eslint-disable-next-line no-restricted-syntax
     const time = timeService.formatDateToLocal(new Date(message.timestamp));
-    
+
     let context = `${time}, ${message.role}`;
-    
+
     if (dashboardContext) {
       const contextSummary = DynamicContextBuilder.createContextSummary(dashboardContext);
       context += `, ${contextSummary}`;

@@ -37,7 +37,7 @@ export const GiphyGrid = memo(function GiphyGrid({
           onFavoriteToggle={() => onFavoriteToggle(gif)}
         />
       ))}
-      
+
       {/* Loading more indicator */}
       {loading && gifs.length > 0 && (
         <div className="giphy-loading-more">

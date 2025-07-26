@@ -1,6 +1,6 @@
 /**
  * RhythmMachineAdapter - Dashboard App Adapter for Rhythm Machine
- * 
+ *
  * Provides unified access to drum patterns and rhythm data for Virgil AI assistant,
  * enabling responses about saved beats, patterns, and music creation.
  */
@@ -42,7 +42,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   readonly appName = 'rhythm';
   readonly displayName = 'Rhythm Machine';
   readonly icon = '🥁';
-  
+
   private saveSlots: (SavedPattern | null)[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -88,7 +88,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     if (category) {
       return category;
     }
-    
+
     const desc = description.toLowerCase();
     if (desc.includes('techno')) return 'techno';
     if (desc.includes('house')) return 'house';
@@ -102,23 +102,23 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     if (desc.includes('glitch')) return 'glitch';
     if (desc.includes('ambient')) return 'ambient';
     if (desc.includes('rock')) return 'rock';
-    
+
     return 'other';
   }
 
   private calculateComplexity(pattern: boolean[][]): number {
     if (!pattern || pattern.length === 0) return 0;
-    
+
     let activeSteps = 0;
     let totalSteps = 0;
-    
+
     pattern.forEach(track => {
       track.forEach(step => {
         if (step) activeSteps++;
         totalSteps++;
       });
     });
-    
+
     return totalSteps > 0 ? (activeSteps / totalSteps) : 0;
   }
 
@@ -133,15 +133,15 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
   getContextData(): AppContextData<RhythmMachineData> {
     this.ensureFreshData();
-    
+
     const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
-    
+
     // Categorize patterns
     const categories: { [category: string]: number } = {};
     const genresUsed = new Set<string>();
     let totalBeats = 0;
     let totalComplexity = 0;
-    
+
     const recentPatterns = savedPatterns
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 5)
@@ -149,17 +149,17 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
         const category = this.getCategoryFromDescription(pattern.description, pattern.category);
         categories[category] = (categories[category] || 0) + 1;
         genresUsed.add(category);
-        
+
         const complexity = this.calculateComplexity(pattern.pattern);
         totalComplexity += complexity;
-        
+
         // Count total beats
         pattern.pattern.forEach(track => {
           track.forEach(step => {
             if (step) totalBeats++;
           });
         });
-        
+
         return {
           description: pattern.description,
           category,
@@ -168,7 +168,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
           bars: this.getBarCount(pattern.pattern),
         };
       });
-    
+
     // Find most active slot (most recently used)
     let mostActiveSlot: number | null = null;
     let mostRecentTime = 0;
@@ -178,7 +178,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
         mostActiveSlot = index + 1; // 1-indexed for user display
       }
     });
-    
+
     // Get popular categories
     const popularCategories = Object.entries(categories)
       .sort(([, a], [, b]) => b - a)
@@ -227,11 +227,11 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
     const parts: string[] = [];
     parts.push(`${data.patterns.total} drum patterns`);
-    
+
     if (data.stats.popularCategories.length > 0) {
       parts.push(`mostly ${data.stats.popularCategories[0]}`);
     }
-    
+
     const complexityPercent = Math.round(data.stats.averageComplexity * 100);
     if (complexityPercent > 60) {
       parts.push('complex beats');
@@ -245,7 +245,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -304,13 +304,13 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
     const emptySlots = 5 - data.patterns.total;
     let response = `You have ${data.patterns.total} drum pattern${data.patterns.total !== 1 ? 's' : ''} saved`;
-    
+
     if (emptySlots > 0) {
       response += ` with ${emptySlots} empty slot${emptySlots !== 1 ? 's' : ''} available`;
     } else {
       response += ' (all slots full)';
     }
-    
+
     response += '.';
 
     if (data.stats.totalBeats > 100) {
@@ -323,19 +323,19 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   private getGenreResponse(genre: string): string {
     const contextData = this.getContextData();
     const data = contextData.data;
-    
+
     const count = data.patterns.categories[genre] || 0;
-    
+
     if (count === 0) {
       return `You don't have any ${genre} patterns saved yet. Try creating a ${genre} beat in the Rhythm Machine!`;
     }
 
     let response = `You have ${count} ${genre} pattern${count !== 1 ? 's' : ''} saved`;
-    
+
     if (genre === data.stats.popularCategories[0]) {
       response += `. ${genre.charAt(0).toUpperCase() + genre.slice(1)} is your favorite style!`;
     }
-    
+
     response += '.';
 
     return response;
@@ -352,16 +352,16 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     const recent = data.patterns.recent[0];
     const date = timeService.fromTimestamp(recent.timestamp);
     const timeAgo = this.getTimeAgo(date);
-    
+
     let response = `Your most recent pattern is a ${recent.bars}-bar ${recent.category} beat: "${recent.description}", created ${timeAgo}`;
-    
+
     const complexityPercent = Math.round(recent.complexity * 100);
     if (complexityPercent > 70) {
       response += ' (complex pattern)';
     } else if (complexityPercent < 30) {
       response += ' (minimal groove)';
     }
-    
+
     response += '.';
 
     if (data.patterns.recent.length > 1) {
@@ -384,7 +384,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
     const avgComplexityPercent = Math.round(data.stats.averageComplexity * 100);
     let response = `Your drum patterns have an average complexity of ${avgComplexityPercent}%`;
-    
+
     if (avgComplexityPercent > 60) {
       response += '. You tend to create busy, complex beats with lots of hits!';
     } else if (avgComplexityPercent < 30) {
@@ -399,7 +399,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
       const sorted = [...patterns].sort((a, b) => b.complexity - a.complexity);
       const mostComplex = sorted[0];
       const leastComplex = sorted[sorted.length - 1];
-      
+
       response += `\n\nMost complex: "${mostComplex.description}" (${Math.round(mostComplex.complexity * 100)}%)`;
       response += `\nMost minimal: "${leastComplex.description}" (${Math.round(leastComplex.complexity * 100)}%)`;
     }
@@ -412,7 +412,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     const data = contextData.data;
 
     let response = 'Save slot status:\n';
-    
+
     this.saveSlots.forEach((slot, index) => {
       if (slot) {
         const category = this.getCategoryFromDescription(slot.description, slot.category);
@@ -438,16 +438,16 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     }
 
     let response = `Rhythm Machine: ${data.patterns.total} drum patterns`;
-    
+
     if (data.stats.popularCategories.length > 0) {
       response += ` (mostly ${data.stats.popularCategories.slice(0, 2).join(' and ')})`;
     }
-    
+
     const emptySlots = 5 - data.patterns.total;
     if (emptySlots > 0) {
       response += `, ${emptySlots} slots available`;
     }
-    
+
     response += '.';
 
     return response;
@@ -459,7 +459,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
@@ -468,16 +468,16 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     // Search in descriptions and categories
     savedPatterns.forEach((pattern, index) => {
       let relevance = 0;
-      
+
       if (pattern.description.toLowerCase().includes(lowerQuery)) {
         relevance += 100;
       }
-      
+
       const category = this.getCategoryFromDescription(pattern.description, pattern.category);
       if (category.includes(lowerQuery)) {
         relevance += 50;
       }
-      
+
       if (relevance > 0) {
         results.push({
           id: `slot-${index + 1}`,
@@ -495,19 +495,19 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
   subscribe(callback: (data: RhythmMachineData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up storage listener
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === this.STORAGE_KEY) {
         this.refreshData();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);

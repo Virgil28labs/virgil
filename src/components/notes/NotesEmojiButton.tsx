@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from '../common/EmojiButton';
 
-const NotesApp = lazy(() => 
-  import('./NotesApp').then(module => ({ 
-    default: module.NotesApp, 
+const NotesApp = lazy(() =>
+  import('./NotesApp').then(module => ({
+    default: module.NotesApp,
   })),
 );
 

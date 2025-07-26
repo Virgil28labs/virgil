@@ -1,6 +1,6 @@
 /**
  * DashboardContextService - Smart Context Collection & Management
- * 
+ *
  * Collects real-time context from dashboard components to enhance
  * Virgil's AI responses with environmental awareness.
  */
@@ -20,7 +20,7 @@ export interface DashboardContext {
   currentDate: string;
   timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
   dayOfWeek: string;
-  
+
   // Location context
   location: {
     hasGPS: boolean;
@@ -34,7 +34,7 @@ export interface DashboardContext {
     isp?: string;
     postal?: string;
   };
-  
+
   // Weather context
   weather: {
     hasData: boolean;
@@ -46,7 +46,7 @@ export interface DashboardContext {
     windSpeed?: number;
     unit: 'celsius' | 'fahrenheit';
   };
-  
+
   // User context
   user: {
     isAuthenticated: boolean;
@@ -56,7 +56,7 @@ export interface DashboardContext {
     preferences?: Record<string, unknown>;
     profile?: UserProfile;
   };
-  
+
   // Activity context
   activity: {
     activeComponents: string[];
@@ -64,7 +64,7 @@ export interface DashboardContext {
     timeSpentInSession: number;
     lastInteraction: number;
   };
-  
+
   // Environment context
   environment: {
     isOnline: boolean;
@@ -72,7 +72,7 @@ export interface DashboardContext {
     prefersDarkMode: boolean;
     language: string;
   };
-  
+
   // Device context (from useDeviceInfo)
   device: {
     hasData: boolean;
@@ -101,7 +101,7 @@ export interface DashboardContext {
     tabVisible?: boolean;
     sessionDuration?: number;
   };
-  
+
   // Dashboard apps context
   apps?: DashboardAppData;
 }
@@ -121,11 +121,11 @@ export class DashboardContextService {
   private listeners: ((context: DashboardContext) => void)[] = [];
   private activityLog: { action: string; timestamp: number }[] = [];
   private sessionStartTime: number;
-  
+
   // Unified timer system for periodic updates (context only, not time)
   private mainTimer?: NodeJS.Timeout;
   private lastMinuteUpdate: number = 0;
-  
+
   // Event listener references for cleanup
   private onlineHandler?: () => void;
   private offlineHandler?: () => void;
@@ -197,7 +197,7 @@ export class DashboardContextService {
   getLocalDate(): string {
     return timeService.getLocalDate();
   }
-  
+
   /**
    * Format any date to local YYYY-MM-DD format
    * @param date Date object to format
@@ -302,7 +302,7 @@ export class DashboardContextService {
       memberSince: userData.user?.created_at ? this.formatDateToLocal(timeService.parseDate(userData.user.created_at) || this.getCurrentDateTime()) : undefined,
       profile: userProfile,
     };
-    
+
     // Update the user profile adapter
     if (userProfile) {
       userProfileAdapter.updateProfile(userProfile, userData);
@@ -311,7 +311,7 @@ export class DashboardContextService {
         dashboardAppService.registerAdapter(userProfileAdapter);
       }
     }
-    
+
     this.notifyListeners();
   }
 
@@ -353,12 +353,12 @@ export class DashboardContextService {
   logActivity(action: string, component?: string): void {
     const timestamp = this.getTimestamp();
     this.activityLog.push({ action, timestamp });
-    
+
     // Keep only recent activities (last 10 minutes)
     this.activityLog = this.activityLog.filter(
       log => timestamp - log.timestamp < 10 * 60 * 1000,
     );
-    
+
     // Update activity context
     this.context.activity = {
       ...this.context.activity,
@@ -380,11 +380,11 @@ export class DashboardContextService {
   private startPeriodicUpdates(): void {
     // Initialize last minute update timestamp
     this.lastMinuteUpdate = timeService.getTimestamp();
-    
+
     // Context update timer (runs every minute)
     this.mainTimer = setInterval(() => {
       const now = timeService.getTimestamp();
-      
+
       // Update dashboard context every minute
       if (now - this.lastMinuteUpdate >= 60000) {
         this.lastMinuteUpdate = now;
@@ -406,7 +406,7 @@ export class DashboardContextService {
       this.context.environment.isOnline = false;
       this.notifyListeners();
     };
-    
+
     window.addEventListener('online', this.onlineHandler);
     window.addEventListener('offline', this.offlineHandler);
   }
@@ -646,7 +646,7 @@ export class DashboardContextService {
       clearInterval(this.mainTimer);
       this.mainTimer = undefined;
     }
-    
+
     // Remove event listeners
     if (this.onlineHandler) {
       window.removeEventListener('online', this.onlineHandler);
@@ -656,10 +656,10 @@ export class DashboardContextService {
       window.removeEventListener('offline', this.offlineHandler);
       this.offlineHandler = undefined;
     }
-    
+
     // Clear listeners
     this.listeners = [];
-    
+
     dashboardAppService.destroy();
   }
 }

@@ -64,7 +64,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
     // Text search
     if (filters.query.trim()) {
       const query = filters.query.toLowerCase();
-      
+
       filteredMemories = memories.filter(memory =>
         memory.content.toLowerCase().includes(query) ||
         memory.context.toLowerCase().includes(query) ||
@@ -82,7 +82,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
     if (filters.dateRange !== 'all') {
       const now = dashboardContextService.getTimestamp();
       let startTime = 0;
-      
+
       switch (filters.dateRange) {
         case 'today':
           startTime = now - (24 * 60 * 60 * 1000);
@@ -119,7 +119,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
     if (filters.tags.length > 0) {
       filteredMemories = filteredMemories.filter(memory => {
         if (memory.tag && filters.tags.includes(memory.tag)) return true;
-        return filters.tags.some(tag => 
+        return filters.tags.some(tag =>
           memory.content.toLowerCase().includes(`#${tag.toLowerCase()}`),
         );
       });
@@ -228,7 +228,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
             {isExpanded ? '🔼' : '🔽'}
           </button>
         </div>
-        
+
         {hasActiveFilters && (
           <button className="clear-filters" onClick={clearFilters}>
             Clear Filters
@@ -241,7 +241,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           <div className="filter-row">
             <div className="filter-group">
               <label>Date Range</label>
-              <select 
+              <select
                 value={filters.dateRange}
                 onChange={(e) => updateFilters({ dateRange: e.target.value as SearchFilters['dateRange'] })}
               >
@@ -255,7 +255,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
 
             <div className="filter-group">
               <label>Content Type</label>
-              <select 
+              <select
                 value={filters.contentType}
                 onChange={(e) => updateFilters({ contentType: e.target.value as SearchFilters['contentType'] })}
               >
@@ -267,7 +267,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
 
             <div className="filter-group">
               <label>Sort By</label>
-              <select 
+              <select
                 value={filters.sortBy}
                 onChange={(e) => updateFilters({ sortBy: e.target.value as SearchFilters['sortBy'] })}
               >

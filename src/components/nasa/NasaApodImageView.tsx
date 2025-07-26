@@ -36,7 +36,7 @@ export const NasaApodImageView = memo(function NasaApodImageView({
             <div className="nasa-apod-skeleton-shimmer" />
           </div>
         )}
-        
+
         {apod.mediaType === 'image' ? (
           <img
             src={apod.hdImageUrl || apod.imageUrl}
@@ -55,13 +55,13 @@ export const NasaApodImageView = memo(function NasaApodImageView({
             style={{ display: imageLoading ? 'none' : 'block' }}
           />
         )}
-        
+
         {/* Overlays */}
         <NasaApodFavoriteOverlay
           isFavorited={isFavorited}
           onFavoriteToggle={onFavoriteToggle}
         />
-        
+
         <NasaApodActionOverlay apod={apod} />
       </div>
 

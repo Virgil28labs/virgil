@@ -16,7 +16,7 @@ export interface UseChatApiOptions {
 
 /**
  * Custom hook for chat API interactions
- * 
+ *
  * Handles sending messages, loading states, and error handling
  */
 export function useChatApi(options: UseChatApiOptions = {}) {
@@ -37,11 +37,11 @@ export function useChatApi(options: UseChatApiOptions = {}) {
     setIsLoading(true);
     setError(null);
     options.onTypingChange?.(true);
-    
+
     // Enhanced loading states
     setLoadingState({ type: 'processing' });
     options.onLoadingStateChange?.({ type: 'processing' });
-    
+
     // Simulate progress for better UX
     const progressInterval = setInterval(() => {
       setLoadingState(prev => {
@@ -58,24 +58,24 @@ export function useChatApi(options: UseChatApiOptions = {}) {
       // Update to thinking state
       setLoadingState({ type: 'thinking', progress: 90 });
       options.onLoadingStateChange?.({ type: 'thinking', progress: 90 });
-      
+
       const response = await chatService.sendMessage(
         userMessage,
         systemPrompt,
         previousMessages,
         model,
       );
-      
+
       // Complete the progress
       setLoadingState({ type: 'generating', progress: 100 });
       options.onLoadingStateChange?.({ type: 'generating', progress: 100 });
-      
+
       options.onSuccess?.(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
       options.onError?.(errorMessage);
-      
+
       // Send fallback message
       const fallbackMessage = chatService.createFallbackMessage();
       options.onSuccess?.(fallbackMessage);

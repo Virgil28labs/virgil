@@ -1,6 +1,6 @@
 /**
  * Storage Migration Service
- * 
+ *
  * Handles migration of localStorage values from plain strings to JSON format
  * and ensures consistency across the application
  */
@@ -25,7 +25,7 @@ export class StorageMigration {
    */
   static async runMigrations(): Promise<MigrationResult[]> {
     const results: MigrationResult[] = [];
-    
+
     // Check if migrations have already been run
     const lastVersion = StorageService.get(this.MIGRATION_VERSION_KEY, '0.0.0');
     if (lastVersion === this.CURRENT_VERSION) {
@@ -104,20 +104,20 @@ export class StorageMigration {
         // Not JSON, needs migration
         const newValue = JSON.stringify(rawValue);
         localStorage.setItem(key, newValue);
-        return { 
-          key, 
-          success: true, 
-          oldValue: rawValue, 
-          newValue: newValue, 
+        return {
+          key,
+          success: true,
+          oldValue: rawValue,
+          newValue: newValue,
         };
       }
     } catch (error) {
-      return { 
-        key, 
-        success: false, 
-        oldValue: null, 
-        newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error', 
+      return {
+        key,
+        success: false,
+        oldValue: null,
+        newValue: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -143,30 +143,30 @@ export class StorageMigration {
         if (!isNaN(numValue)) {
           const newValue = JSON.stringify(numValue);
           localStorage.setItem(key, newValue);
-          return { 
-            key, 
-            success: true, 
-            oldValue: rawValue, 
-            newValue: newValue, 
+          return {
+            key,
+            success: true,
+            oldValue: rawValue,
+            newValue: newValue,
           };
         } else {
           // Invalid number, remove it
           localStorage.removeItem(key);
-          return { 
-            key, 
-            success: true, 
-            oldValue: rawValue, 
-            newValue: null, 
+          return {
+            key,
+            success: true,
+            oldValue: rawValue,
+            newValue: null,
           };
         }
       }
     } catch (error) {
-      return { 
-        key, 
-        success: false, 
-        oldValue: null, 
-        newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error', 
+      return {
+        key,
+        success: false,
+        oldValue: null,
+        newValue: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -191,20 +191,20 @@ export class StorageMigration {
         const boolValue = rawValue === 'true' || rawValue === 'True' || rawValue === '1';
         const newValue = JSON.stringify(boolValue);
         localStorage.setItem(key, newValue);
-        return { 
-          key, 
-          success: true, 
-          oldValue: rawValue, 
-          newValue: newValue, 
+        return {
+          key,
+          success: true,
+          oldValue: rawValue,
+          newValue: newValue,
         };
       }
     } catch (error) {
-      return { 
-        key, 
-        success: false, 
-        oldValue: null, 
-        newValue: null, 
-        error: error instanceof Error ? error.message : 'Unknown error', 
+      return {
+        key,
+        success: false,
+        oldValue: null,
+        newValue: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -239,7 +239,7 @@ export class StorageMigration {
 
     // Check that all expected keys can be parsed as JSON
     const allKeys = Object.values(STORAGE_KEYS);
-    
+
     for (const key of allKeys) {
       const rawValue = localStorage.getItem(key);
       if (rawValue !== null) {
@@ -262,7 +262,7 @@ export class StorageMigration {
    */
   static createBackup(): Record<string, string> {
     const backup: Record<string, string> = {};
-    
+
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -291,12 +291,12 @@ export class StorageMigration {
     try {
       // Clear current storage
       localStorage.clear();
-      
+
       // Restore from backup
       Object.entries(backup).forEach(([key, value]) => {
         localStorage.setItem(key, value);
       });
-      
+
       logger.info('Storage restored from backup');
     } catch (error) {
       logger.error(

@@ -19,16 +19,16 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
   const [activeActionFilter, setActiveActionFilter] = useState<ActionFilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-  const { 
-    entries, 
+  const {
+    entries,
     isLoading,
     error,
     processingIds,
-    addEntry, 
-    toggleTask, 
-    updateEntry, 
-    deleteEntry, 
-    aiEnabled, 
+    addEntry,
+    toggleTask,
+    updateEntry,
+    deleteEntry,
+    aiEnabled,
     toggleAI,
     clearError,
   } = useNotesStore();
@@ -39,14 +39,14 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
 
     // Apply tag filter
     if (activeFilter !== 'all') {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         entry.tags.includes(activeFilter as TagType),
       );
     }
 
     // Apply action type filter
     if (activeActionFilter !== 'all') {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         entry.actionType === activeActionFilter,
       );
     }
@@ -60,7 +60,7 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
     }
 
     // Sort by timestamp (newest first)
-    return filtered.sort((a, b) => 
+    return filtered.sort((a, b) =>
       // eslint-disable-next-line no-restricted-syntax -- Valid use: sorting by Date timestamps
       b.timestamp.getTime() - a.timestamp.getTime(),
     );
@@ -106,9 +106,9 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
           <span>Notes</span>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
+            style={{
+              background: 'transparent',
+              border: 'none',
               cursor: 'pointer',
               opacity: 0.6,
               fontSize: '1.1rem',
@@ -125,9 +125,9 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
       <div className="notes-container">
         <div className="notes-header">
           {showSettings ? (
-            <div style={{ 
-              padding: '1rem', 
-              background: 'rgba(245, 245, 245, 0.05)', 
+            <div style={{
+              padding: '1rem',
+              background: 'rgba(245, 245, 245, 0.05)',
               borderRadius: '8px',
               marginBottom: '1rem',
             }}
@@ -179,7 +179,7 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
             </>
           )}
         </div>
-        
+
         <div className="notes-content">
           {isLoading ? (
             <div className="notes-loading">
@@ -189,8 +189,8 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
           ) : error ? (
             <div className="notes-error">
               <p className="notes-error-message">{error.message}</p>
-              <button 
-                onClick={clearError} 
+              <button
+                onClick={clearError}
                 className="notes-error-retry"
                 aria-label="Dismiss error"
               >

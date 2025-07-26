@@ -54,9 +54,9 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
   const handlePhotoModalNext = useCallback(() => {
     navigatePhoto('next');
     const currentPhotos = getCurrentPhotos();
-    const currentIndex = selectedPhoto ? 
+    const currentIndex = selectedPhoto ?
       currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1;
-    
+
     if (currentIndex !== -1) {
       const nextIndex = (currentIndex + 1) % currentPhotos.length;
       setSelectedPhoto(currentPhotos[nextIndex]);
@@ -66,11 +66,11 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
   const handlePhotoModalPrevious = useCallback(() => {
     navigatePhoto('previous');
     const currentPhotos = getCurrentPhotos();
-    const currentIndex = selectedPhoto ? 
+    const currentIndex = selectedPhoto ?
       currentPhotos.findIndex(p => p.id === selectedPhoto.id) : -1;
-    
+
     if (currentIndex !== -1) {
-      const prevIndex = currentIndex === 0 ? 
+      const prevIndex = currentIndex === 0 ?
         currentPhotos.length - 1 : currentIndex - 1;
       setSelectedPhoto(currentPhotos[prevIndex]);
     }
@@ -170,7 +170,7 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
                 <span>{galleryState.favorites.length} favorite{galleryState.favorites.length !== 1 ? 's' : ''}</span>
               )}
             </div>
-            
+
             <div className="camera-app-shortcuts">
               <span className="shortcut-hint">
                 Press <kbd>Esc</kbd> to close

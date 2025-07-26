@@ -1,6 +1,6 @@
 /**
  * UserProfileAdapter - Dashboard App Adapter for User Profile Data
- * 
+ *
  * Integrates user profile information with DashboardAppService,
  * making all profile fields searchable and queryable by Virgil.
  */
@@ -14,7 +14,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   readonly appName = 'userProfile';
   readonly displayName = 'User Profile';
   readonly icon = '👤';
-  
+
   private profile: UserProfile | null = null;
   private authData: AuthContextValue | null = null;
   private subscribers: ((data: UserProfile) => void)[] = [];
@@ -76,19 +76,19 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       // Identity keywords
       'my name', 'what\'s my name', 'who am i', 'my identity',
       'nickname', 'full name', 'username', 'unique id',
-      
+
       // Contact keywords
       'my email', 'email address', 'my phone', 'phone number',
       'contact', 'contact info', 'contact information',
-      
+
       // Address keywords
       'my address', 'where do i live', 'home address', 'location',
       'street', 'city', 'state', 'zip', 'postal', 'country',
-      
+
       // Personal info keywords
       'my birthday', 'date of birth', 'when was i born', 'my age',
       'gender', 'marital status', 'personal info', 'profile',
-      
+
       // General profile keywords
       'my info', 'my information', 'my details', 'my data',
       'about me', 'my profile', 'user profile', 'account info',
@@ -255,29 +255,29 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
   private generateSummary(): string {
     if (!this.profile) return 'No profile data available';
-    
+
     const parts: string[] = [];
-    
+
     if (this.profile.fullName || this.profile.nickname) {
       parts.push(`User: ${this.profile.nickname || this.profile.fullName}`);
     }
-    
+
     if (this.profile.email) {
       parts.push(`Email: ${this.profile.email}`);
     }
-    
+
     if (this.hasCompleteAddress()) {
       parts.push(`Location: ${this.profile.address.city}, ${this.profile.address.state}`);
     }
-    
+
     return parts.length > 0 ? parts.join(', ') : 'Profile incomplete';
   }
 
   private getProfileSummary(): string {
     if (!this.profile) return 'No profile information available.';
-    
+
     const sections: string[] = [];
-    
+
     // Name section
     if (this.profile.fullName || this.profile.nickname) {
       let nameInfo = `**Name**: ${this.profile.fullName || this.profile.nickname}`;
@@ -289,7 +289,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       }
       sections.push(nameInfo);
     }
-    
+
     // Personal info
     const personalInfo: string[] = [];
     if (this.profile.dateOfBirth) {
@@ -305,7 +305,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     if (personalInfo.length > 0) {
       sections.push(`**Personal**: ${personalInfo.join(', ')}`);
     }
-    
+
     // Contact info
     if (this.profile.email || this.profile.phone) {
       const contactInfo: string[] = [];
@@ -313,34 +313,34 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       if (this.profile.phone) contactInfo.push(this.profile.phone);
       sections.push(`**Contact**: ${contactInfo.join(', ')}`);
     }
-    
+
     // Address
     if (this.hasCompleteAddress()) {
       const addr = this.profile.address;
       sections.push(`**Address**: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`);
     }
-    
-    return sections.length > 0 
+
+    return sections.length > 0
       ? `Here's your profile information:\n\n${sections.join('\n')}`
       : 'Your profile is incomplete. Consider adding more information.';
   }
 
   private getContactSummary(): string {
     const contact: string[] = [];
-    
+
     if (this.profile?.email) {
       contact.push(`Email: ${this.profile.email}`);
     }
-    
+
     if (this.profile?.phone) {
       contact.push(`Phone: ${this.profile.phone}`);
     }
-    
+
     if (this.hasCompleteAddress() && this.profile?.address) {
       const addr = this.profile.address;
       contact.push(`Address: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`);
     }
-    
+
     return contact.length > 0
       ? `Your contact information:\n${contact.join('\n')}`
       : "You haven't added any contact information to your profile yet.";
@@ -356,11 +356,11 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     const today = timeService.getCurrentDateTime();
     let age = timeService.getYear(today) - timeService.getYear(birthDate);
     const monthDiff = timeService.getMonth(today) - timeService.getMonth(birthDate);
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && timeService.getDay(today) < timeService.getDay(birthDate))) {
       age--;
     }
-    
+
     return age;
   }
 

@@ -37,17 +37,17 @@ export const useCamera = () => {
       }
 
       const permissionResult = await CameraUtils.requestCameraPermission();
-      
+
       if (!permissionResult.granted) {
-        updateCameraState({ 
-          hasPermission: false, 
-          error: permissionResult.error?.message || 'Permission denied', 
+        updateCameraState({
+          hasPermission: false,
+          error: permissionResult.error?.message || 'Permission denied',
         });
         return;
       }
 
       const cameras = await CameraUtils.getAvailableCameras();
-      
+
       updateCameraState({
         isActive: true,
         hasPermission: true,
@@ -56,10 +56,10 @@ export const useCamera = () => {
       });
     } catch (error) {
       const cameraError = CameraUtils.createCameraError(error);
-      updateCameraState({ 
-        isActive: false, 
-        hasPermission: false, 
-        error: cameraError.message, 
+      updateCameraState({
+        isActive: false,
+        hasPermission: false,
+        error: cameraError.message,
       });
     }
   }, [updateCameraState]);
@@ -71,7 +71,7 @@ export const useCamera = () => {
 
     try {
       updateCameraState({ isCapturing: true });
-      
+
       // If timer is set, start countdown
       if (cameraState.timer && cameraState.timer > 0) {
         const timerSeconds = cameraState.timer;
@@ -79,7 +79,7 @@ export const useCamera = () => {
       }
 
       const photoDataUrl = cameraRef.current.takePhoto();
-      
+
       if (!photoDataUrl) {
         throw new Error('Failed to capture photo');
       }
@@ -112,7 +112,7 @@ export const useCamera = () => {
     const flashModes: Array<'off' | 'on' | 'auto'> = ['off', 'on', 'auto'];
     const currentIndex = flashModes.indexOf(cameraState.flashMode);
     const nextIndex = (currentIndex + 1) % flashModes.length;
-    
+
     updateCameraState({ flashMode: flashModes[nextIndex] });
   }, [cameraState.flashMode, updateCameraState]);
 
@@ -129,10 +129,10 @@ export const useCamera = () => {
   }, [updateCameraState]);
 
   const stopCamera = useCallback(() => {
-    updateCameraState({ 
-      isActive: false, 
-      isCapturing: false, 
-      error: null, 
+    updateCameraState({
+      isActive: false,
+      isCapturing: false,
+      error: null,
     });
   }, [updateCameraState]);
 

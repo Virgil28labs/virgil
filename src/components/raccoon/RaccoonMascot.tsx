@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
-import { useLocation } from '../hooks/useLocation';
-import { timeService } from '../services/TimeService';
+import { useLocation } from '../../hooks/useLocation';
+import { timeService } from '../../services/TimeService';
 
 // Type definitions for the component
 interface Position {
@@ -95,13 +95,13 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    */
   const resetSleepTimer = useCallback(() => {
     lastActivityTime.current = timeService.getTimestamp();
-    
+
     // Clear existing sleep timer
     if (sleepTimer.current) {
       clearTimeout(sleepTimer.current);
       sleepTimer.current = null;
     }
-    
+
     // Wake up if sleeping
     setIsSleeping(current => {
       if (current) {
@@ -114,7 +114,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }
       return current;
     });
-    
+
     // Start new 10-second sleep timer
     sleepTimer.current = setTimeout(() => {
       // Check current state before sleeping
@@ -142,7 +142,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
    */
   const startSleepingAnimation = useCallback(() => {
     sleepEmojiCounter.current = 0;
-    
+
     // Add initial floating emojis
     const initialEmojis = [
       { id: sleepEmojiCounter.current++, delay: 0 },
@@ -150,7 +150,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       { id: sleepEmojiCounter.current++, delay: 1.0 },
     ];
     setSleepingEmojis(initialEmojis);
-    
+
     // Continue spawning new emojis every 2.5 seconds
     sleepEmojiTimer.current = setInterval(() => {
       setSleepingEmojis(prev => {
@@ -359,16 +359,16 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   const handleClick = () => {
     // Reset sleep timer on interaction
     resetSleepTimer();
-    
+
     // Show the GIF modal
     setVisualState((prev) => ({ ...prev, showGif: true }));
 
     if (!isPickedUp) {
       setIsPickedUp(true);
-      setVisualState((prev) => ({ 
-        ...prev, 
+      setVisualState((prev) => ({
+        ...prev,
         bounceCount: prev.bounceCount + 1,
-        showSparkles: true, 
+        showSparkles: true,
       }));
 
       // Play a cute sound effect (if supported)
@@ -479,7 +479,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       clearInterval(interval);
     };
   }, [detectUIElements]);
-
 
   // Physics loop for gravity, movement, and jumping
   useEffect(() => {
@@ -766,10 +765,10 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isPickedUp) return;
-      
+
       // Reset sleep timer on any keyboard activity
       resetSleepTimer();
-      
+
       if (e.key === ' ' || e.key === 'Spacebar') {
         if (position.y === PHYSICS.GROUND_Y && !charging) {
           setCharging(true);
@@ -817,7 +816,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
   useEffect(() => {
     // Start initial sleep timer
     resetSleepTimer();
-    
+
     // Cleanup timers on unmount
     return () => {
       if (sleepTimer.current) {
@@ -828,7 +827,6 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       }
     };
   }, [resetSleepTimer]); // Only run on mount/unmount
-
 
   const raccoonMascotStyles = `
     @keyframes bounce {
@@ -861,17 +859,17 @@ const RaccoonMascot = memo(function RaccoonMascot() {
       50% { transform: scale(1.02); }
     }
     @keyframes floating-zzz {
-      0% { 
-        opacity: 0; 
-        transform: translateY(0px) scale(0.8); 
+      0% {
+        opacity: 0;
+        transform: translateY(0px) scale(0.8);
       }
-      20% { 
-        opacity: 1; 
-        transform: translateY(-10px) scale(1); 
+      20% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1);
       }
-      100% { 
-        opacity: 0; 
-        transform: translateY(-40px) scale(0.6); 
+      100% {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.6);
       }
     }
   `;

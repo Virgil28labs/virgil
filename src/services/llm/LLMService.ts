@@ -20,7 +20,7 @@ export class LLMService extends EventEmitter {
 
   constructor(config: Partial<LLMConfig> = {}) {
     super();
-    
+
     this.config = {
       apiUrl: import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1',
       defaultModel: import.meta.env.VITE_DEFAULT_MODEL || 'gpt-4o-mini',
@@ -30,7 +30,7 @@ export class LLMService extends EventEmitter {
       retryDelay: 1000,
       ...config,
     };
-    
+
     this.cache = new ResponseCache({ ttl: this.config.cacheTTL });
     this.rateLimiter = new RateLimiter({ maxRequests: 20, windowMs: 60000 });
     this.activeRequests = new Map();
@@ -128,7 +128,7 @@ export class LLMService extends EventEmitter {
 
   async *completeStream(options: Partial<LLMRequest>): AsyncGenerator<StreamChunk, void, unknown> {
     const { messages = [], model = this.config.defaultModel, temperature, maxTokens = 256, context = {}, provider = 'openai' } = options;
-    
+
     try {
       const response = await this.makeRequestWithRetry(
         '/llm/stream',
@@ -190,9 +190,9 @@ export class LLMService extends EventEmitter {
   }
 
   private async makeRequestWithRetry(
-    endpoint: string, 
-    body: unknown, 
-    isStream: boolean = false, 
+    endpoint: string,
+    body: unknown,
+    isStream: boolean = false,
     attempt: number = 1,
   ): Promise<Response | LLMResponse> {
     try {
@@ -232,7 +232,7 @@ export class LLMService extends EventEmitter {
           metadata: { endpoint, attempt, delay },
         });
         this.emit('retry', { attempt, delay, error: error.message });
-        
+
         await new Promise(resolve => setTimeout(resolve, delay));
         return this.makeRequestWithRetry(endpoint, body, isStream, attempt + 1);
       }
@@ -284,7 +284,7 @@ export class LLMService extends EventEmitter {
     try {
       const response = await fetch(`${this.config.apiUrl}/llm/models`);
       if (!response.ok) throw new Error('Failed to fetch models');
-      
+
       const data = await response.json();
       return data.data || {};
     } catch (error) {
@@ -306,7 +306,7 @@ export class LLMService extends EventEmitter {
       });
 
       if (!response.ok) throw new Error('Failed to count tokens');
-      
+
       const data = await response.json();
       return data.data?.tokenCount || 0;
     } catch (error) {

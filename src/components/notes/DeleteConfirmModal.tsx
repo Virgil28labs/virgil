@@ -26,14 +26,14 @@ export const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel }: DeleteConfir
           Are you sure you want to delete this note? This action cannot be undone.
         </p>
         <div className="delete-confirm-actions">
-          <button 
-            onClick={handleCancel} 
+          <button
+            onClick={handleCancel}
             className="delete-confirm-button cancel"
           >
             Cancel
           </button>
-          <button 
-            onClick={handleConfirm} 
+          <button
+            onClick={handleConfirm}
             className="delete-confirm-button delete"
           >
             Delete

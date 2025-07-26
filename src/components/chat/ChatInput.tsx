@@ -9,12 +9,12 @@ interface ChatInputProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   isTyping: boolean;
   error: string | null;
-  
+
   // Quick actions
   onQuickAction: (action: string) => void;
   showQuickActions: boolean;
   dashboardContext: DashboardContext | null;
-  
+
   // Focus management
   shouldFocus: boolean;
 }
@@ -50,7 +50,7 @@ const ChatInput = memo(function ChatInput({
 
     // Add contextual quick actions based on current state
     const contextualActions: string[] = [];
-    
+
     if (dashboardContext) {
       // Add time-based quick actions
       if (dashboardContext.timeOfDay === 'morning') {

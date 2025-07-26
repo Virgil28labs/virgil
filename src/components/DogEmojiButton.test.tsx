@@ -27,7 +27,7 @@ describe('DogEmojiButton', () => {
 
   it('renders the dog emoji button', () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     expect(button).toBeInTheDocument();
     expect(button).toHaveTextContent('🐕');
@@ -36,10 +36,10 @@ describe('DogEmojiButton', () => {
 
   it('opens modal when button is clicked', async () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument();
       expect(screen.getByText('Doggo Sanctuary')).toBeInTheDocument();
@@ -48,10 +48,10 @@ describe('DogEmojiButton', () => {
 
   it('shows sanctuary content when opened', async () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: /Doggo Sanctuary/i })).toBeInTheDocument();
       expect(screen.getByText('Your personal collection of adorable companions')).toBeInTheDocument();
@@ -62,19 +62,19 @@ describe('DogEmojiButton', () => {
 
   it('closes modal when close button is clicked', async () => {
     render(<DogEmojiButton />);
-    
+
     // Open the modal
     const openButton = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     fireEvent.click(openButton);
-    
+
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument();
     });
-    
+
     // Close the modal
     const closeButton = screen.getByRole('button', { name: /Close sanctuary/i });
     fireEvent.click(closeButton);
-    
+
     await waitFor(() => {
       expect(screen.queryByTestId('dog-gallery')).not.toBeInTheDocument();
     });
@@ -82,7 +82,7 @@ describe('DogEmojiButton', () => {
 
   it('does not show gallery when not opened', () => {
     render(<DogEmojiButton />);
-    
+
     expect(screen.queryByTestId('dog-gallery')).not.toBeInTheDocument();
     expect(screen.queryByText('Doggo Sanctuary')).not.toBeInTheDocument();
   });
@@ -90,13 +90,13 @@ describe('DogEmojiButton', () => {
   it('handles hover states correctly', async () => {
     const user = userEvent.setup();
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
-    
+
     // Test hover
     await user.hover(button);
     expect(button).toHaveStyle({ opacity: '1' });
-    
+
     // Test unhover
     await user.unhover(button);
     expect(button).toHaveStyle({ opacity: '0.8' });
@@ -104,14 +104,14 @@ describe('DogEmojiButton', () => {
 
   it('opens modal with Enter key', async () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
-    
+
     // Buttons automatically handle Enter and Space keys for accessibility
     // In testing, we simulate the click that would result from these key presses
     button.focus();
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument();
     });
@@ -119,14 +119,14 @@ describe('DogEmojiButton', () => {
 
   it('opens modal with Space key', async () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
-    
+
     // Buttons automatically handle Enter and Space keys for accessibility
     // In testing, we simulate the click that would result from these key presses
     button.focus();
     fireEvent.click(button);
-    
+
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument();
     });
@@ -134,7 +134,7 @@ describe('DogEmojiButton', () => {
 
   it('has proper accessibility attributes', () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     expect(button).toHaveAttribute('aria-label', 'Open Doggo Sanctuary');
     expect(button).toHaveAttribute('title', 'Visit the Doggo Sanctuary!');
@@ -142,9 +142,9 @@ describe('DogEmojiButton', () => {
 
   it('maintains proper button styling', () => {
     render(<DogEmojiButton />);
-    
+
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
-    
+
     // Check if button has the expected styles
     expect(button).toHaveStyle({
       position: 'fixed',
@@ -156,14 +156,14 @@ describe('DogEmojiButton', () => {
 
   it('uses lazy loading for DogGallery', () => {
     render(<DogEmojiButton />);
-    
+
     // Gallery should not be in DOM initially (lazy loaded)
     expect(screen.queryByRole('dialog', { name: 'Doggo Sanctuary' })).not.toBeInTheDocument();
-    
+
     // Only after clicking should it appear
     const button = screen.getByRole('button', { name: /Open Doggo Sanctuary/i });
     fireEvent.click(button);
-    
+
     // Now it should be rendered
     expect(screen.getByRole('dialog', { name: 'Doggo Sanctuary' })).toBeInTheDocument();
   });

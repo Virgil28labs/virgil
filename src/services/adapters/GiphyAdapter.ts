@@ -1,6 +1,6 @@
 /**
  * GiphyAdapter - Dashboard App Adapter for Giphy Gallery
- * 
+ *
  * Provides unified access to Giphy GIF favorites for Virgil AI assistant,
  * enabling responses about saved GIFs, memes, and animated content.
  */
@@ -52,7 +52,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
   readonly appName = 'giphy';
   readonly displayName = 'Giphy Gallery';
   readonly icon = '🎬';
-  
+
   private favorites: GiphyImage[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -90,10 +90,10 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
   getContextData(): AppContextData<GiphyData> {
     this.ensureFreshData();
-    
+
     // Categorize GIFs based on titles
     const categories = this.categorizeGifs();
-    
+
     // Count ratings
     const ratings = {
       g: 0,
@@ -101,7 +101,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       'pg-13': 0,
       r: 0,
     };
-    
+
     let totalSize = 0;
     this.favorites.forEach(gif => {
       ratings[gif.rating]++;
@@ -109,17 +109,17 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       const estimatedSize = (gif.width * gif.height * 4) / 1024; // KB estimate
       totalSize += estimatedSize;
     });
-    
+
     // Find most used rating
     const mostUsedRating = Object.entries(ratings)
       .sort(([, a], [, b]) => b - a)[0]?.[0] || 'pg';
-    
+
     // Get popular categories
     const popularCategories = Object.entries(categories)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([cat]) => cat);
-    
+
     // Get recent favorites (estimate saved time)
     const recentFavorites = this.favorites.slice(0, 10).map((gif, index) => ({
       id: gif.id,
@@ -165,7 +165,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
   private categorizeGifs(): { [category: string]: number } {
     const categories: { [category: string]: number } = {};
-    
+
     const categoryKeywords = {
       'funny': ['funny', 'lol', 'laugh', 'humor', 'comedy'],
       'reaction': ['reaction', 'react', 'response', 'mood'],
@@ -178,23 +178,23 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       'love': ['love', 'heart', 'romance', 'kiss'],
       'wow': ['wow', 'amazing', 'awesome', 'incredible'],
     };
-    
+
     this.favorites.forEach(gif => {
       const title = (gif.title || '').toLowerCase();
       let categorized = false;
-      
+
       Object.entries(categoryKeywords).forEach(([category, keywords]) => {
         if (keywords.some(keyword => title.includes(keyword))) {
           categories[category] = (categories[category] || 0) + 1;
           categorized = true;
         }
       });
-      
+
       if (!categorized) {
         categories['other'] = (categories['other'] || 0) + 1;
       }
     });
-    
+
     return categories;
   }
 
@@ -205,11 +205,11 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
     const parts: string[] = [];
     parts.push(`${data.favorites.total} favorite GIFs`);
-    
+
     if (data.stats.popularCategories.length > 0) {
       parts.push(`mostly ${data.stats.popularCategories[0]}`);
     }
-    
+
     parts.push(`${data.stats.mostUsedRating} rated`);
 
     return parts.join(', ');
@@ -218,7 +218,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -273,11 +273,11 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     }
 
     let response = `You have ${data.favorites.total} favorite GIF${data.favorites.total !== 1 ? 's' : ''} saved`;
-    
+
     if (data.stats.popularCategories.length > 0) {
       response += `, with ${data.stats.popularCategories[0]} being your favorite type`;
     }
-    
+
     response += '.';
 
     return response;
@@ -286,22 +286,22 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
   private getCategoryResponse(category: string): string {
     const contextData = this.getContextData();
     const data = contextData.data;
-    
+
     const count = data.favorites.categories[category] || 0;
-    
+
     if (count === 0) {
       return `You don't have any ${category} GIFs saved yet. Giphy has tons of ${category} content to explore!`;
     }
 
     let response = `You have ${count} ${category} GIF${count !== 1 ? 's' : ''} in your favorites`;
-    
+
     const percentage = Math.round((count / data.favorites.total) * 100);
     if (percentage > 20) {
       response += ` (${percentage}% of your collection)`;
     }
-    
+
     response += '.';
-    
+
     if (category === data.stats.popularCategories[0]) {
       response += ` ${category.charAt(0).toUpperCase() + category.slice(1)} GIFs are your favorite type!`;
     }
@@ -319,7 +319,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
     const recent = data.favorites.recent[0];
     let response = `Your most recent favorite GIF is "${recent.title}" (rated ${recent.rating})`;
-    
+
     if (data.favorites.recent.length > 1) {
       response += '. Recent favorites include:';
       data.favorites.recent.slice(0, 3).forEach(gif => {
@@ -341,14 +341,14 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     }
 
     let response = 'Your GIF collection ratings:';
-    
+
     Object.entries(data.favorites.ratings).forEach(([rating, count]) => {
       if (count > 0) {
         const percentage = Math.round((count / data.favorites.total) * 100);
         response += `\n• ${rating.toUpperCase()}: ${count} GIFs (${percentage}%)`;
       }
     });
-    
+
     response += `\n\nMostly ${data.stats.mostUsedRating.toUpperCase()}-rated content.`;
 
     return response;
@@ -363,13 +363,13 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     }
 
     let response = `Giphy Gallery: ${data.favorites.total} favorite GIFs`;
-    
+
     if (data.stats.popularCategories.length > 0) {
       response += ` (mostly ${data.stats.popularCategories.slice(0, 2).join(' and ')})`;
     }
-    
+
     response += `, ${data.stats.mostUsedRating.toUpperCase()}-rated`;
-    
+
     response += '.';
 
     return response;
@@ -377,7 +377,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
@@ -400,19 +400,19 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
   subscribe(callback: (data: GiphyData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up storage listener
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === this.STORAGE_KEY) {
         this.refreshData();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
@@ -432,9 +432,9 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
 
   getAggregateData(): AggregateableData[] {
     this.ensureFreshData();
-    
+
     const aggregateData: AggregateableData[] = [];
-    
+
     // Add GIF count
     if (this.favorites.length > 0) {
       aggregateData.push({
@@ -448,7 +448,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
         },
       });
     }
-    
+
     return aggregateData;
   }
 }

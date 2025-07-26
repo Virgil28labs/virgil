@@ -1,6 +1,6 @@
 /**
  * IPHoverCard Component
- * 
+ *
  * Displays detailed IP information in a hover card with Virgil's design aesthetic.
  * Shows location, ISP, connection type, and privacy indicators.
  */
@@ -37,7 +37,7 @@ const IPHoverCard = memo(function IPHoverCard({
     if (!ipLocation.timezone_details?.current_time) {
       return null;
     }
-    
+
     try {
       const date = timeService.parseDate(ipLocation.timezone_details.current_time);
       if (!date) return 'N/A';
@@ -47,7 +47,7 @@ const IPHoverCard = memo(function IPHoverCard({
         minute: '2-digit',
         hour12: true,
       });
-      
+
       // Add day/night emoji
       const timeEmoji = hours >= 6 && hours < 18 ? '☀️' : '🌙';
       return `${timeEmoji} ${timeStr}`;
@@ -61,19 +61,19 @@ const IPHoverCard = memo(function IPHoverCard({
     const type = ipLocation.type?.toLowerCase();
     const isp = ipLocation.isp?.toLowerCase() || '';
     const org = ipLocation.org?.toLowerCase() || '';
-    
+
     // Check for VPN/proxy indicators
-    if (type === 'vpn' || type === 'proxy' || 
+    if (type === 'vpn' || type === 'proxy' ||
         isp.includes('vpn') || org.includes('vpn') ||
         isp.includes('proxy') || org.includes('proxy') ||
         type === 'hosting' || type === 'datacenter') {
       return { text: 'VPN/Proxy Detected', icon: '🔒', isPrivate: true };
     }
-    
+
     if (type === 'business' || type === 'corporate') {
       return { text: 'Business', icon: '🏢', isPrivate: false };
     }
-    
+
     return { text: 'Residential', icon: '🏠', isPrivate: false };
   };
 
@@ -83,7 +83,7 @@ const IPHoverCard = memo(function IPHoverCard({
   // Show minimal card for limited data
   if (hasLimitedData) {
     return (
-      <div 
+      <div
         className={`ip-hover-card ip-hover-card-minimal ${className}`}
         role="tooltip"
         aria-label="IP address details"
@@ -102,7 +102,7 @@ const IPHoverCard = memo(function IPHoverCard({
   }
 
   return (
-    <div 
+    <div
       className={`ip-hover-card ${className}`}
       role="tooltip"
       aria-label="IP address details"
@@ -176,39 +176,39 @@ export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
     const calculatePosition = () => {
       const trigger = triggerRef.current;
       if (!trigger) return;
-      
+
       const rect = trigger.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      
+
       // Card dimensions (estimated)
       const cardHeight = 200;
       const cardWidth = 320;
       const offset = 12; // Space between trigger and card
-      
+
       // Determine vertical placement - prefer bottom for better UX
       const spaceBelow = viewportHeight - rect.bottom;
       const placement = spaceBelow > cardHeight + offset ? 'bottom' : 'top';
-      
+
       // Calculate position
-      const top = placement === 'top' 
-        ? rect.top - cardHeight - offset 
+      const top = placement === 'top'
+        ? rect.top - cardHeight - offset
         : rect.bottom + offset;
-      
+
       let left = rect.left + rect.width / 2;
-      
+
       // Adjust horizontal position to stay within viewport
       if (left - cardWidth / 2 < 10) {
         left = cardWidth / 2 + 10;
       } else if (left + cardWidth / 2 > viewportWidth - 10) {
         left = viewportWidth - cardWidth / 2 - 10;
       }
-      
+
       setPosition({ top, left, placement });
     };
 
     calculatePosition();
-    
+
     // Recalculate on window resize
     window.addEventListener('resize', calculatePosition);
     return () => window.removeEventListener('resize', calculatePosition);
@@ -217,7 +217,7 @@ export const PositionedIPHoverCard = memo(function PositionedIPHoverCard({
   if (!cardProps.isVisible) return null;
 
   return createPortal(
-    <div 
+    <div
       ref={cardRef}
       className={`ip-hover-card-wrapper ${position.placement}`}
       style={{

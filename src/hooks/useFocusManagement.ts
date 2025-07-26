@@ -20,7 +20,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
 
   const getFocusableElements = useCallback((): HTMLElement[] => {
     if (!containerRef.current) return [];
-    
+
     const focusableSelectors = [
       'input:not([disabled]):not([tabindex="-1"])',
       'button:not([disabled]):not([tabindex="-1"])',
@@ -34,14 +34,14 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
     return Array.from(containerRef.current.querySelectorAll(focusableSelectors))
       .filter((element): element is HTMLElement => {
         if (!(element instanceof HTMLElement)) return false;
-        
+
         // In test environment, skip visibility check as jsdom doesn't have layout
         const isTestEnv = process.env.NODE_ENV === 'test';
         const isVisible = isTestEnv || element.offsetParent !== null;
-        
+
         // Check if element is disabled (only form elements have this property)
         const isDisabled = 'disabled' in element && element.disabled === true;
-        
+
         return isVisible && !isDisabled;
       });
   }, []);
@@ -50,15 +50,15 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
     const focusableElements = getFocusableElements();
     if (focusableElements.length > 0) {
       // Try to find element matching initial focus selector first
-      let targetElement = focusableElements.find(el => 
+      let targetElement = focusableElements.find(el =>
         el.matches(initialFocusSelector),
       );
-      
+
       // Fallback to first focusable element
       if (!targetElement) {
         targetElement = focusableElements[0];
       }
-      
+
       targetElement?.focus();
       return targetElement;
     }
@@ -139,7 +139,7 @@ export function useFocusManagement(isActive: boolean, options: FocusManagementOp
 
   const focusElement = useCallback((selector: string) => {
     if (!containerRef.current) return null;
-    
+
     const element = containerRef.current.querySelector(selector) as HTMLElement;
     if (element) {
       element.focus();

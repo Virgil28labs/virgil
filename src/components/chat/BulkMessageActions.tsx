@@ -22,7 +22,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
 }: BulkMessageActionsProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  const selectedMessageData = messages.filter(msg => 
+  const selectedMessageData = messages.filter(msg =>
     selectedMessages.includes(msg.id),
   );
 
@@ -41,7 +41,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       const combinedText = selectedMessageData
         .map(msg => `${msg.role === 'user' ? 'You' : 'Virgil'}: ${msg.content}`)
         .join('\n\n');
-      
+
       await navigator.clipboard.writeText(combinedText);
       toastService.success(`${selectedMessageData.length} messages copied to clipboard`);
     } catch (_error) {
@@ -67,8 +67,8 @@ const BulkMessageActions = memo(function BulkMessageActions({
         })),
       };
 
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-        type: 'application/json', 
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -76,7 +76,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
       a.download = `virgil-messages-${selectedMessageData.length}-${dashboardContextService.getLocalDate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      
+
       toastService.success(`${selectedMessageData.length} messages exported successfully`);
     } catch (_error) {
       toastService.error('Failed to export messages');

@@ -3,11 +3,11 @@ import type { ImageModalProps } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 import { logger } from '../../lib/logger';
 
-export const ImageModal = memo(function ImageModal({ 
-  dogs, 
+export const ImageModal = memo(function ImageModal({
+  dogs,
   currentIndex,
   isFavorited,
-  onClose, 
+  onClose,
   onNavigate,
   onFavoriteToggle,
 }: ImageModalProps) {
@@ -35,7 +35,7 @@ export const ImageModal = memo(function ImageModal({
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
     stopEvent(e);
     if (!currentDog) return;
-    
+
     try {
       await downloadImage(currentDog.url, currentDog.breed);
       setShowDownloaded(true);
@@ -56,7 +56,7 @@ export const ImageModal = memo(function ImageModal({
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     stopEvent(e);
     if (!currentDog) return;
-    
+
     try {
       await copyImageToClipboard(currentDog.url);
       setShowCopied(true);
@@ -110,8 +110,8 @@ export const ImageModal = memo(function ImageModal({
   if (currentIndex === null || !currentDog) return null;
 
   return (
-    <div 
-      className="doggo-image-modal" 
+    <div
+      className="doggo-image-modal"
       onClick={(e) => {
         e.stopPropagation();
         onClose();
@@ -124,7 +124,7 @@ export const ImageModal = memo(function ImageModal({
           className="doggo-modal-image"
           onClick={(e) => e.stopPropagation()}
         />
-        
+
         <div className="doggo-modal-actions">
           <button
             className={`doggo-modal-action ${isFavorited(currentDog.url) ? 'favorited' : ''}`}
@@ -152,7 +152,7 @@ export const ImageModal = memo(function ImageModal({
           </button>
         </div>
       </div>
-      
+
       <button
         className="doggo-modal-close"
         onClick={onClose}

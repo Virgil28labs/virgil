@@ -61,7 +61,7 @@ export function handleError(error: unknown): AppError {
     if (error.name === 'AbortError') {
       return new AppError('Request was cancelled', 'ABORT_ERROR');
     }
-    
+
     if (error.message.includes('fetch')) {
       return new NetworkError(error.message);
     }
@@ -88,18 +88,18 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  
+
   if (typeof error === 'string') {
     return error;
   }
-  
+
   return 'An unexpected error occurred';
 }
 
 // Error logging utility
 export function logError(error: unknown, component: string, action?: string): void {
   const errorObj = handleError(error);
-  
+
   logger.error(
     `${errorObj.name}: ${errorObj.message}`,
     errorObj,

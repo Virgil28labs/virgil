@@ -100,7 +100,7 @@ export const EditableDataPoint = memo(function EditableDataPoint({
           aria-label={label}
         />
       ) : (
-        <span 
+        <span
           className={`data-value ${!value ? 'placeholder' : ''} ${readOnly ? 'readonly' : ''}`}
           onClick={handleClick}
           role={readOnly ? undefined : 'button'}

@@ -115,7 +115,7 @@ export class CameraUtils {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx?.drawImage(img, 0, 0);
-        
+
         const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
         resolve(compressedDataUrl);
       };
@@ -127,14 +127,14 @@ export class CameraUtils {
   static getImageDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
+
       img.onload = () => {
         resolve({
           width: img.naturalWidth,
           height: img.naturalHeight,
         });
       };
-      
+
       img.onerror = reject;
       img.src = dataUrl;
     });
@@ -148,11 +148,11 @@ export class CameraUtils {
 
   static formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
@@ -189,7 +189,7 @@ export class CameraUtils {
 
   static validateSettings(settings: Partial<CameraSettings>): CameraSettings {
     const defaults = this.getDefaultSettings();
-    
+
     return {
       resolution: settings.resolution || defaults.resolution,
       aspectRatio: settings.aspectRatio || defaults.aspectRatio,
@@ -270,7 +270,7 @@ export class CameraUtils {
     const hours = String(timeService.getHours(date)).padStart(2, '0');
     const minutes = String(timeService.getMinutes(date)).padStart(2, '0');
     const seconds = String(timeService.getSeconds(date)).padStart(2, '0');
-    
+
     return `Virgil_${year}${month}${day}_${hours}${minutes}${seconds}.jpg`;
   }
 }

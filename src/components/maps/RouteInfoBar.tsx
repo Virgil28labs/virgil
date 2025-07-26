@@ -33,36 +33,36 @@ export const RouteInfoBar = memo(function RouteInfoBar({
   // Get traffic-aware duration if available
   const duration = leg.duration_in_traffic || leg.duration;
   const distance = leg.distance;
-  
+
   // Calculate traffic severity (comparing normal duration to traffic duration)
   const getTrafficSeverity = () => {
     if (!leg.duration || !leg.duration_in_traffic) return 'normal';
-    
+
     const normalTime = leg.duration.value;
     const trafficTime = leg.duration_in_traffic.value;
     const ratio = trafficTime / normalTime;
-    
+
     if (ratio > 1.5) return 'heavy';
     if (ratio > 1.2) return 'moderate';
     return 'light';
   };
-  
+
   const trafficSeverity = getTrafficSeverity();
-  
+
   // Format duration for display
   const formatDuration = (dur: google.maps.Duration | undefined) => {
     if (!dur) return '--';
-    
+
     const totalMinutes = Math.round(dur.value / 60);
     if (totalMinutes < 60) {
       return `${totalMinutes} min`;
     }
-    
+
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
     return `${hours} hr ${minutes} min`;
   };
-  
+
   // Get traffic color based on severity
   const getTrafficColor = (severity: string) => {
     switch (severity) {
@@ -93,7 +93,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
             <span className="distance-value">{distance?.text || '--'}</span>
           </div>
         </div>
-        
+
         {/* Departure time selector - moved after metrics */}
         {onDepartureTimeChange && (
           <div className="departure-section">
@@ -104,7 +104,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
             />
           </div>
         )}
-        
+
         {/* Traffic status - pushed to right */}
         <div className="traffic-section">
           <div className={`traffic-icon ${trafficSeverity}`}>
@@ -116,13 +116,13 @@ export const RouteInfoBar = memo(function RouteInfoBar({
           </div>
           {isExpanded && (
             <span className="traffic-label">
-              {trafficSeverity === 'heavy' ? 'Heavy traffic' : 
-                trafficSeverity === 'moderate' ? 'Moderate traffic' : 
+              {trafficSeverity === 'heavy' ? 'Heavy traffic' :
+                trafficSeverity === 'moderate' ? 'Moderate traffic' :
                   'Light traffic'}
             </span>
           )}
         </div>
-        
+
         {/* Control buttons */}
         <div className="route-controls">
           {onToggleExpand && alternativeRoutes.length > 0 && (
@@ -160,7 +160,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
           )}
         </div>
       </div>
-      
+
       {isExpanded && alternativeRoutes.length > 0 && (
         <div className="alternative-routes">
           <div className="routes-header">Routes</div>
@@ -168,7 +168,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
             {[route, ...alternativeRoutes].slice(0, 3).map((r, index) => {
               const routeLeg = r.legs[0];
               const routeDuration = routeLeg.duration_in_traffic || routeLeg.duration;
-              
+
               return (
                 <button
                   key={index}
@@ -184,7 +184,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
           </div>
         </div>
       )}
-      
+
       <div className="route-summary">
         via {route.summary}
       </div>

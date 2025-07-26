@@ -4,7 +4,7 @@ import { FetchControls } from './FetchControls';
 
 describe('FetchControls', () => {
   const mockBreeds = ['akita', 'beagle', 'corgi', 'dalmatian'];
-  
+
   const defaultProps = {
     selectedBreed: '',
     fetchCount: 1,
@@ -32,14 +32,14 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const breedSelect = screen.getByLabelText('Breed:') as HTMLSelectElement;
-      
+
       // Should have default + all breeds
       expect(breedSelect.options).toHaveLength(mockBreeds.length + 1);
-      
+
       // Check default option
       expect(breedSelect.options[0].value).toBe('');
       expect(breedSelect.options[0].text).toBe('Random Mix');
-      
+
       // Check breed options
       mockBreeds.forEach((breed, index) => {
         expect(breedSelect.options[index + 1].value).toBe(breed);
@@ -53,9 +53,9 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const countSelect = screen.getByLabelText('Count:') as HTMLSelectElement;
-      
+
       expect(countSelect.options).toHaveLength(9);
-      
+
       for (let i = 1; i <= 9; i++) {
         expect(countSelect.options[i - 1].value).toBe(i.toString());
         expect(countSelect.options[i - 1].text).toBe(i.toString());
@@ -96,7 +96,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} breeds={[]} />);
 
       const breedSelect = screen.getByLabelText('Breed:') as HTMLSelectElement;
-      
+
       // Should only have the default option
       expect(breedSelect.options).toHaveLength(1);
       expect(breedSelect.options[0].text).toBe('Random Mix');
@@ -109,7 +109,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const breedSelect = screen.getByLabelText('Breed:');
-      
+
       await user.selectOptions(breedSelect, 'corgi');
 
       expect(defaultProps.onBreedChange).toHaveBeenCalledTimes(1);
@@ -121,7 +121,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} selectedBreed="akita" />);
 
       const breedSelect = screen.getByLabelText('Breed:');
-      
+
       await user.selectOptions(breedSelect, '');
 
       expect(defaultProps.onBreedChange).toHaveBeenCalledWith('');
@@ -132,7 +132,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const countSelect = screen.getByLabelText('Count:');
-      
+
       await user.selectOptions(countSelect, '7');
 
       expect(defaultProps.onCountChange).toHaveBeenCalledTimes(1);
@@ -144,7 +144,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const fetchButton = screen.getByRole('button', { name: 'Fetch' });
-      
+
       await user.click(fetchButton);
 
       expect(defaultProps.onFetch).toHaveBeenCalledTimes(1);
@@ -155,7 +155,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} loading />);
 
       const fetchButton = screen.getByRole('button', { name: 'Fetching...' });
-      
+
       await user.click(fetchButton);
 
       expect(defaultProps.onFetch).not.toHaveBeenCalled();
@@ -184,7 +184,7 @@ describe('FetchControls', () => {
   describe('memoization', () => {
     it('should not re-render when props are the same', () => {
       const { rerender } = render(<FetchControls {...defaultProps} />);
-      
+
       const breedSelect = screen.getByLabelText('Breed:');
       const originalSelect = breedSelect;
 
@@ -197,7 +197,7 @@ describe('FetchControls', () => {
 
     it('should re-render when selectedBreed changes', () => {
       const { rerender } = render(<FetchControls {...defaultProps} />);
-      
+
       expect(screen.getByLabelText('Breed:')).toHaveValue('');
 
       rerender(<FetchControls {...defaultProps} selectedBreed="akita" />);
@@ -207,7 +207,7 @@ describe('FetchControls', () => {
 
     it('should re-render when fetchCount changes', () => {
       const { rerender } = render(<FetchControls {...defaultProps} />);
-      
+
       expect(screen.getByLabelText('Count:')).toHaveValue('1');
 
       rerender(<FetchControls {...defaultProps} fetchCount={9} />);
@@ -217,7 +217,7 @@ describe('FetchControls', () => {
 
     it('should re-render when loading state changes', () => {
       const { rerender } = render(<FetchControls {...defaultProps} />);
-      
+
       expect(screen.getByRole('button')).toHaveTextContent('Fetch');
 
       rerender(<FetchControls {...defaultProps} loading />);
@@ -227,7 +227,7 @@ describe('FetchControls', () => {
 
     it('should re-render when breeds array changes', () => {
       const { rerender } = render(<FetchControls {...defaultProps} />);
-      
+
       const breedSelect = screen.getByLabelText('Breed:') as HTMLSelectElement;
       expect(breedSelect.options).toHaveLength(5); // 1 default + 4 breeds
 
@@ -244,7 +244,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} breeds={specialBreeds} />);
 
       const breedSelect = screen.getByLabelText('Breed:') as HTMLSelectElement;
-      
+
       expect(breedSelect.options[1].value).toBe('golden-retriever');
       expect(breedSelect.options[1].text).toBe('Golden-retriever');
     });
@@ -262,7 +262,7 @@ describe('FetchControls', () => {
       render(<FetchControls {...defaultProps} />);
 
       const fetchButton = screen.getByRole('button');
-      
+
       // Click multiple times rapidly
       await user.click(fetchButton);
       await user.click(fetchButton);

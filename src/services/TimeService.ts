@@ -1,9 +1,9 @@
 /**
  * TimeService - Single Source of Truth for Time/Date Operations
- * 
+ *
  * Provides consistent time and date handling across the application.
  * All methods work with local timezone to prevent UTC-related bugs.
- * 
+ *
  * @see src/services/TimeService.md for developer guide
  */
 
@@ -16,20 +16,20 @@ export interface TimeUpdate {
 export class TimeService {
   private timeListeners: ((time: TimeUpdate) => void)[] = [];
   private mainTimer?: NodeJS.Timeout;
-  
+
   // Memoized formatters for performance
   private readonly timeFormatter: Intl.DateTimeFormat;
   private readonly dateFormatter: Intl.DateTimeFormat;
   private readonly dayFormatter: Intl.DateTimeFormat;
-  
+
   // Cache for frequently called methods (cleared every minute)
   private localDateCache: { date: string; timestamp: number } | null = null;
-  
+
   // Performance optimization: Pre-calculate constants
   private static readonly MINUTE_MS = 60 * 1000;
   private static readonly HOUR_MS = 60 * 60 * 1000;
   private static readonly DAY_MS = 24 * 60 * 60 * 1000;
-  
+
   constructor() {
     // Initialize memoized formatters
     this.timeFormatter = new Intl.DateTimeFormat('en-US', {
@@ -37,38 +37,38 @@ export class TimeService {
       minute: '2-digit',
       hour12: false,
     });
-    
+
     this.dateFormatter = new Intl.DateTimeFormat('en-US', {
       month: 'long',
       day: 'numeric',
       year: 'numeric',
     });
-    
+
     this.dayFormatter = new Intl.DateTimeFormat('en-US', {
       weekday: 'long',
     });
-    
+
     this.startTimer();
   }
-  
+
   /**
    * Get current date in local YYYY-MM-DD format
    * @returns Local date string (e.g., "2024-01-15")
    */
   getLocalDate(): string {
     const now = Date.now();
-    
+
     // Check cache (valid for 60 seconds)
     if (this.localDateCache && (now - this.localDateCache.timestamp) < TimeService.MINUTE_MS) {
       return this.localDateCache.date;
     }
-    
+
     // Generate new date and cache it
     const date = this.formatDateToLocal(new Date(now));
     this.localDateCache = { date, timestamp: now };
     return date;
   }
-  
+
   /**
    * Format any date to local YYYY-MM-DD format, or with custom options
    * @param date Date object to format
@@ -154,7 +154,7 @@ export class TimeService {
    */
   subscribeToTimeUpdates(callback: (time: TimeUpdate) => void): () => void {
     this.timeListeners.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
       this.timeListeners = this.timeListeners.filter(listener => listener !== callback);
@@ -175,7 +175,7 @@ export class TimeService {
             currentDate: this.dateFormatter.format(now),
             dateObject: now,
           };
-          
+
           // Use for...of for better performance
           for (const callback of this.timeListeners) {
             try {
@@ -522,29 +522,29 @@ export class TimeService {
    */
   getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
+
     if (seconds < 60) return 'just now';
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes === 1) return '1 minute ago';
     if (minutes < 60) return `${minutes} minutes ago`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours === 1) return '1 hour ago';
     if (hours < 24) return `${hours} hours ago`;
-    
+
     const days = Math.floor(hours / 24);
     if (days === 1) return '1 day ago';
     if (days < 7) return `${days} days ago`;
-    
+
     const weeks = Math.floor(days / 7);
     if (weeks === 1) return '1 week ago';
     if (weeks < 4) return `${weeks} weeks ago`;
-    
+
     const months = Math.floor(days / 30);
     if (months === 1) return '1 month ago';
     if (months < 12) return `${months} months ago`;
-    
+
     const years = Math.floor(days / 365);
     if (years === 1) return '1 year ago';
     return `${years} years ago`;
@@ -559,29 +559,29 @@ export class TimeService {
     const ms = date.getTime() - Date.now();
     const seconds = Math.floor(Math.abs(ms) / 1000);
     const isPast = ms < 0;
-    
+
     if (seconds < 60) return isPast ? 'just now' : 'in a moment';
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes === 1) return isPast ? '1 minute ago' : 'in 1 minute';
     if (minutes < 60) return isPast ? `${minutes} minutes ago` : `in ${minutes} minutes`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours === 1) return isPast ? '1 hour ago' : 'in 1 hour';
     if (hours < 24) return isPast ? `${hours} hours ago` : `in ${hours} hours`;
-    
+
     const days = Math.floor(hours / 24);
     if (days === 1) return isPast ? '1 day ago' : 'in 1 day';
     if (days < 7) return isPast ? `${days} days ago` : `in ${days} days`;
-    
+
     const weeks = Math.floor(days / 7);
     if (weeks === 1) return isPast ? '1 week ago' : 'in 1 week';
     if (weeks < 4) return isPast ? `${weeks} weeks ago` : `in ${weeks} weeks`;
-    
+
     const months = Math.floor(days / 30);
     if (months === 1) return isPast ? '1 month ago' : 'in 1 month';
     if (months < 12) return isPast ? `${months} months ago` : `in ${months} months`;
-    
+
     const years = Math.floor(days / 365);
     if (years === 1) return isPast ? '1 year ago' : 'in 1 year';
     return isPast ? `${years} years ago` : `in ${years} years`;

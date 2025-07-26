@@ -21,7 +21,7 @@ class RequestDeduplicator {
     const method = options?.method || 'GET';
     const body = options?.body || '';
     const str = `${method}:${url}:${body}`;
-    
+
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
@@ -93,13 +93,13 @@ class RequestDeduplicator {
    */
   private cleanup(now: number): void {
     const keysToDelete: number[] = [];
-    
+
     for (const [key, request] of this.pendingRequests.entries()) {
       if (now - request.timestamp > this.maxAge) {
         keysToDelete.push(key);
       }
     }
-    
+
     // Batch delete for better performance
     keysToDelete.forEach(key => this.pendingRequests.delete(key));
   }

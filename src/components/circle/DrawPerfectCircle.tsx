@@ -1,12 +1,12 @@
 import React, { memo, useState, useRef, useEffect, useCallback } from 'react';
 import './DrawPerfectCircle.css';
-import type { 
-  DrawPerfectCircleProps, 
-  Point, 
-  EvaluationResult, 
-  CircleEvaluationParams, 
-  GridConfig, 
-  DrawingConfig, 
+import type {
+  DrawPerfectCircleProps,
+  Point,
+  EvaluationResult,
+  CircleEvaluationParams,
+  GridConfig,
+  DrawingConfig,
 } from './types';
 import { logger } from '../../lib/logger';
 
@@ -35,9 +35,9 @@ const DRAWING_CONFIG: DrawingConfig = {
   shadowColor: 'rgba(179, 179, 179, 0.3)',
 };
 
-export const DrawPerfectCircle = memo(function DrawPerfectCircle({ 
-  isOpen, 
-  onClose, 
+export const DrawPerfectCircle = memo(function DrawPerfectCircle({
+  isOpen,
+  onClose,
 }: DrawPerfectCircleProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -68,7 +68,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       return 0;
     }
   });
-  
+
   /**
    * Evaluates the quality of a drawn circle based on points
    * @param points Array of points representing the drawn circle
@@ -84,7 +84,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       x: acc.x + point.x,
       y: acc.y + point.y,
     }), { x: 0, y: 0 });
-    
+
     center.x /= points.length;
     center.y /= points.length;
 
@@ -92,7 +92,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     let avgRadius = 0;
     for (const point of points) {
       const distance = Math.sqrt(
-        Math.pow(point.x - center.x, 2) + 
+        Math.pow(point.x - center.x, 2) +
         Math.pow(point.y - center.y, 2),
       );
       avgRadius += distance;
@@ -102,7 +102,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     let radiusVariance = 0;
     for (const point of points) {
       const distance = Math.sqrt(
-        Math.pow(point.x - center.x, 2) + 
+        Math.pow(point.x - center.x, 2) +
         Math.pow(point.y - center.y, 2),
       );
       radiusVariance += Math.pow(distance - avgRadius, 2);
@@ -113,7 +113,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     const startPoint = points[0];
     const endPoint = points[points.length - 1];
     const closureDistance = Math.sqrt(
-      Math.pow(endPoint.x - startPoint.x, 2) + 
+      Math.pow(endPoint.x - startPoint.x, 2) +
       Math.pow(endPoint.y - startPoint.y, 2),
     );
     const maxClosureDistance = avgRadius * (EVALUATION_CONFIG.maxClosureDistanceFactor ?? 0.2);
@@ -123,7 +123,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     const maxVariance = avgRadius * 0.5;
     const varianceScore = Math.max(0, 1 - (radiusVariance / maxVariance));
     const closureScore = isClosed ? 1 : 0.5;
-    
+
     let totalScore = Math.round((varianceScore * (EVALUATION_CONFIG.varianceWeight ?? 0.6) + closureScore * (EVALUATION_CONFIG.closureWeight ?? 0.4)) * 100);
     totalScore = Math.max(0, Math.min(100, totalScore));
 
@@ -154,31 +154,31 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     const displayWidth = canvas.width / (window.devicePixelRatio || 1);
     const displayHeight = canvas.height / (window.devicePixelRatio || 1);
-    
+
     // Clear canvas completely first
     ctx.clearRect(0, 0, displayWidth, displayHeight);
-    
+
     // Fill with uniform subtle background
     ctx.fillStyle = 'rgba(45, 34, 51, 0.06)';
     ctx.fillRect(0, 0, displayWidth, displayHeight);
-    
+
     // Draw subtle grid if enabled
     if (showGrid) {
       // Save canvas state before drawing grid
       ctx.save();
-      
+
       ctx.strokeStyle = GRID_CONFIG.color;
       ctx.lineWidth = GRID_CONFIG.lineWidth;
       ctx.lineCap = 'square';
       ctx.lineJoin = 'miter';
       const gridSize = GRID_CONFIG.size;
-      
+
       // Calculate grid centering to create equal margins on all sides
       const numVerticalLines = Math.floor(displayWidth / gridSize) + 1;
       const numHorizontalLines = Math.floor(displayHeight / gridSize) + 1;
@@ -186,7 +186,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
       const totalGridHeight = (numHorizontalLines - 1) * gridSize;
       const startX = (displayWidth - totalGridWidth) / 2;
       const startY = (displayHeight - totalGridHeight) / 2;
-      
+
       // Draw vertical grid lines (centered)
       for (let i = 0; i < numVerticalLines; i++) {
         const x = startX + (i * gridSize);
@@ -195,7 +195,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
         ctx.lineTo(x, displayHeight);
         ctx.stroke();
       }
-      
+
       // Draw horizontal grid lines (centered)
       for (let i = 0; i < numHorizontalLines; i++) {
         const y = startY + (i * gridSize);
@@ -204,32 +204,32 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
         ctx.lineTo(displayWidth, y);
         ctx.stroke();
       }
-      
+
       // Restore canvas state after drawing grid
       ctx.restore();
     }
-    
+
     // Draw the circle with sophisticated gray color
     if (points.length > 1) {
       // Save canvas state before drawing circle
       ctx.save();
-      
+
       ctx.strokeStyle = DRAWING_CONFIG.strokeColor;
       ctx.lineWidth = DRAWING_CONFIG.lineWidth;
       ctx.lineJoin = DRAWING_CONFIG.lineJoin;
       ctx.lineCap = DRAWING_CONFIG.lineCap;
       ctx.shadowBlur = DRAWING_CONFIG.shadowBlur;
       ctx.shadowColor = DRAWING_CONFIG.shadowColor;
-      
+
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
-      
+
       for (let i = 1; i < points.length; i++) {
         ctx.lineTo(points[i].x, points[i].y);
       }
-      
+
       ctx.stroke();
-      
+
       // Restore canvas state after drawing circle
       ctx.restore();
     }
@@ -242,30 +242,30 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     // Set canvas size and scale for high DPI displays
     const updateCanvasSize = () => {
       const container = canvas.parentElement;
       if (!container) return;
-      
+
       const rect = container.getBoundingClientRect();
       const scale = window.devicePixelRatio || 1;
-      
+
       canvas.width = rect.width * scale;
       canvas.height = rect.height * scale;
       canvas.style.width = rect.width + 'px';
       canvas.style.height = rect.height + 'px';
-      
+
       ctx.scale(scale, scale);
       drawCanvas();
     };
-    
+
     updateCanvasSize();
-    
+
     const handleResize = () => {
       updateCanvasSize();
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [isOpen, drawCanvas]);
@@ -283,7 +283,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
   const getMousePos = useCallback((e: React.MouseEvent<HTMLCanvasElement>): Point | null => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
-    
+
     const rect = canvas.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -300,7 +300,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
     if (e.touches.length === 0) return null;
     const canvas = canvasRef.current;
     if (!canvas) return null;
-    
+
     const rect = canvas.getBoundingClientRect();
     return {
       x: e.touches[0].clientX - rect.left,
@@ -323,10 +323,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
   const stopDrawing = useCallback(() => {
     if (!isDrawing || result) return;
     setIsDrawing(false);
-    
+
     const evaluation = evaluateCircle(points);
     setResult(evaluation);
-    
+
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
     try {
@@ -337,7 +337,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
         action: 'saveAttempts',
       });
     }
-    
+
     if (evaluation.score > bestScore) {
       setBestScore(evaluation.score);
       try {
@@ -393,7 +393,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
           ctx.globalAlpha = alpha;
           ctx.fillStyle = 'rgba(45, 34, 51, 0.4)';
           ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
-          
+
           if (alpha > 0) {
             requestAnimationFrame(fadeOut);
           } else {
@@ -402,12 +402,12 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
             ctx.save();
             ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
             ctx.restore();
-            
+
             // Reset state after fade animation
             setPoints([]);
             setResult(null);
             setIsDrawing(false);
-            
+
             // Force complete redraw with proper state
             drawCanvas();
           }
@@ -445,23 +445,23 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="circle-game-backdrop" 
+    <div
+      className="circle-game-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Draw Perfect Circle Game"
     >
-      <div 
-        className="circle-game-panel" 
+      <div
+        className="circle-game-panel"
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
         <div className="circle-game-header">
           <h2 className="circle-game-title">Draw Perfect Circle</h2>
-          <button 
-            className="circle-game-close" 
+          <button
+            className="circle-game-close"
             onClick={onClose}
             aria-label="Close circle game"
           >
@@ -482,7 +482,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           />
-          
+
           {/* Instructions */}
           {points.length === 0 && !result && (
             <div className="circle-game-instructions">
@@ -493,7 +493,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
               </p>
             </div>
           )}
-          
+
           {/* Result Display */}
           {result && (
             <div className="circle-game-result">

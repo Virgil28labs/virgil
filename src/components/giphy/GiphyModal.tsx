@@ -3,11 +3,11 @@ import { giphyService } from '../../lib/giphyService';
 import type { GiphyModalProps } from '../../types/giphy.types';
 import { logger } from '../../lib/logger';
 
-export const GiphyModal = memo(function GiphyModal({ 
-  gifs, 
+export const GiphyModal = memo(function GiphyModal({
+  gifs,
   currentIndex,
   isFavorited,
-  onClose, 
+  onClose,
   onNavigate,
   onFavoriteToggle,
 }: GiphyModalProps) {
@@ -35,7 +35,7 @@ export const GiphyModal = memo(function GiphyModal({
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentGif) return;
-    
+
     try {
       await giphyService.downloadGif(currentGif, `${currentGif.title || 'gif'}-${currentGif.id}.gif`);
       setShowDownloaded(true);
@@ -52,7 +52,7 @@ export const GiphyModal = memo(function GiphyModal({
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentGif) return;
-    
+
     try {
       const success = await giphyService.copyGifUrl(currentGif);
       if (success) {
@@ -71,9 +71,9 @@ export const GiphyModal = memo(function GiphyModal({
   const handleShare = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentGif) return;
-    
+
     const shareUrl = giphyService.getShareUrl(currentGif);
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -151,8 +151,8 @@ export const GiphyModal = memo(function GiphyModal({
   if (currentIndex === null || !currentGif) return null;
 
   return (
-    <div 
-      className="giphy-image-modal" 
+    <div
+      className="giphy-image-modal"
       onClick={(e) => {
         e.stopPropagation();
         onClose();
@@ -170,7 +170,7 @@ export const GiphyModal = memo(function GiphyModal({
         backdropFilter: 'blur(10px)',
       }}
     >
-      <div 
+      <div
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -194,19 +194,19 @@ export const GiphyModal = memo(function GiphyModal({
             cursor: 'default',
           }}
         />
-        
+
         {/* GIF Info */}
         {currentGif.title && (
-          <div 
+          <div
             style={{
               textAlign: 'center',
               color: 'white',
               maxWidth: '600px',
             }}
           >
-            <h3 style={{ 
-              margin: 0, 
-              fontSize: '1.25rem', 
+            <h3 style={{
+              margin: 0,
+              fontSize: '1.25rem',
               fontWeight: '600',
               marginBottom: '0.5rem',
             }}
@@ -214,10 +214,10 @@ export const GiphyModal = memo(function GiphyModal({
               {currentGif.title}
             </h3>
             {currentGif.username && (
-              <p style={{ 
-                margin: 0, 
-                fontSize: '0.9rem', 
-                opacity: 0.8, 
+              <p style={{
+                margin: 0,
+                fontSize: '0.9rem',
+                opacity: 0.8,
               }}
               >
                 by {currentGif.username}
@@ -225,9 +225,9 @@ export const GiphyModal = memo(function GiphyModal({
             )}
           </div>
         )}
-        
+
         {/* Action buttons */}
-        <div 
+        <div
           style={{
             display: 'flex',
             gap: 'var(--giphy-spacing-md)',
@@ -268,7 +268,7 @@ export const GiphyModal = memo(function GiphyModal({
           >
             {isFavorited(currentGif.url) ? '❤️' : '🤍'}
           </button>
-          
+
           <button
             onClick={handleDownload}
             aria-label="Download GIF"
@@ -299,7 +299,7 @@ export const GiphyModal = memo(function GiphyModal({
           >
             {showDownloaded ? '✓' : '⬇️'}
           </button>
-          
+
           <button
             onClick={handleCopy}
             aria-label="Copy GIF URL"
@@ -330,7 +330,7 @@ export const GiphyModal = memo(function GiphyModal({
           >
             {showCopied ? '✓' : '📋'}
           </button>
-          
+
           <button
             onClick={handleShare}
             aria-label="Share GIF"
@@ -363,7 +363,7 @@ export const GiphyModal = memo(function GiphyModal({
           </button>
         </div>
       </div>
-      
+
       {/* Close button */}
       <button
         onClick={onClose}
@@ -482,7 +482,7 @@ export const GiphyModal = memo(function GiphyModal({
       )}
 
       {/* Counter */}
-      <div 
+      <div
         style={{
           position: 'absolute',
           bottom: 'var(--giphy-spacing-xl)',

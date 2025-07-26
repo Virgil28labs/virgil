@@ -51,7 +51,7 @@ const MemoryModal = memo(function MemoryModal({
       await memoryService.forgetMemory(memoryId);
       const updatedMemories = await memoryService.getMarkedMemories();
       onMemoriesUpdate(updatedMemories);
-      
+
       const newContext = await memoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(!!newContext);
@@ -117,10 +117,10 @@ const MemoryModal = memo(function MemoryModal({
     try {
       const context = `From conversation on ${timeService.formatDateToLocal(timeService.getCurrentDateTime())}`;
       await memoryService.markAsImportant(message.id, message.content, context);
-      
+
       const updatedMemories = await memoryService.getMarkedMemories();
       onMemoriesUpdate(updatedMemories);
-      
+
       const newContext = await memoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(true);
@@ -172,7 +172,7 @@ const MemoryModal = memo(function MemoryModal({
       <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
         <div className="memory-modal-header">
           <h3>🧠 Memory & Conversations</h3>
-          <button 
+          <button
             className="close-btn"
             onClick={onClose}
             title="Close memory viewer"
@@ -237,8 +237,8 @@ const MemoryModal = memo(function MemoryModal({
                   </div>
                 ) : (
                   filteredResults.conversations.map(conv => (
-                    <div 
-                      key={conv.id} 
+                    <div
+                      key={conv.id}
                       className="conversation-item clickable"
                       onClick={() => handleConversationClick(conv)}
                       role="button"
@@ -276,7 +276,7 @@ const MemoryModal = memo(function MemoryModal({
             >
               {isLoading ? '⏳ Exporting...' : '💾 Export All Data'}
             </button>
-            
+
             <button
               className="memory-action-btn clear"
               onClick={handleClearAllData}

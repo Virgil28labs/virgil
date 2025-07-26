@@ -27,7 +27,7 @@ export const DEFAULT_PHYSICS_CONFIG: PhysicsConfig = {
 
 export class PhysicsEngine {
   private config: PhysicsConfig;
-  
+
   constructor(config: Partial<PhysicsConfig> = {}) {
     this.config = { ...DEFAULT_PHYSICS_CONFIG, ...config };
   }
@@ -54,10 +54,10 @@ export class PhysicsEngine {
 
   handleGroundCollision(body: PhysicsBody, containerHeight: number, bodyHeight: number): boolean {
     const groundY = containerHeight - this.config.groundLevel - bodyHeight;
-    
+
     if (body.y >= groundY) {
       body.y = groundY;
-      
+
       if (Math.abs(body.vy) > 1) {
         body.vy = -body.vy * this.config.bounceDamping;
         body.angularVelocity = (Math.random() - 0.5) * 10;
@@ -67,13 +67,13 @@ export class PhysicsEngine {
         body.angularVelocity *= 0.9;
       }
     }
-    
+
     return false;
   }
 
   handleWallCollision(body: PhysicsBody, containerWidth: number, bodyWidth: number): boolean {
     let bounced = false;
-    
+
     if (body.x <= 0) {
       body.x = 0;
       body.vx = Math.abs(body.vx) * this.config.bounceDamping;
@@ -85,7 +85,7 @@ export class PhysicsEngine {
       body.angularVelocity = (Math.random() - 0.5) * 10;
       bounced = true;
     }
-    
+
     return bounced;
   }
 
@@ -110,8 +110,8 @@ export class PhysicsEngine {
   }
 
   isAtRest(body: PhysicsBody, threshold: number = 0.1): boolean {
-    return Math.abs(body.vx) < threshold && 
-           Math.abs(body.vy) < threshold && 
+    return Math.abs(body.vx) < threshold &&
+           Math.abs(body.vy) < threshold &&
            Math.abs(body.angularVelocity) < threshold;
   }
 
@@ -119,10 +119,10 @@ export class PhysicsEngine {
     this.applyGravity(body);
     this.applyFriction(body);
     this.updatePosition(body);
-    
+
     const groundBounced = this.handleGroundCollision(body, containerDimensions.height, bodyDimensions.height);
     const wallBounced = this.handleWallCollision(body, containerDimensions.width, bodyDimensions.width);
-    
+
     return { bounced: groundBounced || wallBounced };
   }
 }

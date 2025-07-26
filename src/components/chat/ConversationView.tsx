@@ -30,7 +30,7 @@ const ConversationView = memo(function ConversationView({
         messages: conversation.messages,
       },
     };
-    
+
     const blob = new Blob([JSON.stringify(conversationData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

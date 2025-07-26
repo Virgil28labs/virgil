@@ -35,15 +35,15 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="habit-tracker-backdrop" 
+    <div
+      className="habit-tracker-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Habit Tracker"
     >
-      <div 
-        className="habit-tracker-panel" 
+      <div
+        className="habit-tracker-panel"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -86,13 +86,13 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
             <span className="stat-value">{stats.totalCheckIns}</span>
             <span className="stat-label">Check-ins</span>
           </div>
-          <div 
+          <div
             className="stat best-streak-stat"
             data-start-date={
-              stats.bestStreakStartDate 
-                ? `Started ${timeService.formatDateToLocal(timeService.parseDate(stats.bestStreakStartDate) || timeService.getCurrentDateTime(), { 
-                  month: 'short', 
-                  day: 'numeric', 
+              stats.bestStreakStartDate
+                ? `Started ${timeService.formatDateToLocal(timeService.parseDate(stats.bestStreakStartDate) || timeService.getCurrentDateTime(), {
+                  month: 'short',
+                  day: 'numeric',
                 })}`
                 : ''
             }
@@ -125,7 +125,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
               onUndo={undoCheckIn}
             />
           ))}
-          
+
           {/* Add new habit */}
           {habits.length < 10 && !isAddingHabit && (
             <button

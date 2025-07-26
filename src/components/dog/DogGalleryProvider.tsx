@@ -93,7 +93,7 @@ export const DogGalleryProvider = memo(function DogGalleryProvider({ children, i
     loading,
     error,
     favorites,
-    
+
     // Actions
     setActiveTab,
     setSelectedBreed,
@@ -111,4 +111,3 @@ export const DogGalleryProvider = memo(function DogGalleryProvider({ children, i
     </DogGalleryContext.Provider>
   );
 });
-

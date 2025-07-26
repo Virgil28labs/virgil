@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /**
  * Time Test Utilities
- * 
+ *
  * Helper functions for testing time-dependent code with TimeService.
  * Provides time travel, freezing, and common test scenarios.
  */
@@ -28,37 +28,37 @@ export interface TimeTestContext {
  */
 export function setupTimeTest(initialDate?: Date | string): TimeTestContext {
   const timeService = createMockTimeService(initialDate);
-  
+
   return {
     timeService,
-    
+
     advanceTime: (ms: number) => {
       timeService.advanceTime(ms);
       jest.advanceTimersByTime(ms);
     },
-    
+
     setTime: (date: Date | string) => {
       timeService.setMockDate(date);
     },
-    
+
     freezeTime: () => {
       timeService.freezeTime();
       jest.useFakeTimers();
     },
-    
+
     unfreezeTime: () => {
       timeService.unfreezeTime();
       jest.useRealTimers();
     },
-    
+
     expectTimeAgo: (date: Date, expected: string) => {
       expect(timeService.getTimeAgo(date)).toBe(expected);
     },
-    
+
     expectRelativeTime: (date: Date, expected: string) => {
       expect(timeService.getRelativeTime(date)).toBe(expected);
     },
-    
+
     cleanup: () => {
       timeService.destroy();
       jest.useRealTimers();
@@ -71,7 +71,7 @@ export function setupTimeTest(initialDate?: Date | string): TimeTestContext {
  */
 export class TimeTravel {
   constructor(private timeService: MockTimeService) {}
-  
+
   // Common time jumps
   forward = {
     seconds: (n: number) => this.timeService.advanceTime(n * 1000),
@@ -96,7 +96,7 @@ export class TimeTravel {
       }
     },
   };
-  
+
   backward = {
     seconds: (n: number) => this.timeService.advanceTime(-n * 1000),
     minutes: (n: number) => this.timeService.advanceTime(-n * 60 * 1000),
@@ -120,7 +120,7 @@ export class TimeTravel {
       }
     },
   };
-  
+
   to = {
     // Jump to specific times of day
     morning: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 8)),
@@ -129,7 +129,7 @@ export class TimeTravel {
     evening: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 19)),
     night: () => this.timeService.setMockDate(this.timeService.addHours(this.timeService.startOfDay(), 23)),
     midnight: () => this.timeService.setMockDate(this.timeService.startOfDay()),
-    
+
     // Jump to specific dates
     startOfDay: () => {
       this.timeService.setMockDate(this.timeService.startOfDay());
@@ -149,7 +149,7 @@ export class TimeTravel {
     endOfMonth: () => {
       this.timeService.setMockDate(this.timeService.endOfMonth());
     },
-    
+
     // Jump to specific date
     date: (date: Date | string) => {
       this.timeService.setMockDate(date);
@@ -169,7 +169,7 @@ export const timeScenarios = {
       afterExpiry: () => timeService.advanceTime(cacheDuration + 1),
     };
   },
-  
+
   // Session timeout testing
   sessionTimeout: (timeService: MockTimeService, timeout: number) => {
     return {
@@ -178,7 +178,7 @@ export const timeScenarios = {
       justExpired: () => timeService.advanceTime(timeout + 1),
     };
   },
-  
+
   // Animation frame testing
   animationFrames: (timeService: MockTimeService, fps: number = 60) => {
     const frameTime = 1000 / fps;
@@ -188,7 +188,7 @@ export const timeScenarios = {
       oneSecond: () => timeService.advanceTime(1000),
     };
   },
-  
+
   // Rate limiting testing
   rateLimiting: (timeService: MockTimeService, windowMs: number) => {
     return {
@@ -206,7 +206,7 @@ export function withTimezone(_timeService: MockTimeService, _timezone: string, f
   // Note: This is a simplified version. In real implementation,
   // we'd need to mock Intl.DateTimeFormat to respect timezone
   const originalFormat = Intl.DateTimeFormat;
-  
+
   try {
     // Execute test with timezone context
     fn();
@@ -223,23 +223,23 @@ export const timeAssertions = {
   expectSameDay: (timeService: MockTimeService, date1: Date, date2: Date) => {
     expect(timeService.isSameDay(date1, date2)).toBe(true);
   },
-  
+
   expectDifferentDay: (timeService: MockTimeService, date1: Date, date2: Date) => {
     expect(timeService.isSameDay(date1, date2)).toBe(false);
   },
-  
+
   expectToday: (timeService: MockTimeService, date: Date) => {
     expect(timeService.isToday(date)).toBe(true);
   },
-  
+
   expectNotToday: (timeService: MockTimeService, date: Date) => {
     expect(timeService.isToday(date)).toBe(false);
   },
-  
+
   expectTimeOfDay: (timeService: MockTimeService, expected: 'morning' | 'afternoon' | 'evening' | 'night') => {
     expect(timeService.getTimeOfDay()).toBe(expected);
   },
-  
+
   expectDayOfWeek: (timeService: MockTimeService, expected: string) => {
     expect(timeService.getDayOfWeek()).toBe(expected.toLowerCase());
   },
@@ -252,12 +252,12 @@ export function mockTimers() {
   beforeEach(() => {
     jest.useFakeTimers();
   });
-  
+
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });
-  
+
   return {
     tick: (ms: number) => jest.advanceTimersByTime(ms),
     runAll: () => jest.runAllTimers(),

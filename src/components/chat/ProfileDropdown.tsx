@@ -60,7 +60,7 @@ const ProfileDropdown = memo(function ProfileDropdown({
 
   return (
     <div className="profile-selector">
-      <button 
+      <button
         className="status-pill edit-pill"
         onClick={() => setShowDropdown(!showDropdown)}
         title="System Prompt Editor"
@@ -69,7 +69,7 @@ const ProfileDropdown = memo(function ProfileDropdown({
       >
         ⚙️ EDIT
       </button>
-      
+
       {showDropdown && (
         <div className="profile-dropdown" role="menu">
           <div className="profile-section">
@@ -81,22 +81,22 @@ const ProfileDropdown = memo(function ProfileDropdown({
               className="chatbot-prompt-textarea"
               rows={6}
             />
-            
+
             <div className="chatbot-prompt-actions">
-              <button 
+              <button
                 className="chatbot-prompt-btn save"
                 onClick={handleSave}
               >
                 💾 Save
               </button>
-              <button 
+              <button
                 className="chatbot-prompt-btn reset"
                 onClick={handleReset}
               >
                 🔄 Default
               </button>
             </div>
-            
+
             <div className="chatbot-prompt-info">
               <small>
                 Length: {customSystemPrompt.length} characters

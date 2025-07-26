@@ -65,8 +65,8 @@ const Message = memo(function Message({
       exportedAt: timeService.toISOString(now),
     };
 
-    const blob = new Blob([JSON.stringify(messageData, null, 2)], { 
-      type: 'application/json', 
+    const blob = new Blob([JSON.stringify(messageData, null, 2)], {
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -74,13 +74,13 @@ const Message = memo(function Message({
     a.download = `message-${message.id}-${dashboardContextService.getLocalDate()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
+
     toastService.success('Message exported successfully');
   }, [message]);
 
   const handleQuoteMessage = useCallback(() => {
     const quotedText = `> ${message.content.split('\n').join('\n> ')}\n\n`;
-    
+
     // Try to find and focus the chat input
     const chatInput = document.querySelector('input[placeholder*="Type your message"]') as HTMLInputElement;
     if (chatInput) {
@@ -89,11 +89,11 @@ const Message = memo(function Message({
       chatInput.focus();
       // Move cursor to end
       chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-      
+
       // Trigger input event for React
       const event = new Event('input', { bubbles: true });
       chatInput.dispatchEvent(event);
-      
+
       toastService.success('Message quoted in input');
     } else {
       // Fallback to clipboard
@@ -107,7 +107,7 @@ const Message = memo(function Message({
   }, [isExpanded]);
 
   // Different class names based on variant
-  const messageClass = variant === 'chat' 
+  const messageClass = variant === 'chat'
     ? `message ${message.role === 'user' ? 'user-msg' : 'assistant-msg'}`
     : `conversation-message ${message.role === 'user' ? 'user' : 'assistant'}`;
 

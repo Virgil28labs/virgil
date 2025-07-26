@@ -1,6 +1,6 @@
 /**
  * DogGalleryAdapter - Dashboard App Adapter for Dog Gallery
- * 
+ *
  * Provides unified access to dog gallery favorites for Virgil AI assistant,
  * enabling responses about saved dog images, breeds, and favorites.
  */
@@ -38,7 +38,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
   readonly appName = 'dog';
   readonly displayName = 'Dog Gallery';
   readonly icon = '🐕';
-  
+
   private favorites: DogImage[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -76,14 +76,14 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
   getContextData(): AppContextData<DogGalleryData> {
     this.ensureFreshData();
-    
+
     // Calculate breed statistics
     const breedCounts: { [breed: string]: number } = {};
     this.favorites.forEach(dog => {
       const breed = dog.breed || 'mixed';
       breedCounts[breed] = (breedCounts[breed] || 0) + 1;
     });
-    
+
     // Find most favorited breed
     let mostFavoritedBreed: string | undefined;
     let maxCount = 0;
@@ -93,10 +93,10 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
         mostFavoritedBreed = breed;
       }
     });
-    
+
     // Get unique breeds
     const uniqueBreeds = Object.keys(breedCounts);
-    
+
     // Get recent favorites (with timestamps if available)
     const recentFavorites = this.favorites.slice(0, 10).map((dog, index) => ({
       url: dog.url,
@@ -146,11 +146,11 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
     const parts: string[] = [];
     parts.push(`${data.favorites.total} favorite dogs`);
-    
+
     if (data.stats.breedDiversity > 1) {
       parts.push(`${data.stats.breedDiversity} breeds`);
     }
-    
+
     if (data.stats.mostFavoritedBreed) {
       const count = data.favorites.breeds[data.stats.mostFavoritedBreed];
       if (count > 1) {
@@ -164,7 +164,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -201,7 +201,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     }
 
     // Specific breed queries
-    const breedNames = ['retriever', 'labrador', 'poodle', 'bulldog', 'beagle', 
+    const breedNames = ['retriever', 'labrador', 'poodle', 'bulldog', 'beagle',
       'husky', 'corgi', 'terrier', 'shepherd', 'spaniel'];
     for (const breed of breedNames) {
       if (lowerQuery.includes(breed)) {
@@ -222,11 +222,11 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     }
 
     let response = `You have ${data.favorites.total} favorite dog${data.favorites.total !== 1 ? 's' : ''} saved`;
-    
+
     if (data.stats.breedDiversity > 1) {
       response += ` across ${data.stats.breedDiversity} different breeds`;
     }
-    
+
     response += '.';
 
     if (data.stats.mostFavoritedBreed && data.favorites.breeds[data.stats.mostFavoritedBreed] > 2) {
@@ -253,11 +253,11 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
     // List all breeds
     let response = `You have favorites from ${data.stats.breedDiversity} breed${data.stats.breedDiversity !== 1 ? 's' : ''}:`;
-    
+
     const sortedBreeds = Object.entries(data.favorites.breeds)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5); // Top 5 breeds
-    
+
     sortedBreeds.forEach(([breed, count]) => {
       response += `\n• ${breed}: ${count} photo${count !== 1 ? 's' : ''}`;
     });
@@ -279,26 +279,26 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
     const recent = data.favorites.recent[0];
     let response = `Your most recent favorite is a ${recent.breed}`;
-    
+
     if (data.favorites.recent.length > 1) {
       response += `. You have ${data.favorites.recent.length} recent favorites`;
-      
+
       // Show variety in recent favorites
       const recentBreeds = new Set(data.favorites.recent.slice(0, 3).map(d => d.breed));
       if (recentBreeds.size > 1) {
         response += ` including ${Array.from(recentBreeds).join(', ')}`;
       }
     }
-    
+
     response += '.';
     return response;
   }
 
   private getSpecificBreedResponse(breed: string): string {
     this.ensureFreshData();
-    
+
     // Find all favorites matching the breed
-    const matchingDogs = this.favorites.filter(dog => 
+    const matchingDogs = this.favorites.filter(dog =>
       dog.breed.toLowerCase().includes(breed.toLowerCase()),
     );
 
@@ -321,15 +321,15 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     }
 
     let response = `Dog Gallery: ${data.favorites.total} favorite dogs`;
-    
+
     if (data.stats.breedDiversity > 1) {
       response += ` (${data.stats.breedDiversity} breeds)`;
     }
-    
+
     if (data.stats.mostFavoritedBreed) {
       response += `, mostly ${data.stats.mostFavoritedBreed}s`;
     }
-    
+
     response += '.';
 
     return response;
@@ -337,7 +337,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
@@ -359,19 +359,19 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
   subscribe(callback: (data: DogGalleryData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up storage listener
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === this.STORAGE_KEY) {
         this.refreshData();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
@@ -391,9 +391,9 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
 
   getAggregateData(): AggregateableData[] {
     this.ensureFreshData();
-    
+
     const aggregateData: AggregateableData[] = [];
-    
+
     // Add dog image count
     if (this.favorites.length > 0) {
       aggregateData.push({
@@ -407,7 +407,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
         },
       });
     }
-    
+
     return aggregateData;
   }
 }

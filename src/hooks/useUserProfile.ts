@@ -70,23 +70,23 @@ export const useUserProfile = () => {
   // Generate unique ID based on name and date of birth
   const generateUniqueId = useCallback((fullName: string, dob: string): string => {
     if (!fullName || !dob) return '';
-    
+
     const firstName = fullName.split(' ')[0];
     const date = timeService.parseDate(dob);
     if (!date) return '';
-    
+
     const day = timeService.getDay(date);
     const month = timeService.getMonth(date);
-    
+
     // Start with firstName + day
     let uniqueId = `${firstName}${day}`;
-    
+
     // Add month if needed for uniqueness (in real app, would check against database)
     // For now, just add month if day is common (1-10)
     if (day <= 10) {
       uniqueId = `${firstName}${day}${month}`;
     }
-    
+
     return uniqueId;
   }, []);
 
@@ -94,19 +94,19 @@ export const useUserProfile = () => {
   useEffect(() => {
     const loadProfile = async () => {
       if (!user) return;
-      
+
       // Skip loading if we just saved to prevent race condition
       if (skipNextLoadRef.current) {
         skipNextLoadRef.current = false;
         return;
       }
-      
+
       setLoading(true);
       try {
         // Get user metadata
         const metadata = user.user_metadata || {};
         // Loading profile from Supabase metadata
-        
+
         // Set profile with existing data
         setProfile(prev => ({
           ...prev,
@@ -126,7 +126,7 @@ export const useUserProfile = () => {
             country: '',
           },
         }));
-        
+
         // Generate unique ID if not set
         if (!metadata.uniqueId && metadata.fullName && metadata.dateOfBirth) {
           const newUniqueId = generateUniqueId(metadata.fullName, metadata.dateOfBirth);
@@ -138,7 +138,7 @@ export const useUserProfile = () => {
         setLoading(false);
       }
     };
-    
+
     loadProfile();
   }, [user, generateUniqueId]);
 
@@ -147,21 +147,21 @@ export const useUserProfile = () => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-    
+
     saveTimeoutRef.current = setTimeout(async () => {
       if (!user) return;
-      
+
       skipNextLoadRef.current = true;
       setSaving(true);
-      
+
       try {
         // Get current user to preserve existing metadata
         const { data: { user: currentUser }, error: getUserError } = await supabase.auth.getUser();
-        
+
         if (getUserError) throw getUserError;
-        
+
         const currentMetadata = currentUser?.user_metadata || {};
-        
+
         const { error } = await supabase.auth.updateUser({
           data: {
             ...currentMetadata, // Preserve all existing metadata fields
@@ -176,9 +176,9 @@ export const useUserProfile = () => {
             name: profileData.nickname || profileData.fullName, // Keep name field for compatibility
           },
         });
-        
+
         if (error) throw error;
-        
+
         // Verify the save by fetching the updated user
         const { error: verifyError } = await supabase.auth.getUser();
         if (verifyError) {
@@ -186,7 +186,7 @@ export const useUserProfile = () => {
         } else {
           // Profile saved successfully
         }
-        
+
         // Show success indicator
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
@@ -206,10 +206,10 @@ export const useUserProfile = () => {
     if (typeof value === 'string' && field !== 'email' && field !== 'dateOfBirth') {
       sanitizedValue = sanitizeText(value);
     }
-    
+
     // Validate field
     const errors = { ...validationErrors };
-    
+
     switch (field) {
       case 'email':
         if (sanitizedValue && typeof sanitizedValue === 'string' && !validateEmail(sanitizedValue)) {
@@ -237,22 +237,22 @@ export const useUserProfile = () => {
         }
         break;
     }
-    
+
     setValidationErrors(errors);
-    
+
     setProfile(prev => {
       const updated = { ...prev, [field]: sanitizedValue };
-      
+
       // Auto-generate unique ID when name or DOB changes
       if ((field === 'fullName' || field === 'dateOfBirth') && updated.fullName && updated.dateOfBirth) {
         updated.uniqueId = generateUniqueId(updated.fullName, updated.dateOfBirth);
       }
-      
+
       // Only trigger auto-save if there are no validation errors
       if (Object.keys(errors).length === 0) {
         debouncedSave(updated);
       }
-      
+
       return updated;
     });
   }, [generateUniqueId, debouncedSave, validationErrors]);
@@ -261,7 +261,7 @@ export const useUserProfile = () => {
   const updateAddress = useCallback((field: keyof UserAddress, value: string) => {
     // Sanitize the value
     const sanitizedValue = sanitizeText(value);
-    
+
     setProfile(prev => {
       const updated = {
         ...prev,
@@ -270,10 +270,10 @@ export const useUserProfile = () => {
           [field]: sanitizedValue,
         },
       };
-      
+
       // Trigger auto-save (address fields don't have specific validation)
       debouncedSave(updated);
-      
+
       return updated;
     });
   }, [debouncedSave]);
@@ -281,17 +281,17 @@ export const useUserProfile = () => {
   // Manual save profile function (for external use if needed)
   const saveProfile = useCallback(async () => {
     if (!user || !profile) return;
-    
+
     skipNextLoadRef.current = true;
     setSaving(true);
-    
+
     try {
       const { data: { user: currentUser }, error: getUserError } = await supabase.auth.getUser();
-      
+
       if (getUserError) throw getUserError;
-      
+
       const currentMetadata = currentUser?.user_metadata || {};
-      
+
       const { error } = await supabase.auth.updateUser({
         data: {
           ...currentMetadata,
@@ -306,9 +306,9 @@ export const useUserProfile = () => {
           name: profile.nickname || profile.fullName,
         },
       });
-      
+
       if (error) throw error;
-      
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (error) {

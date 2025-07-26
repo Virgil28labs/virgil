@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
-const RhythmMachineViewer = lazy(() => 
-  import('./rhythm/RhythmMachineViewer').then(module => ({ 
-    default: module.RhythmMachineViewer, 
+const RhythmMachineViewer = lazy(() =>
+  import('./rhythm/RhythmMachineViewer').then(module => ({
+    default: module.RhythmMachineViewer,
   })),
 );
 

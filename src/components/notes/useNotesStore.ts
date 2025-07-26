@@ -15,7 +15,7 @@ import { logger } from '../../lib/logger';
 /**
  * Main store hook for the notes application
  * Provides all state management and operations for notes
- * 
+ *
  * Features:
  * - Automatic IndexedDB persistence
  * - Optimistic updates for better UX
@@ -27,7 +27,7 @@ export const useNotesStore = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<NotesError | null>(null);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
-  
+
   const [aiEnabled, setAiEnabled] = useState(() => {
     const saved = localStorage.getItem('notesAiEnabled');
     return saved !== null ? saved === 'true' : true;
@@ -46,8 +46,8 @@ export const useNotesStore = () => {
           action: 'loadEntries',
         });
         setError(
-          error instanceof NotesError 
-            ? error 
+          error instanceof NotesError
+            ? error
             : new NotesError(
               ErrorType.STORAGE_ERROR,
               'Failed to load your notes. Please refresh the page.',
@@ -69,7 +69,7 @@ export const useNotesStore = () => {
   const addEntry = useCallback(async (content: string) => {
     // Clear any previous errors
     setError(null);
-    
+
     // Create new entry
     const newEntry: Entry = {
       id: crypto.randomUUID(),
@@ -92,7 +92,7 @@ export const useNotesStore = () => {
       if (aiEnabled && shouldProcessContent(content)) {
         // Mark as processing
         setProcessingIds(prev => new Set(prev).add(newEntry.id));
-        
+
         processEntryWithAI(newEntry.content).then(async (aiData) => {
           if (aiData) {
             const updatedEntry: Entry = {
@@ -104,8 +104,8 @@ export const useNotesStore = () => {
             };
 
             // Update state
-            setEntries(prev => 
-              prev.map(entry => 
+            setEntries(prev =>
+              prev.map(entry =>
                 entry.id === newEntry.id ? updatedEntry : entry,
               ),
             );
@@ -139,10 +139,10 @@ export const useNotesStore = () => {
         component: 'useNotesStore',
         action: 'saveEntry',
       });
-      
+
       // Rollback optimistic update
       setEntries(prev => prev.filter(e => e.id !== newEntry.id));
-      
+
       // Set user-friendly error
       setError(
         error instanceof NotesError
@@ -163,11 +163,11 @@ export const useNotesStore = () => {
    */
   const updateEntry = useCallback(async (id: string, updates: Partial<Entry>) => {
     setError(null);
-    
+
     // Optimistic update
-    setEntries(prev => 
-      prev.map(entry => 
-        entry.id === id 
+    setEntries(prev =>
+      prev.map(entry =>
+        entry.id === id
           ? { ...entry, ...updates, isEdited: true }
           : entry,
       ),
@@ -182,12 +182,12 @@ export const useNotesStore = () => {
           component: 'useNotesStore',
           action: 'updateEntry',
         });
-        
+
         // Rollback optimistic update
-        setEntries(prev => 
+        setEntries(prev =>
           prev.map(e => e.id === id ? entry : e),
         );
-        
+
         setError(
           error instanceof NotesError
             ? error
@@ -220,10 +220,10 @@ export const useNotesStore = () => {
    */
   const deleteEntry = useCallback(async (id: string) => {
     setError(null);
-    
+
     // Store entry for potential rollback
     const entryToDelete = entries.find(e => e.id === id);
-    
+
     // Optimistic update
     setEntries(prev => prev.filter(e => e.id !== id));
 
@@ -234,15 +234,15 @@ export const useNotesStore = () => {
         component: 'useNotesStore',
         action: 'deleteEntry',
       });
-      
+
       // Rollback if we have the entry
       if (entryToDelete) {
-        setEntries(prev => [...prev, entryToDelete].sort((a, b) => 
+        setEntries(prev => [...prev, entryToDelete].sort((a, b) =>
           // eslint-disable-next-line no-restricted-syntax -- Valid use: sorting by Date timestamps
           b.timestamp.getTime() - a.timestamp.getTime(),
         ));
       }
-      
+
       setError(
         error instanceof NotesError
           ? error
@@ -287,4 +287,3 @@ export const useNotesStore = () => {
     clearError,
   };
 };
-

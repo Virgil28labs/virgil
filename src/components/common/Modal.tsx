@@ -9,13 +9,13 @@ interface ModalProps {
   size?: 'small' | 'medium' | 'large' | 'extra-large'
 }
 
-export const Modal = memo(function Modal({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
+export const Modal = memo(function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
   className = '',
-  size = 'medium', 
+  size = 'medium',
 }: ModalProps) {
   // Handle escape key
   useEffect(() => {

@@ -73,10 +73,9 @@ export interface LocationContextValue extends LocationState {
   hasIpLocation: boolean;
 }
 
-
 export type PermissionStatus = 'granted' | 'denied' | 'prompt' | 'unknown' | 'unavailable';
 
-export type LocationActionType = 
+export type LocationActionType =
   | 'SET_LOADING'
   | 'SET_LOCATION_DATA'
   | 'SET_ERROR'

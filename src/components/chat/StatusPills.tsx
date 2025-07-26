@@ -22,7 +22,7 @@ const StatusPills = memo(function StatusPills({
     return null;
   }
 
-  const contextTitle = dashboardContext 
+  const contextTitle = dashboardContext
     ? `Context Aware: ${dashboardContext.timeOfDay}${dashboardContext.weather.hasData ? ', weather' : ''}${dashboardContext.location.hasGPS ? ', location' : ''}`
     : '';
 
@@ -31,7 +31,7 @@ const StatusPills = memo(function StatusPills({
   return (
     <div className="status-cluster">
       {showMemoryIndicator && (
-        <button 
+        <button
           className="status-pill memory-pill"
           onClick={onMemoryClick}
           title={memoryTitle}
@@ -40,7 +40,7 @@ const StatusPills = memo(function StatusPills({
         </button>
       )}
       {dashboardContext && (
-        <div 
+        <div
           className="status-pill context-pill"
           title={contextTitle}
         >

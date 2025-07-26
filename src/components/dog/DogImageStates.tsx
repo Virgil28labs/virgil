@@ -42,18 +42,18 @@ export const DogImageStates = memo(function DogImageStates({
       <div className="doggo-empty">
         <div className="doggo-empty-icon">🏠</div>
         <h3 className="doggo-empty-title">
-          {activeTab === 'fetch' 
+          {activeTab === 'fetch'
             ? 'Ready to meet some doggos?'
             : 'Your Doggo Sanctuary is empty!'}
         </h3>
         <p className="doggo-empty-message">
-          {activeTab === 'fetch' 
+          {activeTab === 'fetch'
             ? "Choose your preferences and click 'Fetch'"
             : 'Start by fetching some adorable friends'}
         </p>
         {activeTab === 'gallery' && onSwitchToFetch && (
-          <button 
-            className="doggo-empty-button" 
+          <button
+            className="doggo-empty-button"
             onClick={onSwitchToFetch}
             aria-label="Switch to fetch tab to get dogs"
           >

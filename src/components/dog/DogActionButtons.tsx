@@ -3,7 +3,7 @@ import type { DogActionButtonsProps } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 import { logger } from '../../lib/logger';
 
-export const DogActionButtons = memo(function DogActionButtons({ 
+export const DogActionButtons = memo(function DogActionButtons({
   dog,
   isFavorited,
   onFavoriteToggle,
@@ -63,7 +63,7 @@ export const DogActionButtons = memo(function DogActionButtons({
 
   const sizeClasses = {
     small: 'doggo-action-btn--small',
-    medium: 'doggo-action-btn--medium', 
+    medium: 'doggo-action-btn--medium',
     large: 'doggo-action-btn--large',
   };
 
@@ -84,7 +84,7 @@ export const DogActionButtons = memo(function DogActionButtons({
           </span>
         )}
       </button>
-      
+
       <button
         className={buttonClass}
         onClick={handleDownload}
@@ -98,7 +98,7 @@ export const DogActionButtons = memo(function DogActionButtons({
           </span>
         )}
       </button>
-      
+
       <button
         className={buttonClass}
         onClick={handleCopy}

@@ -14,7 +14,7 @@ export const FormattedText = React.memo(function FormattedText({ content }: Form
   const formattedElements = useMemo(() => {
     return formatText(content);
   }, [content]);
-  
+
   return (
     <div className="space-y-2">
       {formattedElements.map((element, index) => (

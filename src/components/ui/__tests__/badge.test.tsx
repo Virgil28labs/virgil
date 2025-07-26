@@ -4,7 +4,7 @@ import { Badge, badgeVariants } from '../badge';
 describe('Badge Component', () => {
   it('renders with default variant', () => {
     render(<Badge>Default Badge</Badge>);
-    
+
     const badge = screen.getByText('Default Badge');
     expect(badge).toBeInTheDocument();
     expect(badge.tagName).toBe('SPAN');
@@ -16,7 +16,7 @@ describe('Badge Component', () => {
   describe('variants', () => {
     it('renders secondary variant', () => {
       render(<Badge variant="secondary">Secondary</Badge>);
-      
+
       const badge = screen.getByText('Secondary');
       expect(badge).toHaveClass('bg-secondary');
       expect(badge).toHaveClass('text-secondary-foreground');
@@ -25,7 +25,7 @@ describe('Badge Component', () => {
 
     it('renders destructive variant', () => {
       render(<Badge variant="destructive">Error</Badge>);
-      
+
       const badge = screen.getByText('Error');
       expect(badge).toHaveClass('bg-destructive');
       expect(badge).toHaveClass('text-white');
@@ -34,7 +34,7 @@ describe('Badge Component', () => {
 
     it('renders outline variant', () => {
       render(<Badge variant="outline">Outlined</Badge>);
-      
+
       const badge = screen.getByText('Outlined');
       expect(badge).toHaveClass('text-foreground');
       expect(badge).toHaveClass('border-gray-300');
@@ -43,7 +43,7 @@ describe('Badge Component', () => {
 
     it('renders keyboard variant', () => {
       render(<Badge variant="keyboard">Ctrl</Badge>);
-      
+
       const badge = screen.getByText('Ctrl');
       expect(badge).toHaveClass('border-gray-300');
       expect(badge).toHaveClass('bg-gray-50');
@@ -55,7 +55,7 @@ describe('Badge Component', () => {
 
   it('applies custom className', () => {
     render(<Badge className="custom-badge">Custom</Badge>);
-    
+
     const badge = screen.getByText('Custom');
     expect(badge).toHaveClass('custom-badge');
     // Should still have base classes
@@ -65,7 +65,7 @@ describe('Badge Component', () => {
 
   it('renders with base styling classes', () => {
     render(<Badge>Styled Badge</Badge>);
-    
+
     const badge = screen.getByText('Styled Badge');
     expect(badge).toHaveClass('inline-flex');
     expect(badge).toHaveClass('items-center');
@@ -82,7 +82,7 @@ describe('Badge Component', () => {
 
   it('passes through HTML attributes', () => {
     render(
-      <Badge 
+      <Badge
         id="test-badge"
         data-testid="badge"
         title="Badge title"
@@ -91,7 +91,7 @@ describe('Badge Component', () => {
         Badge with attrs
       </Badge>,
     );
-    
+
     const badge = screen.getByText('Badge with attrs');
     expect(badge).toHaveAttribute('id', 'test-badge');
     expect(badge).toHaveAttribute('data-testid', 'badge');
@@ -106,7 +106,7 @@ describe('Badge Component', () => {
         <span>Badge Text</span>
       </Badge>,
     );
-    
+
     const badge = screen.getByText('Badge Text').closest('span.inline-flex');
     const icon = screen.getByTestId('icon');
     expect(badge).toContainElement(icon);
@@ -114,7 +114,7 @@ describe('Badge Component', () => {
 
   it('handles focus state classes', () => {
     render(<Badge>Focusable</Badge>);
-    
+
     const badge = screen.getByText('Focusable');
     expect(badge).toHaveClass('focus-visible:border-ring');
     expect(badge).toHaveClass('focus-visible:ring-ring/50');
@@ -123,14 +123,14 @@ describe('Badge Component', () => {
 
   it('has transition classes', () => {
     render(<Badge>Transitioned</Badge>);
-    
+
     const badge = screen.getByText('Transitioned');
     expect(badge).toHaveClass('transition-[color,box-shadow]');
   });
 
   it('handles overflow', () => {
     render(<Badge>Very long badge text that might overflow</Badge>);
-    
+
     const badge = screen.getByText(/Very long badge text/);
     expect(badge).toHaveClass('overflow-hidden');
   });

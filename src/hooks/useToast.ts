@@ -10,8 +10,8 @@ export function useToast() {
     toast: Omit<Toast, 'id'> | string,
   ) => {
     const id = timeService.getTimestamp().toString() + Math.random().toString(36).substr(2, 9);
-    
-    const newToast: Toast = typeof toast === 'string' 
+
+    const newToast: Toast = typeof toast === 'string'
       ? {
         id,
         type: 'info',

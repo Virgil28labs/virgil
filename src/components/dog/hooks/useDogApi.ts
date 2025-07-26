@@ -18,13 +18,13 @@ export const useDogApi = () => {
   const [breeds, setBreeds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Fetch with timeout wrapper
   const fetchWithTimeout = useCallback(async (url: string, signal: AbortSignal): Promise<Response> => {
     const timeoutId = setTimeout(() => abortControllerRef.current?.abort(), REQUEST_TIMEOUT);
-    
+
     try {
       const response = await dedupeFetch(url, { signal });
       clearTimeout(timeoutId);
@@ -47,45 +47,45 @@ export const useDogApi = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       let url = `${DOG_API}/breeds/image/random`;
-      
+
       if (breed) {
         url = `${DOG_API}/breed/${breed}/images/random`;
       }
-      
+
       if (count > 1) {
         url += `/${count}`;
       }
-      
+
       const response = await fetchWithTimeout(url, abortControllerRef.current.signal);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch dogs');
       }
-      
+
       const data = await response.json();
       const urls = Array.isArray(data.message) ? data.message : [data.message];
-      
+
       const newDogs: DogImage[] = urls.map((url: string, index: number) => ({
         url,
         breed: breed || extractBreedFromUrl(url),
         id: `${timeService.getTimestamp()}-${index}`,
       }));
-      
+
       setDogs(newDogs);
-      
+
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         return;
       }
-      
+
       logger.warn('Dog API fetch failed', {
         component: 'useDogApi',
         action: 'fetchDogs',
@@ -102,15 +102,15 @@ export const useDogApi = () => {
   const fetchBreeds = useCallback(async () => {
     try {
       const response = await fetchWithTimeout(`${DOG_API}/breeds/list/all`, new AbortController().signal);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch breeds');
       }
-      
+
       const data = await response.json();
       const breedList = Object.keys(data.message || {});
       setBreeds(breedList);
-      
+
     } catch (error) {
       logger.warn('Failed to fetch breeds', {
         component: 'useDogApi',

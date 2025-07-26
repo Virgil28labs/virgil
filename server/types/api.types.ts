@@ -16,7 +16,6 @@ export interface HealthCheckResponse {
   version?: string;
 }
 
-
 export interface LLMApiRequest {
   messages: Array<{
     role: 'user' | 'assistant' | 'system';
@@ -49,5 +48,3 @@ export interface ModelsApiResponse {
   success: boolean;
   data: Record<string, string[]>;
 }
-
-

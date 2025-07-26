@@ -63,10 +63,10 @@ export const HabitCard = memo(function HabitCard({
   }, [habit.name, habit.emoji]);
 
   return (
-    <div 
+    <div
       className={`
-        habit-card 
-        ${checkedToday ? 'checked' : ''} 
+        habit-card
+        ${checkedToday ? 'checked' : ''}
         ${canCheckIn && !checkedToday ? 'can-check' : ''}
         ${isEditing ? 'editing' : ''}
       `}
@@ -91,7 +91,7 @@ export const HabitCard = memo(function HabitCard({
           </button>
         </div>
       )}
-      
+
       {isEditing ? (
         <div className="habit-edit-form">
           <input
@@ -127,31 +127,31 @@ export const HabitCard = memo(function HabitCard({
         >
           <div className="habit-emoji">{habit.emoji}</div>
           <div className="habit-name">{habit.name}</div>
-        
+
           <div className={`habit-streak ${habit.streak > 0 ? 'has-streak' : ''}`}>
             <span className={`streak-icon ${checkedToday ? 'active' : 'inactive'}`}>
               🔥
             </span>
             <span className="streak-count">{habit.streak}</span>
           </div>
-        
+
           <div className="streak-dots habit-streak-dots">
             {Array.from({ length: 7 }, (_, i) => {
               const date = timeService.subtractDays(timeService.getCurrentDateTime(), 6 - i);
               const dateStr = dashboardContextService.formatDateToLocal(date);
               const isToday = i === 6;
               const isChecked = isToday ? checkedToday : habit.checkIns.includes(dateStr);
-            
+
               return (
                 <div
                   key={dateStr}
                   className="streak-dot-wrapper"
                   title={`${new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)} - ${isChecked ? 'Completed' : 'Missed'}`}
                 >
-                  <div 
+                  <div
                     className={`
-                    streak-dot 
-                    ${isChecked ? 'checked' : 'missed'} 
+                    streak-dot
+                    ${isChecked ? 'checked' : 'missed'}
                     ${isToday ? 'today' : ''}
                   `}
                   />

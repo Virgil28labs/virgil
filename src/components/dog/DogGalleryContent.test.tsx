@@ -101,7 +101,7 @@ describe('DogGalleryContent', () => {
 
   it('renders DogImageStates component with correct props', () => {
     render(<DogGalleryContent />);
-    
+
     expect(screen.getByTestId('dog-image-states')).toBeInTheDocument();
     expect(screen.getByTestId('loading')).toHaveTextContent('false');
     expect(screen.getByTestId('error')).toHaveTextContent('no-error');
@@ -111,7 +111,7 @@ describe('DogGalleryContent', () => {
 
   it('shows FetchControls when activeTab is fetch', () => {
     render(<DogGalleryContent />);
-    
+
     expect(screen.getByTestId('fetch-controls')).toBeInTheDocument();
   });
 
@@ -121,15 +121,15 @@ describe('DogGalleryContent', () => {
       state: { ...mockContextValue.state, activeTab: 'gallery' as const },
     };
     mockUseDogGallery.mockReturnValue(galleryContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.queryByTestId('fetch-controls')).not.toBeInTheDocument();
   });
 
   it('shows DogGrid when there are dogs and not loading', () => {
     render(<DogGalleryContent />);
-    
+
     expect(screen.getByTestId('dog-grid')).toBeInTheDocument();
     expect(screen.getByTestId('dog-test-1')).toBeInTheDocument();
   });
@@ -140,9 +140,9 @@ describe('DogGalleryContent', () => {
       loading: true,
     };
     mockUseDogGallery.mockReturnValue(loadingContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.queryByTestId('dog-grid')).not.toBeInTheDocument();
   });
 
@@ -152,9 +152,9 @@ describe('DogGalleryContent', () => {
       dogs: [],
     };
     mockUseDogGallery.mockReturnValue(noDogContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.queryByTestId('dog-grid')).not.toBeInTheDocument();
   });
 
@@ -165,9 +165,9 @@ describe('DogGalleryContent', () => {
       favorites: [mockDog],
     };
     mockUseDogGallery.mockReturnValue(galleryContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.getByTestId('dog-grid')).toBeInTheDocument();
     expect(screen.getByTestId('dogs-count')).toHaveTextContent('1');
   });
@@ -180,9 +180,9 @@ describe('DogGalleryContent', () => {
       favorites: [],
     };
     mockUseDogGallery.mockReturnValue(galleryContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.getByText('Switch to Fetch')).toBeInTheDocument();
   });
 
@@ -193,33 +193,33 @@ describe('DogGalleryContent', () => {
       favorites: [],
     };
     mockUseDogGallery.mockReturnValue(fetchContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     expect(screen.queryByText('Switch to Fetch')).not.toBeInTheDocument();
   });
 
   it('calls setSelectedImageIndex when image is clicked', () => {
     render(<DogGalleryContent />);
-    
+
     screen.getByText('Image').click();
-    
+
     expect(mockContextValue.setSelectedImageIndex).toHaveBeenCalledWith(0);
   });
 
   it('calls toggleFavorite when favorite button is clicked', () => {
     render(<DogGalleryContent />);
-    
+
     screen.getByText('Favorite').click();
-    
+
     expect(mockContextValue.toggleFavorite).toHaveBeenCalledWith(mockDog);
   });
 
   it('calls fetchDogs when fetch button is clicked', () => {
     render(<DogGalleryContent />);
-    
+
     screen.getByText('Fetch').click();
-    
+
     expect(mockContextValue.fetchDogs).toHaveBeenCalledTimes(1);
   });
 
@@ -231,11 +231,11 @@ describe('DogGalleryContent', () => {
       favorites: [],
     };
     mockUseDogGallery.mockReturnValue(galleryContextValue);
-    
+
     render(<DogGalleryContent />);
-    
+
     screen.getByText('Switch to Fetch').click();
-    
+
     expect(mockContextValue.setActiveTab).toHaveBeenCalledWith('fetch');
   });
 
@@ -249,13 +249,13 @@ describe('DogGalleryContent', () => {
       ],
     };
     mockUseDogGallery.mockReturnValue(multiDogsContext);
-    
+
     render(<DogGalleryContent />);
-    
+
     // Click the second dog (index 1)
     const images = screen.getAllByText('Image');
     images[1].click();
-    
+
     expect(mockContextValue.setSelectedImageIndex).toHaveBeenCalledWith(1);
   });
 });

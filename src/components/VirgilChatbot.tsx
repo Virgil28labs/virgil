@@ -31,7 +31,7 @@ const AVAILABLE_MODELS: ModelOption[] = [
 function VirgilChatbotInner() {
   const { state, dispatch, setOpen, setWindowSize, addMessage, setInput, setTyping, setError, clearMessages, newChat } = useChatContext();
   const { user } = useAuth();
-  
+
   // Use custom hooks for cleaner code
   useContextSync();
 
@@ -73,10 +73,10 @@ function VirgilChatbotInner() {
     contextualSuggestions: state.contextualSuggestions,
   });
 
-  const { 
-    sendMessage: _sendMessage, 
-    handleSubmit, 
-    handleKeyDown, 
+  const {
+    sendMessage: _sendMessage,
+    handleSubmit,
+    handleKeyDown,
     handleQuickAction,
     loadingState,
     inputRef: _inputRef,
@@ -107,7 +107,7 @@ function VirgilChatbotInner() {
 
   // Use localStorage hook for selected model
   const [, setStoredModel] = useLocalStorage('virgil-selected-model', 'gpt-4.1-mini');
-  
+
   const handleModelChange = useCallback((modelId: string) => {
     dispatch({ type: 'SET_MODEL', payload: modelId });
     setStoredModel(modelId);
@@ -128,7 +128,7 @@ function VirgilChatbotInner() {
 
   // Use localStorage hook for system prompt
   const [, setStoredSystemPrompt] = useLocalStorage('virgil-custom-system-prompt', '');
-  
+
   const handleSystemPromptSave = useCallback(() => {
     setStoredSystemPrompt(state.customSystemPrompt);
   }, [state.customSystemPrompt, setStoredSystemPrompt]);
@@ -175,7 +175,7 @@ function VirgilChatbotInner() {
   }
 
   return (
-    <div 
+    <div
       ref={(el) => {
         if (chatContainerRef) chatContainerRef.current = el;
         if (keyboardNavRef) keyboardNavRef.current = el;

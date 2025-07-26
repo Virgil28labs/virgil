@@ -84,18 +84,18 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="giphy-gallery-backdrop" 
-      onClick={onClose} 
+    <div
+      className="giphy-gallery-backdrop"
+      onClick={onClose}
       onKeyDown={handleKeyDown}
-      role="dialog" 
-      aria-modal="true" 
+      role="dialog"
+      aria-modal="true"
       aria-label="Giphy Gallery"
       tabIndex={-1}
     >
-      <div 
-        className="giphy-gallery-panel" 
-        onClick={(e) => e.stopPropagation()} 
+      <div
+        className="giphy-gallery-panel"
+        onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
@@ -106,8 +106,8 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
               GIPHY Gifs
             </h2>
           </div>
-          <button 
-            className="giphy-gallery-close" 
+          <button
+            className="giphy-gallery-close"
             onClick={onClose}
             aria-label="Close gallery"
           >
@@ -142,7 +142,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
             <div className="giphy-error">
               <div className="giphy-error-icon">⚠️</div>
               <div className="giphy-error-message">{error}</div>
-              <button 
+              <button
                 className="giphy-error-retry"
                 onClick={clearError}
               >
@@ -168,7 +168,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
                   <div className="giphy-empty-icon">🔍</div>
                   <div className="giphy-empty-title">No search results</div>
                   <div className="giphy-empty-message">
-                    {searchQuery ? 
+                    {searchQuery ?
                       `No GIFs found for "${searchQuery}". Try a different search term.` :
                       'Enter a search term to find GIFs'}
                   </div>
@@ -197,7 +197,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
 
       {/* Image Modal */}
       {selectedImageIndex !== null && (
-        <GiphyModal 
+        <GiphyModal
           gifs={currentGifs}
           currentIndex={selectedImageIndex}
           isFavorited={isFavorited}

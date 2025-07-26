@@ -107,7 +107,7 @@ export async function createLocationMarker(
 ): Promise<google.maps.marker.AdvancedMarkerElement> {
   // Import AdvancedMarkerElement library
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
-  
+
   // Create custom pin element with Virgil brand colors
   const pinElement = new PinElement({
     background: '#6c3baa',
@@ -115,7 +115,7 @@ export async function createLocationMarker(
     glyphColor: '#ffffff',
     scale: 1.2,
   });
-  
+
   // Create and return the advanced marker
   return new AdvancedMarkerElement({
     position,
@@ -179,7 +179,7 @@ export async function checkStreetViewAvailability(
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const streetViewService = new google.maps.StreetViewService();
-    
+
     streetViewService.getPanorama(
       {
         location: position,

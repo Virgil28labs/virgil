@@ -51,12 +51,12 @@ export const NotesInput = ({ onSubmit }: NotesInputProps) => {
 
   const handleSubmit = useCallback((e?: React.FormEvent) => {
     e?.preventDefault();
-    
+
     const trimmedValue = value.trim();
     if (trimmedValue) {
       onSubmit(trimmedValue);
       setValue('');
-      
+
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';

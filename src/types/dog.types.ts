@@ -106,7 +106,7 @@ export interface DogGalleryContextType {
   loading: boolean
   error: string | null
   favorites: DogImage[]
-  
+
   // Actions
   setActiveTab: (tab: TabType) => void
   setSelectedBreed: (breed: string) => void

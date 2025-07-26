@@ -17,7 +17,6 @@ export interface GoogleMapsModalProps {
   } | null;
 }
 
-
 // Simplified types for traffic checking use case
 
 // Custom map styles for Virgil theme

@@ -72,20 +72,20 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
         setMessage(error.message);
       } else {
         setMessage('Login successful!');
-        
+
         // Save email for next time
         try {
           localStorage.setItem('virgil_email', formData.email.trim().toLowerCase());
         } catch {
           // Ignore localStorage errors
         }
-        
+
         // Clear only password, keep email
         setFormData(prev => ({ ...prev, password: '' }));
-        
+
         // Force a session refresh to ensure AuthContext updates
         await supabase.auth.getSession();
-        
+
         if (onSuccess) onSuccess();
       }
     } catch {
@@ -114,7 +114,7 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
             autoComplete="email"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Password:</label>
           <input
@@ -130,14 +130,14 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
             autoComplete="current-password"
           />
         </div>
-        
+
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      
+
       {message && (
-        <div 
+        <div
           id="login-message"
           className={`message ${message.includes('successful') ? 'success' : 'error'}`}
           role="alert"

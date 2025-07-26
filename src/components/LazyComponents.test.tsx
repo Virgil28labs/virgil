@@ -26,7 +26,7 @@ jest.mock('react', () => ({
       }
       return <div>Unknown Component</div>;
     };
-    
+
     MockComponent.displayName = 'MockLazyComponent';
     return MockComponent;
   },
@@ -112,16 +112,15 @@ describe('LazyComponents', () => {
   describe('Lazy Service Loaders', () => {
     it('lazy loads the weather service', async () => {
       const weatherService = await lazyWeatherService();
-      
+
       expect(weatherService).toBeDefined();
       expect(weatherService.getWeatherByCoordinates).toBeDefined();
       expect(weatherService.convertTemperature).toBeDefined();
     });
 
-
     it('lazy loads the location service', async () => {
       const locationService = await lazyLocationService();
-      
+
       expect(locationService).toBeDefined();
       expect(locationService.getIpLocation).toBeDefined();
       expect(locationService.getAddressFromCoordinates).toBeDefined();
@@ -135,7 +134,7 @@ describe('LazyComponents', () => {
       expect(LazyVirgilChatbot).toBeDefined();
       expect(LazyWeather).toBeDefined();
       expect(LazyUserProfileViewer).toBeDefined();
-      
+
       // In test environment, these are mocked but still valid components
       expect(typeof LazyRaccoonMascot).toBe('function');
       expect(typeof LazyVirgilChatbot).toBe('function');

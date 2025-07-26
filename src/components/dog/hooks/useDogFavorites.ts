@@ -22,7 +22,7 @@ export const useDogFavorites = () => {
   const toggleFavorite = useCallback((dog: DogImage) => {
     setFavorites(prev => {
       const exists = prev.some(fav => fav.url === dog.url);
-      
+
       if (exists) {
         return prev.filter(fav => fav.url !== dog.url);
       } else {

@@ -27,15 +27,15 @@ export class RateLimiter {
   checkLimit(): boolean {
     const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
-    
+
     // Remove old requests outside the window
     this.requests = this.requests.filter(time => time > windowStart);
-    
+
     // Check if we're at the limit
     if (this.requests.length >= this.maxRequests) {
       return false;
     }
-    
+
     // Add current request
     this.requests.push(now);
     return true;
@@ -45,7 +45,7 @@ export class RateLimiter {
     const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
     this.requests = this.requests.filter(time => time > windowStart);
-    
+
     return Math.max(0, this.maxRequests - this.requests.length);
   }
 
@@ -53,7 +53,7 @@ export class RateLimiter {
     if (this.requests.length === 0) {
       return null;
     }
-    
+
     // Get the oldest request time
     const oldestRequest = Math.min(...this.requests);
     return timeService.fromTimestamp(oldestRequest + this.windowMs);
@@ -63,7 +63,7 @@ export class RateLimiter {
     const now = timeService.getTimestamp();
     const windowStart = now - this.windowMs;
     this.requests = this.requests.filter(time => time > windowStart);
-    
+
     return {
       currentRequests: this.requests.length,
       maxRequests: this.maxRequests,

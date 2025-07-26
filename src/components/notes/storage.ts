@@ -42,14 +42,14 @@ class NotesStorage {
 
         request.onsuccess = () => {
           this.db = request.result;
-          
+
           // Handle database version changes
           this.db.onversionchange = () => {
             this.db?.close();
             this.db = null;
             this.initPromise = null;
           };
-          
+
           resolve();
         };
 
@@ -82,14 +82,14 @@ class NotesStorage {
     if (!this.db) {
       await this.init();
     }
-    
+
     if (!this.db) {
       throw new NotesError(
         ErrorType.STORAGE_ERROR,
         'Database not available',
       );
     }
-    
+
     return this.db;
   }
 
@@ -101,7 +101,7 @@ class NotesStorage {
   async getAllEntries(): Promise<Entry[]> {
     try {
       const db = await this.ensureDb();
-      
+
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORAGE_CONFIG.STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORAGE_CONFIG.STORE_NAME);
@@ -159,7 +159,7 @@ class NotesStorage {
         });
 
         request.onsuccess = () => resolve();
-        
+
         request.onerror = () => {
           reject(new NotesError(
             ErrorType.STORAGE_ERROR,
@@ -196,7 +196,7 @@ class NotesStorage {
         });
 
         request.onsuccess = () => resolve();
-        
+
         request.onerror = () => {
           reject(new NotesError(
             ErrorType.STORAGE_ERROR,
@@ -230,7 +230,7 @@ class NotesStorage {
         const request = store.delete(id);
 
         request.onsuccess = () => resolve();
-        
+
         request.onerror = () => {
           reject(new NotesError(
             ErrorType.STORAGE_ERROR,
@@ -258,8 +258,8 @@ class NotesStorage {
     try {
       const allEntries = await this.getAllEntries();
       const lowerQuery = query.toLowerCase();
-      
-      return allEntries.filter(entry => 
+
+      return allEntries.filter(entry =>
         entry.content.toLowerCase().includes(lowerQuery) ||
         entry.tags.some(tag => tag.toLowerCase().includes(lowerQuery)),
       );
@@ -295,7 +295,7 @@ class NotesStorage {
           }));
           resolve(entries);
         };
-        
+
         request.onerror = () => {
           reject(new NotesError(
             ErrorType.STORAGE_ERROR,
@@ -323,7 +323,7 @@ class NotesStorage {
   async getEntriesByDateRange(start: Date, end: Date): Promise<Entry[]> {
     try {
       const allEntries = await this.getAllEntries();
-      
+
       return allEntries.filter(entry => {
         const entryDate = entry.timestamp instanceof Date ? entry.timestamp : timeService.parseDate(entry.timestamp) || timeService.getCurrentDateTime();
         return entryDate >= start && entryDate <= end;
@@ -353,7 +353,7 @@ class NotesStorage {
         const request = store.clear();
 
         request.onsuccess = () => resolve();
-        
+
         request.onerror = () => {
           reject(new NotesError(
             ErrorType.STORAGE_ERROR,

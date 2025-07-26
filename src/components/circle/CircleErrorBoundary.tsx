@@ -34,7 +34,7 @@ export class CircleErrorBoundary extends Component<Props, State> {
   public override render() {
     if (this.state.hasError) {
       return (
-        <div 
+        <div
           style={{
             position: 'fixed',
             inset: 0,
@@ -57,7 +57,7 @@ export class CircleErrorBoundary extends Component<Props, State> {
             boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
           }}
           >
-            <h2 style={{ 
+            <h2 style={{
               margin: '0 0 1rem 0',
               color: '#ff6b9d',
               fontSize: '1.5rem',
@@ -65,7 +65,7 @@ export class CircleErrorBoundary extends Component<Props, State> {
             >
               Oops! Something went wrong
             </h2>
-            <p style={{ 
+            <p style={{
               margin: '0 0 1.5rem 0',
               color: 'rgba(255, 255, 255, 0.8)',
               lineHeight: '1.5',

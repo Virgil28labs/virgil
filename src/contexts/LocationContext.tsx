@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { locationService } from '../lib/locationService';
-import type { 
-  LocationState, 
+import type {
+  LocationState,
   LocationAction,
   LocationContextValue,
 } from '../types/location.types';
@@ -12,10 +12,10 @@ import { LocationContext } from './LocationContextInstance';
 
 /**
  * LocationContext - Location Services State Management
- * 
+ *
  * Provides GPS coordinates, IP geolocation, and address data
  * with automatic permission handling and caching.
- * 
+ *
  * Features:
  * - GPS coordinates via Navigator API
  * - IP-based geolocation fallback
@@ -29,12 +29,12 @@ const locationReducer = (state: LocationState, action: LocationAction): Location
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_LOCATION_DATA':
-      return { 
-        ...state, 
+      return {
+        ...state,
         coordinates: action.payload.coordinates ?? state.coordinates,
         address: action.payload.address ?? state.address,
         ipLocation: action.payload.ipLocation ?? state.ipLocation,
-        loading: false, 
+        loading: false,
         error: null,
         lastUpdated: timeService.getTimestamp(),
         initialized: true,
@@ -94,18 +94,18 @@ export function LocationProvider({ children }: LocationProviderProps) {
         // If no quick location, still set loading to false
         dispatch({ type: 'SET_LOADING', payload: false });
       }
-      
+
       // Then enhance with GPS data in the background (non-blocking)
       // Check if GPS request is already in progress to prevent concurrent calls
       if (!gpsRequestInProgressRef.current) {
         gpsRequestInProgressRef.current = true;
-        
+
         // Add warm-up delay to let location services initialize
         setTimeout(() => {
           // Pass the existing IP location to avoid duplicate fetching
           locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
             // Only update if we got GPS coordinates or better address
-            if (fullLocationData.coordinates || 
+            if (fullLocationData.coordinates ||
                 (fullLocationData.address?.street && !state.address?.street)) {
               dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData });
             }
@@ -135,13 +135,13 @@ export function LocationProvider({ children }: LocationProviderProps) {
     try {
       const permission = await navigator.permissions.query({ name: 'geolocation' });
       dispatch({ type: 'SET_PERMISSION_STATUS', payload: permission.state });
-      
+
       // Store permission listener for cleanup
       const handlePermissionChange = () => {
         dispatch({ type: 'SET_PERMISSION_STATUS', payload: permission.state });
       };
       permission.addEventListener('change', handlePermissionChange);
-      
+
       // Return cleanup function
       return () => {
         permission.removeEventListener('change', handlePermissionChange);
@@ -191,7 +191,6 @@ export function LocationProvider({ children }: LocationProviderProps) {
     }
   }, [state.permissionStatus, state.loading, state.lastUpdated, fetchLocationData]);
 
-
   // Memoized context value to prevent unnecessary re-renders (performance optimization)
   const value: LocationContextValue = useMemo(() => ({
     ...state,
@@ -203,9 +202,9 @@ export function LocationProvider({ children }: LocationProviderProps) {
     hasIpLocation: !!state.ipLocation,
     initialized: true,  // Always initialized after mount
   }), [
-    state, 
-    fetchLocationData, 
-    requestLocationPermission, 
+    state,
+    fetchLocationData,
+    requestLocationPermission,
     clearError,
   ]);
 
@@ -215,4 +214,3 @@ export function LocationProvider({ children }: LocationProviderProps) {
     </LocationContext.Provider>
   );
 }
-

@@ -58,7 +58,7 @@ export const useRaccoonAnimations = ({
     showSparkles: false,
     showGif: false,
   });
-  
+
   // Sleeping Animation State
   const [isSleeping, setIsSleeping] = useState<boolean>(false);
   const [sleepingEmojis, setSleepingEmojis] = useState<SleepingEmoji[]>([]);
@@ -66,37 +66,37 @@ export const useRaccoonAnimations = ({
   const sleepTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sleepEmojiTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const sleepEmojiCounter = useRef<number>(0);
-  
+
   // Running Animation State
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [facingDirection, setFacingDirection] = useState<'left' | 'right'>('right');
-  
+
   // UI Element Interaction State
   const [isOnUIElement, setIsOnUIElement] = useState<boolean>(false);
   const [currentUIElement, setCurrentUIElement] = useState<UIElement | null>(null);
   const [currentRaccoonEmoji, setCurrentRaccoonEmoji] = useState<string>('🦝');
   const wasOnUIElement = useRef<boolean>(false);
-  
+
   /**
    * Returns a random raccoon-related emoji
    */
   const getRandomRaccoonEmoji = useCallback(() => {
     return RACCOON_EMOJIS[Math.floor(Math.random() * RACCOON_EMOJIS.length)];
   }, []);
-  
+
   /**
    * Returns a random weather-related emoji
    */
   const getRandomWeatherEmoji = useCallback(() => {
     return WEATHER_EMOJIS[Math.floor(Math.random() * WEATHER_EMOJIS.length)];
   }, []);
-  
+
   /**
    * Starts the sleeping animation with floating zzz emojis
    */
   const startSleepingAnimation = useCallback(() => {
     sleepEmojiCounter.current = 0;
-    
+
     // Add initial floating emojis
     const initialEmojis = [
       { id: sleepEmojiCounter.current++, delay: 0 },
@@ -104,7 +104,7 @@ export const useRaccoonAnimations = ({
       { id: sleepEmojiCounter.current++, delay: 1.0 },
     ];
     setSleepingEmojis(initialEmojis);
-    
+
     // Continue spawning new emojis every 2.5 seconds
     sleepEmojiTimer.current = setInterval(() => {
       setSleepingEmojis(prev => {
@@ -114,19 +114,19 @@ export const useRaccoonAnimations = ({
       });
     }, ANIMATION_TIMINGS.SLEEP_EMOJI_INTERVAL);
   }, []);
-  
+
   /**
    * Resets the sleep timer and records activity
    */
   const resetSleepTimer = useCallback(() => {
     lastActivityTime.current = timeService.getTimestamp();
-    
+
     // Clear existing sleep timer
     if (sleepTimer.current) {
       clearTimeout(sleepTimer.current);
       sleepTimer.current = null;
     }
-    
+
     // Wake up if sleeping
     setIsSleeping(current => {
       if (current) {
@@ -139,7 +139,7 @@ export const useRaccoonAnimations = ({
       }
       return current;
     });
-    
+
     // Start new sleep timer
     sleepTimer.current = setTimeout(() => {
       // Check conditions before sleeping
@@ -149,31 +149,31 @@ export const useRaccoonAnimations = ({
       }
     }, ANIMATION_TIMINGS.SLEEP_TIMEOUT);
   }, [isPickedUp, isDragging, charging, isOnGround, startSleepingAnimation]);
-  
+
   /**
    * Shows pickup animation with sparkles
    */
   const showPickupAnimation = useCallback(() => {
-    setVisualState(prev => ({ 
-      ...prev, 
+    setVisualState(prev => ({
+      ...prev,
       bounceCount: prev.bounceCount + 1,
       showSparkles: true,
       showGif: true,
     }));
-    
+
     // Hide sparkles after animation
     setTimeout(() => {
       setVisualState(prev => ({ ...prev, showSparkles: false }));
     }, ANIMATION_TIMINGS.SPARKLE_DURATION);
   }, []);
-  
+
   /**
    * Hides the GIF modal
    */
   const hideGif = useCallback(() => {
     setVisualState(prev => ({ ...prev, showGif: false }));
   }, []);
-  
+
   /**
    * Handles landing on UI element
    */
@@ -181,7 +181,7 @@ export const useRaccoonAnimations = ({
     if (element) {
       setIsOnUIElement(true);
       setCurrentUIElement(element);
-      
+
       // Only set new random emoji if just landed
       if (!wasOnUIElement.current) {
         if (element.isPowerButton) {
@@ -192,7 +192,7 @@ export const useRaccoonAnimations = ({
           setCurrentRaccoonEmoji(getRandomRaccoonEmoji());
         }
       }
-      
+
       // Add glow effect to element
       if (element.element) {
         if (element.isPowerButton) {
@@ -213,7 +213,7 @@ export const useRaccoonAnimations = ({
           element.element.style.transition = 'box-shadow 0.3s ease';
         }
       }
-      
+
       wasOnUIElement.current = true;
     } else {
       // Clear glow effect from previous UI element
@@ -232,17 +232,17 @@ export const useRaccoonAnimations = ({
           currentUIElement.element.style.boxShadow = '';
         }
       }
-      
+
       setIsOnUIElement(false);
       setCurrentUIElement(null);
       wasOnUIElement.current = false;
     }
   }, [currentUIElement, getRandomRaccoonEmoji, getRandomWeatherEmoji]);
-  
+
   // Initialize sleep timer
   useEffect(() => {
     resetSleepTimer();
-    
+
     // Cleanup timers on unmount
     return () => {
       if (sleepTimer.current) {
@@ -253,14 +253,14 @@ export const useRaccoonAnimations = ({
       }
     };
   }, [resetSleepTimer]);
-  
+
   // Reset sleep timer on activity
   useEffect(() => {
     if (isMoving || isPickedUp || isDragging || charging) {
       resetSleepTimer();
     }
   }, [isMoving, isPickedUp, isDragging, charging, resetSleepTimer]);
-  
+
   return {
     visualState,
     sleepState: {

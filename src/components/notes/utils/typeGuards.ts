@@ -12,9 +12,9 @@ import { timeService } from '../../../services/TimeService';
  */
 export function isEntry(value: unknown): value is Entry {
   if (!value || typeof value !== 'object') return false;
-  
+
   const entry = value as Record<string, unknown>;
-  
+
   return (
     typeof entry.id === 'string' &&
     entry.timestamp instanceof Date &&
@@ -34,9 +34,9 @@ export function isEntry(value: unknown): value is Entry {
  */
 export function isTask(value: unknown): value is Task {
   if (!value || typeof value !== 'object') return false;
-  
+
   const task = value as Record<string, unknown>;
-  
+
   return (
     typeof task.text === 'string' &&
     typeof task.completed === 'boolean' &&
@@ -117,11 +117,11 @@ export function toValidDate(value: unknown): Date | null {
   if (value instanceof Date && !isNaN(value.getTime())) { // eslint-disable-line no-restricted-syntax -- Valid use: checking if Date is valid
     return value;
   }
-  
+
   if (typeof value === 'string' || typeof value === 'number') {
     return timeService.parseDate(value.toString());
   }
-  
+
   return null;
 }
 
@@ -140,35 +140,35 @@ export function hasProperty<K extends PropertyKey>(
  */
 export function sanitizeEntry(data: unknown): Partial<Entry> | null {
   if (!data || typeof data !== 'object') return null;
-  
+
   const obj = data as Record<string, unknown>;
   const sanitized: Partial<Entry> = {};
-  
+
   if (typeof obj.id === 'string') sanitized.id = obj.id;
   if (typeof obj.content === 'string') sanitized.content = obj.content;
-  
+
   const timestamp = toValidDate(obj.timestamp);
   if (timestamp) sanitized.timestamp = timestamp;
-  
+
   if (Array.isArray(obj.tags)) {
     sanitized.tags = obj.tags.filter(isTagType);
   }
-  
+
   if (Array.isArray(obj.tasks)) {
     sanitized.tasks = obj.tasks.filter(isTask);
   }
-  
+
   if (typeof obj.aiProcessed === 'boolean') {
     sanitized.aiProcessed = obj.aiProcessed;
   }
-  
+
   if (typeof obj.isEdited === 'boolean') {
     sanitized.isEdited = obj.isEdited;
   }
-  
+
   if (isActionType(obj.actionType)) {
     sanitized.actionType = obj.actionType;
   }
-  
+
   return sanitized;
 }

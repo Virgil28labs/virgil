@@ -13,36 +13,36 @@ interface ChatHeaderProps {
   windowSize: 'normal' | 'large' | 'fullscreen';
   onSizeToggle: () => void;
   onMinimize: () => void;
-  
+
   // Model selection
   selectedModel: string;
   onModelChange: (modelId: string) => void;
   models: ModelOption[];
-  
+
   // Memory state
   showMemoryIndicator: boolean;
   markedMemories: MarkedMemory[];
   recentConversations: StoredConversation[];
   onMemoryModalOpen: () => void;
-  
+
   // Context state
   dashboardContext: DashboardContext | null;
-  
+
   // Profile/System prompt
   customSystemPrompt: string;
   onSystemPromptChange: (prompt: string) => void;
   onSystemPromptSave: () => void;
-  
+
   // New chat functionality
   onNewChat: () => void;
   messageCount: number;
-  
+
   // Clear messages functionality
   onClearMessages: () => void;
-  
+
   // Export functionality
   onExportMessages: () => void;
-  
+
   // Tooltip/system prompt preview
   createSystemPrompt: () => string;
 }
@@ -96,7 +96,7 @@ const ChatHeader = memo(function ChatHeader({
     <div className="chatbot-header">
       <div className="header-left">
         {/* Virgil Logo/Name */}
-        <div 
+        <div
           className="assistant-name clickable-logo"
           onClick={handleLogoClick}
           onMouseEnter={() => setShowTooltip(true)}

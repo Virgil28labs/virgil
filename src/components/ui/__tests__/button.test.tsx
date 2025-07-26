@@ -5,7 +5,7 @@ import React from 'react';
 describe('Button Component', () => {
   it('renders with default props', () => {
     render(<Button>Click me</Button>);
-    
+
     const button = screen.getByRole('button', { name: 'Click me' });
     expect(button).toBeInTheDocument();
     expect(button).toHaveClass('bg-violet-600');
@@ -15,7 +15,7 @@ describe('Button Component', () => {
   describe('variants', () => {
     it('renders default variant', () => {
       render(<Button variant="default">Default</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-violet-600');
       expect(button).toHaveClass('text-white');
@@ -23,7 +23,7 @@ describe('Button Component', () => {
 
     it('renders secondary variant', () => {
       render(<Button variant="secondary">Secondary</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-gray-700');
       expect(button).toHaveClass('text-gray-100');
@@ -31,7 +31,7 @@ describe('Button Component', () => {
 
     it('renders outline variant', () => {
       render(<Button variant="outline">Outline</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('border');
       expect(button).toHaveClass('border-gray-600');
@@ -40,7 +40,7 @@ describe('Button Component', () => {
 
     it('renders ghost variant', () => {
       render(<Button variant="ghost">Ghost</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('text-gray-200');
       expect(button).not.toHaveClass('border');
@@ -50,7 +50,7 @@ describe('Button Component', () => {
   describe('sizes', () => {
     it('renders default size', () => {
       render(<Button size="default">Default</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('h-9');
       expect(button).toHaveClass('px-4');
@@ -59,7 +59,7 @@ describe('Button Component', () => {
 
     it('renders small size', () => {
       render(<Button size="sm">Small</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('h-8');
       expect(button).toHaveClass('px-3');
@@ -68,7 +68,7 @@ describe('Button Component', () => {
 
     it('renders large size', () => {
       render(<Button size="lg">Large</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('h-10');
       expect(button).toHaveClass('px-8');
@@ -76,7 +76,7 @@ describe('Button Component', () => {
 
     it('renders icon size', () => {
       render(<Button size="icon" aria-label="Icon button">🎯</Button>);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass('h-9');
       expect(button).toHaveClass('w-9');
@@ -85,7 +85,7 @@ describe('Button Component', () => {
 
   it('applies custom className', () => {
     render(<Button className="custom-class">Custom</Button>);
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveClass('custom-class');
     // Should still have default classes
@@ -95,22 +95,22 @@ describe('Button Component', () => {
   it('handles click events', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('can be disabled', () => {
     const handleClick = jest.fn();
     render(<Button disabled onClick={handleClick}>Disabled</Button>);
-    
+
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveClass('disabled:pointer-events-none');
     expect(button).toHaveClass('disabled:opacity-50');
-    
+
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
@@ -118,15 +118,15 @@ describe('Button Component', () => {
   it('forwards ref correctly', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(<Button ref={ref}>Button with ref</Button>);
-    
+
     expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     expect(ref.current?.textContent).toBe('Button with ref');
   });
 
   it('passes through HTML button attributes', () => {
     render(
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         name="test-button"
         value="test-value"
         form="test-form"
@@ -134,7 +134,7 @@ describe('Button Component', () => {
         Submit
       </Button>,
     );
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('type', 'submit');
     expect(button).toHaveAttribute('name', 'test-button');
@@ -144,7 +144,7 @@ describe('Button Component', () => {
 
   it('has proper accessibility classes', () => {
     render(<Button>Accessible</Button>);
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveClass('outline-none');
     expect(button).toHaveClass('focus-visible:ring-2');
@@ -157,7 +157,7 @@ describe('Button Component', () => {
         Secondary Large
       </Button>,
     );
-    
+
     const button = screen.getByRole('button');
     // Secondary variant classes
     expect(button).toHaveClass('bg-gray-700');

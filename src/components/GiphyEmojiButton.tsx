@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
-const GiphyGallery = lazy(() => 
-  import('./giphy/GiphyGallery').then(module => ({ 
-    default: module.GiphyGallery, 
+const GiphyGallery = lazy(() =>
+  import('./giphy/GiphyGallery').then(module => ({
+    default: module.GiphyGallery,
   })),
 );
 

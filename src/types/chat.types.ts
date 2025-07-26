@@ -20,7 +20,6 @@ export interface ModelOption {
   description: string;
 }
 
-
 export interface ChatHookOptions {
   model?: string;
   temperature?: number;
@@ -67,7 +66,7 @@ export interface ChatError {
 export interface ChatContextValue {
   state: ChatState;
   dispatch: React.Dispatch<ChatAction>;
-  
+
   // Convenience methods
   setOpen: (isOpen: boolean) => void;
   setWindowSize: (size: 'normal' | 'large' | 'fullscreen') => void;

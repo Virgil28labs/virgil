@@ -45,7 +45,7 @@ export function useMessageHandling({
   const { sendMessage: sendChatMessage, loadingState } = useChatApi({
     onSuccess: async (message) => {
       addMessage(message);
-      
+
       // Save assistant message to continuous conversation
       try {
         await memoryService.saveConversation([message]);
@@ -57,7 +57,7 @@ export function useMessageHandling({
           action: 'saveAssistantMessage',
         });
       }
-      
+
       setTimeout(() => inputRef.current?.focus(), 0);
     },
     onError: (error) => {
@@ -73,7 +73,7 @@ export function useMessageHandling({
     addMessage(userMessage);
     setInput('');
     setError(null);
-    
+
     // Save user message to continuous conversation
     try {
       await memoryService.saveConversation([userMessage]);
@@ -85,7 +85,7 @@ export function useMessageHandling({
         action: 'saveUserMessage',
       });
     }
-    
+
     setTimeout(() => inputRef.current?.focus(), 0);
 
     const systemPrompt = await createSystemPrompt(messageText);

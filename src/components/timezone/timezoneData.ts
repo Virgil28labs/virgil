@@ -1,6 +1,6 @@
 /**
  * Timezone Database and Utilities
- * 
+ *
  * Provides timezone data, search functionality, and mappings for the timezone widget.
  * City-first approach for better user experience.
  */
@@ -262,33 +262,33 @@ export function searchTimezones(query: string, limit = 10): TimezoneInfo[] {
   }
 
   const normalizedQuery = query.toLowerCase().trim();
-  
+
   // Score each timezone based on match quality
   const scored = TIMEZONE_DATABASE.map(timezone => {
     let score = 0;
-    
+
     // Exact matches get highest score
     if (timezone.city.toLowerCase() === normalizedQuery) score += 100;
     if (timezone.country.toLowerCase() === normalizedQuery) score += 90;
     if (timezone.timezone.toLowerCase() === normalizedQuery) score += 80;
-    
+
     // Partial matches
     if (timezone.city.toLowerCase().includes(normalizedQuery)) score += 60;
     if (timezone.country.toLowerCase().includes(normalizedQuery)) score += 50;
     if (timezone.region?.toLowerCase().includes(normalizedQuery)) score += 40;
-    
+
     // Search terms matches
     timezone.searchTerms.forEach(term => {
       if (term === normalizedQuery) score += 70;
       if (term.includes(normalizedQuery)) score += 30;
     });
-    
+
     // Boost popular timezones
     if (timezone.popular) score += 20;
-    
+
     return { timezone, score };
   });
-  
+
   return scored
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
@@ -310,7 +310,6 @@ export function getTimezoneInfo(timezone: string): TimezoneInfo | undefined {
   return TIMEZONE_DATABASE.find(tz => tz.timezone === timezone);
 }
 
-
 /**
  * Generate unique ID for selected timezone
  */
@@ -325,7 +324,7 @@ export function getDefaultTimezones(): SelectedTimezone[] {
   // Start with user's local timezone
   const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const localInfo = getTimezoneInfo(localTimezone);
-  
+
   return [{
     id: generateTimezoneId(),
     timezone: localTimezone,

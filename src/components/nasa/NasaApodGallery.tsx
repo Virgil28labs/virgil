@@ -1,10 +1,10 @@
 import React, { memo, useCallback, useState } from 'react';
 import type { ApodImage } from '../../types/nasa.types';
-import { 
-  downloadApodImage, 
+import {
+  downloadApodImage,
   copyApodToClipboard,
   shareApod,
-  stopEvent, 
+  stopEvent,
 } from './utils/nasaImageUtils';
 import { logger } from '../../lib/logger';
 import { timeService } from '../../services/TimeService';
@@ -97,10 +97,10 @@ export const NasaApodGallery = memo(function NasaApodGallery({
         <h3>My Cosmic Collection</h3>
         <p className="nasa-apod-gallery-count">{favorites.length} favorite{favorites.length !== 1 ? 's' : ''}</p>
       </div>
-      
+
       <div className="nasa-apod-gallery-grid">
         {favorites.map((apod, index) => (
-          <div 
+          <div
             key={apod.id}
             className="nasa-apod-gallery-item"
             onClick={() => handleImageClick(index)}
@@ -122,14 +122,14 @@ export const NasaApodGallery = memo(function NasaApodGallery({
                   <span className="nasa-apod-gallery-video-label">Video</span>
                 </div>
               ) : (
-                <img 
-                  src={apod.imageUrl} 
+                <img
+                  src={apod.imageUrl}
                   alt={apod.title}
                   loading="lazy"
                   className="nasa-apod-gallery-image"
                 />
               )}
-              
+
               {/* Favorite Overlay - Always Visible */}
               <button
                 className="nasa-apod-gallery-favorite-overlay favorited"
@@ -139,7 +139,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
               >
                 ❤️
               </button>
-              
+
               {/* Action Overlay - Show on Hover */}
               <div className="nasa-apod-gallery-action-overlay">
                 <button
@@ -171,7 +171,7 @@ export const NasaApodGallery = memo(function NasaApodGallery({
                 </button>
               </div>
             </div>
-            
+
             {/* Info */}
             <div className="nasa-apod-gallery-info">
               <h4 className="nasa-apod-gallery-title">{apod.title}</h4>

@@ -44,10 +44,10 @@ export const Weather = memo(function Weather() {
 
   // Always render the widget container to prevent mount/unmount flashing
   return (
-    <div 
+    <div
       ref={componentRef}
-      className={`weather-widget ${showForecast ? 'weather-widget-expanded' : ''}`} 
-      role="region" 
+      className={`weather-widget ${showForecast ? 'weather-widget-expanded' : ''}`}
+      role="region"
       aria-label="Weather information"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -86,7 +86,7 @@ export const Weather = memo(function Weather() {
           <Skeleton className="w-32 h-6" />
         </div>
       )}
-      
+
       {/* Forecast panel */}
       {showForecast && forecast && (
         <div className="weather-forecast-container">
@@ -96,4 +96,3 @@ export const Weather = memo(function Weather() {
     </div>
   );
 });
-

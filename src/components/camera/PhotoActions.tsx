@@ -169,14 +169,14 @@ export const PhotoActions = memo(function PhotoActions({
               {timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
-          
+
           <div className="metadata-item">
             <span className="metadata-label">Time:</span>
             <span className="metadata-value">
               {timeService.formatTimeToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
-          
+
           {photo.size && (
             <div className="metadata-item">
               <span className="metadata-label">Size:</span>
@@ -185,7 +185,7 @@ export const PhotoActions = memo(function PhotoActions({
               </span>
             </div>
           )}
-          
+
           {photo.width && photo.height && (
             <div className="metadata-item">
               <span className="metadata-label">Dimensions:</span>

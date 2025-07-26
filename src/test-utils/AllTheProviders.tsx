@@ -14,7 +14,7 @@ interface AllTheProvidersProps {
 }
 
 // Custom provider that wraps components with all necessary contexts
-export const AllTheProviders: React.FC<AllTheProvidersProps> = ({ 
+export const AllTheProviders: React.FC<AllTheProvidersProps> = ({
   children,
   authValue: _authValue = mockAuthContextValue,
   locationValue: _locationValue = mockLocationContextValue,

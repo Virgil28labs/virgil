@@ -1,19 +1,19 @@
 import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
-const VectorMemory = lazy(() => 
-  import('./VectorMemory').then(module => ({ 
-    default: module.VectorMemory, 
+const VectorMemory = lazy(() =>
+  import('./VectorMemory').then(module => ({
+    default: module.VectorMemory,
   })),
 );
 
 const VectorMemoryWrapper = ({ onClose }: { onClose: () => void }) => (
-  <div style={{ 
-    position: 'fixed', 
-    top: 0, 
-    left: 0, 
-    right: 0, 
-    bottom: 0, 
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     zIndex: 1000,
     display: 'flex',
@@ -21,16 +21,16 @@ const VectorMemoryWrapper = ({ onClose }: { onClose: () => void }) => (
     justifyContent: 'center',
   }}
   >
-    <div style={{ 
-      backgroundColor: 'white', 
-      borderRadius: '12px', 
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
       maxWidth: '90vw',
       maxHeight: '90vh',
       overflow: 'auto',
       position: 'relative',
     }}
     >
-      <button 
+      <button
         onClick={onClose}
         style={{
           position: 'absolute',

@@ -47,11 +47,11 @@ export function useVirtualization({
   const visibleRange = useMemo(() => {
     const visibleStart = Math.floor(scrollTop / itemHeight);
     const visibleEnd = Math.ceil((scrollTop + containerHeight) / itemHeight);
-    
+
     // Add overscan
     const start = Math.max(0, visibleStart - overscan);
     const end = Math.min(itemCount, visibleEnd + overscan);
-    
+
     return { start, end };
   }, [scrollTop, itemHeight, containerHeight, itemCount, overscan]);
 
@@ -105,13 +105,13 @@ export function useDynamicVirtualization<T>(
   const cumulativeHeights = useMemo(() => {
     const heights = [0];
     let total = 0;
-    
+
     for (let i = 0; i < items.length; i++) {
       const height = itemHeights[i] || estimatedItemHeight;
       total += height;
       heights.push(total);
     }
-    
+
     return heights;
   }, [items.length, itemHeights, estimatedItemHeight]);
 

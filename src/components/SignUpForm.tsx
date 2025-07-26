@@ -100,7 +100,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             autoComplete="name"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
@@ -116,7 +116,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             autoComplete="email"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Password:</label>
           <input
@@ -136,14 +136,14 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             Password must be at least 6 characters long
           </div>
         </div>
-        
+
         <button type="submit" disabled={loading}>
           {loading ? 'Signing Up...' : 'Sign Up'}
         </button>
       </form>
-      
+
       {message && (
-        <div 
+        <div
           id="signup-message"
           className={`message ${message.includes('successful') ? 'success' : 'error'}`}
           role="alert"

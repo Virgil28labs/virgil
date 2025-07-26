@@ -31,11 +31,11 @@ export const RouteInputBar = memo(function RouteInputBar({
       return '';
     }
   }, []);
-  
+
   const [origin, setOrigin] = useState(currentAddress || 'Current Location');
   const [destination, setDestination] = useState(initialDestination);
   const [isOriginCurrentLocation, setIsOriginCurrentLocation] = useState(true);
-  
+
   const originInputRef = useRef<HTMLInputElement>(null);
   const destinationInputRef = useRef<HTMLInputElement>(null);
   const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
@@ -93,7 +93,7 @@ export const RouteInputBar = memo(function RouteInputBar({
             metadata: { error },
           });
         }
-        
+
         if (onDestinationSelect) {
           onDestinationSelect(place);
         }
@@ -134,7 +134,7 @@ export const RouteInputBar = memo(function RouteInputBar({
     setOrigin(destination);
     setDestination(temp);
     setIsOriginCurrentLocation(false);
-    
+
     if (origin && destination) {
       onRouteRequest(destination, origin);
     }
@@ -143,7 +143,7 @@ export const RouteInputBar = memo(function RouteInputBar({
   const handleUseCurrentLocation = useCallback(() => {
     setOrigin(currentAddress || 'Current Location');
     setIsOriginCurrentLocation(true);
-    
+
     if (destination) {
       onRouteRequest(currentAddress || 'Current Location', destination);
     }
@@ -204,7 +204,7 @@ export const RouteInputBar = memo(function RouteInputBar({
               </svg>
             </button>
           )}
-          
+
           {/* Origin autocomplete suggestions */}
           {showOriginSuggestions && originSuggestions.length > 0 && (
             <div className="autocomplete-dropdown">
@@ -231,10 +231,10 @@ export const RouteInputBar = memo(function RouteInputBar({
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
-              d="M3 6L6 3M6 3L9 6M6 3V13M13 10L10 13M10 13L7 10M10 13V3" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
+              d="M3 6L6 3M6 3L9 6M6 3V13M13 10L10 13M10 13L7 10M10 13V3"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
@@ -271,7 +271,7 @@ export const RouteInputBar = memo(function RouteInputBar({
               </svg>
             </button>
           )}
-          
+
           {/* Destination autocomplete suggestions */}
           {showDestinationSuggestions && destinationSuggestions.length > 0 && (
             <div className="autocomplete-dropdown">

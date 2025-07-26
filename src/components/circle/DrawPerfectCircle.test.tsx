@@ -67,7 +67,7 @@ describe('DrawPerfectCircle', () => {
 
   it('renders when isOpen is true', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Draw Perfect Circle')).toBeInTheDocument();
     expect(screen.getByText('Draw a perfect circle')).toBeInTheDocument();
@@ -75,43 +75,43 @@ describe('DrawPerfectCircle', () => {
 
   it('does not render when isOpen is false', () => {
     render(<DrawPerfectCircle isOpen={false} onClose={mockOnClose} />);
-    
+
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const closeButton = screen.getByRole('button', { name: /close circle game/i });
     await user.click(closeButton);
-    
+
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('calls onClose when backdrop is clicked', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const backdrop = screen.getByRole('dialog');
     await user.click(backdrop);
-    
+
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('does not call onClose when panel is clicked', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const panel = screen.getByRole('document');
     await user.click(panel);
-    
+
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 
   it('displays initial instructions', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     expect(screen.getByText('Draw a perfect circle')).toBeInTheDocument();
     expect(screen.getByText('Click and drag to draw your circle')).toBeInTheDocument();
     expect(screen.getByText(/Best score: 0/)).toBeInTheDocument();
@@ -120,7 +120,7 @@ describe('DrawPerfectCircle', () => {
 
   it('renders canvas element', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const canvas = document.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
     expect(canvas).toHaveClass('circle-game-canvas');
@@ -128,7 +128,7 @@ describe('DrawPerfectCircle', () => {
 
   it('renders control buttons', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /hide grid/i })).toBeInTheDocument();
   });
@@ -136,20 +136,20 @@ describe('DrawPerfectCircle', () => {
   it('toggles grid visibility', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const gridButton = screen.getByRole('button', { name: /hide grid/i });
     await user.click(gridButton);
-    
+
     expect(screen.getByRole('button', { name: /show grid/i })).toBeInTheDocument();
   });
 
   it('clears canvas when clear button is clicked', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const clearButton = screen.getByRole('button', { name: /clear/i });
     await user.click(clearButton);
-    
+
     expect(mockCanvasContext.clearRect).toHaveBeenCalled();
   });
 
@@ -161,7 +161,7 @@ describe('DrawPerfectCircle', () => {
     });
 
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     expect(screen.getByText(/Best score: 85/)).toBeInTheDocument();
     expect(screen.getByText(/Attempts: 3/)).toBeInTheDocument();
   });
@@ -169,18 +169,18 @@ describe('DrawPerfectCircle', () => {
   it('handles keyboard shortcuts', async () => {
     const user = userEvent.setup();
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     // Test Escape key
     await user.keyboard('{Escape}');
     expect(mockOnClose).toHaveBeenCalledTimes(1);
-    
+
     // Reset mock
     mockOnClose.mockClear();
-    
+
     // Test Ctrl+C for clear
     await user.keyboard('{Control>}c{/Control}');
     expect(mockCanvasContext.clearRect).toHaveBeenCalled();
-    
+
     // Test Ctrl+G for grid toggle
     await user.keyboard('{Control>}g{/Control}');
     expect(screen.getByRole('button', { name: /show grid/i })).toBeInTheDocument();
@@ -188,19 +188,19 @@ describe('DrawPerfectCircle', () => {
 
   it('handles mouse drawing events', async () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const canvas = document.querySelector('canvas');
     if (!canvas) throw new Error('Canvas not found');
-    
+
     // Simulate mouse down
     fireEvent.mouseDown(canvas, { clientX: 100, clientY: 100 });
-    
+
     // Simulate mouse move
     fireEvent.mouseMove(canvas, { clientX: 150, clientY: 150 });
-    
+
     // Simulate mouse up
     fireEvent.mouseUp(canvas);
-    
+
     expect(mockCanvasContext.beginPath).toHaveBeenCalled();
     expect(mockCanvasContext.moveTo).toHaveBeenCalled();
     expect(mockCanvasContext.lineTo).toHaveBeenCalled();
@@ -209,23 +209,23 @@ describe('DrawPerfectCircle', () => {
 
   it('handles touch drawing events', async () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const canvas = document.querySelector('canvas');
     if (!canvas) throw new Error('Canvas not found');
-    
+
     // Simulate touch start
     fireEvent.touchStart(canvas, {
       touches: [{ clientX: 100, clientY: 100 }],
     });
-    
+
     // Simulate touch move
     fireEvent.touchMove(canvas, {
       touches: [{ clientX: 150, clientY: 150 }],
     });
-    
+
     // Simulate touch end
     fireEvent.touchEnd(canvas);
-    
+
     expect(mockCanvasContext.beginPath).toHaveBeenCalled();
     expect(mockCanvasContext.moveTo).toHaveBeenCalled();
     expect(mockCanvasContext.lineTo).toHaveBeenCalled();
@@ -234,21 +234,21 @@ describe('DrawPerfectCircle', () => {
 
   it('has proper accessibility attributes', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog).toHaveAttribute('aria-label', 'Draw Perfect Circle Game');
-    
+
     const closeButton = screen.getByRole('button', { name: /close circle game/i });
     expect(closeButton).toHaveAttribute('aria-label', 'Close circle game');
   });
 
   it('handles window resize events', async () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     // Simulate window resize
     fireEvent.resize(window);
-    
+
     // Check that canvas context methods are called (indicating redraw)
     await waitFor(() => {
       expect(mockCanvasContext.scale).toHaveBeenCalled();
@@ -257,20 +257,20 @@ describe('DrawPerfectCircle', () => {
 
   it('prevents default on mouse and touch events', () => {
     render(<DrawPerfectCircle isOpen onClose={mockOnClose} />);
-    
+
     const canvas = document.querySelector('canvas');
     if (!canvas) throw new Error('Canvas not found');
-    
-    const mouseDownEvent = new MouseEvent('mousedown', { 
-      bubbles: true, 
+
+    const mouseDownEvent = new MouseEvent('mousedown', {
+      bubbles: true,
       cancelable: true,
       clientX: 100,
       clientY: 100,
     });
-    
+
     const preventDefault = jest.spyOn(mouseDownEvent, 'preventDefault');
     fireEvent(canvas, mouseDownEvent);
-    
+
     expect(preventDefault).toHaveBeenCalled();
   });
 });

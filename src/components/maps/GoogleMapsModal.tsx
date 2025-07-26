@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react';
 import { Modal } from '../common/Modal';
 import { timeService } from '../../services/TimeService';
-import { 
-  loadGoogleMaps, 
-  createLocationMarker, 
-  getGoogleMapsApiKey, 
+import {
+  loadGoogleMaps,
+  createLocationMarker,
+  getGoogleMapsApiKey,
 } from '../../utils/googleMaps';
-import type { 
+import type {
   GoogleMapsModalProps,
 } from '../../types/maps.types';
 import { RouteInputBar } from './RouteInputBar';
@@ -24,7 +24,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
 }: GoogleMapsModalProps) {
   // DOM refs
   const mapRef = useRef<HTMLDivElement>(null);
-  
+
   // Map instance refs
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerInstanceRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
@@ -34,13 +34,13 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   const trafficLayerRef = useRef<google.maps.TrafficLayer | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const autoCollapseTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapsLoaded, setMapsLoaded] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<string>('Current Location');
-  
+
   // Consolidated route state
   const {
     currentRoute,
@@ -55,14 +55,14 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
     clearRoute: clearRouteState,
     setRouteData,
   } = useRouteState();
-  
+
   // Other state
   const [currentDestinationPlace, setCurrentDestinationPlace] = useState<google.maps.places.PlaceResult | null>(null);
   const [showTraffic, setShowTraffic] = useState(true);
   const [departureTime, setDepartureTime] = useState<Date | 'now'>('now');
 
   // Memoized values to prevent unnecessary re-renders
-  const currentLocation = useMemo(() => 
+  const currentLocation = useMemo(() =>
     coordinates ? {
       lat: coordinates.latitude,
       lng: coordinates.longitude,
@@ -70,7 +70,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   [coordinates],
   );
 
-  const currentAddressDisplay = useMemo(() => 
+  const currentAddressDisplay = useMemo(() =>
     currentAddress || address?.formatted || 'Current Location',
   [currentAddress, address?.formatted],
   );
@@ -82,31 +82,31 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
       markerInstanceRef.current.map = null;
       markerInstanceRef.current = null;
     }
-    
+
     if (directionsRendererRef.current) {
       directionsRendererRef.current.setMap(null);
       directionsRendererRef.current = null;
     }
-    
+
     // Clean up alternative renderers
     alternativeRenderersRef.current.forEach(renderer => {
       renderer.setMap(null);
     });
     alternativeRenderersRef.current = [];
-    
+
     if (trafficLayerRef.current) {
       trafficLayerRef.current.setMap(null);
       trafficLayerRef.current = null;
     }
-    
+
     if (mapInstanceRef.current) {
       google.maps.event.clearInstanceListeners(mapInstanceRef.current);
       mapInstanceRef.current = null;
     }
-    
+
     directionsServiceRef.current = null;
     geocoderRef.current = null;
-    
+
     // Clear auto-collapse timer
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
@@ -117,7 +117,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Get address for current location with timeout for performance
   const geocodeLocation = useCallback(async (latLng: google.maps.LatLngLiteral) => {
     if (!geocoderRef.current) return '';
-    
+
     try {
       const result = await Promise.race([
         new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
@@ -133,11 +133,11 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
             }
           });
         }),
-        new Promise<never>((_, reject) => 
+        new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Geocoding timeout')), 3000),
         ),
       ]);
-      
+
       return result[0]?.formatted_address || '';
     } catch (error) {
       // Don't log timeout errors as they're expected for performance
@@ -155,10 +155,10 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Handle route request
   const handleRouteRequest = useCallback(async (origin: string, destination: string, customDepartureTime?: Date | 'now') => {
     if (!directionsServiceRef.current || !directionsRendererRef.current) return;
-    
+
     // Use custom departure time if provided, otherwise use state
     const depTime = customDepartureTime !== undefined ? customDepartureTime : departureTime;
-    
+
     const request: google.maps.DirectionsRequest = {
       origin,
       destination,
@@ -169,7 +169,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
         trafficModel: google.maps.TrafficModel.BEST_GUESS,
       },
     };
-    
+
     try {
       const result = await new Promise<google.maps.DirectionsResult>((resolve, reject) => {
         if (!directionsServiceRef.current) {
@@ -184,17 +184,17 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
           }
         });
       });
-      
+
       if (result.routes.length > 0) {
         // Use consolidated route state setter for better performance
         setRouteData(result.routes);
-        
+
         // Clear previous alternative renderers
         alternativeRenderersRef.current.forEach(renderer => {
           renderer.setMap(null);
         });
         alternativeRenderersRef.current = [];
-        
+
         // Display main route
         directionsRendererRef.current.setDirections(result);
         directionsRendererRef.current.setRouteIndex(0);
@@ -206,7 +206,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
             zIndex: 1000,
           },
         });
-        
+
         // Display alternative routes with different styling
         result.routes.slice(1).forEach((_route, index) => {
           const renderer = new google.maps.DirectionsRenderer({
@@ -226,7 +226,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
           });
           alternativeRenderersRef.current.push(renderer);
         });
-        
+
         // Fit map to route bounds
         const bounds = result.routes[0].bounds;
         if (bounds && mapInstanceRef.current) {
@@ -251,19 +251,19 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Handle route selection
   const handleRouteSelect = useCallback((index: number) => {
     if (!directionsRendererRef.current || !currentRoute) return;
-    
+
     setSelectedRouteIndex(index);
-    
+
     // Clear any existing timer
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
     }
-    
+
     // Auto-collapse after 800ms
     autoCollapseTimerRef.current = setTimeout(() => {
       setShowRouteOptions(false);
     }, 800);
-    
+
     // Update main route to show selected route
     directionsRendererRef.current.setRouteIndex(index);
     directionsRendererRef.current.setOptions({
@@ -274,7 +274,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
         zIndex: 1000,
       },
     });
-    
+
     // Update alternative routes styling
     alternativeRenderersRef.current.forEach((renderer, i) => {
       const routeIndex = i + 1;
@@ -294,7 +294,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
         });
       }
     });
-    
+
     // If selecting an alternative route, we need to update the display
     if (index > 0) {
       // Show the previously selected route as an alternative
@@ -316,23 +316,23 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
       // Store it temporarily
       alternativeRenderersRef.current[index - 1] = prevRenderer;
     }
-    
+
     // Get all routes and select the correct one
     const allRoutes = [currentRoute, ...alternativeRoutes];
     if (index < allRoutes.length) {
       const selectedRoute = allRoutes[index];
-      
+
       // Fit map to the selected route bounds with smooth animation
       const bounds = selectedRoute.bounds;
       if (bounds && mapInstanceRef.current) {
         const padding = {
-          top: 100, 
-          right: 50, 
-          bottom: 150, 
+          top: 100,
+          right: 50,
+          bottom: 150,
           left: 50,
         };
         mapInstanceRef.current.panToBounds(bounds, padding);
-        
+
         setTimeout(() => {
           if (mapInstanceRef.current) {
             mapInstanceRef.current.fitBounds(bounds, padding);
@@ -350,22 +350,22 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
       directionsRendererRef.current.setMap(mapInstanceRef.current);
       directionsRendererRef.current.setDirections({ routes: [] } as unknown as google.maps.DirectionsResult);
     }
-    
+
     // Clear alternative renderers
     alternativeRenderersRef.current.forEach(renderer => {
       renderer.setMap(null);
     });
     alternativeRenderersRef.current = [];
-    
+
     // Clear consolidated route state
     clearRouteState();
-    
+
     // Clear any auto-collapse timer
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
       autoCollapseTimerRef.current = null;
     }
-    
+
     // Reset map view to current location
     if (mapInstanceRef.current && currentLocation) {
       mapInstanceRef.current.setCenter(currentLocation);
@@ -376,7 +376,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Handle toggle expand/collapse
   const handleToggleExpand = useCallback(() => {
     setShowRouteOptions((prev) => !prev);
-    
+
     // Clear auto-collapse timer if user manually toggles
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
@@ -387,7 +387,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Handle close route info
   const handleCloseRouteInfo = useCallback(() => {
     setRouteInfoVisible(false);
-    
+
     // Clear auto-collapse timer
     if (autoCollapseTimerRef.current) {
       clearTimeout(autoCollapseTimerRef.current);
@@ -409,7 +409,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Handle departure time change
   const handleDepartureTimeChange = useCallback((newTime: Date | 'now') => {
     setDepartureTime(newTime);
-    
+
     // If we have a route, recalculate with new departure time
     if (hasActiveRoute && currentDestinationPlace) {
       const origin = currentAddress || 'Current Location';
@@ -421,28 +421,28 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
   // Initialize map
   useEffect(() => {
     if (!isOpen || !mapRef.current || !coordinates) return;
-    
+
     const apiKey = getGoogleMapsApiKey();
     if (!apiKey) {
       setError('Google Maps API key is not configured');
       setIsLoading(false);
       return;
     }
-    
+
     let mounted = true;
-    
+
     const initializeMap = async () => {
       try {
         // Load Google Maps if not already loaded
         if (!window.google?.maps) {
           await loadGoogleMaps({ apiKey });
         }
-        
+
         // Wait for Google Maps to be fully initialized
         if (!window.google?.maps?.ControlPosition) {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
-        
+
         if (!mounted || !mapRef.current || !window.google?.maps?.ControlPosition) {
           logger.error('Google Maps not properly initialized', undefined, {
             component: 'GoogleMapsModal',
@@ -455,7 +455,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
           });
           return;
         }
-        
+
         // Create map instance with optimized configuration
         const map = new google.maps.Map(mapRef.current, {
           center: {
@@ -476,9 +476,9 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
           scaleControl: false,
           clickableIcons: false,
         });
-        
+
         mapInstanceRef.current = map;
-        
+
         // Initialize services
         directionsServiceRef.current = new google.maps.DirectionsService();
         directionsRendererRef.current = new google.maps.DirectionsRenderer({
@@ -494,22 +494,22 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
           },
         });
         geocoderRef.current = new google.maps.Geocoder();
-        
+
         // Add traffic layer (ON by default)
         trafficLayerRef.current = new google.maps.TrafficLayer();
         trafficLayerRef.current.setMap(map);
-        
+
         // Add current location marker
         markerInstanceRef.current = await createLocationMarker({
           lat: coordinates.latitude,
           lng: coordinates.longitude,
         }, map);
-        
+
         // Set map as loaded immediately for fast UI response
         setMapsLoaded(true);
         setIsLoading(false);
         setError(null);
-        
+
         // Get address for current location asynchronously (non-blocking)
         geocodeLocation({
           lat: coordinates.latitude,
@@ -529,7 +529,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
             setCurrentAddress('Current Location'); // Fallback
           }
         });
-        
+
       } catch (err) {
         logger.error('Error initializing map', err as Error, {
           component: 'GoogleMapsModal',
@@ -541,16 +541,14 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
         }
       }
     };
-    
+
     initializeMap();
-    
+
     return () => {
       mounted = false;
       cleanupMaps();
     };
   }, [isOpen, coordinates, cleanupMaps, geocodeLocation]);
-
-
 
   return (
     <Modal
@@ -567,19 +565,19 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
             <p>Loading map...</p>
           </div>
         )}
-        
+
         {error && (
           <div className="maps-error">
             <p>{error}</p>
             <button onClick={() => window.location.reload()}>Reload</button>
           </div>
         )}
-        
-        <div 
-          ref={mapRef} 
+
+        <div
+          ref={mapRef}
           className={`map-view ${!isLoading && mapsLoaded ? 'active' : ''}`}
         />
-        
+
         {/* Map controls */}
         {mapsLoaded && !isLoading && (
           <>
@@ -592,13 +590,13 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
               hasRoute={hasActiveRoute}
               onClearRoute={handleClearRoute}
             />
-            
+
             <TrafficIndicator
               map={mapInstanceRef.current}
               isTrafficEnabled={showTraffic}
               onToggleTraffic={handleToggleTraffic}
             />
-            
+
             {routeInfoVisible && currentRoute && (
               <RouteInfoBar
                 route={currentRoute}

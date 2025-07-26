@@ -52,7 +52,6 @@ export const Dashboard = memo(function Dashboard() {
     }
   });
 
-
   const toggleElevationUnit = useCallback(() => {
     setElevationUnit(prev => {
       const newUnit = prev === 'meters' ? 'feet' : 'meters';
@@ -71,7 +70,7 @@ export const Dashboard = memo(function Dashboard() {
 
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return; // Prevent multiple clicks
-    
+
     setIsSigningOut(true);
     const { error } = await signOut();
     if (error) {
@@ -150,9 +149,9 @@ export const Dashboard = memo(function Dashboard() {
       </SectionErrorBoundary>
 
       {/* Power button */}
-      <button 
+      <button
         className={`power-button ${isSigningOut ? 'signing-out' : ''}`}
-        onClick={handleSignOut} 
+        onClick={handleSignOut}
         title={isSigningOut ? 'Signing out...' : 'Sign Out'}
         aria-label={isSigningOut ? 'Signing out...' : 'Sign out of your account'}
         data-keyboard-nav
@@ -173,7 +172,7 @@ export const Dashboard = memo(function Dashboard() {
           <div className="address-info">
             {address ? (
               address.street ? (
-                <p 
+                <p
                   className="street-address clickable"
                   onClick={() => setShowMapsModal(true)}
                   title="Click to view on map"
@@ -181,7 +180,7 @@ export const Dashboard = memo(function Dashboard() {
                   {address.house_number && `${address.house_number} `}{address.street}
                 </p>
               ) : address.formatted ? (
-                <p 
+                <p
                   className="street-address clickable"
                   onClick={() => setShowMapsModal(true)}
                   title="Click to view on map"
@@ -194,7 +193,7 @@ export const Dashboard = memo(function Dashboard() {
             ) : locationLoading ? (
               <Skeleton className="w-48 h-4" />
             ) : ipLocation?.city ? (
-              <p 
+              <p
                 className="street-address clickable"
                 onClick={() => setShowMapsModal(true)}
                 title="Click to view on map (IP-based location)"
@@ -205,10 +204,10 @@ export const Dashboard = memo(function Dashboard() {
               <p className="address-error">Location unavailable</p>
             )}
           </div>
-          
+
           <div className="ip-info">
             {ipLocation ? (
-              <div 
+              <div
                 ref={ipRef}
                 className="ip-hover-container"
                 onMouseEnter={() => setShowIPHover(true)}
@@ -227,16 +226,16 @@ export const Dashboard = memo(function Dashboard() {
               <p className="ip-error">IP address unavailable</p>
             )}
           </div>
-          
+
           <div className="elevation-info">
             {coordinates?.elevation !== undefined ? (
-              <p 
-                className="elevation" 
+              <p
+                className="elevation"
                 onClick={toggleElevationUnit}
                 style={{ cursor: 'pointer' }}
                 title="Click to toggle unit"
               >
-                Elevation: {elevationUnit === 'meters' 
+                Elevation: {elevationUnit === 'meters'
                   ? `${Math.round(coordinates.elevation)}m`
                   : `${Math.round(coordinates.elevation * 3.28084)}ft`}
               </p>
@@ -259,37 +258,37 @@ export const Dashboard = memo(function Dashboard() {
       </SectionErrorBoundary>
       {/* Dog Emoji Button */}
       <DogEmojiButton />
-      
+
       {/* Giphy Emoji Button */}
       <GiphyEmojiButton />
-      
+
       {/* NASA APOD Button */}
       <NasaApodButton />
-      
+
       {/* Rhythm Machine Button */}
       <RhythmMachineButton />
-      
+
       {/* Circle Game Button */}
       <CircleGameButton />
-      
+
       {/* Streak Tracker Button */}
       <StreakTrackerButton />
-      
+
       {/* Camera Button */}
       <CameraEmojiButton />
-      
+
       {/* Pomodoro Timer Button */}
       <PomodoroEmojiButton />
-      
+
       {/* Notes Button */}
       <NotesEmojiButton />
-      
+
       {/* Vector Test Button */}
       <VectorMemoryButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
-        <LazyUserProfileViewer 
+        <LazyUserProfileViewer
           isOpen={showProfileViewer}
           onClose={() => setShowProfileViewer(false)}
         />

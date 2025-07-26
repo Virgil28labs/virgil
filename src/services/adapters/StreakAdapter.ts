@@ -1,6 +1,6 @@
 /**
  * StreakAdapter - Dashboard App Adapter for Habit Streak Tracker
- * 
+ *
  * Provides unified access to habit tracking data for Virgil AI assistant,
  * enabling responses about habits, streaks, and daily check-ins.
  */
@@ -42,7 +42,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
   readonly appName = 'streaks';
   readonly displayName = 'Habit Streaks';
   readonly icon = '🔥';
-  
+
   private userData: UserHabitsData | null = null;
   private listeners: ((data: StreakData) => void)[] = [];
   private lastFetchTime = 0;
@@ -85,7 +85,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   getContextData(): AppContextData<StreakData> {
     this.ensureFreshData();
-    
+
     if (!this.userData) {
       return {
         appName: this.appName,
@@ -204,7 +204,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private generateSummary(data: StreakData): string {
     const parts: string[] = [];
-    
+
     if (data.stats.totalHabits === 0) {
       return 'No habits tracked yet';
     }
@@ -232,7 +232,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
   private getLastUsedTime(): number {
     if (!this.userData || this.userData.habits.length === 0) return 0;
 
-    const allCheckIns = this.userData.habits.flatMap(h => 
+    const allCheckIns = this.userData.habits.flatMap(h =>
       h.checkIns.map(date => (timeService.parseDate(date) || timeService.getCurrentDateTime()).getTime()), // eslint-disable-line no-restricted-syntax
     );
 
@@ -248,7 +248,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -264,7 +264,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   async getResponse(query: string): Promise<string> {
     this.ensureFreshData();
-    
+
     if (!this.userData) {
       return "You haven't set up any habits yet. Open the Habit Tracker to start building positive routines!";
     }
@@ -297,7 +297,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private getTodayStatusResponse(): string {
     const data = this.transformUserData();
-    
+
     if (data.habits.length === 0) {
       return "You don't have any habits set up yet. Start by adding your first habit!";
     }
@@ -323,7 +323,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private getStreakResponse(): string {
     const data = this.transformUserData();
-    
+
     if (data.habits.length === 0) {
       return "You don't have any streaks yet because you haven't added any habits. Start building streaks today!";
     }
@@ -354,9 +354,9 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private getHabitDetailsResponse(query: string): string {
     const data = this.transformUserData();
-    
+
     // Look for specific habit name in query
-    const habit = data.habits.find(h => 
+    const habit = data.habits.find(h =>
       query.toLowerCase().includes(h.name.toLowerCase()),
     );
 
@@ -375,14 +375,14 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     }
 
     return `You're tracking ${data.habits.length} habit${data.habits.length > 1 ? 's' : ''}:\n` +
-           data.habits.map(h => 
+           data.habits.map(h =>
              `• ${h.emoji} ${h.name} (${h.streak}-day streak${h.isCheckedToday ? ', ✅ done today' : ''})`,
            ).join('\n');
   }
 
   private getProgressResponse(): string {
     const data = this.transformUserData();
-    
+
     if (data.stats.totalCheckIns === 0) {
       return "No progress yet - you haven't started tracking any habits. Begin your journey today!";
     }
@@ -409,7 +409,7 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   private getOverviewResponse(): string {
     const data = this.transformUserData();
-    
+
     if (data.habits.length === 0) {
       return 'Habit Tracker helps you build positive routines with visual streaks. Open it to add your first habit and start your journey!';
     }
@@ -417,14 +417,14 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     return `Habit Tracker: ${data.stats.habitsCompletedToday}/${data.stats.totalHabits} habits done today. ` +
            `Best streak: ${data.stats.bestStreak} days 🔥. ` +
            `Total check-ins: ${data.stats.totalCheckIns}. ` +
-           (data.stats.habitsCompletedToday < data.stats.totalHabits 
-             ? 'Keep going!' 
+           (data.stats.habitsCompletedToday < data.stats.totalHabits
+             ? 'Keep going!'
              : 'Great job today! 🌟');
   }
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     if (!this.userData) return [];
 
     const lowerQuery = query.toLowerCase();
@@ -457,16 +457,16 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
 
   subscribe(callback: (data: StreakData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up periodic refresh
     const intervalId = setInterval(() => {
       this.loadUserData();
       this.notifyListeners();
     }, 30000); // Refresh every 30 seconds
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);

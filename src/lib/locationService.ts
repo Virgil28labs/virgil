@@ -148,26 +148,26 @@ export const locationService = {
             },
           },
         );
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch address: ${response.status}`);
         }
-        
+
         const data = await response.json();
         const address = data.address || {};
-        
+
         // Handle various street name fields from OpenStreetMap
-        const streetName = address.road || 
-                          address.pedestrian || 
-                          address.footway || 
-                          address.path || 
-                          address.cycleway || 
-                          address.residential || 
+        const streetName = address.road ||
+                          address.pedestrian ||
+                          address.footway ||
+                          address.path ||
+                          address.cycleway ||
+                          address.residential ||
                           address.avenue ||
                           address.street ||
                           address.way ||
                           '';
-        
+
         return {
           street: streetName,
           house_number: address.house_number || '',
@@ -187,7 +187,6 @@ export const locationService = {
     );
   },
 
-
   async getIpLocation(ip?: string): Promise<IpLocation> {
     return retryWithBackoff(
       async () => {
@@ -198,11 +197,11 @@ export const locationService = {
           throw new Error('Failed to fetch IP location');
         }
         const data: IpWhoResponse = await response.json();
-        
+
         if (!data.success) {
           throw new Error(data.message || 'Failed to get location from IP');
         }
-        
+
         // Extract all available fields for the hover card
         const ipLocation: IpLocation = {
           ip: data.ip,
@@ -236,7 +235,7 @@ export const locationService = {
             is_dst: data.timezone.is_dst,
           };
         }
-        
+
         return ipLocation;
       },
       {
@@ -259,21 +258,21 @@ export const locationService = {
               signal: AbortSignal.timeout(8000), // Increased to 8 second timeout
             },
           );
-          
+
           if (!response.ok) {
             if (response.status === 404) {
               throw new Error('Elevation data not available for this location');
             }
             throw new Error(`Failed to fetch elevation data: ${response.status}`);
           }
-          
+
           const data = await response.json();
-          
+
           // Validate response data
           if (typeof data.elevation !== 'number' || typeof data.elevationFeet !== 'number') {
             throw new Error('Invalid elevation data format');
           }
-          
+
           return {
             elevation: data.elevation,
             elevationFeet: data.elevationFeet,
@@ -307,7 +306,7 @@ export const locationService = {
       // Get IP location in one call
       const ipLocation = await this.getIpLocation();
       locationData.ipLocation = ipLocation;
-      
+
       // Create basic address from IP data
       if (ipLocation?.city) {
         locationData.address = this.createAddressFromIpLocation(ipLocation);
@@ -380,13 +379,13 @@ export const locationService = {
     try {
       const coords = await this.getCurrentPosition();
       const result: { coordinates?: Coordinates; address?: Address } = { coordinates: coords };
-      
+
       // Fetch address and elevation in parallel
       const [addressResult, elevationResult] = await Promise.allSettled([
         this.getAddressFromCoordinates(coords.latitude, coords.longitude),
         this.getElevation(coords.latitude, coords.longitude),
       ]);
-      
+
       if (addressResult.status === 'fulfilled') {
         result.address = addressResult.value;
       } else {
@@ -397,7 +396,7 @@ export const locationService = {
           metadata: { coords },
         });
       }
-      
+
       if (elevationResult.status === 'fulfilled' && elevationResult.value) {
         result.coordinates = {
           ...coords,
@@ -408,7 +407,7 @@ export const locationService = {
         // Still return coordinates without elevation
         result.coordinates = coords;
       }
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to fetch GPS location data', error as Error, {

@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from '../common/EmojiButton';
 
-const CameraApp = lazy(() => 
-  import('./CameraApp').then(module => ({ 
-    default: module.CameraApp, 
+const CameraApp = lazy(() =>
+  import('./CameraApp').then(module => ({
+    default: module.CameraApp,
   })),
 );
 

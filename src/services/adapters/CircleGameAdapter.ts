@@ -1,6 +1,6 @@
 /**
  * CircleGameAdapter - Dashboard App Adapter for Perfect Circle Game
- * 
+ *
  * Provides unified access to Perfect Circle game scores and statistics
  * for Virgil AI assistant, enabling responses about gaming performance.
  */
@@ -43,7 +43,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   readonly appName = 'circle';
   readonly displayName = 'Perfect Circle';
   readonly icon = '⭕';
-  
+
   private bestScore = 0;
   private attempts = 0;
   private scoreHistory: number[] = [];
@@ -63,19 +63,19 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       // Load best score
       const savedBest = localStorage.getItem('perfectCircleBestScore');
       this.bestScore = savedBest ? parseInt(savedBest, 10) : 0;
-      
+
       // Load attempts
       const savedAttempts = localStorage.getItem('perfectCircleAttempts');
       this.attempts = savedAttempts ? parseInt(savedAttempts, 10) : 0;
-      
+
       // Load score history (if available)
       const savedHistory = localStorage.getItem(this.SCORE_HISTORY_KEY);
       this.scoreHistory = savedHistory ? JSON.parse(savedHistory) : [];
-      
+
       // Load last play time
       const savedLastPlay = localStorage.getItem(this.LAST_PLAY_KEY);
       this.lastPlayTime = savedLastPlay ? parseInt(savedLastPlay, 10) : 0;
-      
+
       this.lastFetchTime = timeService.getTimestamp();
       this.notifyListeners();
     } catch (error) {
@@ -104,12 +104,12 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   private calculateImprovementRate(): number {
     if (this.scoreHistory.length < 2) return 0;
-    
+
     // Compare recent average to older average
     const midPoint = Math.floor(this.scoreHistory.length / 2);
     const oldAvg = this.scoreHistory.slice(0, midPoint).reduce((a, b) => a + b, 0) / midPoint;
     const newAvg = this.scoreHistory.slice(midPoint).reduce((a, b) => a + b, 0) / (this.scoreHistory.length - midPoint);
-    
+
     return newAvg > oldAvg ? (newAvg - oldAvg) / oldAvg : 0;
   }
 
@@ -122,7 +122,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       fair: 0,
       needsWork: 0,
     };
-    
+
     this.scoreHistory.forEach(score => {
       if (score >= 95) distribution.perfect++;
       else if (score >= 85) distribution.excellent++;
@@ -131,13 +131,13 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       else if (score >= 40) distribution.fair++;
       else distribution.needsWork++;
     });
-    
+
     return distribution;
   }
 
   private getAchievements(): CircleGameData['achievements'] {
     const distribution = this.getScoreDistribution();
-    
+
     return {
       firstPerfect: this.bestScore >= 95,
       consistentPlayer: this.attempts >= 20,
@@ -149,11 +149,11 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   getContextData(): AppContextData<CircleGameData> {
     this.ensureFreshData();
-    
+
     const averageScore = this.calculateAverageScore();
     const distribution = this.getScoreDistribution();
     const achievements = this.getAchievements();
-    
+
     const data: CircleGameData = {
       scores: {
         best: this.bestScore,
@@ -199,7 +199,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     const parts: string[] = [];
     parts.push(`Best: ${data.scores.best}%`);
     parts.push(`${data.scores.attempts} attempts`);
-    
+
     if (data.scores.best >= 95) {
       parts.push('Master artist!');
     } else if (data.scores.best >= 85) {
@@ -214,7 +214,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -266,7 +266,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     }
 
     let response = `Your best Perfect Circle score is ${this.bestScore}%`;
-    
+
     if (this.bestScore >= 95) {
       response += " - That's a perfect circle! You're a true artist! ✨";
     } else if (this.bestScore >= 85) {
@@ -293,12 +293,12 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     }
 
     let response = `You've attempted to draw perfect circles ${this.attempts} time${this.attempts !== 1 ? 's' : ''}`;
-    
+
     if (this.lastPlayTime) {
       const timeAgo = this.getTimeAgo(timeService.fromTimestamp(this.lastPlayTime));
       response += `, last played ${timeAgo}`;
     }
-    
+
     response += '.';
 
     const achievements = this.getAchievements();
@@ -314,13 +314,13 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   private getAchievementResponse(): string {
     const achievements = this.getAchievements();
     const unlockedCount = Object.values(achievements).filter(a => a).length;
-    
+
     if (unlockedCount === 0) {
       return 'No achievements unlocked yet. Keep playing to earn badges!';
     }
 
     let response = `You've unlocked ${unlockedCount} achievement${unlockedCount !== 1 ? 's' : ''}:\n`;
-    
+
     if (achievements.firstPerfect) response += '• First Perfect - Score 95% or higher ✨\n';
     if (achievements.circleMaster) response += '• Circle Master - Get 3 perfect scores 🎯\n';
     if (achievements.consistentPlayer) response += '• Consistent Player - Play 20+ times 🎮\n';
@@ -337,7 +337,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
     const improvementRate = this.calculateImprovementRate();
     let response = '';
-    
+
     if (improvementRate > 0.1) {
       const percent = Math.round(improvementRate * 100);
       response = `Great progress! Your scores have improved by ${percent}% on average. `;
@@ -362,9 +362,9 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
     const distribution = this.getScoreDistribution();
     const total = Object.values(distribution).reduce((a, b) => a + b, 0);
-    
+
     let response = `Perfect Circle Statistics (${total} games):\n`;
-    
+
     if (distribution.perfect > 0) {
       response += `• Perfect (95-100%): ${distribution.perfect} circles\n`;
     }
@@ -393,13 +393,13 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     }
 
     let response = `Perfect Circle: Best score ${this.bestScore}%, ${this.attempts} attempt${this.attempts !== 1 ? 's' : ''}`;
-    
+
     const achievements = this.getAchievements();
     const unlockedCount = Object.values(achievements).filter(a => a).length;
     if (unlockedCount > 0) {
       response += `, ${unlockedCount} achievement${unlockedCount !== 1 ? 's' : ''}`;
     }
-    
+
     response += '.';
 
     return response;
@@ -411,7 +411,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
@@ -445,21 +445,21 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
 
   subscribe(callback: (data: CircleGameData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up storage listener
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'perfectCircleBestScore' || 
+      if (e.key === 'perfectCircleBestScore' ||
           e.key === 'perfectCircleAttempts' ||
           e.key === this.SCORE_HISTORY_KEY) {
         this.refreshData();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);

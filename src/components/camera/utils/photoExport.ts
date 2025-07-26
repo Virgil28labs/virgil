@@ -9,17 +9,17 @@ export class PhotoExport {
     try {
       const exportData = await PhotoStorage.exportPhotos(photos);
       const filename = options.filename || `virgil_photos_${timeService.getTimestamp()}.json`;
-      
+
       const blob = new Blob([exportData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       URL.revokeObjectURL(url);
     } catch (error) {
       logger.error('Error exporting as JSON', error instanceof Error ? error : new Error(String(error)), {
@@ -45,20 +45,20 @@ export class PhotoExport {
           favoriteCount: photos.filter(p => p.isFavorite).length,
         } : undefined,
       };
-      
+
       const jsonData = JSON.stringify(exportData, null, 2);
       const filename = options.filename || `virgil_photos_${timeService.getTimestamp()}.json`;
-      
+
       const blob = new Blob([jsonData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       URL.revokeObjectURL(url);
     } catch (error) {
       logger.error('Error exporting as ZIP', error instanceof Error ? error : new Error(String(error)), {
@@ -87,7 +87,7 @@ export class PhotoExport {
       for (const photo of photos) {
         const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
         await CameraUtils.downloadPhoto(photo.dataUrl, filename);
-        
+
         // Add a small delay to avoid overwhelming the browser
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -120,7 +120,7 @@ export class PhotoExport {
 
     try {
       const files: File[] = [];
-      
+
       for (const photo of photos) {
         const response = await fetch(photo.dataUrl);
         const blob = await response.blob();
@@ -185,20 +185,20 @@ export class PhotoExport {
   }> {
     try {
       const totalSize = photos.reduce((sum, photo) => sum + (photo.size || 0), 0);
-      
+
       // Estimate export file size based on format and options
       let estimatedFileSize = totalSize;
-      
+
       if (options.format === 'json') {
         // JSON adds metadata overhead
         estimatedFileSize = Math.round(totalSize * 1.1);
       } else if (options.format === 'zip') {
         // ZIP compression
-        const compressionRatio = options.compressionLevel === 'high' ? 0.7 : 
+        const compressionRatio = options.compressionLevel === 'high' ? 0.7 :
           options.compressionLevel === 'medium' ? 0.8 : 0.9;
         estimatedFileSize = Math.round(totalSize * compressionRatio);
       }
-      
+
       return {
         photoCount: photos.length,
         totalSize,

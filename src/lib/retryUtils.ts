@@ -31,13 +31,13 @@ export async function retryWithBackoff<T>(
   } = options;
 
   let lastError: unknown;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       // Check if we should retry this error
       if (!shouldRetry(error) || attempt === maxRetries) {
         if (attempt === maxRetries) {
@@ -49,27 +49,26 @@ export async function retryWithBackoff<T>(
         }
         throw error;
       }
-      
+
       // For rate limit errors (429), use longer delay
       let delay = Math.min(
         initialDelay * Math.pow(backoffFactor, attempt),
         maxDelay,
       );
-      
+
       // Check if error has status code 429 and Retry-After header
       if (hasStatusCode(error) && error.status === 429) {
         // Use 60 seconds for rate limit errors
         delay = 60000;
       }
-      
+
       if (onRetry) {
         onRetry(attempt + 1, error);
       }
-      
+
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 }
-

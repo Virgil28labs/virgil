@@ -101,7 +101,7 @@ describe('App Component', () => {
     });
 
     render(<App />);
-    
+
     // Wait for lazy component to load
     await waitFor(() => {
       expect(screen.getByTestId('chatbot')).toBeInTheDocument();
@@ -112,7 +112,7 @@ describe('App Component', () => {
     // Just verify that the app renders with error boundary
     // Testing error boundary behavior is done in ErrorBoundary.test.tsx
     render(<App />);
-    
+
     // App should render successfully
     expect(document.querySelector('.app')).toBeInTheDocument();
   });

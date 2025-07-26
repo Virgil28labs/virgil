@@ -55,7 +55,7 @@ export class RhythmService {
       }
 
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to generate rhythm pattern');
       }
@@ -68,7 +68,7 @@ export class RhythmService {
         component: 'RhythmService',
         action: 'generateRhythmPattern',
       });
-      
+
       // Fallback to local algorithmic generation
       return this.generateFallbackPattern(options);
     }
@@ -79,13 +79,13 @@ export class RhythmService {
    */
   private generateFallbackPattern(options: RhythmGenerationOptions): RhythmPattern {
     const { description, barLength, style = '' } = options;
-    
+
     // Initialize empty pattern
     const pattern: boolean[][] = Array(5).fill(null).map(() => Array(barLength).fill(false));
-    
+
     // Generate basic patterns based on description keywords
     const desc = description.toLowerCase();
-    
+
     for (let step = 0; step < barLength; step++) {
       // KICK patterns (index 0)
       if (desc.includes('hip hop') || desc.includes('trap')) {
@@ -97,7 +97,7 @@ export class RhythmService {
       } else {
         pattern[0][step] = step % 4 === 0;
       }
-      
+
       // SNARE patterns (index 1)
       if (desc.includes('hip hop') || desc.includes('trap')) {
         pattern[1][step] = step % 8 === 4 || (step % 16 === 14 && Math.random() > 0.4);
@@ -108,7 +108,7 @@ export class RhythmService {
       } else {
         pattern[1][step] = step % 8 === 4;
       }
-      
+
       // HIHAT patterns (index 2)
       if (desc.includes('hip hop') || desc.includes('trap')) {
         pattern[2][step] = step % 2 === 1 && Math.random() > 0.1;
@@ -119,10 +119,10 @@ export class RhythmService {
       } else {
         pattern[2][step] = step % 2 === 1 && Math.random() > 0.3;
       }
-      
+
       // OPENHAT patterns (index 3)
       pattern[3][step] = step % 8 === 7 && Math.random() > 0.5;
-      
+
       // CLAP patterns (index 4)
       if (desc.includes('hip hop') || desc.includes('trap')) {
         pattern[4][step] = step % 16 === 12 && Math.random() > 0.4;
@@ -130,7 +130,7 @@ export class RhythmService {
         pattern[4][step] = step % 16 === 12 && Math.random() > 0.7;
       }
     }
-    
+
     return {
       pattern,
       description,

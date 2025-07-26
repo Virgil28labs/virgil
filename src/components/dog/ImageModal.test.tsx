@@ -311,7 +311,7 @@ describe('ImageModal', () => {
   describe('memoization', () => {
     it('should not re-render when props are the same', () => {
       const { rerender } = render(<ImageModal {...defaultProps} />);
-      
+
       const image = screen.getByAltText('beagle dog');
       const originalImage = image;
 
@@ -324,7 +324,7 @@ describe('ImageModal', () => {
 
     it('should re-render when currentIndex changes', () => {
       const { rerender } = render(<ImageModal {...defaultProps} />);
-      
+
       expect(screen.getByAltText('beagle dog')).toBeInTheDocument();
 
       rerender(<ImageModal {...defaultProps} currentIndex={0} />);
@@ -334,7 +334,7 @@ describe('ImageModal', () => {
 
     it('should re-render when dogs array changes', () => {
       const { rerender } = render(<ImageModal {...defaultProps} />);
-      
+
       expect(screen.getByText('2 / 3')).toBeInTheDocument();
 
       const newDogs = [...mockDogs, { url: 'https://example.com/dog4.jpg', breed: 'husky', id: 'dog-4' }];
@@ -345,7 +345,7 @@ describe('ImageModal', () => {
 
     it('should re-render when isFavorited changes', () => {
       const { rerender } = render(<ImageModal {...defaultProps} />);
-      
+
       expect(screen.getByLabelText('Remove from favorites')).toBeInTheDocument();
 
       const newIsFavorited = jest.fn(() => false);
@@ -387,7 +387,7 @@ describe('ImageModal', () => {
       render(<ImageModal {...defaultProps} />);
 
       const nextButton = screen.getByLabelText('Next image');
-      
+
       // Click multiple times rapidly
       await user.click(nextButton);
       await user.click(nextButton);
@@ -399,7 +399,7 @@ describe('ImageModal', () => {
 
     it('should handle all actions when no current dog', () => {
       const { rerender } = render(<ImageModal {...defaultProps} />);
-      
+
       // Force a state where currentIndex is valid but dog is not found
       rerender(<ImageModal {...defaultProps} dogs={[]} currentIndex={0} />);
 

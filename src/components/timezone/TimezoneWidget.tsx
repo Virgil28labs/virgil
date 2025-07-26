@@ -1,6 +1,6 @@
 /**
  * TimezoneWidget Component
- * 
+ *
  * Main timezone widget that provides the complete timezone functionality.
  * Integrates modal, hover panel, and click/hover interactions.
  */
@@ -31,7 +31,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { selectedTimezones } = useTimezones();
 
   // Check if we should show hover panel
@@ -52,7 +52,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
   // Handle click to open modal
   const handleClick = useCallback(() => {
     if (disabled || !clickToOpen) return;
-    
+
     // Clear any pending hover states
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -62,7 +62,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    
+
     setIsModalOpen(true);
     setIsHoverPanelVisible(false);
   }, [disabled, clickToOpen]);
@@ -105,7 +105,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
     }
-    
+
     hideTimeoutRef.current = setTimeout(() => {
       setIsHoverPanelVisible(false);
     }, 100);
@@ -124,7 +124,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
           setIsHoverPanelVisible(false);
         }
         break;
-        
+
       case 'Escape':
         if (isModalOpen) {
           setIsModalOpen(false);
@@ -136,7 +136,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
   // Handle focus events for keyboard users
   const handleFocus = useCallback(() => {
     if (!shouldShowHoverPanel) return;
-    
+
     // Show hover panel on focus for keyboard users
     setIsHoverPanelVisible(true);
   }, [shouldShowHoverPanel]);
@@ -151,7 +151,7 @@ export const TimezoneWidget = memo(function TimezoneWidget({
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="timezone-widget-container"
       onMouseEnter={handleMouseEnter}
@@ -198,5 +198,3 @@ export const TimezoneWidget = memo(function TimezoneWidget({
     </div>
   );
 });
-
-

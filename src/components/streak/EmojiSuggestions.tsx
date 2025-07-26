@@ -7,8 +7,6 @@ interface EmojiSuggestionsProps {
   currentEmoji: string
 }
 
-
-
 export const EmojiSuggestions = memo(function EmojiSuggestions({
   searchTerm,
   onSelect,
@@ -18,19 +16,19 @@ export const EmojiSuggestions = memo(function EmojiSuggestions({
     if (!searchTerm.trim()) {
       return POPULAR_EMOJIS;
     }
-    
+
     const term = searchTerm.toLowerCase();
     const matches = EMOJI_DATABASE
-      .filter(({ keywords }) => 
+      .filter(({ keywords }) =>
         keywords.some(keyword => keyword.includes(term)),
       )
       .map(({ emoji }) => emoji)
       .slice(0, 20);
-    
+
     // If no matches, show popular emojis
     return matches.length > 0 ? matches : POPULAR_EMOJIS;
   }, [searchTerm]);
-  
+
   return (
     <div className="emoji-suggestions">
       <div className="suggestions-header">

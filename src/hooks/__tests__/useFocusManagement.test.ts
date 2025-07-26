@@ -129,7 +129,7 @@ describe('useFocusManagement', () => {
     });
 
     it('should focus element matching initial selector', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useFocusManagement(false, { initialFocusSelector: 'button' }),
       );
 
@@ -276,16 +276,16 @@ describe('useFocusManagement', () => {
       expect(document.activeElement?.id).toBe('previousButton');
 
       const { rerender } = renderHook(
-        ({ isActive }) => useFocusManagement(isActive, { 
+        ({ isActive }) => useFocusManagement(isActive, {
           restoreFocus: true,
-          autoFocus: false, 
+          autoFocus: false,
         }),
         { initialProps: { isActive: false } },
       );
 
       // Activate
       rerender({ isActive: true });
-      
+
       // Focus something else
       container.querySelector<HTMLElement>('#button1')?.focus();
       expect(document.activeElement?.id).toBe('button1');
@@ -301,9 +301,9 @@ describe('useFocusManagement', () => {
       previousActiveElement.focus();
 
       const { rerender } = renderHook(
-        ({ isActive }) => useFocusManagement(isActive, { 
+        ({ isActive }) => useFocusManagement(isActive, {
           restoreFocus: false,
-          autoFocus: false, 
+          autoFocus: false,
         }),
         { initialProps: { isActive: false } },
       );
@@ -318,7 +318,7 @@ describe('useFocusManagement', () => {
 
   describe('trapFocus behavior', () => {
     it('should trap focus within container on Tab', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useFocusManagement(true, { trapFocus: true }),
       );
 
@@ -345,7 +345,7 @@ describe('useFocusManagement', () => {
     });
 
     it('should trap focus within container on Shift+Tab', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useFocusManagement(true, { trapFocus: true }),
       );
 
@@ -373,7 +373,7 @@ describe('useFocusManagement', () => {
     });
 
     it('should not trap focus when trapFocus is false', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useFocusManagement(true, { trapFocus: false }),
       );
 
@@ -400,8 +400,8 @@ describe('useFocusManagement', () => {
     it('should restore focus on Escape when trapFocus is true', () => {
       previousActiveElement.focus();
 
-      const { result } = renderHook(() => 
-        useFocusManagement(true, { 
+      const { result } = renderHook(() =>
+        useFocusManagement(true, {
           trapFocus: true,
           restoreFocus: true,
           autoFocus: false,
@@ -451,7 +451,7 @@ describe('useFocusManagement', () => {
     it('should cleanup timeout on unmount', () => {
       const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
 
-      const { unmount } = renderHook(() => 
+      const { unmount } = renderHook(() =>
         useFocusManagement(true, { autoFocus: true }),
       );
 

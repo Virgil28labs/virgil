@@ -14,15 +14,15 @@ const PRESET_TIMES = [5, 10, 25];
 const DEFAULT_MINUTES = 25;
 
 export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
-  const { 
-    state, 
-    progress, 
-    formatTime, 
-    setMinutes, 
-    start, 
-    pause, 
-    reset, 
-    toggleSound, 
+  const {
+    state,
+    progress,
+    formatTime,
+    setMinutes,
+    start,
+    pause,
+    reset,
+    toggleSound,
   } = usePomodoro(DEFAULT_MINUTES);
 
   if (!isOpen) return null;
@@ -85,7 +85,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
         {/* Controls */}
         <div className="controls">
           {!state.isRunning ? (
-            <Button 
+            <Button
               onClick={start}
               disabled={state.timeRemaining === 0}
             >
@@ -97,8 +97,8 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
             </Button>
           )}
 
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             onClick={reset}
           >
             Reset

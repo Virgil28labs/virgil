@@ -38,18 +38,19 @@ export interface PhysicsState {
 }
 
 export interface UIElement {
-  id: string;
-  type: string;
+  element: HTMLElement;
   x: number;
   y: number;
+  right: number;
+  bottom: number;
   width: number;
   height: number;
-  bottom: number;
-  right: number;
-  element: HTMLElement;
+  isText: boolean;
+  isPowerButton: boolean;
+  isWeatherWidget?: boolean;
+  id?: string;
+  type?: string;
   textBaseline?: number;
-  isText?: boolean;
-  isPowerButton?: boolean;
 }
 
 export interface DragState {

@@ -1,6 +1,6 @@
 /**
  * DashboardAppService - Unified Dashboard App Data Access Layer
- * 
+ *
  * Provides centralized access to all dashboard app data for Virgil,
  * enabling comprehensive integration with Notes, Pomodoro, Streak Tracker,
  * Camera, and other dashboard applications.
@@ -40,23 +40,23 @@ export interface AppDataAdapter<T = unknown> {
   readonly appName: string;
   readonly displayName: string;
   readonly icon?: string;
-  
+
   // Data access methods
   getContextData(): AppContextData<T>;
-  
+
   // Real-time subscription (optional)
   subscribe?(callback: (data: T) => void): () => void;
-  
+
   // Query capabilities
   canAnswer(query: string): boolean;
   getKeywords(): string[];
-  
+
   // Response generation
   getResponse?(query: string): Promise<string>;
-  
+
   // Search within app data
   search?(query: string): Promise<unknown[]>;
-  
+
   // Cross-app aggregation support (optional)
   supportsAggregation?(): boolean;
   getAggregateData?(): AggregateableData[];
@@ -73,31 +73,31 @@ export class DashboardAppService {
   private listeners: ((data: DashboardAppData) => void)[] = [];
   private cache: Map<string, { data: AppContextData; timestamp: number }> = new Map();
   private readonly CACHE_TTL = 5000; // 5 seconds cache
-  
+
   // Define cross-app concepts that naturally span multiple apps
   private readonly crossAppConcepts: CrossAppConcept[] = [
-    { 
-      name: 'favorites', 
+    {
+      name: 'favorites',
       keywords: ['favorite', 'favorites', 'starred', 'liked', 'saved favorite'],
       aggregationType: 'sum',
     },
-    { 
-      name: 'images', 
+    {
+      name: 'images',
       keywords: ['image', 'images', 'photo', 'photos', 'picture', 'pictures', 'pic', 'pics'],
       aggregationType: 'sum',
     },
-    { 
-      name: 'saved', 
+    {
+      name: 'saved',
       keywords: ['saved', 'stored', 'collected', 'kept'],
       aggregationType: 'sum',
     },
-    { 
-      name: 'media', 
+    {
+      name: 'media',
       keywords: ['media', 'content', 'files'],
       aggregationType: 'sum',
     },
   ];
-  
+
   constructor() {
     // Service will be initialized with adapters in Dashboard component
   }
@@ -107,7 +107,7 @@ export class DashboardAppService {
    */
   registerAdapter(adapter: AppDataAdapter): void {
     this.adapters.set(adapter.appName, adapter);
-    
+
     // Subscribe to real-time updates if supported
     if (adapter.subscribe) {
       adapter.subscribe(() => {
@@ -115,7 +115,7 @@ export class DashboardAppService {
         this.notifyListeners();
       });
     }
-    
+
     this.notifyListeners();
   }
 
@@ -134,10 +134,10 @@ export class DashboardAppService {
   getAllAppData(): DashboardAppData {
     const apps = new Map<string, AppContextData>();
     const activeApps: string[] = [];
-    
+
     for (const [appName, adapter] of this.adapters) {
       const cachedData = this.getCachedData(appName);
-      
+
       if (cachedData) {
         apps.set(appName, cachedData);
         if (cachedData.isActive) {
@@ -148,7 +148,7 @@ export class DashboardAppService {
           const data = adapter.getContextData();
           apps.set(appName, data);
           this.setCacheData(appName, data);
-          
+
           if (data.isActive) {
             activeApps.push(appName);
           }
@@ -161,7 +161,7 @@ export class DashboardAppService {
         }
       }
     }
-    
+
     return {
       apps,
       activeApps,
@@ -175,10 +175,10 @@ export class DashboardAppService {
   getAppData(appName: string): AppContextData | null {
     const adapter = this.adapters.get(appName);
     if (!adapter) return null;
-    
+
     const cachedData = this.getCachedData(appName);
     if (cachedData) return cachedData;
-    
+
     try {
       const data = adapter.getContextData();
       this.setCacheData(appName, data);
@@ -198,13 +198,13 @@ export class DashboardAppService {
    */
   findAppsForQuery(query: string): AppDataAdapter[] {
     const relevantApps: AppDataAdapter[] = [];
-    
+
     for (const adapter of this.adapters.values()) {
       if (adapter.canAnswer(query)) {
         relevantApps.push(adapter);
       }
     }
-    
+
     return relevantApps;
   }
 
@@ -226,7 +226,7 @@ export class DashboardAppService {
       'all saved',
       'all my',
     ];
-    
+
     return crossAppKeywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -236,17 +236,17 @@ export class DashboardAppService {
   private detectCrossAppConcepts(query: string): CrossAppConcept[] {
     const lowerQuery = query.toLowerCase();
     const detectedConcepts: CrossAppConcept[] = [];
-    
+
     for (const concept of this.crossAppConcepts) {
-      const hasKeyword = concept.keywords.some(keyword => 
+      const hasKeyword = concept.keywords.some(keyword =>
         lowerQuery.includes(keyword.toLowerCase()),
       );
-      
+
       if (hasKeyword) {
         detectedConcepts.push(concept);
       }
     }
-    
+
     return detectedConcepts;
   }
 
@@ -259,23 +259,23 @@ export class DashboardAppService {
       const relevantApps = this.findAppsForQuery(query);
       return { shouldAggregate: true, relevantApps };
     }
-    
+
     // Check for cross-app concepts
     const concepts = this.detectCrossAppConcepts(query);
     if (concepts.length === 0) {
       return { shouldAggregate: false, relevantApps: [] };
     }
-    
+
     // Find apps that can answer the query
     const relevantApps = this.findAppsForQuery(query);
-    
+
     // If multiple apps can provide data, check if they actually have data
     if (relevantApps.length >= 2) {
       // For now, aggregate if 2+ apps match
       // Future enhancement: check if apps actually have non-zero data
       return { shouldAggregate: true, relevantApps };
     }
-    
+
     return { shouldAggregate: false, relevantApps };
   }
 
@@ -284,11 +284,11 @@ export class DashboardAppService {
    */
   private getAggregatedData(): Map<string, AggregateableData[]> {
     const aggregatedByType = new Map<string, AggregateableData[]>();
-    
+
     for (const adapter of this.adapters.values()) {
       if (adapter.supportsAggregation && adapter.supportsAggregation()) {
         const data = adapter.getAggregateData ? adapter.getAggregateData() : [];
-        
+
         data.forEach(item => {
           const existing = aggregatedByType.get(item.type) || [];
           existing.push(item);
@@ -296,7 +296,7 @@ export class DashboardAppService {
         });
       }
     }
-    
+
     return aggregatedByType;
   }
 
@@ -305,34 +305,34 @@ export class DashboardAppService {
    */
   private buildAggregatedResponse(query: string, aggregatedData: Map<string, AggregateableData[]>): string {
     const lowerQuery = query.toLowerCase();
-    
+
     // Check if query is about favorites
     if (lowerQuery.includes('favorite') || lowerQuery.includes('starred')) {
       const imageData = aggregatedData.get('image') || [];
       const videoData = aggregatedData.get('video') || [];
       const allFavorites = [...imageData, ...videoData];
-      
+
       if (allFavorites.length === 0) {
         return "You don't have any favorites saved across your dashboard apps yet.";
       }
-      
+
       // Filter only items that are actually favorites (based on label)
-      const favoriteItems = allFavorites.filter(item => 
-        item.label.toLowerCase().includes('favorite') || 
+      const favoriteItems = allFavorites.filter(item =>
+        item.label.toLowerCase().includes('favorite') ||
         item.label.toLowerCase().includes('dog') || // Dog Gallery favorites
         item.label.toLowerCase().includes('space'), // NASA favorites
       );
-      
+
       if (favoriteItems.length === 0) {
         return "You don't have any favorites saved across your dashboard apps yet.";
       }
-      
+
       // Calculate total favorites
       const total = favoriteItems.reduce((sum, item) => sum + item.count, 0);
-      
+
       // Build response
       let response = `You have ${total} favorite`;
-      
+
       // Determine if we're talking about images specifically
       const isImageQuery = lowerQuery.includes('image') || lowerQuery.includes('photo') || lowerQuery.includes('picture');
       if (isImageQuery) {
@@ -340,7 +340,7 @@ export class DashboardAppService {
       } else {
         response += 's';
       }
-      
+
       if (favoriteItems.length === 1 && total > 0) {
         const item = favoriteItems[0];
         const adapter = this.adapters.get(item.appName);
@@ -355,7 +355,7 @@ export class DashboardAppService {
             const displayName = adapter ? adapter.displayName : item.appName;
             return `${item.count} ${item.label} in ${displayName}`;
           });
-        
+
         if (parts.length > 2) {
           const last = parts.pop();
           response += parts.join(', ') + ', and ' + last;
@@ -363,25 +363,25 @@ export class DashboardAppService {
           response += parts.join(' and ');
         }
       }
-      
+
       response += '.';
       return response;
     }
-    
+
     // Check if query is specifically about images
     if (lowerQuery.includes('image') || lowerQuery.includes('photo') || lowerQuery.includes('picture')) {
       const imageData = aggregatedData.get('image') || [];
-      
+
       if (imageData.length === 0) {
         return "You don't have any images saved across your dashboard apps yet.";
       }
-      
+
       // Calculate total
       const total = imageData.reduce((sum, item) => sum + item.count, 0);
-      
+
       // Build response
       let response = `You have ${total} images across all apps`;
-      
+
       if (imageData.length > 1) {
         response += ': ';
         const parts = imageData
@@ -392,7 +392,7 @@ export class DashboardAppService {
             const displayName = adapter ? adapter.displayName : item.appName;
             return `${item.count} ${item.label} in ${displayName}`;
           });
-        
+
         if (parts.length > 2) {
           const last = parts.pop();
           response += parts.join(', ') + ', and ' + last;
@@ -400,19 +400,19 @@ export class DashboardAppService {
           response += parts.join(' and ');
         }
       }
-      
+
       response += '.';
       return response;
     }
-    
+
     // For general "everything" queries
     if (lowerQuery.includes('everything') || lowerQuery.includes('all')) {
       const summary: string[] = [];
-      
+
       aggregatedData.forEach((items, type) => {
         const total = items.reduce((sum, item) => sum + item.count, 0);
         if (total > 0) {
-          const typeLabel = type === 'image' ? 'images' : 
+          const typeLabel = type === 'image' ? 'images' :
             type === 'video' ? 'videos' :
               type === 'audio' ? 'audio files' :
                 type === 'document' ? 'documents' :
@@ -420,11 +420,11 @@ export class DashboardAppService {
           summary.push(`${total} ${typeLabel}`);
         }
       });
-      
+
       if (summary.length === 0) {
         return "You don't have any saved content across your dashboard apps yet.";
       }
-      
+
       let response = 'Across all dashboard apps, you have: ';
       if (summary.length > 2) {
         const last = summary.pop();
@@ -432,11 +432,11 @@ export class DashboardAppService {
       } else {
         response += summary.join(' and ');
       }
-      
+
       response += '.';
       return response;
     }
-    
+
     // Default to showing everything
     return this.buildAggregatedResponse(query + ' everything', aggregatedData);
   }
@@ -447,22 +447,22 @@ export class DashboardAppService {
   async getResponseForQuery(query: string): Promise<{ appName: string; response: string } | null> {
     // Check if we should aggregate responses
     const { shouldAggregate, relevantApps } = await this.shouldAggregateResponses(query);
-    
+
     if (shouldAggregate && relevantApps.length > 0) {
       const aggregatedData = this.getAggregatedData();
-      
+
       if (aggregatedData.size > 0) {
         const response = this.buildAggregatedResponse(query, aggregatedData);
         return { appName: 'dashboard', response };
       }
     }
-    
+
     // Fall back to single-app logic if not aggregating
     if (relevantApps.length === 0) {
       // Find apps that can answer if we haven't already
       const apps = this.findAppsForQuery(query);
       if (apps.length === 0) return null;
-      
+
       // Use the first app that can provide a response
       for (const app of apps) {
         if (app.getResponse) {
@@ -499,7 +499,7 @@ export class DashboardAppService {
         }
       }
     }
-    
+
     return null;
   }
 
@@ -508,7 +508,7 @@ export class DashboardAppService {
    */
   async searchAllApps(query: string): Promise<{ appName: string; results: unknown[] }[]> {
     const searchResults: { appName: string; results: unknown[] }[] = [];
-    
+
     for (const adapter of this.adapters.values()) {
       if (adapter.search) {
         try {
@@ -528,7 +528,7 @@ export class DashboardAppService {
         }
       }
     }
-    
+
     return searchResults;
   }
 
@@ -538,17 +538,17 @@ export class DashboardAppService {
   getContextSummary(): string {
     const appData = this.getAllAppData();
     const summaries: string[] = [];
-    
+
     for (const [_appName, data] of appData.apps) {
       if (data.isActive || data.summary) {
         summaries.push(`${data.displayName}: ${data.summary}`);
       }
     }
-    
+
     if (summaries.length === 0) {
       return 'No active dashboard apps';
     }
-    
+
     return `Dashboard Apps:\n${summaries.join('\n')}`;
   }
 
@@ -558,27 +558,27 @@ export class DashboardAppService {
   getDetailedContext(appNames?: string[]): string {
     const appData = this.getAllAppData();
     const contexts: string[] = [];
-    
+
     const appsToInclude = appNames || Array.from(appData.apps.keys());
-    
+
     for (const appName of appsToInclude) {
       const data = appData.apps.get(appName);
       if (data) {
         let context = `\n${data.displayName.toUpperCase()}:`;
         context += `\n- Status: ${data.isActive ? 'Active' : 'Inactive'}`;
-        
+
         if (data.summary) {
           context += `\n- ${data.summary}`;
         }
-        
+
         if (data.capabilities.length > 0) {
           context += `\n- Can help with: ${data.capabilities.join(', ')}`;
         }
-        
+
         contexts.push(context);
       }
     }
-    
+
     return contexts.join('\n');
   }
 
@@ -587,10 +587,10 @@ export class DashboardAppService {
    */
   subscribe(callback: (data: DashboardAppData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getAllAppData());
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(listener => listener !== callback);
@@ -602,11 +602,11 @@ export class DashboardAppService {
    */
   getAllKeywords(): Map<string, string[]> {
     const keywordMap = new Map<string, string[]>();
-    
+
     for (const [appName, adapter] of this.adapters) {
       keywordMap.set(appName, adapter.getKeywords());
     }
-    
+
     return keywordMap;
   }
 
@@ -614,12 +614,12 @@ export class DashboardAppService {
   private getCachedData(appName: string): AppContextData | null {
     const cached = this.cache.get(appName);
     if (!cached) return null;
-    
+
     if (timeService.getTimestamp() - cached.timestamp > this.CACHE_TTL) {
       this.cache.delete(appName);
       return null;
     }
-    
+
     return cached.data;
   }
 

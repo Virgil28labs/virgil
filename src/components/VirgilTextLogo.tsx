@@ -6,7 +6,7 @@ interface VirgilTextLogoProps {
 
 /**
  * VirgilTextLogo Component
- * 
+ *
  * Displays the "Virgil" brand name with styled first letter
  * Can be clickable to trigger actions (e.g., open profile)
  * Memoized for performance
@@ -14,7 +14,7 @@ interface VirgilTextLogoProps {
 export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTextLogoProps) {
   if (onClick) {
     return (
-      <button 
+      <button
         className="virgil-logo virgil-logo-button"
         onClick={onClick}
         aria-label="Virgil - Open user profile"
@@ -25,7 +25,7 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
       </button>
     );
   }
-  
+
   return (
     <div className="virgil-logo">
       Virgil

@@ -37,7 +37,7 @@ jest.mock('./DogGrid', () => ({
 }));
 
 jest.mock('./ImageModal', () => ({
-  ImageModal: jest.fn(({ currentIndex, onClose, onNavigate }) => 
+  ImageModal: jest.fn(({ currentIndex, onClose, onNavigate }) =>
     currentIndex !== null ? (
       <div data-testid="image-modal">
         <button onClick={onClose}>Close Modal</button>
@@ -298,13 +298,13 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={jest.fn()} />);
 
       await user.click(screen.getByText('View akita'));
-      
+
       // Modal should be showing first image (index 0)
       expect(screen.getByTestId('image-modal')).toBeInTheDocument();
-      
+
       // Click next should update index
       await user.click(screen.getByText('Next'));
-      
+
       // Modal should still be visible (with updated index)
       expect(screen.getByTestId('image-modal')).toBeInTheDocument();
     });
@@ -403,10 +403,10 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={jest.fn()} />);
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0];
-      
+
       // Switch to gallery first
       fireEvent.click(screen.getByRole('tab', { name: /Favorites/i }));
-      
+
       // Use f shortcut
       act(() => {
         const fShortcut = shortcuts.find((s: Shortcut) => s.key === 'f');
@@ -441,7 +441,7 @@ describe('DogGallery', () => {
       // The component would pass a different Escape handler when modal is open
       // For this test, we'll verify the modal closes
       await user.click(screen.getByText('Close Modal'));
-      
+
       expect(screen.queryByTestId('image-modal')).not.toBeInTheDocument();
     });
   });
@@ -449,7 +449,7 @@ describe('DogGallery', () => {
   describe('memoization', () => {
     it('should not re-render when props are the same', () => {
       const { rerender } = render(<DogGallery isOpen onClose={jest.fn()} />);
-      
+
       const title = screen.getByText('Doggo Sanctuary');
       const originalTitle = title;
 
@@ -462,7 +462,7 @@ describe('DogGallery', () => {
 
     it('should re-render when isOpen changes', () => {
       const { rerender } = render(<DogGallery isOpen={false} onClose={jest.fn()} />);
-      
+
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
       rerender(<DogGallery isOpen onClose={jest.fn()} />);
@@ -499,7 +499,7 @@ describe('DogGallery', () => {
 
       // FetchControls should still be rendered even while loading
       expect(screen.getByTestId('fetch-controls')).toBeInTheDocument();
-      
+
       // Clicking fetch should still work
       await user.click(screen.getByText('Fetch'));
       expect(defaultApiReturn.fetchDogs).toHaveBeenCalled();

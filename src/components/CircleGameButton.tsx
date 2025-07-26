@@ -2,9 +2,9 @@ import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 import { CircleErrorBoundary } from './circle/CircleErrorBoundary';
 
-const DrawPerfectCircle = lazy(() => 
-  import('./circle/DrawPerfectCircle').then(module => ({ 
-    default: module.DrawPerfectCircle, 
+const DrawPerfectCircle = lazy(() =>
+  import('./circle/DrawPerfectCircle').then(module => ({
+    default: module.DrawPerfectCircle,
   })),
 );
 

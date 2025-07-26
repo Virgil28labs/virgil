@@ -61,7 +61,7 @@ export interface WeatherContextType extends WeatherState {
   hasWeather: boolean;
 }
 
-export type WeatherActionType = 
+export type WeatherActionType =
   | 'SET_LOADING'
   | 'SET_WEATHER_DATA'
   | 'SET_FORECAST_DATA'

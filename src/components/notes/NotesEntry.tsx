@@ -24,7 +24,7 @@ interface NotesEntryProps {
  * - Edit and delete actions
  * - Relative time display
  * - AI processing indicator
- * 
+ *
  * Performance optimized with React.memo and useMemo
  */
 const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProcessing = false }: NotesEntryProps) => {
@@ -43,11 +43,11 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
     return lines.map((line, lineIndex) => {
       // Check if this line is a checkbox
       const checkboxMatch = line.match(/^(?:[-*]\s*)?\[([ x])\]\s*(.+)/);
-      
+
       if (checkboxMatch) {
         const currentTaskIndex = taskIndex++;
         const task = entry.tasks[currentTaskIndex];
-        
+
         return (
           <div key={lineIndex} className="notes-task-line">
             <label className="notes-checkbox-label">
@@ -94,7 +94,7 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
   }, [entry.id, onDelete]);
 
   return (
-    <article 
+    <article
       className={`notes-entry ${isProcessing ? 'ai-processing' : ''}`}
       aria-label={`Note from ${formattedTime}`}
     >
@@ -212,7 +212,7 @@ export const NotesEntry = memo(NotesEntryComponent, (prevProps, nextProps) => {
     prevProps.entry.isEdited === nextProps.entry.isEdited &&
     prevProps.entry.actionType === nextProps.entry.actionType &&
     // Check if any task completion status changed
-    prevProps.entry.tasks.every((task, index) => 
+    prevProps.entry.tasks.every((task, index) =>
       task.completed === nextProps.entry.tasks[index]?.completed,
     )
   );

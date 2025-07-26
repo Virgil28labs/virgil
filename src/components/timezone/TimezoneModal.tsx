@@ -1,6 +1,6 @@
 /**
  * TimezoneModal Component
- * 
+ *
  * Modal for selecting and managing timezones. Features search, management,
  * reordering, and editing with full accessibility support.
  */
@@ -137,18 +137,17 @@ const TimezoneModal = memo(function TimezoneModal({
     }
   }, [handleSaveLabel, handleCancelEditing]);
 
-
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className={`timezone-modal-overlay ${className}`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="timezone-modal-title"
     >
-      <div 
+      <div
         ref={modalRef}
         className="timezone-modal"
         role="document"
@@ -206,8 +205,8 @@ const TimezoneModal = memo(function TimezoneModal({
                   const isEditing = editingId === timezone.id;
 
                   return (
-                    <li 
-                      key={timezone.id} 
+                    <li
+                      key={timezone.id}
                       className={`timezone-item ${!timezone.isValid ? 'invalid' : ''}`}
                       role="listitem"
                     >
@@ -235,7 +234,7 @@ const TimezoneModal = memo(function TimezoneModal({
                             </button>
                           )}
                         </div>
-                        
+
                         <div className="timezone-details">
                           <span className="timezone-time">
                             {timezone.isValid ? formatTime(timezone.currentTime) : 'Invalid'}

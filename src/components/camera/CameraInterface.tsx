@@ -27,7 +27,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
     if (cameraState.timer) {
       setIsCountingDown(true);
       setCountdown(cameraState.timer);
-      
+
       // Start countdown
       const interval = setInterval(() => {
         setCountdown(prev => {
@@ -73,7 +73,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
           title={`Flash: ${cameraState.flashMode}`}
         >
           <span className="camera-control-icon">
-            {cameraState.flashMode === 'off' ? '🔦' : 
+            {cameraState.flashMode === 'off' ? '🔦' :
               cameraState.flashMode === 'on' ? '⚡' : '🔄'}
           </span>
         </button>
@@ -155,16 +155,16 @@ export const CameraInterface = memo(function CameraInterface({
   // Initialize camera on mount
   useEffect(() => {
     let isMounted = true;
-    
+
     const init = async () => {
       await initializeCamera();
       if (isMounted) {
         setIsInitialized(true);
       }
     };
-    
+
     init();
-    
+
     return () => {
       isMounted = false;
     };
@@ -211,7 +211,7 @@ export const CameraInterface = memo(function CameraInterface({
           <div className="error-icon">📷</div>
           <h3>Camera Error</h3>
           <p>{cameraState.error || 'Unknown camera error'}</p>
-          <button 
+          <button
             className="retry-btn"
             onClick={retryCamera}
           >
@@ -229,7 +229,7 @@ export const CameraInterface = memo(function CameraInterface({
           <div className="permission-icon">🔐</div>
           <h3>Camera Permission Required</h3>
           <p>Please allow camera access to take photos</p>
-          <button 
+          <button
             className="permission-btn"
             onClick={initializeCamera}
           >
@@ -255,7 +255,7 @@ export const CameraInterface = memo(function CameraInterface({
             canvas: 'Canvas not supported in this browser.',
           }}
         />
-        
+
         {/* Grid Overlay */}
         {cameraState.showGrid && (
           <div className="camera-grid">

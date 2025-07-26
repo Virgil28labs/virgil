@@ -52,12 +52,12 @@ export class NotesErrorBoundary extends Component<Props, State> {
       action: 'componentDidCatch',
       errorInfo: errorInfo.componentStack,
     });
-    
+
     // Update state with error info
     this.setState({
       errorInfo,
     });
-    
+
     // Call optional error handler
     this.props.onError?.(error, errorInfo);
   }
@@ -91,7 +91,7 @@ export class NotesErrorBoundary extends Component<Props, State> {
           return 'An unexpected error occurred. Please refresh the page.';
       }
     }
-    
+
     return 'Something went wrong. Please refresh the page or try again later.';
   }
 
@@ -110,7 +110,7 @@ export class NotesErrorBoundary extends Component<Props, State> {
             <p className="notes-error-message">
               {this.getErrorMessage(this.state.error)}
             </p>
-            
+
             {/* Show technical details in development */}
             {process.env.NODE_ENV === 'development' && (
               <details className="notes-error-details">
@@ -121,7 +121,7 @@ export class NotesErrorBoundary extends Component<Props, State> {
                 )}
               </details>
             )}
-            
+
             <div className="notes-error-actions">
               <button
                 onClick={this.reset}

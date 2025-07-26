@@ -34,7 +34,7 @@ export function useKeyboardShortcuts(
 ) {
   const { enabled = true, target, defaultScope = 'global' } = options;
   const shortcutsRef = useRef(shortcuts);
-  
+
   // Update shortcuts ref when they change
   useEffect(() => {
     shortcutsRef.current = shortcuts;
@@ -45,16 +45,16 @@ export function useKeyboardShortcuts(
 
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const target = event.target as HTMLElement;
-    const isInputElement = target.tagName === 'INPUT' || 
-                          target.tagName === 'TEXTAREA' || 
+    const isInputElement = target.tagName === 'INPUT' ||
+                          target.tagName === 'TEXTAREA' ||
                           target.contentEditable === 'true';
-    
+
     for (const shortcut of shortcutsRef.current) {
       // Check scope
       const scope = shortcut.scope || defaultScope;
       if (scope === 'input' && !isInputElement) continue;
       if (scope === 'modal' && !target.closest('[role="dialog"]')) continue;
-      
+
       // Check if key matches
       if (event.key.toLowerCase() !== shortcut.key.toLowerCase()) continue;
 
@@ -67,7 +67,7 @@ export function useKeyboardShortcuts(
 
       // Handle cmd/ctrl based on platform
       const ctrlOrCmd = isMac ? event.metaKey : event.ctrlKey;
-      
+
       const modifiersMatch =
         (!hasCtrl && !hasCmd || (hasCtrl && event.ctrlKey) || (hasCmd && event.metaKey) || ((hasCtrl || hasCmd) && ctrlOrCmd)) &&
         (!hasAlt || event.altKey) &&
@@ -89,7 +89,7 @@ export function useKeyboardShortcuts(
 
   useEffect(() => {
     const targetElement = target || document;
-    
+
     targetElement.addEventListener('keydown', handleKeyDown as EventListener);
     return () => targetElement.removeEventListener('keydown', handleKeyDown as EventListener);
   }, [handleKeyDown, target]);
@@ -128,12 +128,12 @@ export function formatShortcut(
   }
 
   // Format special keys
-  const formattedKey = key.length === 1 
-    ? key.toUpperCase() 
+  const formattedKey = key.length === 1
+    ? key.toUpperCase()
     : key.charAt(0).toUpperCase() + key.slice(1);
-  
+
   parts.push(formattedKey);
-  
+
   return parts.join(isMac ? '' : '+');
 }
 

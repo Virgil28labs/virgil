@@ -29,13 +29,13 @@ interface NotesFilterProps {
  * - Clear visual feedback for active states
  * - Accessible search toggle
  */
-export const NotesFilter = ({ 
-  activeFilter, 
+export const NotesFilter = ({
+  activeFilter,
   onFilterChange,
   activeActionFilter = 'all',
   onActionFilterChange,
   searchQuery,
-  onSearchChange, 
+  onSearchChange,
 }: NotesFilterProps) => {
   const [showSearch, setShowSearch] = useState(false);
 
@@ -66,7 +66,7 @@ export const NotesFilter = ({
             {filter.label}
           </button>
         ))}
-        
+
         <button
           onClick={() => setShowSearch(!showSearch)}
           className={`notes-search-toggle ${showSearch ? 'active' : ''}`}
@@ -83,7 +83,7 @@ export const NotesFilter = ({
           </svg>
         </button>
       </div>
-      
+
       {onActionFilterChange && (
         <div className="notes-filter-bar notes-action-filters" role="tablist" aria-label="Filter by action type">
           {actionFilters.map(filter => (

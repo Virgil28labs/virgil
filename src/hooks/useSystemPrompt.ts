@@ -44,12 +44,12 @@ export function useSystemPrompt({
 
   // Memoized static parts of system prompt
   const staticPromptParts = useMemo(() => {
-    const staticUserContext = user ? 
+    const staticUserContext = user ?
       `User: ${user.user_metadata?.name || 'User'}${locationContext ? ` • Location: ${locationContext}` : ''} • Time: ${timeOfDay}` :
       `Location: ${locationContext || 'Unknown'} • Time: ${timeOfDay}`;
 
     const basePrompt = customSystemPrompt || 'You are Virgil, a contextual AI assistant.';
-    
+
     return { basePrompt, staticUserContext };
   }, [user, locationContext, timeOfDay, customSystemPrompt]);
 
@@ -90,7 +90,7 @@ export function useSystemPrompt({
     }
 
     const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
-    
+
     return systemPrompt + responseRules;
   }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
 
@@ -113,7 +113,7 @@ export function useSystemPrompt({
     }
 
     const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
-    
+
     return systemPrompt + responseRules;
   }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
 

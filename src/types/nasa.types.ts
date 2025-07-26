@@ -101,11 +101,11 @@ export interface ApodContextType {
   error: string | null;
   showHD: boolean;
   isZoomed: boolean;
-  
+
   // Navigation state
   history: string[]; // Date history for back navigation
   favorites: ApodImage[]; // Favorited APODs
-  
+
   // Actions
   loadApod: (date?: string) => Promise<void>;
   loadTodaysApod: () => Promise<void>;

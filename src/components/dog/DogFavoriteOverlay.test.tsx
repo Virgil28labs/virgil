@@ -13,7 +13,7 @@ describe('DogFavoriteOverlay', () => {
 
   it('renders unfavorited state correctly', () => {
     render(<DogFavoriteOverlay {...defaultProps} />);
-    
+
     const button = screen.getByLabelText('Add to favorites');
     expect(button).toBeInTheDocument();
     expect(button).toHaveTextContent('🤍');
@@ -23,7 +23,7 @@ describe('DogFavoriteOverlay', () => {
 
   it('renders favorited state correctly', () => {
     render(<DogFavoriteOverlay {...defaultProps} isFavorited />);
-    
+
     const button = screen.getByLabelText('Remove from favorites');
     expect(button).toBeInTheDocument();
     expect(button).toHaveTextContent('❤️');
@@ -34,14 +34,14 @@ describe('DogFavoriteOverlay', () => {
   it('calls onFavoriteToggle when clicked', () => {
     const mockToggle = jest.fn();
     render(<DogFavoriteOverlay {...defaultProps} onFavoriteToggle={mockToggle} />);
-    
+
     fireEvent.click(screen.getByLabelText('Add to favorites'));
     expect(mockToggle).toHaveBeenCalledTimes(1);
   });
 
   it('has proper accessibility attributes', () => {
     render(<DogFavoriteOverlay {...defaultProps} />);
-    
+
     const button = screen.getByLabelText('Add to favorites');
     expect(button).toHaveAttribute('title', 'Add to favorites');
     expect(button).toHaveAttribute('aria-label', 'Add to favorites');
@@ -49,7 +49,7 @@ describe('DogFavoriteOverlay', () => {
 
   it('updates accessibility attributes when favorited', () => {
     render(<DogFavoriteOverlay {...defaultProps} isFavorited />);
-    
+
     const button = screen.getByLabelText('Remove from favorites');
     expect(button).toHaveAttribute('title', 'Remove from favorites');
     expect(button).toHaveAttribute('aria-label', 'Remove from favorites');

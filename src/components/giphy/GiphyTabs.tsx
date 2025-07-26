@@ -27,7 +27,7 @@ export const GiphyTabs = memo(function GiphyTabs({
           <span className="giphy-tab-count">{searchCount}</span>
         )}
       </button>
-      
+
       <button
         className={`giphy-gallery-tab ${currentTab === 'trending' ? 'active' : ''}`}
         onClick={() => onTabChange('trending')}
@@ -38,7 +38,7 @@ export const GiphyTabs = memo(function GiphyTabs({
           <span className="giphy-tab-count">{trendingCount}</span>
         )}
       </button>
-      
+
       <button
         className={`giphy-gallery-tab ${currentTab === 'favorites' ? 'active' : ''}`}
         onClick={() => onTabChange('favorites')}

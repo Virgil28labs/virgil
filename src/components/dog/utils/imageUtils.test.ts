@@ -39,7 +39,7 @@ describe('imageUtils', () => {
     beforeEach(() => {
       // Mock fetch
       global.fetch = jest.fn();
-      
+
       // Mock URL methods
       global.URL.createObjectURL = jest.fn().mockReturnValue('blob:mock-url');
       global.URL.revokeObjectURL = jest.fn();
@@ -153,7 +153,7 @@ describe('imageUtils', () => {
 
     it('should copy image to clipboard successfully', async () => {
       const mockBlob = new Blob(['image data'], { type: 'image/png' });
-      
+
       // Mock image loading
       mockImage.onload = null;
       setTimeout(() => {
@@ -269,7 +269,7 @@ describe('imageUtils', () => {
 
     it('should handle clipboard write error', async () => {
       const mockBlob = new Blob(['image data'], { type: 'image/png' });
-      
+
       // Mock image loading
       setTimeout(() => {
         if (mockImage.onload) mockImage.onload({} as Event);
@@ -301,7 +301,7 @@ describe('imageUtils', () => {
       ;(navigator.clipboard.writeText as jest.Mock).mockRejectedValue(new Error('Clipboard error'));
 
       const url = 'https://example.com/dog.jpg';
-      
+
       await expect(copyImageToClipboard(url)).rejects.toThrow('Clipboard error');
     });
   });

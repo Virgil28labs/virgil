@@ -1,6 +1,6 @@
 /**
  * PomodoroAdapter - Dashboard App Adapter for Pomodoro Timer
- * 
+ *
  * Provides unified access to Pomodoro timer data for Virgil AI assistant,
  * enabling responses about focus sessions, productivity tracking, and timer status.
  */
@@ -30,7 +30,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   readonly appName = 'pomodoro';
   readonly displayName = 'Pomodoro Timer';
   readonly icon = '🍅';
-  
+
   private currentData: PomodoroData = {
     isActive: false,
     isRunning: false,
@@ -41,7 +41,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       lastSessionTime: null,
     },
   };
-  
+
   private listeners: ((data: PomodoroData) => void)[] = [];
 
   constructor() {
@@ -106,7 +106,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
 
   private generateSummary(): string {
     const parts: string[] = [];
-    
+
     if (this.currentData.isRunning && this.currentData.currentSession) {
       const { timeRemaining, selectedMinutes } = this.currentData.currentSession;
       const minutesLeft = Math.ceil(timeRemaining / 60);
@@ -124,7 +124,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -169,7 +169,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       const { timeRemaining, selectedMinutes, progress } = this.currentData.currentSession;
       const minutesLeft = Math.floor(timeRemaining / 60);
       const secondsLeft = timeRemaining % 60;
-      
+
       if (progress > 90) {
         return `Almost done! Just ${minutesLeft}:${secondsLeft.toString().padStart(2, '0')} left in your ${selectedMinutes}-minute focus session. Finish strong! 🏁`;
       } else if (progress > 50) {
@@ -201,7 +201,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     if (lastSessionTime) {
       const timeSinceLastSession = timeService.getTimestamp() - lastSessionTime.getTime(); // eslint-disable-line no-restricted-syntax
       const hoursSince = Math.floor(timeSinceLastSession / (1000 * 60 * 60));
-      
+
       if (hoursSince < 1) {
         response += 'Keep up the momentum!';
       } else if (hoursSince < 3) {
@@ -252,7 +252,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     }
 
     const { sessionsCompleted, totalFocusMinutes } = this.currentData.todayStats;
-    
+
     if (sessionsCompleted > 0) {
       return `Pomodoro Timer: ${sessionsCompleted} sessions completed today (${totalFocusMinutes} minutes total). ${this.currentData.isActive ? 'Timer is open and ready!' : 'Open the timer to start another session.'}`;
     }
@@ -267,10 +267,10 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
 
   subscribe(callback: (data: PomodoroData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.currentData);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
@@ -284,7 +284,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   }): void {
     this.currentData.isActive = isActive;
     this.currentData.isRunning = isRunning;
-    
+
     if (sessionData) {
       const progress = ((sessionData.selectedMinutes * 60 - sessionData.timeRemaining) / (sessionData.selectedMinutes * 60)) * 100;
       this.currentData.currentSession = {
@@ -295,7 +295,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     } else {
       this.currentData.currentSession = null;
     }
-    
+
     this.notifyListeners();
   }
 
@@ -304,10 +304,10 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     this.currentData.todayStats.totalFocusMinutes += minutes;
     this.currentData.todayStats.lastSessionTime = timeService.getCurrentDateTime();
     this.saveTodayStats();
-    
+
     this.currentData.isRunning = false;
     this.currentData.currentSession = null;
-    
+
     this.notifyListeners();
   }
 

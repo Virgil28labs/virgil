@@ -40,7 +40,7 @@ export const usePhotoGallery = () => {
   }, []);
 
   const setActiveTab = useCallback((tab: 'camera' | 'gallery' | 'favorites') => {
-    updateGalleryState({ 
+    updateGalleryState({
       activeTab: tab,
       selectedPhoto: null,
       selectedPhotos: new Set(),
@@ -55,13 +55,13 @@ export const usePhotoGallery = () => {
   const togglePhotoSelection = useCallback((photoId: string) => {
     setGalleryState(prev => {
       const newSelectedPhotos = new Set(prev.selectedPhotos);
-      
+
       if (newSelectedPhotos.has(photoId)) {
         newSelectedPhotos.delete(photoId);
       } else {
         newSelectedPhotos.add(photoId);
       }
-      
+
       return {
         ...prev,
         selectedPhotos: newSelectedPhotos,
@@ -72,7 +72,7 @@ export const usePhotoGallery = () => {
 
   const selectAllPhotos = useCallback(() => {
     let currentPhotos: SavedPhoto[] = [];
-    
+
     switch (galleryState.activeTab) {
       case 'gallery':
         currentPhotos = photos;
@@ -85,16 +85,16 @@ export const usePhotoGallery = () => {
         currentPhotos = [];
         break;
     }
-    
+
     if (galleryState.filter === 'favorites') {
       currentPhotos = currentPhotos.filter(photo => photo.isFavorite);
     } else if (galleryState.filter === 'recent') {
       const oneDayAgo = timeService.getTimestamp() - (24 * 60 * 60 * 1000);
       currentPhotos = currentPhotos.filter(photo => photo.timestamp > oneDayAgo);
     }
-    
+
     const allPhotoIds = new Set(currentPhotos.map(photo => photo.id));
-    
+
     updateGalleryState({
       selectedPhotos: allPhotoIds,
       isSelectionMode: allPhotoIds.size > 0,
@@ -126,7 +126,7 @@ export const usePhotoGallery = () => {
 
   const getCurrentPhotos = useCallback((): SavedPhoto[] => {
     let currentPhotos: SavedPhoto[] = [];
-    
+
     switch (galleryState.activeTab) {
       case 'gallery':
         currentPhotos = photos;
@@ -139,12 +139,12 @@ export const usePhotoGallery = () => {
         currentPhotos = [];
         break;
     }
-    
+
     // Apply search filter
     if (galleryState.searchQuery) {
       currentPhotos = searchPhotos(galleryState.searchQuery);
     }
-    
+
     // Apply additional filters
     switch (galleryState.filter) {
       case 'favorites':
@@ -160,10 +160,10 @@ export const usePhotoGallery = () => {
         // No additional filtering
         break;
     }
-    
+
     // Apply sorting
     currentPhotos = sortPhotos(currentPhotos, galleryState.sortBy, galleryState.sortOrder);
-    
+
     return currentPhotos;
   }, [galleryState.activeTab, galleryState.searchQuery, galleryState.filter, galleryState.sortBy, galleryState.sortOrder, photos, favorites, searchPhotos, sortPhotos]);
 
@@ -186,13 +186,13 @@ export const usePhotoGallery = () => {
 
   const handlePhotoDelete = useCallback(async (photoId: string): Promise<boolean> => {
     const success = await deletePhoto(photoId);
-    
+
     if (success) {
       // Clear selection if deleted photo was selected
       if (galleryState.selectedPhoto?.id === photoId) {
         setSelectedPhoto(null);
       }
-      
+
       // Remove from selection set
       if (galleryState.selectedPhotos.has(photoId)) {
         const newSelectedPhotos = new Set(galleryState.selectedPhotos);
@@ -203,19 +203,19 @@ export const usePhotoGallery = () => {
         });
       }
     }
-    
+
     return success;
   }, [deletePhoto, galleryState.selectedPhoto, galleryState.selectedPhotos, setSelectedPhoto, updateGalleryState]);
 
   const handleBulkDelete = useCallback(async (): Promise<number> => {
     const photoIds = Array.from(galleryState.selectedPhotos);
     const deletedCount = await deletePhotos(photoIds);
-    
+
     if (deletedCount > 0) {
       clearSelection();
       setSelectedPhoto(null);
     }
-    
+
     return deletedCount;
   }, [galleryState.selectedPhotos, deletePhotos, clearSelection, setSelectedPhoto]);
 
@@ -226,7 +226,7 @@ export const usePhotoGallery = () => {
   const handleBulkFavorite = useCallback(async (makeFavorite: boolean): Promise<number> => {
     const photoIds = Array.from(galleryState.selectedPhotos);
     let successCount = 0;
-    
+
     for (const photoId of photoIds) {
       const photo = getPhotoById(photoId);
       if (photo && photo.isFavorite !== makeFavorite) {
@@ -234,25 +234,25 @@ export const usePhotoGallery = () => {
         if (success) successCount++;
       }
     }
-    
+
     return successCount;
   }, [galleryState.selectedPhotos, getPhotoById, toggleFavorite]);
 
   const navigatePhoto = useCallback((direction: 'next' | 'previous') => {
     if (!galleryState.selectedPhoto) return;
-    
+
     const currentPhotos = getCurrentPhotos();
     const currentIndex = currentPhotos.findIndex(photo => photo.id === galleryState.selectedPhoto?.id);
-    
+
     if (currentIndex === -1) return;
-    
+
     let newIndex: number;
     if (direction === 'next') {
       newIndex = (currentIndex + 1) % currentPhotos.length;
     } else {
       newIndex = currentIndex === 0 ? currentPhotos.length - 1 : currentIndex - 1;
     }
-    
+
     setSelectedPhoto(currentPhotos[newIndex]);
   }, [galleryState.selectedPhoto, getCurrentPhotos, setSelectedPhoto]);
 
@@ -261,7 +261,7 @@ export const usePhotoGallery = () => {
     const totalPhotos = photos.length;
     const totalFavorites = favorites.length;
     const selectedCount = galleryState.selectedPhotos.size;
-    
+
     return {
       currentPhotos: currentPhotos.length,
       totalPhotos,

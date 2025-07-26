@@ -54,14 +54,14 @@ export function extractFallbackTasks(content: string): string[] {
   lines.forEach(line => {
     const trimmedLine = line.trim();
     if (!trimmedLine) return;
-    
+
     const lowerLine = trimmedLine.toLowerCase();
-    
+
     // Check for action words at the beginning of lines
     if (TASK_PATTERNS.actionWords.some(word => lowerLine.startsWith(word))) {
       tasks.push(trimmedLine);
     }
-    
+
     // Check for pattern-based tasks
     for (const pattern of TASK_PATTERNS.needToPatterns) {
       const match = trimmedLine.match(pattern);
@@ -84,13 +84,13 @@ export function extractFallbackTasks(content: string): string[] {
  */
 export function mergeTasksWithAI(manualTasks: Task[], aiTasks: string[]): Task[] {
   const merged = [...manualTasks];
-  
+
   aiTasks.forEach(aiTask => {
-    const exists = merged.some(task => 
+    const exists = merged.some(task =>
       task.text.toLowerCase().includes(aiTask.toLowerCase()) ||
       aiTask.toLowerCase().includes(task.text.toLowerCase()),
     );
-    
+
     if (!exists) {
       merged.push({
         text: aiTask,
@@ -129,12 +129,12 @@ export function areAllTasksCompleted(tasks: Task[]): boolean {
  */
 export function toggleTaskAtIndex(tasks: Task[], index: number): Task[] {
   if (index < 0 || index >= tasks.length) return tasks;
-  
+
   const updatedTasks = [...tasks];
   updatedTasks[index] = {
     ...updatedTasks[index],
     completed: !updatedTasks[index].completed,
   };
-  
+
   return updatedTasks;
 }

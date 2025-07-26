@@ -9,11 +9,11 @@ interface DogGridProps {
   onFavoriteToggle: (dog: DogImage) => void
 }
 
-export const DogGrid = memo(function DogGrid({ 
-  dogs, 
-  isFavorited, 
-  onImageClick, 
-  onFavoriteToggle, 
+export const DogGrid = memo(function DogGrid({
+  dogs,
+  isFavorited,
+  onImageClick,
+  onFavoriteToggle,
 }: DogGridProps) {
   const handleFavoriteToggle = useCallback((e: React.MouseEvent, dog: DogImage) => {
     e.stopPropagation();

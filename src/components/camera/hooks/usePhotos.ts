@@ -14,12 +14,12 @@ export const usePhotos = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const [allPhotos, favoritePhotos] = await Promise.all([
         PhotoStorage.getAllPhotos(),
         PhotoStorage.getFavoritePhotos(),
       ]);
-      
+
       setPhotos(allPhotos);
       setFavorites(favoritePhotos);
     } catch (err) {
@@ -32,17 +32,17 @@ export const usePhotos = () => {
   const savePhoto = useCallback(async (dataUrl: string, name?: string): Promise<SavedPhoto | null> => {
     try {
       setError(null);
-      
+
       const photo = await PhotoStorage.savePhoto({
         dataUrl,
         timestamp: timeService.getTimestamp(),
         isFavorite: false,
         name,
       });
-      
+
       // Update local state
       setPhotos(prev => [photo, ...prev]);
-      
+
       return photo;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save photo');
@@ -53,14 +53,14 @@ export const usePhotos = () => {
   const deletePhoto = useCallback(async (photoId: string): Promise<boolean> => {
     try {
       setError(null);
-      
+
       const deleted = await PhotoStorage.deletePhoto(photoId);
-      
+
       if (deleted) {
         setPhotos(prev => prev.filter(photo => photo.id !== photoId));
         setFavorites(prev => prev.filter(photo => photo.id !== photoId));
       }
-      
+
       return deleted;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete photo');
@@ -71,14 +71,14 @@ export const usePhotos = () => {
   const deletePhotos = useCallback(async (photoIds: string[]): Promise<number> => {
     try {
       setError(null);
-      
+
       const deletedCount = await PhotoStorage.deletePhotos(photoIds);
-      
+
       if (deletedCount > 0) {
         setPhotos(prev => prev.filter(photo => !photoIds.includes(photo.id)));
         setFavorites(prev => prev.filter(photo => !photoIds.includes(photo.id)));
       }
-      
+
       return deletedCount;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete photos');
@@ -89,14 +89,14 @@ export const usePhotos = () => {
   const toggleFavorite = useCallback(async (photoId: string): Promise<boolean> => {
     try {
       setError(null);
-      
+
       const isFavorite = await PhotoStorage.toggleFavorite(photoId);
-      
+
       // Update local state
-      setPhotos(prev => prev.map(photo => 
+      setPhotos(prev => prev.map(photo =>
         photo.id === photoId ? { ...photo, isFavorite } : photo,
       ));
-      
+
       if (isFavorite) {
         // Add to favorites
         const photo = photos.find(p => p.id === photoId);
@@ -107,7 +107,7 @@ export const usePhotos = () => {
         // Remove from favorites
         setFavorites(prev => prev.filter(photo => photo.id !== photoId));
       }
-      
+
       return isFavorite;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to toggle favorite');
@@ -118,21 +118,21 @@ export const usePhotos = () => {
   const updatePhoto = useCallback(async (photoId: string, updates: Partial<SavedPhoto>): Promise<SavedPhoto | null> => {
     try {
       setError(null);
-      
+
       const updatedPhoto = await PhotoStorage.updatePhoto(photoId, updates);
-      
+
       if (updatedPhoto) {
-        setPhotos(prev => prev.map(photo => 
+        setPhotos(prev => prev.map(photo =>
           photo.id === photoId ? updatedPhoto : photo,
         ));
-        
+
         if (updatedPhoto.isFavorite) {
-          setFavorites(prev => prev.map(photo => 
+          setFavorites(prev => prev.map(photo =>
             photo.id === photoId ? updatedPhoto : photo,
           ));
         }
       }
-      
+
       return updatedPhoto;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update photo');
@@ -146,22 +146,22 @@ export const usePhotos = () => {
 
   const searchPhotos = useCallback((query: string): SavedPhoto[] => {
     if (!query.trim()) return photos;
-    
+
     const lowerQuery = query.toLowerCase();
-    return photos.filter(photo => 
+    return photos.filter(photo =>
       photo.name?.toLowerCase().includes(lowerQuery) ||
       photo.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)),
     );
   }, [photos]);
 
   const sortPhotos = useCallback((
-    photosToSort: SavedPhoto[], 
-    sortBy: 'date' | 'name' | 'size', 
+    photosToSort: SavedPhoto[],
+    sortBy: 'date' | 'name' | 'size',
     order: 'asc' | 'desc',
   ): SavedPhoto[] => {
     const sorted = [...photosToSort].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'date':
           comparison = a.timestamp - b.timestamp;
@@ -173,10 +173,10 @@ export const usePhotos = () => {
           comparison = (a.size || 0) - (b.size || 0);
           break;
       }
-      
+
       return order === 'asc' ? comparison : -comparison;
     });
-    
+
     return sorted;
   }, []);
 
@@ -192,11 +192,11 @@ export const usePhotos = () => {
   const clearAllPhotos = useCallback(async (): Promise<boolean> => {
     try {
       setError(null);
-      
+
       await PhotoStorage.clearAllPhotos();
       setPhotos([]);
       setFavorites([]);
-      
+
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to clear photos');
@@ -207,10 +207,10 @@ export const usePhotos = () => {
   const downloadPhoto = useCallback(async (photo: SavedPhoto): Promise<boolean> => {
     try {
       setError(null);
-      
+
       const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
       await CameraUtils.downloadPhoto(photo.dataUrl, filename);
-      
+
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download photo');
@@ -221,10 +221,10 @@ export const usePhotos = () => {
   const sharePhoto = useCallback(async (photo: SavedPhoto): Promise<boolean> => {
     try {
       setError(null);
-      
+
       const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
       await CameraUtils.sharePhoto(photo.dataUrl, filename);
-      
+
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to share photo');

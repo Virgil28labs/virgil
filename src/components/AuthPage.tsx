@@ -1,7 +1,7 @@
 import React, { useState, memo } from 'react';
 import { SignUpForm } from './SignUpForm';
 import { LoginForm } from './LoginForm';
-import { RaccoonMascot } from './RaccoonMascot';
+import { RaccoonMascot } from './raccoon/RaccoonMascot';
 
 export const AuthPage = memo(function AuthPage(): React.ReactElement {
   const [isLogin, setIsLogin] = useState<boolean>(true);
@@ -12,15 +12,15 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
         <header>
           <h1>Virgil</h1>
         </header>
-        
+
         <div className="auth-container">
-          <div 
-            className="auth-toggle" 
-            role="tablist" 
+          <div
+            className="auth-toggle"
+            role="tablist"
             aria-label="Authentication mode selection"
           >
-            <button 
-              className={isLogin ? 'active' : ''} 
+            <button
+              className={isLogin ? 'active' : ''}
               onClick={() => setIsLogin(true)}
               role="tab"
               aria-selected={isLogin}
@@ -30,8 +30,8 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
             >
               Login
             </button>
-            <button 
-              className={!isLogin ? 'active' : ''} 
+            <button
+              className={!isLogin ? 'active' : ''}
               onClick={() => setIsLogin(false)}
               role="tab"
               aria-selected={!isLogin}
@@ -42,8 +42,8 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
               Sign Up
             </button>
           </div>
-        
-          <div 
+
+          <div
             id="auth-form-panel"
             role="tabpanel"
             aria-labelledby={isLogin ? 'login-tab' : 'signup-tab'}
@@ -54,7 +54,7 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
               <SignUpForm />
             )}
           </div>
-        
+
           <div className="auth-switch">
             {isLogin ? (
               <p>
@@ -74,7 +74,7 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
           </div>
         </div>
       </div>
-      
+
       {/* Interactive Raccoon Mascot */}
       <RaccoonMascot />
     </div>

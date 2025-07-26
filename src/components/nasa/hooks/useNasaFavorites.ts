@@ -59,7 +59,7 @@ export const useNasaFavorites = () => {
   const toggleFavorite = useCallback((apod: ApodImage) => {
     setFavorites(prev => {
       const exists = prev.some(fav => fav.id === apod.id);
-      
+
       if (exists) {
         return prev.filter(fav => fav.id !== apod.id);
       } else {

@@ -1,6 +1,6 @@
 /**
  * Unified Storage Service
- * 
+ *
  * Provides consistent localStorage access with:
  * - Automatic JSON serialization/deserialization
  * - Backward compatibility for plain string values
@@ -197,14 +197,14 @@ export const STORAGE_KEYS = {
   CUSTOM_SYSTEM_PROMPT: 'virgil-custom-system-prompt',
   WINDOW_SIZE: 'virgil-window-size',
   ACTIVE_CONVERSATION: 'virgil-active-conversation',
-  
+
   // User preferences
   ELEVATION_UNIT: 'elevationUnit',
   WEATHER_UNIT: 'weatherUnit',
   WEATHER_DATA: 'weatherData',
   WEATHER_LAST_UPDATED: 'weatherLastUpdated',
   RHYTHM_VOLUME: 'rhythmVolume',
-  
+
   // App data
   VIRGIL_HABITS: 'virgil_habits',
   DOG_FAVORITES: 'virgil_dog_favorites',

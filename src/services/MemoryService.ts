@@ -101,7 +101,7 @@ export class MemoryService {
   private updateRecentMessagesCache(newMessages: ChatMessage[]): void {
     // Add new messages to cache
     this.recentMessagesCache.push(...newMessages);
-    
+
     // Keep only recent messages in cache
     if (this.recentMessagesCache.length > this.MAX_RECENT_MESSAGES) {
       this.recentMessagesCache = this.recentMessagesCache.slice(-this.MAX_RECENT_MESSAGES);
@@ -136,10 +136,10 @@ export class MemoryService {
       const newMessageCount = (existing?.messageCount || 0) + newMessages.length;
       const userMessages = newMessages.filter(m => m.role === 'user');
       const assistantMessages = newMessages.filter(m => m.role === 'assistant');
-      
-      const newFirstMessage = existing?.firstMessage || 
+
+      const newFirstMessage = existing?.firstMessage ||
         (userMessages[0]?.content.slice(0, 100) || newMessages[0]?.content.slice(0, 100) || '');
-      const newLastMessage = assistantMessages.length > 0 
+      const newLastMessage = assistantMessages.length > 0
         ? assistantMessages[assistantMessages.length - 1].content.slice(0, 100)
         : existing?.lastMessage || '';
 
@@ -181,7 +181,7 @@ export class MemoryService {
       this.recentMessagesCache = [];
       this.conversationMetaCache = null;
       this.invalidateContextCache();
-      
+
       toastService.memoryError('save', error as Error);
       throw error;
     }
@@ -213,7 +213,7 @@ export class MemoryService {
 
       const transaction = this.db.transaction(['memories'], 'readwrite');
       const store = transaction.objectStore('memories');
-      
+
       await new Promise<void>((resolve, reject) => {
         const request = store.add(memory);
         request.onsuccess = () => {
@@ -232,7 +232,7 @@ export class MemoryService {
       // Reset memories cache on error
       this.memoriesCache = null;
       this.invalidateContextCache();
-      
+
       toastService.memoryError('mark', error as Error);
       throw error;
     }
@@ -285,8 +285,8 @@ export class MemoryService {
     const conversations = await this.getRecentConversations(100);
     const searchTerm = query.toLowerCase();
 
-    return conversations.filter(conv => 
-      conv.messages.some(msg => 
+    return conversations.filter(conv =>
+      conv.messages.some(msg =>
         msg.content.toLowerCase().includes(searchTerm),
       ),
     );
@@ -301,10 +301,10 @@ export class MemoryService {
     // If cache is insufficient, load from DB and populate cache
     const conversation = await this.getContinuousConversation();
     if (!conversation || !conversation.messages.length) return [];
-    
+
     // Update cache with recent messages
     this.recentMessagesCache = conversation.messages.slice(-this.MAX_RECENT_MESSAGES);
-    
+
     // Return the requested number of messages
     return this.recentMessagesCache.slice(-limit);
   }
@@ -317,7 +317,7 @@ export class MemoryService {
 
     // Get recent messages for active context (now cached)
     const recentMessages = await this.getRecentMessages(this.MAX_RECENT_MESSAGES);
-    
+
     // Get memories with caching
     const memories = await this.getMarkedMemoriesCached();
 
@@ -330,8 +330,8 @@ export class MemoryService {
       const lastMessages = recentMessages.slice(-20);
       lastMessages.forEach(msg => {
         const role = msg.role === 'user' ? 'User' : 'Virgil';
-        const content = msg.content.length > 200 
-          ? msg.content.slice(0, 200) + '...' 
+        const content = msg.content.length > 200
+          ? msg.content.slice(0, 200) + '...'
           : msg.content;
         context += `${role}: ${content}\n`;
       });
@@ -362,7 +362,7 @@ export class MemoryService {
     try {
       const transaction = this.db.transaction(['memories'], 'readwrite');
       const store = transaction.objectStore('memories');
-      
+
       await new Promise<void>((resolve, reject) => {
         const request = store.delete(memoryId);
         request.onsuccess = () => {
@@ -381,7 +381,7 @@ export class MemoryService {
       // Reset cache on error to maintain consistency
       this.memoriesCache = null;
       this.invalidateContextCache();
-      
+
       toastService.memoryError('forget', error as Error);
       throw error;
     }
@@ -391,7 +391,7 @@ export class MemoryService {
     try {
       const conversations = await this.getRecentConversations(1000);
       const memories = await this.getMarkedMemories();
-      
+
       toastService.memorySuccess('export');
       return { conversations, memories };
     } catch (error) {
@@ -406,7 +406,7 @@ export class MemoryService {
 
     try {
       const transaction = this.db.transaction(['conversations', 'memories'], 'readwrite');
-      
+
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           const request = transaction.objectStore('conversations').clear();
@@ -426,7 +426,7 @@ export class MemoryService {
       this.contextCacheTimestamp = 0;
       this.memoriesCache = null;
       this.conversationMetaCache = null;
-      
+
       toastService.memorySuccess('clear');
     } catch (error) {
       logger.error('Failed to clear all data', error as Error, { component: 'MemoryService', action: 'clearAllData' });
@@ -436,7 +436,7 @@ export class MemoryService {
       this.contextCacheTimestamp = 0;
       this.memoriesCache = null;
       this.conversationMetaCache = null;
-      
+
       toastService.memoryError('clear', error as Error);
       throw error;
     }

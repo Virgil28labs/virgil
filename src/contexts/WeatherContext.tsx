@@ -4,21 +4,21 @@ import { weatherService } from '../lib/weatherService';
 import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
 import { timeService } from '../services/TimeService';
-import type { 
-  WeatherContextType, 
-  WeatherState, 
+import type {
+  WeatherContextType,
+  WeatherState,
   WeatherAction,
   WeatherData,
-  ForecastData, 
+  ForecastData,
 } from '../types/weather.types';
 import { WeatherContext } from './WeatherContextInstance';
 
 /**
  * WeatherContext - Weather Data State Management
- * 
+ *
  * Provides real-time weather information based on user location
  * with automatic updates and caching.
- * 
+ *
  * Features:
  * - Weather data from OpenWeatherMap API
  * - Automatic updates every 10 minutes
@@ -32,24 +32,24 @@ const weatherReducer = (state: WeatherState, action: WeatherAction): WeatherStat
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_WEATHER_DATA':
-      return { 
-        ...state, 
+      return {
+        ...state,
         data: action.payload,
-        loading: false, 
+        loading: false,
         error: null,
         lastUpdated: timeService.getTimestamp(),
       };
     case 'SET_FORECAST_DATA':
-      return { 
-        ...state, 
+      return {
+        ...state,
         forecast: action.payload,
       };
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: false };
     case 'TOGGLE_UNIT':
-      return { 
-        ...state, 
-        unit: state.unit === 'fahrenheit' ? 'celsius' : 'fahrenheit', 
+      return {
+        ...state,
+        unit: state.unit === 'fahrenheit' ? 'celsius' : 'fahrenheit',
       };
     case 'CLEAR_ERROR':
       return { ...state, error: null };
@@ -75,7 +75,6 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
   const [state, dispatch] = useReducer(weatherReducer, initialState);
   const { coordinates, ipLocation } = useLocation();
 
-
   const fetchWeather = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
     // Skip if already loading and not forcing refresh
     if (state.loading && !forceRefresh) {
@@ -96,7 +95,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       try {
         const fallbackWeatherData = await weatherService.getWeatherByCoordinates(37.7749, -122.4194);
         dispatch({ type: 'SET_WEATHER_DATA', payload: fallbackWeatherData });
-        
+
         // Also fetch forecast for fallback location
         try {
           const fallbackForecastData = await weatherService.getForecastByCoordinates(37.7749, -122.4194);
@@ -108,7 +107,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
             metadata: { fallback: true },
           });
         }
-        
+
         return;
       } catch (_fallbackError: unknown) {
         dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
@@ -128,7 +127,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           coordinates.latitude,
           coordinates.longitude,
         );
-        
+
         // Fetch forecast data in parallel
         try {
           const forecastData = await weatherService.getForecastByCoordinates(
@@ -149,7 +148,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           ipLocation.city,
           ipLocation.country,
         );
-        
+
         // Fetch forecast data in parallel
         try {
           const forecastData = await weatherService.getForecastByCity(
@@ -188,7 +187,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
   useEffect(() => {
     const hasGpsCoordinates = !!coordinates;
     const hasIpCity = !!ipLocation?.city;
-    
+
     if (!hasGpsCoordinates && !hasIpCity) return;
 
     // Initial fetch if we don't have recent data

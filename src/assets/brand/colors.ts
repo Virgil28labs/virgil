@@ -15,11 +15,11 @@ export interface SemanticColors {
   // Backgrounds
   background: string;
   surface: string;
-  
+
   // Text
   textPrimary: string;
   textSecondary: string;
-  
+
   // Interactive
   primary: string;
   secondary: string;
@@ -34,7 +34,7 @@ export interface DesignTokens {
     violetPink: string;
     subtle: string;
   };
-  
+
   // Elevations
   elevations: {
     small: string;
@@ -42,14 +42,14 @@ export interface DesignTokens {
     large: string;
     hover: string;
   };
-  
+
   // Transitions
   transitions: {
     fast: string;
     normal: string;
     slow: string;
   };
-  
+
   // Border Radius
   radius: {
     small: string;
@@ -116,7 +116,7 @@ export const cssVariables = {
   offWhite: 'var(--off-white)',
   silverGrey: 'var(--silver-grey)',
   softPink: 'var(--soft-pink)',
-  
+
   // Semantic colors
   colorBackground: 'var(--color-background)',
   colorSurface: 'var(--color-surface)',

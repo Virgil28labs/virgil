@@ -16,7 +16,7 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,43 +25,43 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
         setShowCustomPicker(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   // Format the display text
   const getDisplayText = () => {
     if (selectedTime === 'now') {
       return isCompact ? 'Now' : 'Leave now';
     }
-    
+
     const time = selectedTime;
     const now = timeService.getCurrentDateTime();
     const isToday = timeService.isSameDay(time, now);
-    
+
     if (isToday) {
-      return timeService.formatTimeToLocal(time, { 
-        hour: 'numeric', 
-        minute: '2-digit', 
+      return timeService.formatTimeToLocal(time, {
+        hour: 'numeric',
+        minute: '2-digit',
       });
     } else {
-      return timeService.formatDateToLocal(time, { 
-        month: 'short', 
+      return timeService.formatDateToLocal(time, {
+        month: 'short',
         day: 'numeric',
-        hour: 'numeric', 
-        minute: '2-digit', 
+        hour: 'numeric',
+        minute: '2-digit',
       });
     }
   };
-  
+
   // Quick time options
   const handleQuickOption = (minutes: number) => {
     const newTime = timeService.addMinutes(timeService.getCurrentDateTime(), minutes);
     onTimeChange(newTime);
     setShowDropdown(false);
   };
-  
+
   // Quick date options
   const handleQuickDate = (daysOffset: number, hour: number = 9) => {
     let newTime = timeService.getCurrentDateTime();
@@ -74,7 +74,7 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
     onTimeChange(newTime);
     setShowDropdown(false);
   };
-  
+
   // Handle custom date/time input
   const handleCustomTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = timeService.parseDate(e.target.value);
@@ -84,24 +84,24 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
       setShowDropdown(false);
     }
   };
-  
+
   // Get current datetime string for input
   const getCurrentDateTimeString = () => {
     const now = selectedTime === 'now' ? timeService.getCurrentDateTime() : selectedTime;
     return timeService.formatForDateTimeInput(now);
   };
-  
+
   // Get min/max date strings for the picker
   const getMinDateTimeString = () => {
     const minDate = timeService.addYears(timeService.getCurrentDateTime(), -1); // Allow up to 1 year in the past
     return timeService.formatForDateTimeInput(minDate);
   };
-  
+
   const getMaxDateTimeString = () => {
     const maxDate = timeService.addYears(timeService.getCurrentDateTime(), 1); // Allow up to 1 year in the future
     return timeService.formatForDateTimeInput(maxDate);
   };
-  
+
   return (
     <div className={`departure-time-selector ${showDropdown ? 'open' : ''}`} ref={dropdownRef}>
       <button
@@ -120,7 +120,7 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
           </svg>
         )}
       </button>
-      
+
       {showDropdown && (
         <div className="departure-time-dropdown">
           <button onClick={() => { onTimeChange('now'); setShowDropdown(false); }}>
@@ -152,7 +152,7 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
           <button onClick={() => setShowCustomPicker(!showCustomPicker)}>
             Pick specific date & time...
           </button>
-          
+
           {showCustomPicker && (
             <div className="custom-time-picker">
               <input

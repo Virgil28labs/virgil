@@ -6,17 +6,17 @@ export interface ChatState {
   // UI State
   isOpen: boolean;
   windowSize: 'normal' | 'large' | 'fullscreen';
-  
+
   // Chat State
   messages: ChatMessage[];
   input: string;
   isTyping: boolean;
   error: string | null;
-  
+
   // Model State
   selectedModel: string;
   customSystemPrompt: string;
-  
+
   // Memory State
   lastConversation: StoredConversation | null;
   markedMemories: MarkedMemory[];
@@ -24,7 +24,7 @@ export interface ChatState {
   memoryContext: string;
   showMemoryModal: boolean;
   recentConversations: StoredConversation[];
-  
+
   // Context State
   dashboardContext: DashboardContext | null;
   contextualSuggestions: ContextualSuggestion[];

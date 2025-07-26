@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
-const MinimalHabitTracker = lazy(() => 
-  import('./streak/MinimalHabitTracker').then(module => ({ 
-    default: module.MinimalHabitTracker, 
+const MinimalHabitTracker = lazy(() =>
+  import('./streak/MinimalHabitTracker').then(module => ({
+    default: module.MinimalHabitTracker,
   })),
 );
 

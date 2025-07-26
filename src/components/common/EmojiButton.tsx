@@ -68,21 +68,21 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
     zIndex: 1000,
     opacity: isHovered ? 1 : 0.8,
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    filter: isHovered 
-      ? `drop-shadow(0 8px 25px ${hoverColor.glow})` 
+    filter: isHovered
+      ? `drop-shadow(0 8px 25px ${hoverColor.glow})`
       : 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))',
-    transform: isHovered 
-      ? `scale(${hoverScale}) rotate(-5deg) translateY(-3px)` 
+    transform: isHovered
+      ? `scale(${hoverScale}) rotate(-5deg) translateY(-3px)`
       : 'scale(1) rotate(0deg)',
     backdropFilter: isHovered ? 'blur(20px)' : 'none',
-    boxShadow: isHovered 
-      ? `0 0 30px ${hoverColor.glow.replace('0.4', '0.3')}, inset 0 1px 0 rgba(255, 255, 255, 0.2)` 
+    boxShadow: isHovered
+      ? `0 0 30px ${hoverColor.glow.replace('0.4', '0.3')}, inset 0 1px 0 rgba(255, 255, 255, 0.2)`
       : 'none',
   };
 
   const emojiStyles: React.CSSProperties = {
-    background: isHovered 
-      ? `linear-gradient(45deg, ${hoverColor.border}, ${hoverColor.border.replace('0.6', '0.8')})` 
+    background: isHovered
+      ? `linear-gradient(45deg, ${hoverColor.border}, ${hoverColor.border.replace('0.6', '0.8')})`
       : 'transparent',
     WebkitBackgroundClip: isHovered ? 'text' : undefined,
     WebkitTextFillColor: isHovered ? 'transparent' : 'inherit',

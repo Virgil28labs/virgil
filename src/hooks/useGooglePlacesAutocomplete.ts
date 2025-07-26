@@ -74,18 +74,18 @@ export function useGooglePlacesAutocomplete(
     try {
       // Import the places library if not already loaded
       await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
-      
+
       let formattedSuggestions: PlaceSuggestion[] = [];
-      
+
       // Try new API first
       if ((google.maps.places as unknown as { AutocompleteSuggestion?: unknown }).AutocompleteSuggestion) {
-        
+
         try {
           // Create request object
           if (!sessionTokenRef.current) {
             sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
           }
-          
+
           const request = {
             input,
             sessionToken: sessionTokenRef.current,
@@ -93,9 +93,9 @@ export function useGooglePlacesAutocomplete(
             ...(options.locationBias && { locationBias: options.locationBias }),
             ...(options.locationRestriction && { locationRestriction: options.locationRestriction }),
           };
-          
+
           // Fetch suggestions using the new API
-          const { suggestions: autocompleteSuggestions } = 
+          const { suggestions: autocompleteSuggestions } =
             await (google.maps.places as unknown as {
               AutocompleteSuggestion: {
                 fetchAutocompleteSuggestions: (request: unknown) => Promise<{ suggestions: unknown[] }>
@@ -125,20 +125,20 @@ export function useGooglePlacesAutocomplete(
         }
       } else {
         // Fallback to classic AutocompleteService
-        
+
         const service = new google.maps.places.AutocompleteService();
-        
+
         if (!sessionTokenRef.current) {
           sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
         }
-        
+
         const request: google.maps.places.AutocompletionRequest = {
           input,
           sessionToken: sessionTokenRef.current,
           ...(options.componentRestrictions && { componentRestrictions: options.componentRestrictions }),
           ...(options.types && { types: options.types }),
         };
-        
+
         // Use promise wrapper for callback-based API
         const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve) => {
           service.getPlacePredictions(request, (predictions, status) => {
@@ -149,8 +149,7 @@ export function useGooglePlacesAutocomplete(
             }
           });
         });
-        
-        
+
         // Transform predictions to our format
         formattedSuggestions = predictions.map(prediction => ({
           placePrediction: prediction,
@@ -219,13 +218,13 @@ export function useGooglePlacesAutocomplete(
   const selectPlace = useCallback(async (suggestion: PlaceSuggestion): Promise<google.maps.places.PlaceResult> => {
     try {
       let placeResult: google.maps.places.PlaceResult | undefined;
-      
+
       // Try new API first if available
       if (suggestion.placePrediction && 'toPlace' in suggestion.placePrediction && typeof suggestion.placePrediction.toPlace === 'function') {
         try {
           // Convert prediction to place
           const place = suggestion.placePrediction.toPlace() as ExtendedPlace;
-          
+
           // Fetch place details with correct field names for new API
           await place.fetchFields?.({
             fields: options.fields || ['placeId', 'location', 'displayName', 'formattedAddress'],
@@ -237,7 +236,7 @@ export function useGooglePlacesAutocomplete(
           placeResult = {
             place_id: place.placeId || undefined,
             geometry: place.location ? {
-              location: place.location,  
+              location: place.location,
               viewport: place.viewport || undefined,
             } : undefined,
             name: place.displayName || place.name || undefined,
@@ -253,12 +252,12 @@ export function useGooglePlacesAutocomplete(
           // Fall through to classic API
         }
       }
-      
+
       // Use classic API if new API failed or isn't available
       if (!placeResult) {
         // Classic API - use PlacesService to get details
         const service = new google.maps.places.PlacesService(document.createElement('div'));
-        
+
         placeResult = await new Promise<google.maps.places.PlaceResult>((resolve, reject) => {
           service.getDetails(
             {

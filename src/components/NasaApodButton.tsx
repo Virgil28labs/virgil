@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 
-const NasaApodViewer = lazy(() => 
-  import('./nasa/NasaApodViewer').then(module => ({ 
-    default: module.NasaApodViewer, 
+const NasaApodViewer = lazy(() =>
+  import('./nasa/NasaApodViewer').then(module => ({
+    default: module.NasaApodViewer,
   })),
 );
 

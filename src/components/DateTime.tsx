@@ -4,7 +4,7 @@ import { timeService } from '../services/TimeService';
 
 /**
  * DateTime Component
- * 
+ *
  * Displays current local time and date with real-time updates
  * Now includes timezone widget functionality with click and hover interactions
  * Positioned in center-top of dashboard between logo and power button
@@ -36,7 +36,7 @@ export const DateTime = memo(function DateTime() {
   }), []);
 
   return (
-    <TimezoneWidget 
+    <TimezoneWidget
       className="datetime-widget"
       hoverDelay={150}
       clickToOpen

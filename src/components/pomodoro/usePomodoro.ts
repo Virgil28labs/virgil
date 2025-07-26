@@ -9,7 +9,7 @@ interface TimerState {
   soundEnabled: boolean;
 }
 
-type TimerAction = 
+type TimerAction =
   | { type: 'SET_MINUTES'; minutes: number }
   | { type: 'START' }
   | { type: 'PAUSE' }
@@ -92,7 +92,7 @@ export function usePomodoro(defaultMinutes: number = 25) {
       oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
       gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
-      
+
       oscillator.start(ctx.currentTime);
       oscillator.stop(ctx.currentTime + duration / 1000);
     } catch (error) {

@@ -1,6 +1,6 @@
 /**
  * useTimezones Hook
- * 
+ *
  * Manages timezone state, localStorage persistence, and real-time updates
  * for the timezone widget functionality.
  */
@@ -39,21 +39,21 @@ function loadTimezonesFromStorage(): SelectedTimezone[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return getDefaultTimezones();
-    
+
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return getDefaultTimezones();
-    
+
     // Validate structure
-    const valid = parsed.every(tz => 
-      tz && 
-      typeof tz.id === 'string' && 
-      typeof tz.timezone === 'string' && 
-      typeof tz.label === 'string' && 
+    const valid = parsed.every(tz =>
+      tz &&
+      typeof tz.id === 'string' &&
+      typeof tz.timezone === 'string' &&
+      typeof tz.label === 'string' &&
       typeof tz.order === 'number',
     );
-    
+
     if (!valid) return getDefaultTimezones();
-    
+
     // Sort by order and return
     return parsed.sort((a, b) => a.order - b.order);
   } catch (error) {
@@ -85,10 +85,10 @@ function saveTimezonesToStorage(timezones: SelectedTimezone[]): void {
  * Custom hook for managing timezone state and operations
  */
 export function useTimezones(): UseTimezonesReturn {
-  const [selectedTimezones, setSelectedTimezones] = useState<SelectedTimezone[]>(() => 
+  const [selectedTimezones, setSelectedTimezones] = useState<SelectedTimezone[]>(() =>
     loadTimezonesFromStorage(),
   );
-  const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() => 
+  const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() =>
     DateTime.fromJSDate(dashboardContextService.getCurrentDateTime()),
   );
   const [isUpdating, setIsUpdating] = useState(false);
@@ -189,8 +189,8 @@ export function useTimezones(): UseTimezonesReturn {
   const updateTimezoneLabel = useCallback((id: string, label: string): void => {
     if (!label.trim()) return;
 
-    setSelectedTimezones(prev => 
-      prev.map(tz => 
+    setSelectedTimezones(prev =>
+      prev.map(tz =>
         tz.id === id ? { ...tz, label: label.trim() } : tz,
       ),
     );
@@ -206,7 +206,7 @@ export function useTimezones(): UseTimezonesReturn {
       const reordered = [...prev];
       const [moved] = reordered.splice(fromIndex, 1);
       reordered.splice(toIndex, 0, moved);
-      
+
       // Update order values
       return reordered.map((tz, index) => ({ ...tz, order: index }));
     });
@@ -242,11 +242,11 @@ export function useTimezoneFormatters() {
     formatTime: (dateTime: DateTime): string => {
       return dateTime.toFormat('HH:mm');
     },
-    
+
     // Format relative time (e.g., "3 hours ahead")
     formatRelativeTime: (dateTime: DateTime, baseTime: DateTime): string => {
       const diffHours = dateTime.diff(baseTime, 'hours').hours;
-      
+
       if (diffHours === 0) return 'Same time';
       if (diffHours > 0) {
         const hours = Math.floor(Math.abs(diffHours));

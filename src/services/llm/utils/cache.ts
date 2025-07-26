@@ -44,7 +44,7 @@ export class ResponseCache {
 
   async get<T>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.misses++;
       return null;
@@ -74,7 +74,7 @@ export class ResponseCache {
       expiresAt: timeService.getTimestamp() + (ttl * 1000),
       createdAt: timeService.getTimestamp(),
     });
-    
+
     this.accessOrder.set(key, timeService.getTimestamp());
   }
 
@@ -105,7 +105,7 @@ export class ResponseCache {
   }
 
   getStats(): CacheStats {
-    const hitRate = this.hits + this.misses > 0 
+    const hitRate = this.hits + this.misses > 0
       ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
       : 0;
 

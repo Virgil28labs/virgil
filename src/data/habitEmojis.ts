@@ -15,7 +15,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '🏌️', keywords: ['golf', 'sport', 'swing'] },
   { emoji: '⚽', keywords: ['soccer', 'football', 'sport', 'ball'] },
   { emoji: '🏀', keywords: ['basketball', 'ball', 'sport', 'hoop'] },
-  
+
   // Health & Wellness
   { emoji: '💧', keywords: ['water', 'hydrate', 'drink', 'hydration'] },
   { emoji: '💊', keywords: ['medicine', 'vitamin', 'pill', 'supplement'] },
@@ -27,7 +27,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '🦷', keywords: ['teeth', 'dental', 'brush', 'floss'] },
   { emoji: '🧴', keywords: ['skincare', 'lotion', 'routine'] },
   { emoji: '🧘‍♀️', keywords: ['meditate', 'meditation', 'calm', 'relax'] },
-  
+
   // Learning & Productivity
   { emoji: '📚', keywords: ['read', 'book', 'study', 'learn', 'education'] },
   { emoji: '✏️', keywords: ['write', 'journal', 'diary', 'note', 'pen'] },
@@ -39,7 +39,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '📊', keywords: ['track', 'data', 'analyze', 'chart'] },
   { emoji: '🗓️', keywords: ['plan', 'schedule', 'calendar', 'organize'] },
   { emoji: '💡', keywords: ['idea', 'creative', 'think', 'innovation'] },
-  
+
   // Creative & Hobbies
   { emoji: '🎨', keywords: ['art', 'paint', 'draw', 'creative', 'artist'] },
   { emoji: '🎵', keywords: ['music', 'song', 'listen', 'play'] },
@@ -50,7 +50,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '✂️', keywords: ['craft', 'cut', 'diy', 'make'] },
   { emoji: '🧶', keywords: ['knit', 'yarn', 'craft', 'hobby'] },
   { emoji: '🎭', keywords: ['theater', 'drama', 'act', 'perform'] },
-  
+
   // Daily Routines
   { emoji: '☕', keywords: ['coffee', 'morning', 'caffeine', 'drink'] },
   { emoji: '🍵', keywords: ['tea', 'drink', 'herbal', 'green'] },
@@ -61,7 +61,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '🍳', keywords: ['cook', 'breakfast', 'meal', 'food'] },
   { emoji: '🛏️', keywords: ['bed', 'make', 'tidy', 'morning'] },
   { emoji: '👕', keywords: ['clothes', 'laundry', 'outfit'] },
-  
+
   // Finance & Career
   { emoji: '💰', keywords: ['money', 'save', 'budget', 'finance'] },
   { emoji: '💳', keywords: ['spend', 'budget', 'finance', 'card'] },
@@ -69,7 +69,7 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '📈', keywords: ['invest', 'grow', 'stocks', 'finance'] },
   { emoji: '🏦', keywords: ['bank', 'save', 'money', 'finance'] },
   { emoji: '💸', keywords: ['spend', 'money', 'expense', 'budget'] },
-  
+
   // Social & Relationships
   { emoji: '📱', keywords: ['phone', 'call', 'text', 'mobile'] },
   { emoji: '👥', keywords: ['social', 'friends', 'people', 'meet'] },
@@ -77,18 +77,18 @@ export const EMOJI_DATABASE: EmojiSuggestion[] = [
   { emoji: '❤️', keywords: ['love', 'heart', 'care', 'family'] },
   { emoji: '👪', keywords: ['family', 'time', 'together', 'home'] },
   { emoji: '🤝', keywords: ['meet', 'network', 'connect', 'social'] },
-  
+
   // Mindfulness & Spirituality
   { emoji: '🙏', keywords: ['pray', 'grateful', 'thanks', 'spiritual'] },
   { emoji: '☮️', keywords: ['peace', 'calm', 'zen', 'mindful'] },
   { emoji: '🕉️', keywords: ['om', 'spiritual', 'meditate', 'yoga'] },
   { emoji: '⚡', keywords: ['energy', 'power', 'charge', 'electric'] },
-  
+
   // Time & Planning
   { emoji: '⏰', keywords: ['time', 'alarm', 'wake', 'early'] },
   { emoji: '📅', keywords: ['calendar', 'schedule', 'plan', 'date'] },
   { emoji: '⏱️', keywords: ['timer', 'stopwatch', 'track', 'time'] },
-  
+
   // General Achievement
   { emoji: '🌟', keywords: ['star', 'achieve', 'success', 'goal'] },
   { emoji: '🔥', keywords: ['fire', 'streak', 'hot', 'burn', 'passion'] },

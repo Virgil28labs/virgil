@@ -14,11 +14,11 @@ interface ChatMessagesProps {
   error: string | null;
   onErrorDismiss: () => void;
   onMarkAsImportant: (message: ChatMessage) => void;
-  
+
   // Welcome message data
   user: User | null;
   lastConversation: StoredConversation | null;
-  
+
   // Enhanced loading states
   loadingState?: {
     type: 'generating' | 'processing' | 'thinking' | 'searching';
@@ -78,7 +78,7 @@ const ChatMessages = memo(function ChatMessages({
       <div className="welcome-message-bubble" role="status">
         {lastConversation ? (
           <>
-            Welcome back, {user?.user_metadata?.name || 'there'}! 
+            Welcome back, {user?.user_metadata?.name || 'there'}!
             {lastConversation.timestamp && (timeService.getTimestamp() - lastConversation.timestamp) < 24 * 60 * 60 * 1000 && (
               <> I remember our chat about "{lastConversation.firstMessage}"</>
             )}
@@ -116,7 +116,6 @@ const ChatMessages = memo(function ChatMessages({
     </div>
   ), [onMarkAsImportant]);
 
-
   const renderError = useCallback(() => (
     <div className="error-msg">
       <span>⚠️ {error}</span>
@@ -125,9 +124,9 @@ const ChatMessages = memo(function ChatMessages({
   ), [error, onErrorDismiss]);
 
   return (
-    <div 
-      className="messages-area" 
-      role="log" 
+    <div
+      className="messages-area"
+      role="log"
       aria-label="Chat messages"
       aria-live="polite"
       aria-atomic="false"
@@ -140,22 +139,22 @@ const ChatMessages = memo(function ChatMessages({
 
       {/* Enhanced loading states */}
       {showLoadingState && loadingState && (
-        <LoadingStates 
+        <LoadingStates
           variant="message"
           type={loadingState.type}
           progress={loadingState.progress}
           isVisible
         />
       )}
-      
+
       {/* Simple typing indicator for basic loading */}
       {showTypingIndicator && !loadingState && (
-        <LoadingStates 
+        <LoadingStates
           variant="typing"
           isVisible
         />
       )}
-      
+
       {/* Fallback skeleton for very fast responses */}
       {isTyping && !showTypingIndicator && !showLoadingState && (
         <div className="flex items-center space-x-3 mb-2 px-2" role="status" aria-label="Virgil is typing">

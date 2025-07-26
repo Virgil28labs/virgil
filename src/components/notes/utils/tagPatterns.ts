@@ -80,7 +80,7 @@ export function detectTags(content: string): TagType[] {
  */
 export function detectActionType(content: string): ActionType {
   const lowerContent = content.toLowerCase();
-  
+
   // Check patterns in order of specificity
   // Goal patterns first (most specific)
   for (const pattern of ACTION_PATTERNS.goal) {
@@ -88,28 +88,28 @@ export function detectActionType(content: string): ActionType {
       return 'goal';
     }
   }
-  
+
   // Task patterns
   for (const pattern of ACTION_PATTERNS.task) {
     if (pattern.test(lowerContent)) {
       return 'task';
     }
   }
-  
+
   // Idea patterns
   for (const pattern of ACTION_PATTERNS.idea) {
     if (pattern.test(lowerContent)) {
       return 'idea';
     }
   }
-  
+
   // Reflect patterns
   for (const pattern of ACTION_PATTERNS.reflect) {
     if (pattern.test(lowerContent)) {
       return 'reflect';
     }
   }
-  
+
   // Default to 'note' for informational content
   return 'note';
 }
@@ -121,10 +121,10 @@ export function detectActionType(content: string): ActionType {
  */
 export function validateTags(tags: string[]): TagType[] {
   const allowedTags: TagType[] = ['work', 'health', 'money', 'people', 'growth', 'life'];
-  
+
   return tags
-    .filter((tag): tag is TagType => 
-      typeof tag === 'string' && 
+    .filter((tag): tag is TagType =>
+      typeof tag === 'string' &&
       allowedTags.includes(tag.toLowerCase() as TagType),
     )
     .map(tag => tag.toLowerCase() as TagType);
@@ -137,13 +137,13 @@ export function validateTags(tags: string[]): TagType[] {
  */
 export function validateActionType(actionType: string | undefined): ActionType | undefined {
   const allowedActionTypes: ActionType[] = ['task', 'note', 'idea', 'goal', 'reflect'];
-  
+
   if (!actionType || typeof actionType !== 'string') {
     return undefined;
   }
-  
+
   const normalized = actionType.toLowerCase();
-  return allowedActionTypes.includes(normalized as ActionType) 
-    ? normalized as ActionType 
+  return allowedActionTypes.includes(normalized as ActionType)
+    ? normalized as ActionType
     : undefined;
 }

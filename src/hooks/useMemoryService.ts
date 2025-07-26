@@ -29,7 +29,7 @@ export function useMemoryService({
   const initializeMemory = useCallback(async () => {
     try {
       await memoryService.init();
-      
+
       // Load all memory data
       const [lastConv, memories, conversations, context] = await Promise.all([
         memoryService.getLastConversation(),
@@ -37,7 +37,7 @@ export function useMemoryService({
         memoryService.getRecentConversations(10),
         memoryService.getContextForPrompt(),
       ]);
-      
+
       dispatch({
         type: 'SET_MEMORY_DATA',
         payload: {
@@ -80,10 +80,10 @@ export function useMemoryService({
         context = DynamicContextBuilder.createContextSummary(dashboardContext);
       }
       await memoryService.markAsImportant(message.id, message.content, context);
-      
+
       const memories = await memoryService.getMarkedMemories();
       const newContext = await memoryService.getContextForPrompt();
-      
+
       dispatch({
         type: 'SET_MEMORY_DATA',
         payload: {

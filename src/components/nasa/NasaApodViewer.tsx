@@ -10,29 +10,29 @@ import './NasaApodViewer.css';
 import { logger } from '../../lib/logger';
 import { timeService } from '../../services/TimeService';
 
-export const NasaApodViewer = memo(function NasaApodViewer({ 
-  isOpen, 
+export const NasaApodViewer = memo(function NasaApodViewer({
+  isOpen,
   onClose,
-  initialDate, 
+  initialDate,
 }: NasaApodViewerProps) {
   const [currentApod, setCurrentApod] = useState<ApodImage | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<string>(() => 
+  const [selectedDate, setSelectedDate] = useState<string>(() =>
     initialDate || timeService.toISODateString(),
   );
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<NasaTabType>('browse');
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  
+
   // Favorites hook
-  const { 
-    favorites, 
-    favoriteCount, 
-    isFavorited, 
-    toggleFavorite, 
-    removeFavorite, 
+  const {
+    favorites,
+    favoriteCount,
+    isFavorited,
+    toggleFavorite,
+    removeFavorite,
   } = useNasaFavorites();
 
   // Load APOD for specific date
@@ -42,7 +42,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     setLoading(true);
     setError(null);
     setImageLoading(true);
-    
+
     try {
       const apod = await nasaService.getApodByDate(date);
       setCurrentApod(apod);
@@ -50,12 +50,12 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load APOD';
       setError(errorMessage);
-      
+
       // Special handling for rate limit errors
       if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('too many requests')) {
         setError('NASA API rate limit reached. Please try again later.');
       }
-      
+
       logger.error('Failed to load APOD', err as Error, {
         component: 'NasaApodViewer',
         action: 'loadDailyApod',
@@ -90,19 +90,17 @@ export const NasaApodViewer = memo(function NasaApodViewer({
     }
   }, [selectedDate, loadApodByDate]);
 
-
   // Toggle description expanded state
   const toggleDescription = useCallback(() => {
     setDescriptionExpanded(prev => !prev);
   }, []);
-  
+
   // Handle favorite toggle
   const handleFavoriteToggle = useCallback(() => {
     if (currentApod) {
       toggleFavorite(currentApod);
     }
   }, [currentApod, toggleFavorite]);
-  
 
   // Simple keyboard navigation - just ESC to close
   useEffect(() => {
@@ -139,15 +137,15 @@ export const NasaApodViewer = memo(function NasaApodViewer({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="nasa-apod-backdrop" 
+    <div
+      className="nasa-apod-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="NASA Astronomy Picture of the Day"
     >
-      <div 
-        className="nasa-apod-panel" 
+      <div
+        className="nasa-apod-panel"
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
@@ -159,15 +157,15 @@ export const NasaApodViewer = memo(function NasaApodViewer({
               Astronomy Picture of the Day
             </h2>
           </div>
-          <button 
-            className="nasa-apod-close" 
+          <button
+            className="nasa-apod-close"
             onClick={onClose}
             aria-label="Close APOD viewer"
           >
             ×
           </button>
         </div>
-        
+
         {/* Tab Navigation */}
         <NasaApodTabs
           activeTab={activeTab}
@@ -205,12 +203,12 @@ export const NasaApodViewer = memo(function NasaApodViewer({
                   </div>
                 </div>
               </div>
-              
+
               {error ? (
                 <div className="nasa-apod-error">
                   <div className="nasa-apod-error-icon">⚠️</div>
                   <div className="nasa-apod-error-message">{error}</div>
-                  <button 
+                  <button
                     className="nasa-apod-error-retry"
                     onClick={loadTodaysApod}
                     disabled={loading}
@@ -233,7 +231,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
                     onImageLoad={handleImageLoad}
                     onImageError={handleImageError}
                   />
-              
+
                   {/* Expandable Description */}
                   {currentApod.explanation && (
                     <div className="nasa-apod-description">

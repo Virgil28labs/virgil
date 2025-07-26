@@ -1,6 +1,6 @@
 /**
  * TimeService Mock Factory
- * 
+ *
  * Provides comprehensive mocking utilities for TimeService in tests.
  * Enables time control, travel, and consistent behavior across test suites.
  */
@@ -12,7 +12,7 @@ export class MockTimeService {
   private frozenTime: boolean = false;
   private timeListeners: ((time: TimeUpdate) => void)[] = [];
   private mockTimer?: NodeJS.Timeout;
-  
+
   constructor(initialDate: Date = new Date('2024-01-20T12:00:00')) {
     this.mockDate = new Date(initialDate);
   }
@@ -105,7 +105,7 @@ export class MockTimeService {
       currentDate: this.getCurrentDate(),
       dateObject: this.getCurrentDateTime(),
     });
-    
+
     return () => {
       this.timeListeners = this.timeListeners.filter(l => l !== callback);
     };
@@ -249,29 +249,29 @@ export class MockTimeService {
   // Relative Time
   getTimeAgo(date: Date): string {
     const seconds = Math.floor((this.mockDate.getTime() - date.getTime()) / 1000);
-    
+
     if (seconds < 60) return 'just now';
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes === 1) return '1 minute ago';
     if (minutes < 60) return `${minutes} minutes ago`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours === 1) return '1 hour ago';
     if (hours < 24) return `${hours} hours ago`;
-    
+
     const days = Math.floor(hours / 24);
     if (days === 1) return '1 day ago';
     if (days < 7) return `${days} days ago`;
-    
+
     const weeks = Math.floor(days / 7);
     if (weeks === 1) return '1 week ago';
     if (weeks < 4) return `${weeks} weeks ago`;
-    
+
     const months = Math.floor(days / 30);
     if (months === 1) return '1 month ago';
     if (months < 12) return `${months} months ago`;
-    
+
     const years = Math.floor(days / 365);
     if (years === 1) return '1 year ago';
     return `${years} years ago`;
@@ -281,17 +281,17 @@ export class MockTimeService {
     const ms = date.getTime() - this.mockDate.getTime();
     const seconds = Math.floor(Math.abs(ms) / 1000);
     const isPast = ms < 0;
-    
+
     if (seconds < 60) return isPast ? 'just now' : 'in a moment';
-    
+
     const minutes = Math.floor(seconds / 60);
     if (minutes === 1) return isPast ? '1 minute ago' : 'in 1 minute';
     if (minutes < 60) return isPast ? `${minutes} minutes ago` : `in ${minutes} minutes`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours === 1) return isPast ? '1 hour ago' : 'in 1 hour';
     if (hours < 24) return isPast ? `${hours} hours ago` : `in ${hours} hours`;
-    
+
     const days = Math.floor(hours / 24);
     if (days === 1) return isPast ? '1 day ago' : 'in 1 day';
     return isPast ? `${days} days ago` : `in ${days} days`;

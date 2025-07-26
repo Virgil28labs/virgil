@@ -1,10 +1,10 @@
 import React, { memo, useEffect, useCallback, useState } from 'react';
 import type { ApodImage } from '../../types/nasa.types';
-import { 
-  stopEvent, 
-  downloadApodImage, 
-  copyApodToClipboard, 
-  shareApod, 
+import {
+  stopEvent,
+  downloadApodImage,
+  copyApodToClipboard,
+  shareApod,
 } from './utils/nasaImageUtils';
 import { logger } from '../../lib/logger';
 import { timeService } from '../../services/TimeService';
@@ -53,7 +53,7 @@ export const NasaApodModal = memo(function NasaApodModal({
   const handleDownload = useCallback(async (e: React.MouseEvent, quality: 'standard' | 'hd') => {
     stopEvent(e);
     if (!currentApod) return;
-    
+
     setShowDownloadMenu(false);
     try {
       await downloadApodImage(currentApod, quality);
@@ -71,7 +71,7 @@ export const NasaApodModal = memo(function NasaApodModal({
   const handleDownloadClick = useCallback((e: React.MouseEvent) => {
     stopEvent(e);
     if (!currentApod) return;
-    
+
     if (currentApod.hdImageUrl) {
       setShowDownloadMenu(!showDownloadMenu);
     } else {
@@ -82,7 +82,7 @@ export const NasaApodModal = memo(function NasaApodModal({
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     stopEvent(e);
     if (!currentApod) return;
-    
+
     try {
       await copyApodToClipboard(currentApod);
       setShowCopied(true);
@@ -99,7 +99,7 @@ export const NasaApodModal = memo(function NasaApodModal({
   const handleShare = useCallback(async (e: React.MouseEvent) => {
     stopEvent(e);
     if (!currentApod) return;
-    
+
     try {
       const sharedNatively = await shareApod(currentApod);
       if (!sharedNatively) {
@@ -151,8 +151,8 @@ export const NasaApodModal = memo(function NasaApodModal({
   if (currentIndex === null || !currentApod) return null;
 
   return (
-    <div 
-      className="nasa-apod-modal" 
+    <div
+      className="nasa-apod-modal"
       onClick={(e) => {
         e.stopPropagation();
         onClose();
@@ -174,7 +174,7 @@ export const NasaApodModal = memo(function NasaApodModal({
             onClick={(e) => e.stopPropagation()}
           />
         )}
-        
+
         <div className="nasa-apod-modal-info">
           <h3 className="nasa-apod-modal-title">{currentApod.title}</h3>
           <p className="nasa-apod-modal-date">
@@ -186,7 +186,7 @@ export const NasaApodModal = memo(function NasaApodModal({
             })}
           </p>
         </div>
-        
+
         <div className="nasa-apod-modal-actions">
           <button
             className={`nasa-apod-modal-action ${isFavorited(currentApod.id) ? 'favorited' : ''}`}
@@ -196,7 +196,7 @@ export const NasaApodModal = memo(function NasaApodModal({
           >
             {isFavorited(currentApod.id) ? '❤️' : '🤍'}
           </button>
-          
+
           <div className="nasa-apod-modal-action-group">
             <button
               className="nasa-apod-modal-action"
@@ -206,7 +206,7 @@ export const NasaApodModal = memo(function NasaApodModal({
             >
               {showDownloaded ? '✓' : '⬇️'}
             </button>
-            
+
             {showDownloadMenu && currentApod.hdImageUrl && (
               <div className="nasa-apod-modal-download-popup">
                 <button
@@ -224,7 +224,7 @@ export const NasaApodModal = memo(function NasaApodModal({
               </div>
             )}
           </div>
-          
+
           <button
             className="nasa-apod-modal-action"
             onClick={handleCopy}
@@ -233,7 +233,7 @@ export const NasaApodModal = memo(function NasaApodModal({
           >
             {showCopied ? '✓' : '📋'}
           </button>
-          
+
           <button
             className="nasa-apod-modal-action"
             onClick={handleShare}
@@ -242,7 +242,7 @@ export const NasaApodModal = memo(function NasaApodModal({
           >
             {showShared ? '✓' : '🔗'}
           </button>
-          
+
           <button
             className={`nasa-apod-modal-action ${showDescription ? 'active' : ''}`}
             onClick={(e) => {
@@ -255,7 +255,7 @@ export const NasaApodModal = memo(function NasaApodModal({
             ℹ️
           </button>
         </div>
-        
+
         {showDescription && currentApod.explanation && (
           <div className="nasa-apod-modal-description">
             <h4>About this image</h4>
@@ -266,7 +266,7 @@ export const NasaApodModal = memo(function NasaApodModal({
           </div>
         )}
       </div>
-      
+
       <button
         className="nasa-apod-modal-close"
         onClick={onClose}

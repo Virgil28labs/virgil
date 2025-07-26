@@ -1,4 +1,3 @@
-
 // Mock weather service
 export const weatherService = {
   getWeatherByCoordinates: jest.fn(),

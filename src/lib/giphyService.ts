@@ -1,8 +1,8 @@
-import type { 
-  GiphyApiResponse, 
-  GiphyGif, 
-  GiphyImage, 
-  GiphySearchParams, 
+import type {
+  GiphyApiResponse,
+  GiphyGif,
+  GiphyImage,
+  GiphySearchParams,
   GiphyTrendingParams,
 } from '../types/giphy.types';
 import { dedupeFetch } from './requestDeduplication';
@@ -37,7 +37,7 @@ class GiphyService {
    */
   private transformGiphyGif(gif: GiphyGif): GiphyImage {
     const images = gif.images;
-    
+
     return {
       id: gif.id,
       url: images.fixed_height?.url || images.downsized?.url || gif.url,
@@ -64,7 +64,7 @@ class GiphyService {
     }
 
     const url = new URL(`${GIPHY_API_BASE}${endpoint}`);
-    
+
     // Add API key and merge with default params
     const allParams = {
       api_key: GIPHY_API_KEY,
@@ -98,10 +98,10 @@ class GiphyService {
             } catch {
               errorMessage = `HTTP ${res.status}: ${res.statusText}`;
             }
-            
+
             throw new GiphyServiceError(errorMessage, res.status);
           }
-          
+
           return res;
         },
         {
@@ -136,7 +136,7 @@ class GiphyService {
    */
   async searchGifs(params: GiphySearchParams): Promise<{ gifs: GiphyImage[]; totalCount: number; hasMore: boolean }> {
     const cacheKey = `search-${JSON.stringify(params)}`;
-    
+
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -182,7 +182,7 @@ class GiphyService {
    */
   async getTrendingGifs(params: GiphyTrendingParams = {}): Promise<{ gifs: GiphyImage[]; hasMore: boolean }> {
     const cacheKey = `trending-${JSON.stringify(params)}`;
-    
+
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -222,29 +222,27 @@ class GiphyService {
     }
   }
 
-
-
   /**
    * Download GIF to device
    */
   async downloadGif(gif: GiphyImage, filename?: string): Promise<void> {
     try {
       const response = await fetch(gif.originalUrl);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch GIF: ${response.status}`);
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = filename || `giphy-${gif.id}.gif`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       window.URL.revokeObjectURL(url);
     } catch (error) {
       logger.error('Failed to download GIF', error as Error, {
@@ -269,7 +267,7 @@ class GiphyService {
         action: 'copyGifUrl',
         metadata: { gifId: gif.id },
       });
-      
+
       // Fallback: try to copy using execCommand (deprecated but still works in some browsers)
       try {
         const textArea = document.createElement('textarea');
@@ -291,9 +289,6 @@ class GiphyService {
   getShareUrl(gif: GiphyImage): string {
     return `https://giphy.com/gifs/${gif.id}`;
   }
-
-
-
 
 }
 

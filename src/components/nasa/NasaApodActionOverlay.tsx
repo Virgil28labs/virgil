@@ -1,10 +1,10 @@
 import React, { memo, useState, useCallback } from 'react';
 import type { ApodImage } from '../../types/nasa.types';
-import { 
-  stopEvent, 
-  downloadApodImage, 
-  copyApodToClipboard, 
-  shareApod, 
+import {
+  stopEvent,
+  downloadApodImage,
+  copyApodToClipboard,
+  shareApod,
 } from './utils/nasaImageUtils';
 import { logger } from '../../lib/logger';
 
@@ -12,8 +12,8 @@ interface NasaApodActionOverlayProps {
   apod: ApodImage
 }
 
-export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({ 
-  apod, 
+export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
+  apod,
 }: NasaApodActionOverlayProps) {
   const [showCopied, setShowCopied] = useState(false);
   const [showShared, setShowShared] = useState(false);
@@ -89,7 +89,7 @@ export const NasaApodActionOverlay = memo(function NasaApodActionOverlay({
         >
           {showDownloaded ? '✓' : '⬇️'}
         </button>
-        
+
         {showDownloadMenu && apod.hdImageUrl && (
           <div className="nasa-apod-download-popup">
             <button

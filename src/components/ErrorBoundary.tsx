@@ -24,12 +24,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error('ErrorBoundary caught an error', error, { 
-      component: 'ErrorBoundary', 
+    logger.error('ErrorBoundary caught an error', error, {
+      component: 'ErrorBoundary',
       action: 'componentDidCatch',
       metadata: { errorInfo },
     });
-    
+
     // Call optional error callback
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -97,9 +97,9 @@ export class ErrorBoundary extends Component<Props, State> {
               <summary style={{ cursor: 'pointer', color: 'var(--brand-accent-pink)' }}>
                 Error Details (Development)
               </summary>
-              <pre style={{ 
-                background: 'rgba(0,0,0,0.3)', 
-                padding: '1rem', 
+              <pre style={{
+                background: 'rgba(0,0,0,0.3)',
+                padding: '1rem',
                 borderRadius: '4px',
                 fontSize: '0.875rem',
                 overflow: 'auto',

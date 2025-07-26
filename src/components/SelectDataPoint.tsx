@@ -89,11 +89,11 @@ export const SelectDataPoint = memo(function SelectDataPoint({
 
   const displayValue = () => {
     if (!value) return placeholder;
-    
+
     // Find the label for the value
     const option = options.find(opt => opt.value === value);
     if (option) return option.label;
-    
+
     // It's a custom value
     return value;
   };
@@ -141,7 +141,7 @@ export const SelectDataPoint = memo(function SelectDataPoint({
           </select>
         )
       ) : (
-        <span 
+        <span
           className={`data-value ${!value ? 'placeholder' : ''}`}
           onClick={handleClick}
           role="button"

@@ -11,12 +11,12 @@ export const stopEvent = (e: MouseEvent | SyntheticEvent) => {
 
 // Download APOD image utility
 export const downloadApodImage = async (
-  apod: ApodImage, 
+  apod: ApodImage,
   quality: 'standard' | 'hd' = 'standard',
 ): Promise<void> => {
   // Choose URL based on quality preference and availability
-  const imageUrl = quality === 'hd' && apod.hdImageUrl 
-    ? apod.hdImageUrl 
+  const imageUrl = quality === 'hd' && apod.hdImageUrl
+    ? apod.hdImageUrl
     : apod.imageUrl;
 
   // For videos, we can't download directly - open in new tab
@@ -49,21 +49,21 @@ export const copyApodToClipboard = async (apod: ApodImage): Promise<boolean> => 
     // Try to copy the image itself
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
+
     await new Promise((resolve, reject) => {
       img.onload = resolve;
       img.onerror = reject;
       img.src = apod.imageUrl;
     });
-    
+
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context');
-    
+
     ctx.drawImage(img, 0, 0);
-    
+
     // Convert to blob
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -71,7 +71,7 @@ export const copyApodToClipboard = async (apod: ApodImage): Promise<boolean> => 
         else reject(new Error('Failed to create blob'));
       }, 'image/png');
     });
-    
+
     // Try to copy image
     if (navigator.clipboard && window.ClipboardItem) {
       await navigator.clipboard.write([

@@ -49,7 +49,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
   }, [onPhotoSelect, photo.id]);
 
   return (
-    <div 
+    <div
       className={`photo-card ${isSelected ? 'selected' : ''} ${isSelectionMode ? 'selection-mode' : ''}`}
       onClick={handleCardClick}
     >
@@ -59,7 +59,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
             <div className="photo-loading-spinner" />
           </div>
         )}
-        
+
         {imageError ? (
           <div className="photo-error">
             <span className="photo-error-icon">🖼️</span>
@@ -74,7 +74,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
             style={{ display: imageLoaded ? 'block' : 'none' }}
           />
         )}
-        
+
         {/* Selection Checkbox */}
         {isSelectionMode && (
           <div className="photo-selection-checkbox">
@@ -87,7 +87,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
             </button>
           </div>
         )}
-        
+
         {/* Favorite Button */}
         <button
           className={`photo-favorite-btn ${photo.isFavorite ? 'favorited' : ''}`}
@@ -99,7 +99,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           </span>
         </button>
       </div>
-      
+
       <div className="photo-card-info">
         <div className="photo-metadata">
           <span className="photo-date">
@@ -111,7 +111,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
             </span>
           )}
         </div>
-        
+
         {photo.name && (
           <div className="photo-name">
             {photo.name}
@@ -174,13 +174,13 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
           />
         ))}
       </div>
-      
+
       {/* Grid Footer */}
       <div className="photo-grid-footer">
         <div className="photo-count">
           {photos.length} photo{photos.length !== 1 ? 's' : ''}
         </div>
-        
+
         {isSelectionMode && selectedPhotos.size > 0 && (
           <div className="selection-count">
             {selectedPhotos.size} selected

@@ -3,12 +3,12 @@ import { giphyService } from '../../lib/giphyService';
 import type { GiphyCardProps } from '../../types';
 import { logger } from '../../lib/logger';
 
-export const GiphyCard = memo(function GiphyCard({ 
-  gif, 
-  index, 
-  isFavorited, 
-  onImageClick, 
-  onFavoriteToggle, 
+export const GiphyCard = memo(function GiphyCard({
+  gif,
+  index,
+  isFavorited,
+  onImageClick,
+  onFavoriteToggle,
 }: GiphyCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -19,7 +19,7 @@ export const GiphyCard = memo(function GiphyCard({
   // Handle copy URL
   const handleCopy = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     try {
       const success = await giphyService.copyGifUrl(gif);
       if (success) {
@@ -38,7 +38,7 @@ export const GiphyCard = memo(function GiphyCard({
   // Handle download
   const handleDownload = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     try {
       await giphyService.downloadGif(gif, `${gif.title || 'gif'}-${gif.id}.gif`);
       setShowDownloaded(true);
@@ -71,7 +71,7 @@ export const GiphyCard = memo(function GiphyCard({
       {/* Loading skeleton */}
       {!imageLoaded && !imageError && (
         <div className="giphy-image-skeleton">
-          <div 
+          <div
             style={{
               position: 'absolute',
               inset: 0,
@@ -82,7 +82,7 @@ export const GiphyCard = memo(function GiphyCard({
           />
         </div>
       )}
-      
+
       {/* Error state */}
       {imageError ? (
         <div className="giphy-image-error">
@@ -102,7 +102,7 @@ export const GiphyCard = memo(function GiphyCard({
           style={{ opacity: imageLoaded ? 1 : 0 }}
         />
       )}
-      
+
       {/* Favorite overlay */}
       <button
         className={`giphy-favorite-overlay ${isFavorited ? 'favorited' : ''}`}
@@ -112,7 +112,7 @@ export const GiphyCard = memo(function GiphyCard({
       >
         {isFavorited ? '❤️' : '🤍'}
       </button>
-      
+
       {/* Action buttons */}
       <div className="giphy-action-buttons">
         <button
@@ -135,7 +135,7 @@ export const GiphyCard = memo(function GiphyCard({
 
       {/* GIF info overlay (shows on hover) */}
       {gif.title && imageLoaded && (
-        <div 
+        <div
           className="giphy-info-overlay"
           style={{
             position: 'absolute',
@@ -153,7 +153,7 @@ export const GiphyCard = memo(function GiphyCard({
             zIndex: 1,
           }}
         >
-          <div style={{ 
+          <div style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -162,7 +162,7 @@ export const GiphyCard = memo(function GiphyCard({
             {gif.title}
           </div>
           {gif.username && (
-            <div style={{ 
+            <div style={{
               fontSize: '0.7rem',
               opacity: 0.8,
               marginTop: '0.25rem',

@@ -1,6 +1,6 @@
 /**
  * Unified IndexedDB Service
- * 
+ *
  * Provides consistent interface for all IndexedDB operations with:
  * - Automatic connection management
  * - Retry logic for failed operations
@@ -115,7 +115,7 @@ export class IndexedDBService {
 
       request.onsuccess = () => {
         const db = request.result;
-        
+
         // Handle version changes
         db.onversionchange = () => {
           db.close();
@@ -127,7 +127,7 @@ export class IndexedDBService {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         // Create stores as needed
         config.stores.forEach(storeConfig => {
           if (!db.objectStoreNames.contains(storeConfig.name)) {
@@ -158,7 +158,7 @@ export class IndexedDBService {
     retries = this.retryAttempts,
   ): Promise<OperationResult<T>> {
     const startTime = performance.now();
-    
+
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         const data = await operation();
@@ -180,9 +180,9 @@ export class IndexedDBService {
             duration: performance.now() - startTime,
           };
         }
-        
+
         // Wait before retry with exponential backoff
-        await new Promise(resolve => 
+        await new Promise(resolve =>
           setTimeout(resolve, this.retryDelay * Math.pow(2, attempt)),
         );
       }
@@ -201,7 +201,7 @@ export class IndexedDBService {
   async getAll<T>(dbName: string, storeName: string): Promise<OperationResult<T[]>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<T[]>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
@@ -219,7 +219,7 @@ export class IndexedDBService {
   async get<T>(dbName: string, storeName: string, key: IDBValidKey): Promise<OperationResult<T | undefined>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<T | undefined>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
@@ -237,7 +237,7 @@ export class IndexedDBService {
   async add<T>(dbName: string, storeName: string, data: T): Promise<OperationResult<IDBValidKey>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<IDBValidKey>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
@@ -255,7 +255,7 @@ export class IndexedDBService {
   async put<T>(dbName: string, storeName: string, data: T): Promise<OperationResult<IDBValidKey>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<IDBValidKey>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
@@ -273,7 +273,7 @@ export class IndexedDBService {
   async delete(dbName: string, storeName: string, key: IDBValidKey): Promise<OperationResult<void>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
@@ -291,7 +291,7 @@ export class IndexedDBService {
   async clear(dbName: string, storeName: string): Promise<OperationResult<void>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
@@ -309,7 +309,7 @@ export class IndexedDBService {
   async count(dbName: string, storeName: string): Promise<OperationResult<number>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<number>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
@@ -332,7 +332,7 @@ export class IndexedDBService {
   ): Promise<OperationResult<T[]>> {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
-      
+
       return new Promise<T[]>((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
@@ -357,7 +357,7 @@ export class IndexedDBService {
     return this.executeWithRetry(async () => {
       const db = await this.getDatabase(dbName);
       const transaction = db.transaction(storeNames, mode);
-      
+
       return operation(transaction);
     });
   }
@@ -412,10 +412,10 @@ export class IndexedDBService {
    */
   async deleteDatabase(dbName: string): Promise<OperationResult<void>> {
     this.closeDatabase(dbName);
-    
+
     return new Promise((resolve) => {
       const request = indexedDB.deleteDatabase(dbName);
-      
+
       request.onsuccess = () => resolve({ success: true });
       request.onerror = () => resolve({
         success: false,

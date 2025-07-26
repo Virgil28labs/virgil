@@ -21,11 +21,11 @@ function buildSystemPrompt(): string {
   const tagDescriptions = Object.entries(TAG_DESCRIPTIONS)
     .map(([tag, desc]) => `   - ${tag}: ${desc}`)
     .join('\n');
-  
+
   const actionDescriptions = Object.entries(ACTION_DESCRIPTIONS)
     .map(([action, desc]) => `   - ${action}: ${desc}`)
     .join('\n');
-  
+
   return `You are an AI assistant that analyzes journal entries and notes. Extract actionable tasks, generate relevant tags based on life domains, and classify the action type.
 
 Rules:
@@ -53,7 +53,7 @@ Respond in JSON format:
 /**
  * Processes a note entry with AI to extract tags, tasks, and mood
  * Falls back to rule-based extraction if AI fails
- * 
+ *
  * @param content The note content to analyze
  * @returns Promise<AIResponse | null> Extracted data or null if processing fails
  */
@@ -72,10 +72,10 @@ export async function processEntryWithAI(content: string): Promise<AIResponse | 
       return response;
     } catch (error) {
       lastError = error as Error;
-      
+
       // Don't retry on specific error types
-      if (error instanceof NotesError && 
-          (error.type === ErrorType.VALIDATION_ERROR || 
+      if (error instanceof NotesError &&
+          (error.type === ErrorType.VALIDATION_ERROR ||
            error.type === ErrorType.AI_SERVICE_ERROR)) {
         break;
       }
@@ -92,7 +92,7 @@ export async function processEntryWithAI(content: string): Promise<AIResponse | 
     component: 'aiService',
     action: 'processEntryWithAI',
   });
-  
+
   // Return fallback response
   return {
     tags: detectTags(content),
@@ -127,7 +127,7 @@ async function callAIService(content: string): Promise<AIResponse> {
     // Parse and validate the response
     try {
       const parsed = JSON.parse(response.content);
-      
+
       // Validate the response structure
       if (!Array.isArray(parsed.tags) || !Array.isArray(parsed.tasks)) {
         throw new NotesError(
@@ -139,13 +139,13 @@ async function callAIService(content: string): Promise<AIResponse> {
       // Validate tags and action type using utility functions
       const validTags = validateTags(parsed.tags).slice(0, 2);
       const validActionType = validateActionType(parsed.actionType);
-      
+
       return {
         tags: validTags,
         actionType: validActionType,
         tasks: parsed.tasks.filter((task: unknown) => typeof task === 'string') as string[],
-        mood: parsed.mood && ['positive', 'neutral', 'negative'].includes(parsed.mood) 
-          ? parsed.mood 
+        mood: parsed.mood && ['positive', 'neutral', 'negative'].includes(parsed.mood)
+          ? parsed.mood
           : undefined,
       };
     } catch (parseError) {
@@ -159,7 +159,7 @@ async function callAIService(content: string): Promise<AIResponse> {
     if (error instanceof NotesError) {
       throw error;
     }
-    
+
     throw new NotesError(
       ErrorType.NETWORK_ERROR,
       'Failed to contact AI service',
@@ -167,7 +167,6 @@ async function callAIService(content: string): Promise<AIResponse> {
     );
   }
 }
-
 
 /**
  * Validates that content is appropriate for AI processing
@@ -179,11 +178,11 @@ export function shouldProcessContent(content: string): boolean {
   if (content.trim().length < AI_CONFIG.MIN_CONTENT_LENGTH) {
     return false;
   }
-  
+
   // Don't process content that's just whitespace or special characters
   if (!/[a-zA-Z0-9]/.test(content)) {
     return false;
   }
-  
+
   return true;
 }

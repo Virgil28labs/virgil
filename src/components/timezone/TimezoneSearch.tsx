@@ -1,6 +1,6 @@
 /**
  * TimezoneSearch Component
- * 
+ *
  * Provides search and autocomplete functionality for timezone selection.
  * Features city-first search with keyboard navigation and accessibility support.
  */
@@ -32,10 +32,10 @@ const TimezoneSearch = memo(function TimezoneSearch({
 
   // Search results with popular timezones when empty query
   const searchResults = useMemo(() => {
-    const results = query.trim() 
+    const results = query.trim()
       ? searchTimezones(query, 8)
       : getPopularTimezones().slice(0, 8);
-    
+
     // Filter out already selected timezones
     return results.filter(tz => !excludeTimezones.includes(tz.timezone));
   }, [query, excludeTimezones]);
@@ -165,7 +165,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
           }
           role="combobox"
         />
-        
+
         {query && (
           <button
             type="button"
@@ -177,15 +177,15 @@ const TimezoneSearch = memo(function TimezoneSearch({
             ✕
           </button>
         )}
-        
+
         <div className="search-icon" aria-hidden="true">
           🔍
         </div>
       </div>
 
       {showSuggestions && (
-        <ul 
-          className="suggestions-list" 
+        <ul
+          className="suggestions-list"
           role="listbox"
           aria-label="Timezone suggestions"
         >
@@ -228,4 +228,3 @@ const TimezoneSearch = memo(function TimezoneSearch({
 });
 
 export { TimezoneSearch };
-

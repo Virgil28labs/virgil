@@ -212,18 +212,18 @@ export const PhotoModal = memo(function PhotoModal({
           <div className="photo-modal-title">
             {photo.name || `Photo ${timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}`}
           </div>
-          
+
           <div className="photo-modal-metadata">
             <span className="photo-timestamp">
               {timeService.formatDateTimeToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
-            
+
             {photo.size && (
               <span className="photo-size">
                 {(photo.size / 1024).toFixed(1)} KB
               </span>
             )}
-            
+
             {photo.width && photo.height && (
               <span className="photo-dimensions">
                 {photo.width} × {photo.height}

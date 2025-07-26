@@ -7,15 +7,15 @@ interface LoadingFallbackProps {
   variant?: 'spinner' | 'skeleton' | 'dots' | 'minimal';
 }
 
-export const LoadingFallback = memo(function LoadingFallback({ 
-  message = 'Loading...', 
+export const LoadingFallback = memo(function LoadingFallback({
+  message = 'Loading...',
   size = 'medium',
   variant = 'spinner',
 }: LoadingFallbackProps) {
   if (variant === 'skeleton') {
     const skeletonCount = size === 'small' ? 1 : size === 'medium' ? 3 : 5;
     return (
-      <div 
+      <div
         className={`loading-fallback ${size}`}
         role="status"
         aria-live="polite"
@@ -23,7 +23,7 @@ export const LoadingFallback = memo(function LoadingFallback({
         style={{ padding: '1rem' }}
       >
         {Array.from({ length: skeletonCount }, (_, i) => (
-          <Skeleton 
+          <Skeleton
             key={i}
             className={`${i === 0 ? 'h-10' : 'h-5'} ${i === skeletonCount - 1 ? 'w-3/5' : 'w-full'} mb-2`}
           />
@@ -34,7 +34,7 @@ export const LoadingFallback = memo(function LoadingFallback({
 
   if (variant === 'dots') {
     return (
-      <div 
+      <div
         className={`loading-fallback ${size}`}
         role="status"
         aria-live="polite"
@@ -50,7 +50,7 @@ export const LoadingFallback = memo(function LoadingFallback({
       >
         <div className="loading-dots" style={{ display: 'flex', gap: '4px', marginRight: '0.5rem' }}>
           {[0, 1, 2].map(i => (
-            <div 
+            <div
               key={i}
               className="dot"
               style={{
@@ -70,7 +70,7 @@ export const LoadingFallback = memo(function LoadingFallback({
 
   if (variant === 'minimal') {
     return (
-      <div 
+      <div
         className={`loading-fallback ${size}`}
         role="status"
         aria-live="polite"
@@ -91,12 +91,12 @@ export const LoadingFallback = memo(function LoadingFallback({
 
   const sizeClasses = {
     small: 'w-4 h-4',
-    medium: 'w-8 h-8', 
+    medium: 'w-8 h-8',
     large: 'w-12 h-12',
   };
 
   return (
-    <div 
+    <div
       className={`loading-fallback ${size}`}
       role="status"
       aria-live="polite"
@@ -110,7 +110,7 @@ export const LoadingFallback = memo(function LoadingFallback({
         fontSize: '0.875rem',
       }}
     >
-      <div 
+      <div
         className={`spinner ${sizeClasses[size]}`}
         style={{
           width: size === 'small' ? '16px' : size === 'medium' ? '32px' : '48px',

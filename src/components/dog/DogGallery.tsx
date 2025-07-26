@@ -35,7 +35,7 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
       description: 'Go to fetch tab',
     },
     {
-      key: 'g', 
+      key: 'g',
       handler: () => setActiveTab('gallery'),
       description: 'Go to gallery tab',
     },
@@ -54,8 +54,8 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
               Doggo Sanctuary
             </h2>
           </div>
-          <button 
-            className="doggo-sanctuary-close" 
+          <button
+            className="doggo-sanctuary-close"
             onClick={onClose}
             aria-label="Close sanctuary"
           >
@@ -75,7 +75,7 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
       </div>
 
       {/* Image Modal */}
-      <ImageModal 
+      <ImageModal
         dogs={displayDogs}
         currentIndex={state.selectedImageIndex}
         isFavorited={isFavorited}

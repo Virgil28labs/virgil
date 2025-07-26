@@ -1,6 +1,6 @@
 /**
  * TimezoneHoverPanel Component
- * 
+ *
  * Minimal hover panel that displays selected timezone times in a single row.
  * Clean, lightweight design.
  */
@@ -23,12 +23,12 @@ const TimezoneHoverPanel = memo(function TimezoneHoverPanel({
   if (!isVisible || timezonesWithTime.length < 2) return null;
 
   // Sort by UTC offset: earliest (west) to latest (east)
-  const sortedTimezones = [...timezonesWithTime].sort((a, b) => 
+  const sortedTimezones = [...timezonesWithTime].sort((a, b) =>
     a.currentTime.offset - b.currentTime.offset,
   );
 
   return (
-    <div 
+    <div
       className={`timezone-hover-panel ${className}`}
       role="tooltip"
       aria-label="Selected timezone times"
@@ -67,7 +67,7 @@ const PositionedTimezoneHoverPanel = memo(function PositionedTimezoneHoverPanel(
     const datetimeDisplay = trigger.querySelector('.datetime-display');
     const elementToPosition = datetimeDisplay || trigger;
     const rect = elementToPosition.getBoundingClientRect();
-    
+
     // Position directly below the clock
     setPosition({
       top: rect.bottom + 4,
@@ -78,7 +78,7 @@ const PositionedTimezoneHoverPanel = memo(function PositionedTimezoneHoverPanel(
   if (!panelProps.isVisible) return null;
 
   return (
-    <div 
+    <div
       className="timezone-hover-panel-wrapper"
       style={{
         top: `${position.top}px`,

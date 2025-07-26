@@ -24,7 +24,7 @@ const shouldForwardProp = (propName: string) => {
   if (excludedProps.includes(propName)) {
     return false;
   }
-  
+
   // Use emotion's isPropValid for standard HTML attribute validation
   return isPropValid(propName);
 };
@@ -58,9 +58,9 @@ function AppContent(): React.ReactElement {
       <Dashboard />
       {user && (
         <ErrorBoundary fallback={(
-          <div style={{ 
-            position: 'fixed', 
-            bottom: '20px', 
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
             right: '20px',
             color: 'var(--brand-light-gray)',
             fontSize: '0.875rem',
@@ -112,8 +112,8 @@ function App(): React.ReactElement {
                 >
                   <AppContent />
                 </ErrorBoundary>
-                <ToastContainer 
-                  toasts={toasts} 
+                <ToastContainer
+                  toasts={toasts}
                   onDismiss={removeToast}
                   position="top-right"
                 />

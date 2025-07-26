@@ -7,7 +7,7 @@ import { dashboardContextService } from '../services/DashboardContextService';
 
 /**
  * Custom hook to sync context data with dashboard context service
- * 
+ *
  * Consolidates all context synchronization logic in one place
  */
 export function useContextSync() {

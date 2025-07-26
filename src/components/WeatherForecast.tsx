@@ -12,8 +12,8 @@ interface WeatherForecastProps {
  * WeatherForecast Component
  * Displays 5-day weather forecast in a minimal, elegant style
  */
-export const WeatherForecast = memo(function WeatherForecast({ 
-  forecast, 
+export const WeatherForecast = memo(function WeatherForecast({
+  forecast,
 }: WeatherForecastProps) {
   const formatDate = (dateString: string): string => {
     // Parse date string as local date (not UTC)
@@ -38,7 +38,7 @@ export const WeatherForecast = memo(function WeatherForecast({
         <span className="forecast-title">5-Day Forecast</span>
         <span className="forecast-location">{forecast.cityName}</span>
       </div>
-      
+
       <div className="forecast-days">
         {forecast.forecasts.map((day) => (
           <div key={day.date} className="forecast-day">

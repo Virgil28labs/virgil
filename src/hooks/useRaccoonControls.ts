@@ -36,36 +36,36 @@ export const useRaccoonControls = ({
 }: UseRaccoonControlsProps): UseRaccoonControlsReturn => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragOffset, setDragOffset] = useState<Position>({ x: 0, y: 0 });
-  
+
   // Track key states to handle multiple keys pressed
   const keysPressed = useRef<Set<string>>(new Set());
-  
+
   /**
    * Handle click to pick up and show GIF
    */
   const handleClick = useCallback(() => {
     // Reset sleep timer on interaction
     onResetSleepTimer();
-    
+
     if (!isPickedUp) {
       onPickup();
-      
+
       // Drop after 2 seconds (handled in parent component)
       setTimeout(() => {
         onDrop();
       }, 2000);
     }
   }, [isPickedUp, onPickup, onDrop, onResetSleepTimer]);
-  
+
   /**
    * Handle drag start
    */
   const handleMouseDown = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     if (isPickedUp) return;
-    
+
     // Reset sleep timer on drag interaction
     onResetSleepTimer();
-    
+
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     setDragOffset({
@@ -73,32 +73,32 @@ export const useRaccoonControls = ({
       y: e.clientY - rect.top,
     });
   }, [isPickedUp, onResetSleepTimer]);
-  
+
   /**
    * Handle drag move
    */
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
-    
+
     onPositionChange({
       x: e.clientX - dragOffset.x,
       y: e.clientY - dragOffset.y,
     });
   }, [isDragging, dragOffset, onPositionChange]);
-  
+
   /**
    * Handle drag end
    */
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
-  
+
   // Add global mouse event listeners for dragging
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -106,22 +106,22 @@ export const useRaccoonControls = ({
     }
     return undefined;
   }, [isDragging, handleMouseMove, handleMouseUp]);
-  
+
   // Handle keyboard controls
   useEffect(() => {
     // Capture the keysPressed ref value to use in cleanup
     const keysSet = keysPressed.current;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isPickedUp) return;
-      
+
       // Reset sleep timer on any keyboard activity
       onResetSleepTimer();
-      
+
       // Prevent multiple calls for held keys
       if (keysSet.has(e.key)) return;
       keysSet.add(e.key);
-      
+
       switch (e.key) {
         case ' ':
         case 'Spacebar':
@@ -136,10 +136,10 @@ export const useRaccoonControls = ({
           break;
       }
     };
-    
+
     const handleKeyUp = (e: KeyboardEvent) => {
       keysSet.delete(e.key);
-      
+
       switch (e.key) {
         case ' ':
         case 'Spacebar':
@@ -154,10 +154,10 @@ export const useRaccoonControls = ({
           break;
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-    
+
     // Cleanup
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -166,7 +166,7 @@ export const useRaccoonControls = ({
       keysSet.clear();
     };
   }, [isPickedUp, onMove, onJump, onStartCharge, onReleaseCharge, onResetSleepTimer]);
-  
+
   return {
     isDragging,
     dragOffset,

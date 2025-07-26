@@ -1,4 +1,4 @@
-import type { 
+import type {
   NasaApodResponse,
   ApodImage,
   NasaApodParams,
@@ -33,7 +33,7 @@ class NasaApodService {
     if (!NASA_API_KEY || NASA_API_KEY === 'your_nasa_api_key_here') {
       logger.warn('NASA API key not configured. Using DEMO_KEY with limited requests per hour.', { component: 'NasaApodService', action: 'constructor' });
     }
-    
+
     // Load cache from localStorage
     this.loadCacheFromStorage();
   }
@@ -47,7 +47,7 @@ class NasaApodService {
       if (storedCache) {
         const parsed = JSON.parse(storedCache);
         const now = timeService.getTimestamp();
-        
+
         // Restore valid cache entries
         Object.entries(parsed).forEach(([key, value]: [string, unknown]) => {
           if (value && typeof value === 'object' && 'timestamp' in value && 'data' in value) {
@@ -83,7 +83,7 @@ class NasaApodService {
    */
   private transformApodResponse(response: NasaApodResponse): ApodImage {
     const id = response.date; // Use date as unique identifier
-    
+
     // Calculate aspect ratio if available (for layout optimization)
     let aspectRatio: number | undefined;
     if (response.media_type === 'image') {
@@ -112,12 +112,12 @@ class NasaApodService {
   private async throttleRequest(): Promise<void> {
     const now = timeService.getTimestamp();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     if (timeSinceLastRequest < this.minRequestInterval) {
       const waitTime = this.minRequestInterval - timeSinceLastRequest;
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
-    
+
     this.lastRequestTime = timeService.getTimestamp();
   }
 
@@ -129,7 +129,7 @@ class NasaApodService {
       const remaining = response.headers.get('X-RateLimit-Remaining');
       const limit = response.headers.get('X-RateLimit-Limit');
       const reset = response.headers.get('X-RateLimit-Reset');
-      
+
       if (remaining !== null) {
         this.rateLimitInfo.remaining = parseInt(remaining, 10);
       }
@@ -139,7 +139,7 @@ class NasaApodService {
       if (reset !== null) {
         this.rateLimitInfo.reset = parseInt(reset, 10) * 1000; // Convert to milliseconds
       }
-      
+
       // Log rate limit status
       if (this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null) {
         const percentage = (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100;
@@ -157,7 +157,7 @@ class NasaApodService {
    */
   private async makeNasaRequest(params: NasaApodParams = {}): Promise<Response> {
     const url = new URL(NASA_APOD_BASE);
-    
+
     // Add API key and merge with default params
     const allParams = {
       ...this.defaultParams,
@@ -193,13 +193,13 @@ class NasaApodService {
             } catch {
               errorMessage = `HTTP ${res.status}: ${res.statusText}`;
             }
-            
+
             throw new ApodServiceError(errorMessage, res.status);
           }
-          
+
           // Extract rate limit info from successful response
           this.extractRateLimitInfo(res);
-          
+
           return res;
         },
         {
@@ -243,13 +243,13 @@ class NasaApodService {
     if (!this.isValidDate(date)) {
       throw new ApodServiceError('Invalid date format. Use YYYY-MM-DD');
     }
-    
+
     if (!this.isDateInRange(date)) {
       throw new ApodServiceError(`Date must be between ${FIRST_APOD_DATE} and today`);
     }
 
     const cacheKey = `apod-${date}`;
-    
+
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -275,7 +275,7 @@ class NasaApodService {
           data: apodImage,
           timestamp: timeService.getTimestamp(),
         });
-        
+
         // Save cache to localStorage
         this.saveCacheToStorage();
 
@@ -310,11 +310,11 @@ class NasaApodService {
    */
   async getPreviousApod(currentDate: string): Promise<ApodImage> {
     const prevDate = this.addDays(currentDate, -1);
-    
+
     if (!this.isDateInRange(prevDate)) {
       throw new ApodServiceError('No previous APOD available');
     }
-    
+
     return this.getApodByDate(prevDate);
   }
 
@@ -324,11 +324,11 @@ class NasaApodService {
   async getNextApod(currentDate: string): Promise<ApodImage> {
     const nextDate = this.addDays(currentDate, 1);
     const today = dashboardContextService.getLocalDate();
-    
+
     if (nextDate > today) {
       throw new ApodServiceError('No future APOD available');
     }
-    
+
     return this.getApodByDate(nextDate);
   }
 
@@ -354,28 +354,28 @@ class NasaApodService {
    */
   async downloadApod(apod: ApodImage, useHD: boolean = false, filename?: string): Promise<void> {
     const imageUrl = useHD && apod.hdImageUrl ? apod.hdImageUrl : apod.imageUrl;
-    
+
     if (apod.mediaType !== 'image') {
       throw new ApodServiceError('Cannot download video content');
     }
 
     try {
       const response = await fetch(imageUrl);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.status}`);
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = filename || `nasa-apod-${apod.date}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       window.URL.revokeObjectURL(url);
     } catch (error) {
       throw new ApodServiceError(`Download failed: ${error}`);
@@ -398,13 +398,13 @@ class NasaApodService {
    */
   async copyApodLink(apod: ApodImage): Promise<boolean> {
     const shareData = this.getShareData(apod);
-    
+
     try {
       await navigator.clipboard.writeText(shareData.url);
       return true;
     } catch (error) {
       logger.warn('Clipboard write failed', { component: 'NasaApodService', action: 'copyToClipboard', metadata: { error } });
-      
+
       // Fallback: try to copy using execCommand
       try {
         const textArea = document.createElement('textarea');
@@ -426,7 +426,7 @@ class NasaApodService {
   private isValidDate(dateString: string): boolean {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateString)) return false;
-    
+
     const date = timeService.parseDate(dateString);
     return date !== null;
   }
@@ -439,7 +439,7 @@ class NasaApodService {
     if (!date) return false;
     const firstDate = timeService.parseDate(FIRST_APOD_DATE) || timeService.getCurrentDateTime();
     const today = timeService.getCurrentDateTime();
-    
+
     return date >= firstDate && date <= today;
   }
 
@@ -461,7 +461,7 @@ class NasaApodService {
     const timeDiff = today.getTime() - firstDate.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: calculating time difference
     const randomTime = Math.random() * timeDiff;
     const randomDate = timeService.fromTimestamp(firstDate.getTime() + randomTime); // eslint-disable-line no-restricted-syntax -- Valid use: calculating timestamp
-    
+
     return timeService.toISODateString(randomDate);
   }
 
@@ -499,7 +499,7 @@ class NasaApodService {
     const percentage = this.rateLimitInfo.remaining !== null && this.rateLimitInfo.limit !== null
       ? (this.rateLimitInfo.remaining / this.rateLimitInfo.limit) * 100
       : null;
-    
+
     return {
       remaining: this.rateLimitInfo.remaining,
       limit: this.rateLimitInfo.limit,
@@ -513,7 +513,7 @@ class NasaApodService {
    */
   async preloadAdjacentDates(currentDate: string): Promise<void> {
     const promises: Promise<ApodImage>[] = [];
-    
+
     // Preload previous day
     if (this.canNavigatePrevious(currentDate)) {
       const prevDate = this.addDays(currentDate, -1);
@@ -521,7 +521,7 @@ class NasaApodService {
         promises.push(this.getApodByDate(prevDate).catch(() => ({} as ApodImage)));
       }
     }
-    
+
     // Preload next day
     if (this.canNavigateNext(currentDate)) {
       const nextDate = this.addDays(currentDate, 1);
@@ -529,7 +529,7 @@ class NasaApodService {
         promises.push(this.getApodByDate(nextDate).catch(() => ({} as ApodImage)));
       }
     }
-    
+
     // Execute preloads in background (don't await)
     Promise.all(promises).catch(() => {
       // Silently handle preload failures

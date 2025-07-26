@@ -24,7 +24,7 @@ declare global {
       NODE_ENV: 'development' | 'production' | 'test';
     }
   }
-  
+
   interface Window {
     google?: typeof google;
   }

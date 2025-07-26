@@ -22,26 +22,26 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
     // Fetch the image
     const response = await fetch(image.url);
     const blob = await response.blob();
-    
+
     // Create object URL
     const blobUrl = URL.createObjectURL(blob);
-    
+
     // Generate filename
     const extension = image.url.split('.').pop()?.split('?')[0] || 'jpg';
     const safeTitle = image.title?.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'image';
     const dateStr = image.date || dashboardContextService.getLocalDate();
     const filename = `${filenamePrefix}-${dateStr}-${safeTitle}.${extension}`;
-    
+
     // Create download link
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = filename;
-    
+
     // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Cleanup
     URL.revokeObjectURL(blobUrl);
   } catch (error) {
@@ -53,7 +53,6 @@ export async function downloadImage(image: DownloadableImage, filenamePrefix: st
     throw new Error('Failed to download image. Please try again.');
   }
 }
-
 
 /**
  * Copies image URL to clipboard

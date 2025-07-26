@@ -1,6 +1,6 @@
 /**
  * CameraAdapter - Dashboard App Adapter for Camera/Photo Gallery
- * 
+ *
  * Provides unified access to camera photos for Virgil AI assistant,
  * enabling responses about saved photos, favorites, and storage usage.
  */
@@ -42,7 +42,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   readonly appName = 'camera';
   readonly displayName = 'Camera';
   readonly icon = '📸';
-  
+
   private photos: SavedPhoto[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -83,7 +83,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     const weekCount = this.photos.filter(p => p.timestamp >= weekStart.getTime()).length; // eslint-disable-line no-restricted-syntax
     const monthCount = this.photos.filter(p => p.timestamp >= monthStart.getTime()).length; // eslint-disable-line no-restricted-syntax
     const favorites = this.photos.filter(p => p.isFavorite);
-    
+
     // Get storage info
     const totalSize = this.photos.reduce((sum, photo) => sum + (photo.size || 0), 0);
     const maxSize = 50 * 1024 * 1024; // 50MB default
@@ -144,21 +144,21 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
   private generateSummary(data: CameraData): string {
     const parts: string[] = [];
-    
+
     if (data.photos.total === 0) {
       return 'No photos saved yet';
     }
 
     parts.push(`${data.photos.total} photos`);
-    
+
     if (data.photos.favorites > 0) {
       parts.push(`${data.photos.favorites} favorites`);
     }
-    
+
     if (data.stats.todayCount > 0) {
       parts.push(`${data.stats.todayCount} today`);
     }
-    
+
     parts.push(`${data.storage.usedMB}MB used`);
 
     return parts.join(', ');
@@ -167,7 +167,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -242,17 +242,17 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
     const mostRecent = data.photos.recent[0];
     const timeAgo = this.getTimeAgo(timeService.fromTimestamp(mostRecent.timestamp));
-    
+
     let response = `Your most recent photo was taken ${timeAgo}`;
-    
+
     if (mostRecent.name) {
       response += ` (named "${mostRecent.name}")`;
     }
-    
+
     if (mostRecent.isFavorite) {
       response += ' and is marked as a favorite';
     }
-    
+
     response += '.';
 
     if (data.photos.recent.length > 1) {
@@ -264,14 +264,14 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
   private getFavoritesResponse(): string {
     const favorites = this.photos.filter(p => p.isFavorite);
-    
+
     if (favorites.length === 0) {
       return "You haven't marked any photos as favorites yet. Tap the star icon on photos you love!";
     }
 
     const recent = favorites.slice(0, 3);
     let response = `You have ${favorites.length} favorite photo${favorites.length !== 1 ? 's' : ''}.`;
-    
+
     if (recent.length > 0) {
       response += ' Recent favorites:';
       recent.forEach(photo => {
@@ -295,7 +295,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     }
 
     let response = `Storage usage: ${data.storage.usedMB}MB of ${data.storage.maxMB}MB (${data.storage.usedPercentage}%)`;
-    
+
     if (data.storage.usedPercentage > 80) {
       response += '\n⚠️ Storage is getting full. Consider deleting old photos or exporting them.';
     } else if (data.storage.usedPercentage > 50) {
@@ -350,17 +350,17 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     }
 
     let response = `Camera gallery: ${data.photos.total} photos`;
-    
+
     if (data.photos.favorites > 0) {
       response += ` (${data.photos.favorites} favorites)`;
     }
-    
+
     response += `, ${data.storage.usedMB}MB used`;
-    
+
     if (data.stats.todayCount > 0) {
       response += `, ${data.stats.todayCount} taken today`;
     }
-    
+
     response += '.';
 
     return response;
@@ -372,18 +372,18 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
   async search(query: string): Promise<unknown[]> {
     await this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
     // Search by photo name or tags
     this.photos.forEach(photo => {
       let relevance = 0;
-      
+
       if (photo.name && photo.name.toLowerCase().includes(lowerQuery)) {
         relevance += 50;
       }
-      
+
       if (photo.tags) {
         photo.tags.forEach(tag => {
           if (tag.toLowerCase().includes(lowerQuery)) {
@@ -391,7 +391,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
           }
         });
       }
-      
+
       if (relevance > 0) {
         results.push({
           id: photo.id,
@@ -409,15 +409,15 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
   subscribe(callback: (data: CameraData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up periodic refresh
     const intervalId = setInterval(() => {
       this.refreshData();
     }, 30000); // Refresh every 30 seconds
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
@@ -437,9 +437,9 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
 
   getAggregateData(): AggregateableData[] {
     this.ensureFreshData();
-    
+
     const aggregateData: AggregateableData[] = [];
-    
+
     // Add photo count
     if (this.photos.length > 0) {
       aggregateData.push({
@@ -456,7 +456,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         },
       });
     }
-    
+
     return aggregateData;
   }
 }

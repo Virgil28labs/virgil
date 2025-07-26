@@ -86,7 +86,7 @@ class ToastService {
       export: '📁 Data exported successfully',
       clear: '🧹 All data cleared',
     };
-    
+
     this.success(messages[operation as keyof typeof messages] || `${operation} completed successfully`);
   }
 
@@ -105,11 +105,11 @@ class ToastService {
     };
 
     const baseMessage = baseMessages[operation as keyof typeof baseMessages] || `${operation} failed`;
-    
+
     // Provide user-friendly error context
     let message = baseMessage;
     const errorMessage = error?.message || '';
-    
+
     if (errorMessage.includes('quota')) {
       message += ' - Storage quota exceeded. Try clearing old data.';
     } else if (errorMessage.includes('transaction')) {

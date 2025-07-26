@@ -1,6 +1,6 @@
 /**
  * NasaApodAdapter - Dashboard App Adapter for NASA APOD
- * 
+ *
  * Provides unified access to NASA Astronomy Picture of the Day favorites
  * for Virgil AI assistant, enabling responses about space images and astronomy.
  */
@@ -46,7 +46,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
   readonly appName = 'nasa';
   readonly displayName = 'NASA APOD';
   readonly icon = '🚀';
-  
+
   private favorites: StoredApod[] = [];
   private lastFetchTime = 0;
   private readonly CACHE_DURATION = 5000; // 5 seconds
@@ -86,32 +86,32 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   getContextData(): AppContextData<NasaApodData> {
     this.ensureFreshData();
-    
+
     // Count media types
     const imageCount = this.favorites.filter(f => f.mediaType === 'image').length;
     const videoCount = this.favorites.filter(f => f.mediaType === 'video').length;
     const copyrightedCount = this.favorites.filter(f => f.copyright).length;
-    
+
     // Calculate date range
     let oldestFavorite: Date | undefined;
     let newestFavorite: Date | undefined;
     let monthsSpanned = 0;
-    
+
     if (this.favorites.length > 0) {
       const dates = this.favorites.map(f => timeService.parseDate(f.date) || timeService.getCurrentDateTime());
       const minTimestamp = Math.min(...dates.map(d => d.getTime())); // eslint-disable-line no-restricted-syntax
       const maxTimestamp = Math.max(...dates.map(d => d.getTime())); // eslint-disable-line no-restricted-syntax
       oldestFavorite = timeService.fromTimestamp(minTimestamp);
       newestFavorite = timeService.fromTimestamp(maxTimestamp);
-      
+
       // Calculate months spanned
       const diffTime = newestFavorite.getTime() - oldestFavorite.getTime(); // eslint-disable-line no-restricted-syntax
       monthsSpanned = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30));
     }
-    
+
     // Extract popular topics from titles and explanations
     const popularTopics = this.extractPopularTopics();
-    
+
     // Get recent favorites
     const recentFavorites = this.favorites.slice(0, 10).map(fav => ({
       id: fav.id,
@@ -159,15 +159,15 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   private extractPopularTopics(): string[] {
     if (this.favorites.length === 0) return [];
-    
+
     const topicCounts: { [topic: string]: number } = {};
     const keywords = [
-      'galaxy', 'nebula', 'planet', 'moon', 'sun', 'star', 'comet', 
+      'galaxy', 'nebula', 'planet', 'moon', 'sun', 'star', 'comet',
       'asteroid', 'mars', 'jupiter', 'saturn', 'hubble', 'webb',
       'black hole', 'supernova', 'eclipse', 'aurora', 'milky way',
       'iss', 'spacecraft', 'meteor',
     ];
-    
+
     this.favorites.forEach(fav => {
       const text = (fav.title + ' ' + fav.explanation).toLowerCase();
       keywords.forEach(keyword => {
@@ -176,7 +176,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         }
       });
     });
-    
+
     // Return top 5 topics
     return Object.entries(topicCounts)
       .sort(([, a], [, b]) => b - a)
@@ -191,11 +191,11 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
     const parts: string[] = [];
     parts.push(`${data.favorites.total} space favorites`);
-    
+
     if (data.favorites.videos > 0) {
       parts.push(`${data.favorites.images} images, ${data.favorites.videos} videos`);
     }
-    
+
     if (data.stats.popularTopics.length > 0) {
       parts.push(`featuring ${data.stats.popularTopics[0]}`);
     }
@@ -206,7 +206,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
   canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-    
+
     return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
@@ -269,11 +269,11 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     }
 
     let response = `You have ${data.favorites.total} NASA APOD favorite${data.favorites.total !== 1 ? 's' : ''}`;
-    
+
     if (data.favorites.videos > 0) {
       response += ` (${data.favorites.images} image${data.favorites.images !== 1 ? 's' : ''} and ${data.favorites.videos} video${data.favorites.videos !== 1 ? 's' : ''})`;
     }
-    
+
     response += '.';
 
     if (data.stats.monthsSpanned > 12) {
@@ -294,9 +294,9 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     const recent = data.favorites.recent[0];
     const date = timeService.parseDate(recent.date) || timeService.getCurrentDateTime();
     const timeAgo = this.getTimeAgo(timeService.fromTimestamp(recent.savedAt));
-    
+
     let response = `Your most recent space favorite is "${recent.title}" from ${timeService.formatDateToLocal(date)}, saved ${timeAgo}.`;
-    
+
     if (data.favorites.recent.length > 1) {
       response += ' Recent favorites include:';
       data.favorites.recent.slice(0, 3).forEach(fav => {
@@ -309,8 +309,8 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   private getTopicResponse(topic: string): string {
     this.ensureFreshData();
-    
-    const matchingFavorites = this.favorites.filter(fav => 
+
+    const matchingFavorites = this.favorites.filter(fav =>
       (fav.title + ' ' + fav.explanation).toLowerCase().includes(topic.toLowerCase()),
     );
 
@@ -319,7 +319,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     }
 
     let response = `You have ${matchingFavorites.length} ${topic}-related favorite${matchingFavorites.length !== 1 ? 's' : ''}`;
-    
+
     if (matchingFavorites.length <= 3) {
       response += ':';
       matchingFavorites.forEach(fav => {
@@ -346,10 +346,10 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
     const oldest = this.favorites[this.favorites.length - 1];
     const date = timeService.parseDate(oldest.date) || timeService.getCurrentDateTime();
-    
+
     return `Your oldest NASA APOD favorite is "${oldest.title}" from ${timeService.formatDateToLocal(date)}. ${
-      data.stats.monthsSpanned > 6 
-        ? `You've been collecting space images for over ${data.stats.monthsSpanned} months!` 
+      data.stats.monthsSpanned > 6
+        ? `You've been collecting space images for over ${data.stats.monthsSpanned} months!`
         : ''
     }`;
   }
@@ -364,7 +364,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
     const videoFavorites = this.favorites.filter(f => f.mediaType === 'video');
     let response = `You have ${data.favorites.videos} space video${data.favorites.videos !== 1 ? 's' : ''} saved`;
-    
+
     if (videoFavorites.length <= 3) {
       response += ':';
       videoFavorites.forEach(fav => {
@@ -386,15 +386,15 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     }
 
     let response = `NASA APOD: ${data.favorites.total} space favorites`;
-    
+
     if (data.stats.popularTopics.length > 0) {
       response += ` featuring ${data.stats.popularTopics.slice(0, 2).join(', ')}`;
     }
-    
+
     if (data.stats.monthsSpanned > 0) {
       response += `, collected over ${data.stats.monthsSpanned} month${data.stats.monthsSpanned !== 1 ? 's' : ''}`;
     }
-    
+
     response += '.';
 
     return response;
@@ -406,22 +406,22 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   async search(query: string): Promise<unknown[]> {
     this.ensureFreshData();
-    
+
     const lowerQuery = query.toLowerCase();
     const results: unknown[] = [];
 
     // Search in titles and explanations
     this.favorites.forEach(fav => {
       let relevance = 0;
-      
+
       if (fav.title.toLowerCase().includes(lowerQuery)) {
         relevance += 100;
       }
-      
+
       if (fav.explanation.toLowerCase().includes(lowerQuery)) {
         relevance += 50;
       }
-      
+
       if (relevance > 0) {
         results.push({
           id: fav.id,
@@ -439,19 +439,19 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   subscribe(callback: (data: NasaApodData) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Send initial data
     callback(this.getContextData().data);
-    
+
     // Set up storage listener
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === this.STORAGE_KEY) {
         this.refreshData();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
@@ -471,13 +471,13 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
 
   getAggregateData(): AggregateableData[] {
     this.ensureFreshData();
-    
+
     const aggregateData: AggregateableData[] = [];
-    
+
     // Add space images/videos
     const imageCount = this.favorites.filter(f => f.mediaType === 'image').length;
     const videoCount = this.favorites.filter(f => f.mediaType === 'video').length;
-    
+
     if (imageCount > 0) {
       aggregateData.push({
         type: 'image',
@@ -489,7 +489,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         },
       });
     }
-    
+
     if (videoCount > 0) {
       aggregateData.push({
         type: 'video',
@@ -501,7 +501,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         },
       });
     }
-    
+
     return aggregateData;
   }
 }

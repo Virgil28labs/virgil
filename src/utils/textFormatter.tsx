@@ -22,7 +22,7 @@ export function formatText(text: string): React.ReactNode[] {
 
   // Split text by paragraphs for better structure
   const paragraphs = text.split(/\n\s*\n/);
-  
+
   paragraphs.forEach((paragraph, paragraphIndex) => {
     if (paragraph.trim() === '') return;
 
@@ -124,7 +124,7 @@ function formatInlineElements(text: string): React.ReactNode[] {
 
   // Reset the regex lastIndex to ensure it works correctly with global flag
   COMBINED_INLINE_PATTERN.lastIndex = 0;
-  
+
   let match;
   while ((match = COMBINED_INLINE_PATTERN.exec(text)) !== null) {
     // Add text before the match
@@ -136,7 +136,7 @@ function formatInlineElements(text: string): React.ReactNode[] {
     }
 
     const fullMatch = match[0];
-    
+
     // Keyboard shortcut
     if (match[1]) {
       const cleanShortcut = fullMatch.replace(/\*\*/g, '').trim();

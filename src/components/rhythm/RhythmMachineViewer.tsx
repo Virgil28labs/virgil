@@ -4,10 +4,10 @@ import { rhythmService } from '../../services/rhythm/RhythmService';
 import type { RhythmPattern } from '../../services/rhythm/RhythmService';
 import { timeService } from '../../services/TimeService';
 import { logger } from '../../lib/logger';
-import { 
-  DRUM_SOUNDS, 
-  GENRE_TAGS, 
-  DEFAULT_BPM, 
+import {
+  DRUM_SOUNDS,
+  GENRE_TAGS,
+  DEFAULT_BPM,
   BAR_LENGTHS,
   DrumType,
   type DrumSound,
@@ -20,12 +20,12 @@ interface RhythmMachineViewerProps {
 }
 
 // Helper to create empty pattern
-const createEmptyPattern = (steps: number): boolean[][] => 
+const createEmptyPattern = (steps: number): boolean[][] =>
   Array(DRUM_SOUNDS.length).fill(null).map(() => Array(steps).fill(false));
 
-export const RhythmMachineViewer = memo(function RhythmMachineViewer({ 
-  isOpen, 
-  onClose, 
+export const RhythmMachineViewer = memo(function RhythmMachineViewer({
+  isOpen,
+  onClose,
 }: RhythmMachineViewerProps) {
   const [selectedBarLength, setSelectedBarLength] = useState(1); // Default to 2 bars (8 steps)
   const currentBarLength = BAR_LENGTHS[selectedBarLength];
@@ -41,7 +41,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [audioInitialized, setAudioInitialized] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // Get abbreviation for beat category
   const getCategoryAbbreviation = (category?: string, description?: string): string => {
     if (category) {
@@ -53,7 +53,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         case 'minimal': return 'MIN';
       }
     }
-    
+
     // If no category, try to infer from description
     if (description) {
       const desc = description.toLowerCase();
@@ -66,10 +66,10 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       if (desc.includes('jazz')) return 'JAZ';
       if (desc.includes('afro')) return 'AFR';
     }
-    
+
     return 'MIX';
   };
-  
+
   const [saveSlots, setSaveSlots] = useState<(SavedPattern | null)[]>(() => {
     const saved = localStorage.getItem('rhythmMachineSaveSlots');
     if (saved) {
@@ -82,7 +82,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     }
     return [null, null, null, null, null];
   });
-  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const intervalRef = useRef<number | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -96,16 +96,16 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         gainNodeRef.current = audioContextRef.current.createGain();
         gainNodeRef.current.connect(audioContextRef.current.destination);
         gainNodeRef.current.gain.value = volume;
-        
+
         // Check audio context state
-        
+
         // Resume audio context if suspended
         if (audioContextRef.current.state === 'suspended') {
           // Resume suspended audio context
           await audioContextRef.current.resume();
           // Audio context resumed successfully
         }
-        
+
         setAudioInitialized(true);
         // Audio initialization successful
       } catch (error) {
@@ -135,19 +135,19 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
   // Create drum sound with Web Audio API - Simple synthesis matching original
   const createDrumSound = useCallback(async (sound: DrumSound) => {
     await handleUserInteraction();
-    
+
     const ctx = audioContextRef.current;
     if (!ctx || !gainNodeRef.current) return;
-    
+
     const now = ctx.currentTime;
 
     try {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      
+
       // Configure sound based on drum type - matching original exactly
       switch (sound.type) {
         case DrumType.KICK:
@@ -158,7 +158,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           osc.start(now);
           osc.stop(now + 0.5);
           break;
-          
+
         case DrumType.SNARE: {
           // Noise for snare
           const noise = ctx.createBufferSource();
@@ -168,26 +168,26 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
             noiseData[i] = Math.random() * 2 - 1;
           }
           noise.buffer = noiseBuffer;
-          
+
           const noiseGain = ctx.createGain();
           noise.connect(noiseGain);
           noiseGain.connect(ctx.destination);
           noiseGain.gain.setValueAtTime(0.2, now);
           noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-          
+
           // Tone for snare
           osc.frequency.setValueAtTime(200, now);
           osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
           gain.gain.setValueAtTime(0.3, now);
           gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-          
+
           osc.start(now);
           osc.stop(now + 0.2);
           noise.start(now);
           noise.stop(now + 0.2);
           break;
         }
-          
+
         case DrumType.HIHAT:
           osc.type = 'square';
           osc.frequency.value = 800;
@@ -196,7 +196,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           osc.start(now);
           osc.stop(now + 0.05);
           break;
-          
+
         case DrumType.OPENHAT:
           osc.type = 'square';
           osc.frequency.value = 800;
@@ -205,7 +205,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           osc.start(now);
           osc.stop(now + 0.3);
           break;
-          
+
         case DrumType.CLAP: {
           // Clap noise
           const clapNoise = ctx.createBufferSource();
@@ -215,19 +215,19 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
             clapData[i] = Math.random() * 2 - 1;
           }
           clapNoise.buffer = clapBuffer;
-          
+
           const clapGain = ctx.createGain();
           clapNoise.connect(clapGain);
           clapGain.connect(ctx.destination);
           clapGain.gain.setValueAtTime(0.3, now);
           clapGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-          
+
           clapNoise.start(now);
           clapNoise.stop(now + 0.1);
           break;
         }
       }
-      
+
     } catch (error) {
       logger.error(`Failed to create ${sound.name} sound`, error as Error, {
         component: 'RhythmMachineViewer',
@@ -251,7 +251,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     if (!audioInitialized) {
       await initializeAudio();
     }
-    
+
     if (isPlaying) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -288,7 +288,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
 
   // Generate random pattern
   const generatePattern = useCallback(() => {
-    const newPattern = DRUM_SOUNDS.map(() => 
+    const newPattern = DRUM_SOUNDS.map(() =>
       Array(currentBarLength.steps).fill(false).map(() => Math.random() > 0.7),
     );
     setPattern(newPattern);
@@ -297,9 +297,9 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
   // Generate AI-powered pattern using LLM
   const generateAIPattern = useCallback(async () => {
     if (isGenerating) return;
-    
+
     setIsGenerating(true);
-    
+
     try {
       // If input is empty, generate random beat
       let description = genreInput.trim();
@@ -314,24 +314,24 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         description = randomDescriptions[Math.floor(Math.random() * randomDescriptions.length)];
         setGenreInput(description);
       }
-      
+
       const result: RhythmPattern = await rhythmService.generatePattern({
         description,
         barLength: currentBarLength.steps,
         style: '',
         temperature: 0.7,
       });
-      
+
       // Process generated pattern
-      
+
       if (result.pattern && Array.isArray(result.pattern) && result.pattern.length === 5) {
         setPattern(result.pattern);
-        
+
         // Log the category if available
         if (result.category) {
           // Using category from result
         }
-        
+
         // Show feedback if using fallback
         if (result.fallback) {
           // Using fallback pattern generation
@@ -339,14 +339,14 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       } else {
         throw new Error('Invalid pattern structure received');
       }
-      
+
     } catch (error) {
       logger.error('Pattern generation failed', error as Error, {
         component: 'RhythmMachineViewer',
         action: 'generateAIPattern',
         description: genreInput.trim() || 'random',
       });
-      
+
       // Fallback pattern generation is handled by the backend
     } finally {
       setIsGenerating(false);
@@ -388,7 +388,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         genreInput.toLowerCase().includes('trap') ? 'trap' :
           genreInput.toLowerCase().includes('break') ? 'breakbeat' :
             genreInput.toLowerCase().includes('minimal') ? 'minimal' : undefined;
-    
+
     newSlots[slotIndex] = {
       pattern: JSON.parse(JSON.stringify(pattern)),
       description: genreInput,
@@ -423,10 +423,10 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if user is typing in an input field
       const activeElement = document.activeElement;
-      const isTyping = activeElement?.tagName === 'INPUT' || 
-                       activeElement?.tagName === 'TEXTAREA' || 
+      const isTyping = activeElement?.tagName === 'INPUT' ||
+                       activeElement?.tagName === 'TEXTAREA' ||
                        activeElement?.getAttribute('contenteditable') === 'true';
-      
+
       if (e.key === 'Escape') {
         onClose();
       } else if (e.key === ' ' && !isTyping) {
@@ -505,15 +505,15 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="rhythm-machine-backdrop" 
+    <div
+      className="rhythm-machine-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Rhythm Machine - AI-powered drum sequencer"
     >
-      <div 
-        className="rhythm-machine-panel" 
+      <div
+        className="rhythm-machine-panel"
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
@@ -524,8 +524,8 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               Rhythm Machine
             </h2>
           </div>
-          <button 
-            className="rhythm-machine-close" 
+          <button
+            className="rhythm-machine-close"
             onClick={onClose}
             aria-label="Close rhythm machine"
           >
@@ -551,7 +551,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               className="rhythm-machine-genre-input"
               placeholder="Enter genre or style..."
             />
-            <button 
+            <button
               className={`rhythm-machine-generate ${audioInitialized ? 'ready' : 'pending'} ${isGenerating ? 'generating' : ''}`}
               onClick={handleGenerateClick}
               disabled={isGenerating}
@@ -579,7 +579,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
 
           {/* Transport Controls */}
           <div className="rhythm-machine-transport">
-            <button 
+            <button
               className={`rhythm-machine-play ${isPlaying ? 'playing' : ''}`}
               onClick={handlePlaybackClick}
               aria-label={isPlaying ? 'Stop playback' : 'Start playback'}
@@ -587,7 +587,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               <span>{isPlaying ? '⏸️' : '▶️'}</span>
               {isPlaying ? 'Stop' : 'Play'}
             </button>
-            <button 
+            <button
               className="rhythm-machine-stop"
               onClick={async () => {
                 await handleUserInteraction();
@@ -602,7 +602,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               <span>⏹️</span>
               Stop
             </button>
-            <button 
+            <button
               className="rhythm-machine-clear"
               onClick={async () => {
                 await handleUserInteraction();

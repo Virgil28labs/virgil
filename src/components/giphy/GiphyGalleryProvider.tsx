@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { createContext, useReducer, useCallback, useEffect, memo } from 'react';
 import { giphyService } from '../../lib/giphyService';
-import type { 
-  GiphyContextType, 
-  GiphyState, 
-  GiphyAction, 
+import type {
+  GiphyContextType,
+  GiphyState,
+  GiphyAction,
   GiphyImage,
 } from '../../types';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
@@ -28,65 +28,65 @@ function giphyGalleryReducer(state: GiphyState, action: GiphyAction): GiphyState
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload, loading: 'error' };
-    
+
     case 'SET_SEARCH_RESULTS':
-      return { 
-        ...state, 
-        searchResults: action.payload, 
+      return {
+        ...state,
+        searchResults: action.payload,
         loading: 'success',
         error: null,
-        offset: 0, 
+        offset: 0,
       };
-    
+
     case 'APPEND_SEARCH_RESULTS':
-      return { 
-        ...state, 
+      return {
+        ...state,
         searchResults: [...state.searchResults, ...action.payload],
         loading: 'success',
         error: null,
         offset: state.offset + action.payload.length,
       };
-    
+
     case 'SET_TRENDING_GIFS':
-      return { 
-        ...state, 
-        trendingGifs: action.payload, 
+      return {
+        ...state,
+        trendingGifs: action.payload,
         loading: 'success',
-        error: null, 
+        error: null,
       };
-    
+
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
-    
+
     case 'SET_CURRENT_TAB':
       return { ...state, currentTab: action.payload };
-    
+
     case 'SET_RATING':
       return { ...state, rating: action.payload };
-    
+
     case 'SET_HAS_MORE':
       return { ...state, hasMore: action.payload };
-    
+
     case 'TOGGLE_FAVORITE': {
       const gif = action.payload;
       const isCurrentlyFavorited = state.favorites.some(fav => fav.id === gif.id);
-      
+
       const newFavorites = isCurrentlyFavorited
         ? state.favorites.filter(fav => fav.id !== gif.id)
         : [...state.favorites, gif];
-      
+
       return { ...state, favorites: newFavorites };
     }
-    
+
     case 'SET_FAVORITES':
       return { ...state, favorites: action.payload };
-    
+
     case 'CLEAR_ERROR':
       return { ...state, error: null };
-    
+
     default:
       return state;
   }
@@ -122,14 +122,14 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
   const loadTrending = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: 'loading' });
-      
+
       const result = await giphyService.getTrendingGifs({
         limit: 50,
         rating: state.rating,
       });
-      
+
       dispatch({ type: 'SET_TRENDING_GIFS', payload: result.gifs });
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load trending GIFs';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
@@ -157,7 +157,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
 
     try {
       dispatch({ type: 'SET_LOADING', payload: 'loading' });
-      
+
       const offset = loadMore ? state.offset : 0;
       const searchParams = {
         q: query.trim(),
@@ -167,15 +167,15 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
       };
 
       const result = await giphyService.searchGifs(searchParams);
-      
+
       if (loadMore) {
         dispatch({ type: 'APPEND_SEARCH_RESULTS', payload: result.gifs });
       } else {
         dispatch({ type: 'SET_SEARCH_RESULTS', payload: result.gifs });
       }
-      
+
       dispatch({ type: 'SET_HAS_MORE', payload: result.hasMore });
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to search GIFs';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
@@ -185,7 +185,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
   // Load more results (for infinite scroll)
   const loadMore = useCallback(async () => {
     if (!state.hasMore || state.loading === 'loading') return;
-    
+
     if (state.currentTab === 'search' && state.searchQuery) {
       await search(state.searchQuery, true);
     }
@@ -209,7 +209,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
   // Set current tab
   const setCurrentTab = useCallback((tab: 'search' | 'trending' | 'favorites') => {
     dispatch({ type: 'SET_CURRENT_TAB', payload: tab });
-    
+
     // Load data for the selected tab if needed
     if (tab === 'trending' && state.trendingGifs.length === 0) {
       loadTrending();
@@ -219,7 +219,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
   // Set content rating filter
   const setRating = useCallback((rating: 'g' | 'pg' | 'pg-13' | 'r') => {
     dispatch({ type: 'SET_RATING', payload: rating });
-    
+
     // Reload current data with new rating
     if (state.currentTab === 'trending') {
       loadTrending();
@@ -245,7 +245,7 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
     loading: state.loading,
     error: state.error,
     hasMore: state.hasMore,
-    
+
     // Actions
     search,
     loadTrending,

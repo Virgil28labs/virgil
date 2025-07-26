@@ -1,6 +1,6 @@
 /**
  * ChatService - Handles chat API communication and message processing
- * 
+ *
  * Extracted from VirgilChatbot to improve testability and separation of concerns
  */
 
@@ -63,9 +63,9 @@ export class ChatService {
     // Prepare API messages
     const apiMessages = [
       { role: 'system', content: systemPrompt },
-      ...previousMessages.map((msg) => ({ 
-        role: msg.role, 
-        content: msg.content, 
+      ...previousMessages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
       })),
       { role: 'user', content: userMessage },
     ];
@@ -94,15 +94,15 @@ export class ChatService {
       }
 
       const data = await response.json() as ChatApiResponse;
-      
+
       if (!data.success || !data.message) {
         throw new Error('Invalid response from chat service');
       }
 
       return this.createAssistantMessage(data.message.content);
     } catch (error) {
-      logger.error('Failed to send chat message', error as Error, { 
-        component: 'ChatService', 
+      logger.error('Failed to send chat message', error as Error, {
+        component: 'ChatService',
         action: 'sendMessage',
         metadata: { model, messageLength: userMessage.length },
       });

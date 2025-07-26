@@ -1,6 +1,6 @@
 /**
  * DynamicContextBuilder - Intelligent Context Enhancement for AI Prompts
- * 
+ *
  * Analyzes user queries and dynamically selects the most relevant context
  * to enhance AI responses with environmental awareness.
  */
@@ -11,7 +11,7 @@ import { timeService } from './TimeService';
 
 export interface ContextRelevance {
   timeContext: number;      // 0-1 relevance score
-  locationContext: number;  // 0-1 relevance score  
+  locationContext: number;  // 0-1 relevance score
   weatherContext: number;   // 0-1 relevance score
   userContext: number;      // 0-1 relevance score
   activityContext: number;  // 0-1 relevance score
@@ -89,17 +89,17 @@ export class DynamicContextBuilder {
   }
 
   private static calculateKeywordRelevance(words: string[], keywords: string[]): number {
-    const matches = words.filter(word => 
+    const matches = words.filter(word =>
       keywords.some(keyword => word.includes(keyword) || keyword.includes(word)),
     );
-    
+
     // Base score from keyword matches
     let score = Math.min(matches.length / words.length, 1.0);
-    
+
     // Boost score for exact matches
     const exactMatches = words.filter(word => keywords.includes(word));
     score += (exactMatches.length * 0.2);
-    
+
     return Math.min(score, 1.0);
   }
 
@@ -133,7 +133,7 @@ export class DynamicContextBuilder {
       }
     }
 
-    // Weather context  
+    // Weather context
     if (relevanceScores.weatherContext > 0.2 && context.weather.hasData) {
       contextSections.push(this.buildWeatherContext(context));
       contextUsed.push('weather');
@@ -227,76 +227,76 @@ export class DynamicContextBuilder {
   private static buildTimeContext(context: DashboardContext): string {
     let timeContext = `Time: ${context.currentTime} on ${context.currentDate} (${context.dayOfWeek})`;
     timeContext += `\nTime of day: ${context.timeOfDay}`;
-    
+
     if (context.location.timezone) {
       timeContext += `\nTimezone: ${context.location.timezone}`;
     }
-    
+
     return timeContext;
   }
 
   private static buildLocationContext(context: DashboardContext): string {
     let locationContext = '';
-    
+
     if (context.location.city) {
       locationContext += `Location: ${context.location.city}`;
       if (context.location.region) locationContext += `, ${context.location.region}`;
       if (context.location.country) locationContext += `, ${context.location.country}`;
     }
-    
+
     if (context.location.address) {
       locationContext += `\nAddress: ${context.location.address}`;
     }
-    
+
     if (context.location.ipAddress) {
       locationContext += `\nIP Address: ${context.location.ipAddress}`;
       if (context.location.isp) {
         locationContext += ` (${context.location.isp})`;
       }
     }
-    
+
     if (context.location.postal) {
       locationContext += `\nPostal Code: ${context.location.postal}`;
     }
-    
+
     if (context.location.coordinates) {
       const { latitude, longitude, accuracy } = context.location.coordinates;
       locationContext += `\nCoordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (±${Math.round(accuracy)}m)`;
     }
-    
+
     return locationContext;
   }
 
   private static buildWeatherContext(context: DashboardContext): string {
     const weather = context.weather;
     let weatherContext = '';
-    
+
     if (weather.temperature !== undefined) {
       weatherContext += `Weather: ${weather.temperature}°${weather.unit === 'fahrenheit' ? 'F' : 'C'}`;
       if (weather.feelsLike) {
         weatherContext += ` (feels like ${weather.feelsLike}°${weather.unit === 'fahrenheit' ? 'F' : 'C'})`;
       }
     }
-    
+
     if (weather.description) {
       weatherContext += `\nConditions: ${weather.description}`;
     }
-    
+
     if (weather.humidity) {
       weatherContext += `\nHumidity: ${weather.humidity}%`;
     }
-    
+
     if (weather.windSpeed) {
       weatherContext += `\nWind: ${weather.windSpeed} mph`;
     }
-    
+
     return weatherContext;
   }
 
   private static buildUserContext(context: DashboardContext): string {
     const user = context.user;
     let userContext = '';
-    
+
     // Name
     if (user.profile?.fullName || user.profile?.nickname || user.name) {
       const displayName = user.profile?.nickname || user.profile?.fullName || user.name;
@@ -305,16 +305,16 @@ export class DynamicContextBuilder {
         userContext += ` (ID: ${user.profile.uniqueId})`;
       }
     }
-    
+
     // Contact info
     if (user.profile?.email || user.email) {
       userContext += `\nEmail: ${user.profile?.email || user.email}`;
     }
-    
+
     if (user.profile?.phone) {
       userContext += `\nPhone: ${user.profile.phone}`;
     }
-    
+
     // Personal info
     if (user.profile?.dateOfBirth) {
       const birthDate = timeService.parseDate(user.profile.dateOfBirth);
@@ -323,15 +323,15 @@ export class DynamicContextBuilder {
         userContext += `\nAge: ${age} years old`;
       }
     }
-    
+
     if (user.profile?.gender) {
       userContext += `\nGender: ${user.profile.gender}`;
     }
-    
+
     if (user.profile?.maritalStatus) {
       userContext += `\nMarital Status: ${user.profile.maritalStatus}`;
     }
-    
+
     // Address
     if (user.profile?.address && (user.profile.address.street || user.profile.address.city)) {
       const addr = user.profile.address;
@@ -342,78 +342,78 @@ export class DynamicContextBuilder {
         if (addr.state) userContext += `, ${addr.state}`;
       }
     }
-    
+
     if (user.memberSince) {
       userContext += `\nMember since: ${user.memberSince}`;
     }
-    
+
     const sessionTime = Math.floor(context.activity.timeSpentInSession / 1000 / 60);
     userContext += `\nSession time: ${sessionTime} minutes`;
-    
+
     return userContext;
   }
 
   private static buildActivityContext(context: DashboardContext): string {
     const activity = context.activity;
     let activityContext = '';
-    
+
     if (activity.activeComponents.length > 0) {
       activityContext += `Active features: ${activity.activeComponents.join(', ')}`;
     }
-    
+
     if (activity.recentActions.length > 0) {
       const recentActions = activity.recentActions.slice(-3).join(', ');
       activityContext += `\nRecent actions: ${recentActions}`;
     }
-    
+
     return activityContext;
   }
 
   private static buildDeviceContext(context: DashboardContext): string {
     const device = context.device;
     let deviceContext = '';
-    
+
     if (device.browser) {
       deviceContext += `Browser: ${device.browser}`;
     }
-    
+
     if (device.os) {
       deviceContext += `\nOperating System: ${device.os}`;
     }
-    
+
     if (device.device) {
       deviceContext += `\nDevice: ${device.device}`;
     }
-    
+
     if (device.screen) {
       deviceContext += `\nScreen Resolution: ${device.screen}`;
       if (device.pixelRatio && device.pixelRatio > 1) {
         deviceContext += ` @${device.pixelRatio}x`;
       }
     }
-    
+
     if (device.cpu) {
       deviceContext += `\nCPU: ${device.cpu}${typeof device.cpu === 'number' ? ' cores' : ''}`;
     }
-    
+
     if (device.memory) {
       deviceContext += `\nMemory: ${device.memory}`;
     }
-    
+
     if (device.networkType) {
       deviceContext += `\nNetwork: ${device.networkType}`;
       if (device.downlink) {
         deviceContext += ` (${device.downlink})`;
       }
     }
-    
+
     if (device.batteryLevel !== null && device.batteryLevel !== undefined) {
       deviceContext += `\nBattery: ${device.batteryLevel}%`;
       if (device.batteryCharging !== null) {
         deviceContext += device.batteryCharging ? ' (charging)' : ' (not charging)';
       }
     }
-    
+
     return deviceContext;
   }
 
@@ -432,7 +432,7 @@ export class DynamicContextBuilder {
         if (trigger.startsWith('device:') && relevanceScores.deviceContext > 0.2) return true;
         return false;
       });
-      
+
       return hasRelevantTrigger || suggestion.priority === 'high';
     });
   }
@@ -442,15 +442,15 @@ export class DynamicContextBuilder {
    */
   static createContextSummary(context: DashboardContext): string {
     const summary: string[] = [];
-    
+
     // Add time context
     summary.push(`${context.timeOfDay} on ${context.dayOfWeek}`);
-    
+
     // Add location if available
     if (context.location.city) {
       summary.push(`in ${context.location.city}`);
     }
-    
+
     // Add weather if notable
     if (context.weather.hasData && context.weather.temperature !== undefined) {
       const temp = context.weather.temperature;
@@ -458,12 +458,12 @@ export class DynamicContextBuilder {
         summary.push(`${temp}°${context.weather.unit === 'fahrenheit' ? 'F' : 'C'} weather`);
       }
     }
-    
+
     // Add activity context
     if (context.activity.activeComponents.length > 0) {
       summary.push(`using ${context.activity.activeComponents.join(', ')}`);
     }
-    
+
     return `Context: ${summary.join(', ')}`;
   }
 }

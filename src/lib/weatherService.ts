@@ -18,7 +18,7 @@ class WeatherService {
    */
   async getWeatherByCoordinates(lat: number, lon: number): Promise<WeatherData> {
     const cacheKey = `weather-${lat.toFixed(2)}-${lon.toFixed(2)}`;
-    
+
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -48,7 +48,7 @@ class WeatherService {
             }
             throw new Error(errorText);
           }
-          
+
           return res;
         },
         {
@@ -61,7 +61,7 @@ class WeatherService {
       );
 
       const result = await response.json();
-      
+
       if (!result.success || !result.data) {
         throw new Error('Invalid weather response');
       }
@@ -91,7 +91,7 @@ class WeatherService {
   async getWeatherByCity(city: string, country?: string): Promise<WeatherData> {
     const location = country ? `${city},${country}` : city;
     const cacheKey = `weather-city-${location.toLowerCase()}`;
-    
+
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -103,9 +103,9 @@ class WeatherService {
       if (country) {
         params.append('country', country);
       }
-      
+
       const url = `${BACKEND_API_BASE}/weather?${params.toString()}`;
-        
+
       const response = await dedupeFetch(url, {
         method: 'GET',
         headers: {
@@ -118,7 +118,7 @@ class WeatherService {
       }
 
       const result = await response.json();
-      
+
       if (!result.success || !result.data) {
         throw new Error('Invalid weather response');
       }
@@ -142,13 +142,12 @@ class WeatherService {
     }
   }
 
-
   /**
    * Get weather forecast by coordinates
    */
   async getForecastByCoordinates(lat: number, lon: number): Promise<ForecastData> {
     const cacheKey = `forecast-${lat.toFixed(2)}-${lon.toFixed(2)}`;
-    
+
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -178,7 +177,7 @@ class WeatherService {
             }
             throw new Error(errorText);
           }
-          
+
           return res;
         },
         {
@@ -191,7 +190,7 @@ class WeatherService {
       );
 
       const result = await response.json();
-      
+
       if (!result.success || !result.data) {
         throw new Error('Invalid forecast response');
       }
@@ -221,7 +220,7 @@ class WeatherService {
   async getForecastByCity(city: string, country?: string): Promise<ForecastData> {
     const location = country ? `${city},${country}` : city;
     const cacheKey = `forecast-city-${location.toLowerCase()}`;
-    
+
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
     if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
@@ -233,9 +232,9 @@ class WeatherService {
       if (country) {
         params.append('country', country);
       }
-      
+
       const url = `${BACKEND_API_BASE}/weather/forecast?${params.toString()}`;
-        
+
       const response = await dedupeFetch(url, {
         method: 'GET',
         headers: {
@@ -248,7 +247,7 @@ class WeatherService {
       }
 
       const result = await response.json();
-      
+
       if (!result.success || !result.data) {
         throw new Error('Invalid forecast response');
       }

@@ -1,6 +1,6 @@
 /**
  * Circle Game Types
- * 
+ *
  * Type definitions for the Draw Perfect Circle game components
  */
 

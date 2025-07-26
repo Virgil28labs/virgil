@@ -143,7 +143,6 @@ export interface GiphyTrendingParams {
   random_id?: string;
 }
 
-
 // Loading states
 export type GiphyLoadingState = 'idle' | 'loading' | 'error' | 'success';
 
@@ -195,7 +194,7 @@ export interface GiphyContextType {
   loading: GiphyLoadingState;
   error: string | null;
   hasMore: boolean;
-  
+
   // Actions
   search: (query: string) => Promise<void>;
   loadTrending: () => Promise<void>;
@@ -237,11 +236,9 @@ export interface GiphyState {
   offset: number;
 }
 
-
 // Service response types
 export interface GiphyServiceError {
   message: string;
   status?: number;
   code?: string;
 }
-

@@ -124,7 +124,7 @@ export function setupNetworkMonitoring(config?: ServiceWorkerConfig) {
 
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
-  
+
   // Initial check
   updateOnlineStatus();
 }
