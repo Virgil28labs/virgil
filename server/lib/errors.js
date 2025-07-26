@@ -1,4 +1,5 @@
 // Unified error handling for server
+const logger = require('./logger');
 
 class AppError extends Error {
   constructor(message, code, statusCode = 500, details = null) {
@@ -59,7 +60,7 @@ function errorHandler(err, _req, res, _next) {
 
   // Log error in development
   if (process.env.NODE_ENV === 'development') {
-    console.error({
+    logger.error('Request error:', {
       name: error.name,
       message: error.message,
       code: error.code,

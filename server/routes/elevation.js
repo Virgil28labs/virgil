@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
 const rateLimit = require('express-rate-limit');
+const logger = require('../lib/logger');
 
 // Rate limiting for elevation API
 const elevationLimiter = rateLimit({
@@ -108,7 +109,7 @@ router.get('/coordinates/:lat/:lon', elevationLimiter, async (req, res) => {
       throw fetchError;
     }
   } catch (error) {
-    console.error('Elevation API error:', error.message);
+    logger.error('Elevation API error:', error.message);
 
     if (error.name === 'AbortError') {
       return res.status(504).json({

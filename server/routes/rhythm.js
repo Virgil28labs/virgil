@@ -2,6 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { LLMProxy } = require('../services/llmProxy');
 const { RequestQueue } = require('../services/queue');
+const logger = require('../lib/logger');
 // const { validateRequest } = require('../middleware/validation');
 
 // Custom validation for rhythm generation
@@ -188,7 +189,7 @@ router.post('/generate', validateRhythmRequest, cacheMiddleware, async (req, res
     });
 
   } catch (error) {
-    console.error('Rhythm generation error:', error);
+    logger.error('Rhythm generation error:', error);
 
     // Fallback to algorithmic generation on any error
     try {

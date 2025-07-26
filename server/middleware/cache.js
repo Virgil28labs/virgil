@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const logger = require('../lib/logger');
 
 class ResponseCache {
   constructor(options = {}) {
@@ -153,7 +154,7 @@ const cacheMiddleware = async (req, res, next) => {
       const responseSize = JSON.stringify(data).length;
       if (responseSize < 100000) { // 100KB limit
         cache.set(cacheKey, data).catch(err => {
-          console.error('Cache set error:', err);
+          logger.error('Cache set error:', err);
         });
       }
     }

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const fetch = require('node-fetch');
+const logger = require('../lib/logger');
 
 // Chat-specific rate limiter
 const chatLimiter = rateLimit({
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
     // Validate OpenAI API key
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
-      console.error('OpenAI API key not configured');
+      logger.error('OpenAI API key not configured');
       return res.status(500).json({
         error: 'Chat service is not properly configured',
       });
@@ -56,7 +57,7 @@ router.post('/', async (req, res) => {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('OpenAI API error:', response.status, errorData);
+      logger.error('OpenAI API error:', response.status, errorData);
 
       // Don't expose internal error details to client
       return res.status(response.status).json({
@@ -78,7 +79,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Chat endpoint error:', error);
+    logger.error('Chat endpoint error:', error);
     res.status(500).json({
       error: 'Internal server error',
       message: 'Failed to process chat request',

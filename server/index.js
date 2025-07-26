@@ -145,7 +145,7 @@ async function startServer() {
     return server;
   } catch (error) {
 
-    console.error('❌ Failed to start server:', error);
+    logger.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
@@ -156,7 +156,7 @@ startServer().then(srv => {
   server = srv;
 }).catch(error => {
 
-  console.error('❌ Fatal startup error:', error);
+  logger.error('❌ Fatal startup error:', error);
   process.exit(1);
 });
 
@@ -173,7 +173,7 @@ const gracefulShutdown = () => {
 
     // Force close after 10 seconds
     setTimeout(() => {
-      console.error('❌ Could not close connections in time, forcefully shutting down');
+      logger.error('❌ Could not close connections in time, forcefully shutting down');
       process.exit(1);
     }, 10000);
   } else {

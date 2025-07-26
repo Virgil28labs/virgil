@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const logger = require('../lib/logger');
 
 // In-memory analytics storage (replace with database in production)
 const analytics = {
@@ -53,7 +54,7 @@ router.post('/track', (req, res) => {
     res.json({ success: true });
 
   } catch (error) {
-    console.error('Analytics tracking error:', error);
+    logger.error('Analytics tracking error:', error);
     res.status(500).json({ error: 'Failed to track event' });
   }
 });
@@ -79,7 +80,7 @@ router.get('/summary', (req, res) => {
     });
 
   } catch (error) {
-    console.error('Analytics summary error:', error);
+    logger.error('Analytics summary error:', error);
     res.status(500).json({ error: 'Failed to generate summary' });
   }
 });
@@ -102,7 +103,7 @@ router.get('/usage', (req, res) => {
     });
 
   } catch (error) {
-    console.error('Analytics usage error:', error);
+    logger.error('Analytics usage error:', error);
     res.status(500).json({ error: 'Failed to calculate usage' });
   }
 });
@@ -131,7 +132,7 @@ router.get('/errors', (req, res) => {
     });
 
   } catch (error) {
-    console.error('Analytics errors fetch error:', error);
+    logger.error('Analytics errors fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch errors' });
   }
 });
