@@ -186,7 +186,7 @@ export const Dashboard = memo(function Dashboard() {
                   onClick={() => setShowMapsModal(true)}
                   title="Click to view on map"
                 >
-                  {address.formatted.split(',')[0]}
+                  {address.formatted.split(',').slice(0, 2).join(',').trim()}
                 </p>
               ) : (
                 <Skeleton className="w-48 h-4" />
