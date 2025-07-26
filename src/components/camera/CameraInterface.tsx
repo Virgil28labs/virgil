@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback , memo } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Camera } from 'react-camera-pro';
 import type { CameraControlsProps } from '../../types/camera.types';
 import { useCamera } from './hooks/useCamera';

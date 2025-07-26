@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useContext, useReducer, useEffect, useCallback, useMemo, createContext } from 'react';
+import { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
@@ -11,8 +11,7 @@ import type {
   WeatherData,
   ForecastData, 
 } from '../types/weather.types';
-
-export const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
+import { WeatherContext } from './WeatherContextInstance';
 
 /**
  * WeatherContext - Weather Data State Management
@@ -258,13 +257,4 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       {children}
     </WeatherContext.Provider>
   );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useWeather(): WeatherContextType {
-  const context = useContext(WeatherContext);
-  if (!context) {
-    throw new Error('useWeather must be used within a WeatherProvider');
-  }
-  return context;
 }

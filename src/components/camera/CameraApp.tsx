@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect , memo } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import { PhotoGallery } from './PhotoGallery';
 import { PhotoModal } from './PhotoModal';
 import { usePhotoGallery } from './hooks/usePhotoGallery';

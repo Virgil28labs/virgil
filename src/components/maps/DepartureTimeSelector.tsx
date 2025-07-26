@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect , memo } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import './maps.css';
 import { timeService } from '../../services/TimeService';
 

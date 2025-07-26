@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useReducer, useEffect, useCallback, useMemo, useRef, createContext } from 'react';
+import { useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { locationService } from '../lib/locationService';
 import type { 
   LocationState, 
@@ -8,8 +8,7 @@ import type {
 } from '../types/location.types';
 import { logger } from '../lib/logger';
 import { timeService } from '../services/TimeService';
-
-export const LocationContext = createContext<LocationContextValue | undefined>(undefined);
+import { LocationContext } from './LocationContextInstance';
 
 /**
  * LocationContext - Location Services State Management

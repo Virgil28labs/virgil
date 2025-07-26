@@ -78,9 +78,3 @@ export interface CollisionResult {
 }
 
 export type WallSide = 'left' | 'right' | null;
-
-export type MascotEmoji = '🦝' | '🐾' | '🍃' | '🌰' | '🗑️' | '🌙' | '🐻' | '🍯';
-
-export interface RaccoonMascotProps {
-  // Props if any are added in the future
-}

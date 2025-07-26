@@ -1,10 +1,9 @@
-import { type ReactNode, useReducer, useCallback, useMemo, createContext } from 'react';
+import { type ReactNode, useReducer, useCallback, useMemo } from 'react';
 import { chatReducer } from './chatReducer';
 import { initialChatState } from './chatTypes';
 import type { ChatMessage, ChatContextValue } from '../../types/chat.types';
 import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
-
-export const ChatContext = createContext<ChatContextValue | undefined>(undefined);
+import { ChatContext } from './ChatContextInstance';
 
 interface ChatProviderProps {
   children: ReactNode;

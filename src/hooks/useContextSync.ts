@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
-import { useWeather } from '../contexts/WeatherContext';
+import { useWeather } from './useWeather';
 import { useUserProfile } from './useUserProfile';
 import { dashboardContextService } from '../services/DashboardContextService';
 

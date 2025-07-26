@@ -1,5 +1,5 @@
 import { memo, useState, useRef, useEffect } from 'react';
-import { useWeather } from '../contexts/WeatherContext';
+import { useWeather } from '../hooks/useWeather';
 import { weatherService } from '../lib/weatherService';
 import { Skeleton } from './ui/skeleton';
 import { WeatherForecast } from './WeatherForecast';

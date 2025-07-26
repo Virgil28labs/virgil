@@ -1,4 +1,4 @@
-import React, { useState, useCallback , memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { PhotoGalleryTabs } from './PhotoGalleryTabs';
 import { PhotoGrid } from './PhotoGrid';
 import { CameraInterface } from './CameraInterface';

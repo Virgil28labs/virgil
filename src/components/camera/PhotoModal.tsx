@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect , memo } from 'react';
+import React, { useState, useCallback, useEffect, memo } from 'react';
 import type { PhotoModalProps } from '../../types/camera.types';
 import { PhotoActions } from './PhotoActions';
 import { timeService } from '../../services/TimeService';

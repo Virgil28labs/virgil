@@ -4,6 +4,7 @@ import { DogGallery } from './DogGallery';
 import { useDogApi } from './hooks/useDogApi';
 import { useDogFavorites } from './hooks/useDogFavorites';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import type { Shortcut } from '../../hooks/useKeyboardShortcuts';
 import type { DogImage } from './hooks/useDogApi';
 
 // Mock hooks
@@ -392,7 +393,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={onClose} />);
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0];
-      const escapeShortcut = shortcuts.find((s: any) => s.key === 'Escape');
+      const escapeShortcut = shortcuts.find((s: Shortcut) => s.key === 'Escape');
       escapeShortcut?.handler();
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -408,7 +409,7 @@ describe('DogGallery', () => {
       
       // Use f shortcut
       act(() => {
-        const fShortcut = shortcuts.find((s: any) => s.key === 'f');
+        const fShortcut = shortcuts.find((s: Shortcut) => s.key === 'f');
         fShortcut?.handler();
       });
 
@@ -421,7 +422,7 @@ describe('DogGallery', () => {
 
       const shortcuts = mockUseKeyboardShortcuts.mock.calls[0][0];
       act(() => {
-        const gShortcut = shortcuts.find((s: any) => s.key === 'g');
+        const gShortcut = shortcuts.find((s: Shortcut) => s.key === 'g');
         gShortcut?.handler();
       });
 

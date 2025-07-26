@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
-import { useWeather } from '../contexts/WeatherContext';
+import { useWeather } from '../hooks/useWeather';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { useUserProfile } from '../hooks/useUserProfile';

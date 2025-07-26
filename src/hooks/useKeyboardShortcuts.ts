@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 
-interface Shortcut {
+export interface Shortcut {
   /** Key to listen for */
   key: string
   /** Required modifier keys */
