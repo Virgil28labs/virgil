@@ -10,7 +10,7 @@ jest.mock('./LoginForm', () => ({
   LoginForm: () => <div data-testid="login-form">Login Form</div>,
 }));
 
-jest.mock('./RaccoonMascot', () => ({
+jest.mock('./raccoon/RaccoonMascot', () => ({
   RaccoonMascot: () => <div data-testid="raccoon-mascot">Raccoon Mascot</div>,
 }));
 

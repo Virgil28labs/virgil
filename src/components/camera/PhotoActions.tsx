@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo } from 'react';
 import type { SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';

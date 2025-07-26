@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { PhysicsEngine } from '../lib/physics';
+// import { PhysicsEngine } from '../lib/physics';
 import { PHYSICS_CONSTANTS, RACCOON_SIZE } from '../constants/raccoonConstants';
 import type { Position, Velocity, UIElement } from '../types/physics.types';
 
@@ -51,14 +51,13 @@ export const useRaccoonPhysics = ({
   const [charge, setCharge] = useState<number>(0);
 
   // Physics engine instance (kept for potential future use)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const physicsEngine = useRef(new PhysicsEngine({
-    gravity: PHYSICS_CONSTANTS.GRAVITY,
-    friction: 0.98,
-    bounceDamping: 0.6,
-    angularDamping: 0.95,
-    groundLevel: 100,
-  }));
+  // const physicsEngine = useRef(new PhysicsEngine({
+  //   gravity: PHYSICS_CONSTANTS.GRAVITY,
+  //   friction: 0.98,
+  //   bounceDamping: 0.6,
+  //   angularDamping: 0.95,
+  //   groundLevel: 100,
+  // }));
 
   // Movement state
   const keys = useRef<{ left: boolean; right: boolean; jump: boolean }>({

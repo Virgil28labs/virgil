@@ -80,7 +80,9 @@ describe('DogGallery', () => {
     jest.clearAllMocks();
     mockUseDogApi.mockReturnValue(defaultApiReturn);
     mockUseDogFavorites.mockReturnValue(defaultFavoritesReturn);
-    mockUseKeyboardShortcuts.mockImplementation(() => {});
+    mockUseKeyboardShortcuts.mockImplementation(() => ({
+      shortcuts: [],
+    }));
   });
 
   describe('rendering', () => {

@@ -82,7 +82,7 @@ export const locationService = {
               resolve(highAccuracyCoords);
             } catch (error) {
               // If high accuracy fails, use the low accuracy result
-              logger.warn('Failed to get high accuracy position, using low accuracy', error as Error, {
+              logger.error('Failed to get high accuracy position, using low accuracy', error as Error, {
                 component: 'locationService',
                 action: 'getCurrentPosition',
               });
@@ -348,7 +348,7 @@ export const locationService = {
       }
     } catch (error) {
       // GPS is optional, continue without it
-      logger.warn('Failed to get GPS location data', error as Error, {
+      logger.error('Failed to get GPS location data', error as Error, {
         component: 'locationService',
         action: 'getFullLocationData',
       });
@@ -390,7 +390,7 @@ export const locationService = {
         result.address = addressResult.value;
       } else {
         // Address lookup failed - non-critical, continue without address
-        logger.warn('Address lookup failed', addressResult.reason as Error, {
+        logger.error('Address lookup failed', addressResult.reason as Error, {
           component: 'locationService',
           action: 'fetchGPSLocationData',
           metadata: { coords },

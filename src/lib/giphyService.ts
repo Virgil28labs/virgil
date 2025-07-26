@@ -25,7 +25,7 @@ class GiphyService {
 
   constructor() {
     if (!GIPHY_API_KEY || GIPHY_API_KEY === 'your_giphy_api_key_here') {
-      logger.warn('Giphy API key not configured. Please add VITE_GIPHY_API_KEY to your .env file', undefined, {
+      logger.warn('Giphy API key not configured. Please add VITE_GIPHY_API_KEY to your .env file', {
         component: 'GiphyService',
         action: 'constructor',
       });
@@ -108,7 +108,7 @@ class GiphyService {
           maxRetries: 2,
           initialDelay: 1000,
           onRetry: (attempt, error) => {
-            logger.warn(`Giphy API retry ${attempt}: ${error instanceof Error ? error.message : error}`, undefined, {
+            logger.warn(`Giphy API retry ${attempt}: ${error instanceof Error ? error.message : error}`, {
               component: 'GiphyService',
               action: 'makeGiphyRequest',
               metadata: { attempt, endpoint },
@@ -262,7 +262,7 @@ class GiphyService {
       await navigator.clipboard.writeText(gif.originalUrl);
       return true;
     } catch (error) {
-      logger.warn('Clipboard write failed', error as Error, {
+      logger.error('Clipboard write failed', error as Error, {
         component: 'GiphyService',
         action: 'copyGifUrl',
         metadata: { gifId: gif.id },

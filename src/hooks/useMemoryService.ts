@@ -96,7 +96,9 @@ export function useMemoryService({
       logger.error('Failed to mark message as important', error as Error, {
         component: 'useMemoryService',
         action: 'markAsImportant',
-        messageId: message.id,
+        metadata: {
+          messageId: message.id,
+        },
       });
       setError('Unable to save memory. Please try again.');
     }

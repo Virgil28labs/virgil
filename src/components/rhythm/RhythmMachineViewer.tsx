@@ -232,7 +232,9 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       logger.error(`Failed to create ${sound.name} sound`, error as Error, {
         component: 'RhythmMachineViewer',
         action: 'createDrumSound',
-        drumType: sound.name,
+        metadata: {
+          drumType: sound.name,
+        },
       });
     }
   }, [handleUserInteraction]);
@@ -344,7 +346,9 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       logger.error('Pattern generation failed', error as Error, {
         component: 'RhythmMachineViewer',
         action: 'generateAIPattern',
-        description: genreInput.trim() || 'random',
+        metadata: {
+          description: genreInput.trim() || 'random',
+        },
       });
 
       // Fallback pattern generation is handled by the backend

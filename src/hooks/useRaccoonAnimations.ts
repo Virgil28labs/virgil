@@ -280,7 +280,7 @@ export const useRaccoonAnimations = ({
       showPickupAnimation,
       hideGif,
       setFacingDirection,
-      setIsRunning,
+      setRunning: setIsRunning,
       resetSleepTimer,
       handleUIElementLanding,
     },

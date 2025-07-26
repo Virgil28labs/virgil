@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../ui/button';
 import { usePomodoro } from './usePomodoro';

@@ -168,7 +168,7 @@ export class LLMService extends EventEmitter {
               yield parsed;
             } catch (parseError) {
               // Skip invalid JSON
-              logger.warn('Failed to parse stream chunk', parseError as Error, {
+              logger.error('Failed to parse stream chunk', parseError as Error, {
                 component: 'LLMService',
                 action: 'completeStream',
                 metadata: { line },
@@ -226,7 +226,7 @@ export class LLMService extends EventEmitter {
       const retryDelay = this.config?.retryDelay ?? 1000;
       if (error instanceof Error && attempt < maxRetries && this.isRetryableError(error)) {
         const delay = retryDelay * Math.pow(2, attempt - 1);
-        logger.warn(`LLM request retry attempt ${attempt}`, error, {
+        logger.error(`LLM request retry attempt ${attempt}`, error, {
           component: 'LLMService',
           action: 'makeRequestWithRetry',
           metadata: { endpoint, attempt, delay },
@@ -311,7 +311,7 @@ export class LLMService extends EventEmitter {
       return data.data?.tokenCount || 0;
     } catch (error) {
       // Fallback to estimation
-      logger.warn('Failed to count tokens, using estimation', error as Error, {
+      logger.error('Failed to count tokens, using estimation', error as Error, {
         component: 'LLMService',
         action: 'countTokens',
         metadata: { model, textLength: text.length },

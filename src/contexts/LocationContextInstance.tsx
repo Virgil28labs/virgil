@@ -1,4 +1,4 @@
 import { createContext } from 'react';
-import type { LocationContextType } from '../types/location.types';
+import type { LocationContextValue } from '../types/location.types';
 
-export const LocationContext = createContext<LocationContextType | undefined>(undefined);
+export const LocationContext = createContext<LocationContextValue | undefined>(undefined);

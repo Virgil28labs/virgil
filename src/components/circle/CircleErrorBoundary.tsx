@@ -27,7 +27,9 @@ export class CircleErrorBoundary extends Component<Props, State> {
     logger.error('Circle game error', error, {
       component: 'CircleErrorBoundary',
       action: 'componentDidCatch',
-      errorInfo: errorInfo.componentStack,
+      metadata: {
+        errorInfo: errorInfo.componentStack,
+      },
     });
   }
 

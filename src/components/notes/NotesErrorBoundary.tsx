@@ -50,7 +50,9 @@ export class NotesErrorBoundary extends Component<Props, State> {
     logger.error('Notes Error Boundary caught error', error, {
       component: 'NotesErrorBoundary',
       action: 'componentDidCatch',
-      errorInfo: errorInfo.componentStack,
+      metadata: {
+        errorInfo: errorInfo.componentStack,
+      },
     });
 
     // Update state with error info

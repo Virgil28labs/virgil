@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { DepartureTimeSelector } from './DepartureTimeSelector';
 import './maps.css';
 
