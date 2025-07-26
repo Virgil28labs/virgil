@@ -64,8 +64,7 @@ export class TimeService {
     }
     
     // Generate new date and cache it
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const date = this.formatDateToLocal(new (Date as any)(now));
+    const date = this.formatDateToLocal(new Date(now));
     this.localDateCache = { date, timestamp: now };
     return date;
   }
@@ -92,8 +91,7 @@ export class TimeService {
    * @returns Current local Date object
    */
   getCurrentDateTime(): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (Date as any)(); // Always return current time, not cached
+    return new Date(); // Always return current time, not cached
   }
 
   /**
@@ -110,8 +108,7 @@ export class TimeService {
    * @returns Formatted date string
    */
   formatDate(date?: Date): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dateFormatter.format(date || new (Date as any)());
+    return this.dateFormatter.format(date || new Date());
   }
 
   /**
@@ -119,8 +116,7 @@ export class TimeService {
    * @returns Time string (e.g., "14:30")
    */
   getCurrentTime(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.timeFormatter.format(new (Date as any)());
+    return this.timeFormatter.format(new Date());
   }
 
   /**
@@ -128,8 +124,7 @@ export class TimeService {
    * @returns Date string (e.g., "January 20, 2024")
    */
   getCurrentDate(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dateFormatter.format(new (Date as any)());
+    return this.dateFormatter.format(new Date());
   }
 
   /**
@@ -137,8 +132,7 @@ export class TimeService {
    * @returns Day string (e.g., "monday")
    */
   getDayOfWeek(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.dayFormatter.format(new (Date as any)()).toLowerCase();
+    return this.dayFormatter.format(new Date()).toLowerCase();
   }
 
   /**
@@ -146,8 +140,7 @@ export class TimeService {
    * @returns Time period
    */
   getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const hour = new (Date as any)().getHours();
+    const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return 'morning';
     if (hour >= 12 && hour < 17) return 'afternoon';
     if (hour >= 17 && hour < 21) return 'evening';
@@ -176,8 +169,7 @@ export class TimeService {
     if (!this.mainTimer) {
       this.mainTimer = setInterval(() => {
         if (this.timeListeners.length > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const now = new (Date as any)();
+          const now = new Date();
           const timeUpdate: TimeUpdate = {
             currentTime: this.timeFormatter.format(now),
             currentDate: this.dateFormatter.format(now),
@@ -207,8 +199,7 @@ export class TimeService {
    * @returns Full year (e.g., 2024)
    */
   getYear(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getFullYear();
+    return (date || new Date()).getFullYear();
   }
 
   /**
@@ -217,8 +208,7 @@ export class TimeService {
    * @returns Month number 1-12
    */
   getMonth(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getMonth() + 1;
+    return (date || new Date()).getMonth() + 1;
   }
 
   /**
@@ -227,8 +217,7 @@ export class TimeService {
    * @returns Day of month 1-31
    */
   getDay(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getDate();
+    return (date || new Date()).getDate();
   }
 
   /**
@@ -237,8 +226,7 @@ export class TimeService {
    * @returns Hours 0-23
    */
   getHours(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getHours();
+    return (date || new Date()).getHours();
   }
 
   /**
@@ -247,8 +235,7 @@ export class TimeService {
    * @returns Minutes 0-59
    */
   getMinutes(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getMinutes();
+    return (date || new Date()).getMinutes();
   }
 
   /**
@@ -257,8 +244,7 @@ export class TimeService {
    * @returns Seconds 0-59
    */
   getSeconds(date?: Date): number {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).getSeconds();
+    return (date || new Date()).getSeconds();
   }
 
   /**
@@ -284,8 +270,7 @@ export class TimeService {
    * @returns New Date object
    */
   addDays(date: Date, days: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date);
+    const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
   }
@@ -307,8 +292,7 @@ export class TimeService {
    * @returns New Date object
    */
   addMonths(date: Date, months: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date);
+    const result = new Date(date);
     result.setMonth(result.getMonth() + months);
     return result;
   }
@@ -330,8 +314,7 @@ export class TimeService {
    * @returns New Date object
    */
   addYears(date: Date, years: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date);
+    const result = new Date(date);
     result.setFullYear(result.getFullYear() + years);
     return result;
   }
@@ -353,8 +336,7 @@ export class TimeService {
    * @returns New Date object
    */
   addHours(date: Date, hours: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (Date as any)(date.getTime() + hours * TimeService.HOUR_MS);
+    return new Date(date.getTime() + hours * TimeService.HOUR_MS);
   }
 
   /**
@@ -374,8 +356,7 @@ export class TimeService {
    * @returns New Date object
    */
   addMinutes(date: Date, minutes: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (Date as any)(date.getTime() + minutes * TimeService.MINUTE_MS);
+    return new Date(date.getTime() + minutes * TimeService.MINUTE_MS);
   }
 
   /**
@@ -398,8 +379,7 @@ export class TimeService {
    * @returns ISO string (e.g., "2024-01-15T14:30:00.000Z")
    */
   toISOString(date?: Date): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (date || new (Date as any)()).toISOString();
+    return (date || new Date()).toISOString();
   }
 
   /**
@@ -421,8 +401,7 @@ export class TimeService {
    * @returns New Date at start of day
    */
   startOfDay(date?: Date): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date || new (Date as any)());
+    const result = new Date(date || new Date());
     result.setHours(0, 0, 0, 0);
     return result;
   }
@@ -433,8 +412,7 @@ export class TimeService {
    * @returns New Date at end of day
    */
   endOfDay(date?: Date): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date || new (Date as any)());
+    const result = new Date(date || new Date());
     result.setHours(23, 59, 59, 999);
     return result;
   }
@@ -445,8 +423,7 @@ export class TimeService {
    * @returns New Date at start of week
    */
   startOfWeek(date?: Date): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date || new (Date as any)());
+    const result = new Date(date || new Date());
     const day = result.getDay();
     const diff = result.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
     result.setDate(diff);
@@ -472,8 +449,7 @@ export class TimeService {
    * @returns New Date at start of month
    */
   startOfMonth(date?: Date): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date || new (Date as any)());
+    const result = new Date(date || new Date());
     result.setDate(1);
     result.setHours(0, 0, 0, 0);
     return result;
@@ -485,8 +461,7 @@ export class TimeService {
    * @returns New Date at end of month
    */
   endOfMonth(date?: Date): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = new (Date as any)(date || new (Date as any)());
+    const result = new Date(date || new Date());
     result.setMonth(result.getMonth() + 1, 0); // 0th day of next month = last day of current
     result.setHours(23, 59, 59, 999);
     return result;
@@ -630,8 +605,7 @@ export class TimeService {
    * @returns Date object or null if invalid
    */
   parseDate(dateString: string): Date | null {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const date = new (Date as any)(dateString);
+    const date = new Date(dateString);
     return this.isValidDate(date) ? date : null;
   }
 
@@ -641,8 +615,7 @@ export class TimeService {
    * @returns String in format "YYYY-MM-DDTHH:mm"
    */
   formatForDateTimeInput(date?: Date): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const d = date || new (Date as any)();
+    const d = date || new Date();
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -657,8 +630,7 @@ export class TimeService {
    * @returns String in format "YYYY-MM-DD"
    */
   formatForDateInput(date?: Date): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.formatDateToLocal(date || new (Date as any)());
+    return this.formatDateToLocal(date || new Date());
   }
 
   /**
@@ -667,8 +639,7 @@ export class TimeService {
    * @returns Date object
    */
   fromTimestamp(timestamp: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (Date as any)(timestamp);
+    return new Date(timestamp);
   }
 
   /**
@@ -679,8 +650,7 @@ export class TimeService {
    * @returns Date object
    */
   createDate(year: number, month: number, day: number): Date {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return new (Date as any)(year, month, day);
+    return new Date(year, month, day);
   }
 
   /**

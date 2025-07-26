@@ -298,8 +298,7 @@ export class MockTimeService {
   }
 
   // Validation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  isValidDate(date: any): date is Date {
+  isValidDate(date: unknown): date is Date {
     return date instanceof Date && !isNaN(date.getTime());
   }
 

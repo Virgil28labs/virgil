@@ -6,6 +6,7 @@
  */
 
 import { StorageService, STORAGE_KEYS } from './StorageService';
+import { logger } from '../lib/logger';
 
 interface MigrationResult {
   key: string;
@@ -28,13 +29,11 @@ export class StorageMigration {
     // Check if migrations have already been run
     const lastVersion = StorageService.get(this.MIGRATION_VERSION_KEY, '0.0.0');
     if (lastVersion === this.CURRENT_VERSION) {
-      // eslint-disable-next-line no-console
-      console.log('Storage migrations already up to date');
+      logger.info('Storage migrations already up to date');
       return results;
     }
 
-    // eslint-disable-next-line no-console
-    console.log('Running storage migrations...');
+    logger.info('Running storage migrations...');
 
     // Migrate string values that should remain strings but need JSON encoding
     const stringKeys = [
@@ -78,8 +77,11 @@ export class StorageMigration {
     // Update migration version
     StorageService.set(this.MIGRATION_VERSION_KEY, this.CURRENT_VERSION);
 
-    // eslint-disable-next-line no-console
-    console.log('Storage migrations completed', results);
+    logger.info('Storage migrations completed', {
+      component: 'StorageMigration',
+      action: 'runMigrations',
+      metadata: { results },
+    });
     return results;
   }
 
@@ -214,10 +216,17 @@ export class StorageMigration {
     deprecatedKeys.forEach(key => {
       try {
         localStorage.removeItem(key);
-        // eslint-disable-next-line no-console
-        console.log(`Removed deprecated key: ${key}`);
+        logger.info(`Removed deprecated key: ${key}`);
       } catch (error) {
-        console.error(`Failed to remove deprecated key ${key}:`, error);
+        logger.error(
+          `Failed to remove deprecated key ${key}`,
+          error instanceof Error ? error : new Error(String(error)),
+          {
+            component: 'StorageMigration',
+            action: 'cleanupDeprecatedKeys',
+            metadata: { key },
+          },
+        );
       }
     });
   }
@@ -262,7 +271,14 @@ export class StorageMigration {
         }
       }
     } catch (error) {
-      console.error('Failed to create backup:', error);
+      logger.error(
+        'Failed to create backup',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'StorageMigration',
+          action: 'createBackup',
+        },
+      );
     }
 
     return backup;
@@ -281,10 +297,16 @@ export class StorageMigration {
         localStorage.setItem(key, value);
       });
       
-      // eslint-disable-next-line no-console
-      console.log('Storage restored from backup');
+      logger.info('Storage restored from backup');
     } catch (error) {
-      console.error('Failed to restore from backup:', error);
+      logger.error(
+        'Failed to restore from backup',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'StorageMigration',
+          action: 'restoreFromBackup',
+        },
+      );
     }
   }
 }
