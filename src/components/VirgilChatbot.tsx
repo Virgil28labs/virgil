@@ -65,7 +65,7 @@ function VirgilChatbotInner() {
 
   useDashboardContext({ dispatch });
 
-  const { createSystemPrompt } = useSystemPrompt({
+  const { createSystemPrompt, createSystemPromptSync } = useSystemPrompt({
     user,
     customSystemPrompt: state.customSystemPrompt,
     memoryContext: state.memoryContext,
@@ -204,7 +204,7 @@ function VirgilChatbotInner() {
         messageCount={state.messages.length}
         onClearMessages={clearMessages}
         onExportMessages={handleExportMessages}
-        createSystemPrompt={createSystemPrompt}
+        createSystemPrompt={createSystemPromptSync}
       />
 
       <ChatMessages

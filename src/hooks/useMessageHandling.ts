@@ -2,13 +2,14 @@ import { useCallback, useRef } from 'react';
 import type React from 'react';
 import { chatService } from '../services/ChatService';
 import { memoryService } from '../services/MemoryService';
+import { vectorMemoryService } from '../services/VectorMemoryService';
 import { useChatApi, type LoadingState } from './useChatApi';
 import type { ChatMessage } from '../types/chat.types';
 
 interface UseMessageHandlingProps {
   selectedModel: string;
   messages: ChatMessage[];
-  createSystemPrompt: (userQuery?: string) => string;
+  createSystemPrompt: (userQuery?: string) => Promise<string>;
   addMessage: (message: ChatMessage) => void;
   setInput: (input: string) => void;
   setError: (error: string | null) => void;
@@ -47,6 +48,8 @@ export function useMessageHandling({
       // Save assistant message to continuous conversation
       try {
         await memoryService.saveConversation([message]);
+        // Also store in vector memory
+        await vectorMemoryService.storeMessageWithEmbedding(message);
       } catch (error) {
         console.error('Failed to save assistant message:', error);
       }
@@ -70,13 +73,15 @@ export function useMessageHandling({
     // Save user message to continuous conversation
     try {
       await memoryService.saveConversation([userMessage]);
+      // Also store in vector memory
+      await vectorMemoryService.storeMessageWithEmbedding(userMessage);
     } catch (error) {
       console.error('Failed to save user message:', error);
     }
     
     setTimeout(() => inputRef.current?.focus(), 0);
 
-    const systemPrompt = createSystemPrompt(messageText);
+    const systemPrompt = await createSystemPrompt(messageText);
     await sendChatMessage(messageText, systemPrompt, messages, selectedModel);
   }, [selectedModel, messages, createSystemPrompt, addMessage, setInput, setError, sendChatMessage]);
 

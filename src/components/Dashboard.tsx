@@ -13,6 +13,7 @@ import { StreakTrackerButton } from './StreakTrackerButton';
 import { CameraEmojiButton } from './camera/CameraEmojiButton';
 import { PomodoroEmojiButton } from './pomodoro/PomodoroEmojiButton';
 import { NotesEmojiButton } from './notes/NotesEmojiButton';
+import { VectorMemoryButton } from './VectorMemoryButton';
 import { LoadingFallback } from './LoadingFallback';
 import { Skeleton } from './ui/skeleton';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
@@ -282,6 +283,9 @@ export const Dashboard = memo(function Dashboard() {
       
       {/* Notes Button */}
       <NotesEmojiButton />
+      
+      {/* Vector Test Button */}
+      <VectorMemoryButton />
 
       {/* User Profile Viewer */}
       <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>

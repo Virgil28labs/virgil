@@ -386,7 +386,8 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
   private notifySubscribers(): void {
     if (this.profile) {
-      this.subscribers.forEach(callback => callback(this.profile));
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.subscribers.forEach(callback => callback(this.profile!));
     }
   }
 }

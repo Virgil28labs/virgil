@@ -52,6 +52,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testTimeout: 10000,
   transformIgnorePatterns: [
-    'node_modules/(?!(isows|@supabase|superjson|ws)/)'
+    'node_modules/(?!(isows|@supabase|superjson|ws|@xenova)/)'
   ],
 };

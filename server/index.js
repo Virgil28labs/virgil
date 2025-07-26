@@ -48,6 +48,7 @@ const chatRoutes = require('./routes/chat');
 const weatherRoutes = require('./routes/weather');
 const elevationRoutes = require('./routes/elevation');
 const rhythmRoutes = require('./routes/rhythm');
+const vectorRoutes = require('./routes/vector');
 
 // Mount routes
 app.use('/api/v1/llm', llmRoutes);
@@ -57,6 +58,7 @@ app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/elevation', elevationRoutes);
 app.use('/api/v1/rhythm', rhythmRoutes);
+app.use('/api/v1/vector', vectorRoutes);
 
 // 404 handler
 app.use((req, _res, next) => {
@@ -133,6 +135,9 @@ async function startServer() {
       console.log('  GET /api/v1/weather/city/:city - Weather by city');
       console.log('  GET /api/v1/elevation/coordinates/:lat/:lon - Elevation by coordinates');
       console.log('  POST /api/v1/rhythm/generate - AI-powered rhythm generation');
+      console.log('  POST /api/v1/vector/store - Store text with embedding');
+      console.log('  POST /api/v1/vector/search - Search similar texts');
+      console.log('  GET /api/v1/vector/health - Vector service health check');
       console.log('🎯 Server ready to accept connections');
       /* eslint-enable no-console */
     });

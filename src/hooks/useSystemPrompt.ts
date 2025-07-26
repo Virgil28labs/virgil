@@ -1,6 +1,7 @@
 import { useMemo, useCallback } from 'react';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { dashboardContextService } from '../services/DashboardContextService';
+import { vectorMemoryService } from '../services/VectorMemoryService';
 import type { DashboardContext, ContextualSuggestion } from '../services/DashboardContextService';
 import type { User } from '../types/auth.types';
 
@@ -13,7 +14,8 @@ interface UseSystemPromptProps {
 }
 
 interface UseSystemPromptReturn {
-  createSystemPrompt: (userQuery?: string) => string;
+  createSystemPrompt: (userQuery?: string) => Promise<string>;
+  createSystemPromptSync: (userQuery?: string) => string;
   timeOfDay: string;
   locationContext: string | null;
 }
@@ -50,10 +52,25 @@ export function useSystemPrompt({
     return { basePrompt, staticUserContext };
   }, [user, locationContext, timeOfDay, customSystemPrompt]);
 
-  const createSystemPrompt = useCallback((userQuery?: string) => {
+  const createSystemPrompt = useCallback(async (userQuery?: string) => {
     let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
 
-    if (memoryContext) {
+    // Get enhanced context with vector memories if user query is provided
+    if (userQuery) {
+      try {
+        const enhancedMemoryContext = await vectorMemoryService.getEnhancedContext(userQuery);
+        if (enhancedMemoryContext) {
+          systemPrompt += `\n\nMemory:${enhancedMemoryContext}`;
+        }
+      } catch (error) {
+        console.error('Failed to get enhanced memory context:', error);
+        // Fall back to regular memory context
+        if (memoryContext) {
+          systemPrompt += `\n\nMemory:${memoryContext}`;
+        }
+      }
+    } else if (memoryContext) {
+      // Use regular memory context if no query provided
       systemPrompt += `\n\nMemory:${memoryContext}`;
     }
 
@@ -73,8 +90,32 @@ export function useSystemPrompt({
     return systemPrompt + responseRules;
   }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
 
+  // Synchronous version for UI preview (without vector memory)
+  const createSystemPromptSync = useCallback((userQuery?: string) => {
+    let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
+
+    if (memoryContext) {
+      systemPrompt += `\n\nMemory:${memoryContext}`;
+    }
+
+    if (userQuery && dashboardContext) {
+      const enhancedPrompt = DynamicContextBuilder.buildEnhancedPrompt(
+        systemPrompt,
+        userQuery,
+        dashboardContext,
+        contextualSuggestions,
+      );
+      systemPrompt = enhancedPrompt.enhancedPrompt;
+    }
+
+    const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
+    
+    return systemPrompt + responseRules;
+  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
+
   return {
     createSystemPrompt,
+    createSystemPromptSync,
     timeOfDay,
     locationContext,
   };
