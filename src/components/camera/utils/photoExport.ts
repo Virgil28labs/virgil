@@ -2,6 +2,7 @@ import type { SavedPhoto, ExportOptions } from '../../../types/camera.types';
 import { CameraUtils } from './cameraUtils';
 import { PhotoStorage } from './photoStorage';
 import { timeService } from '../../../services/TimeService';
+import { logger } from '../../../lib/logger';
 
 export class PhotoExport {
   static async exportAsJson(photos: SavedPhoto[], options: ExportOptions): Promise<void> {
@@ -21,7 +22,10 @@ export class PhotoExport {
       
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exporting as JSON:', error);
+      logger.error('Error exporting as JSON', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'exportAsJson',
+      });
       throw new Error('Failed to export photos as JSON');
     }
   }
@@ -57,7 +61,10 @@ export class PhotoExport {
       
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exporting as ZIP:', error);
+      logger.error('Error exporting as ZIP', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'exportAsZip',
+      });
       throw new Error('Failed to export photos as ZIP');
     }
   }
@@ -67,7 +74,10 @@ export class PhotoExport {
       const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
       await CameraUtils.downloadPhoto(photo.dataUrl, filename);
     } catch (error) {
-      console.error('Error exporting single photo:', error);
+      logger.error('Error exporting single photo', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'exportSinglePhoto',
+      });
       throw new Error('Failed to export photo');
     }
   }
@@ -82,7 +92,10 @@ export class PhotoExport {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     } catch (error) {
-      console.error('Error exporting multiple photos:', error);
+      logger.error('Error exporting multiple photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'exportMultiplePhotos',
+      });
       throw new Error('Failed to export photos');
     }
   }
@@ -92,7 +105,10 @@ export class PhotoExport {
       const filename = photo.name || CameraUtils.generatePhotoName(photo.timestamp);
       await CameraUtils.sharePhoto(photo.dataUrl, filename);
     } catch (error) {
-      console.error('Error sharing photo:', error);
+      logger.error('Error sharing photo', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'sharePhoto',
+      });
       throw new Error('Failed to share photo');
     }
   }
@@ -119,7 +135,10 @@ export class PhotoExport {
         text: 'Check out these photos I took!',
       });
     } catch (error) {
-      console.error('Error sharing multiple photos:', error);
+      logger.error('Error sharing multiple photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'shareMultiplePhotos',
+      });
       throw new Error('Failed to share photos');
     }
   }
@@ -128,7 +147,10 @@ export class PhotoExport {
     try {
       return await PhotoStorage.importPhotos(jsonData);
     } catch (error) {
-      console.error('Error importing from JSON:', error);
+      logger.error('Error importing from JSON', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'importFromJson',
+      });
       throw new Error('Failed to import photos from JSON');
     }
   }
@@ -138,7 +160,10 @@ export class PhotoExport {
       const text = await file.text();
       return await this.importFromJson(text);
     } catch (error) {
-      console.error('Error importing from file:', error);
+      logger.error('Error importing from file', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'importFromFile',
+      });
       throw new Error('Failed to import photos from file');
     }
   }
@@ -181,7 +206,10 @@ export class PhotoExport {
         format: options.format,
       };
     } catch (error) {
-      console.error('Error getting export preview:', error);
+      logger.error('Error getting export preview', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoExport',
+        action: 'getExportPreview',
+      });
       throw new Error('Failed to generate export preview');
     }
   }

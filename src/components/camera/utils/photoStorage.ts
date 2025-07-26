@@ -29,7 +29,10 @@ export class PhotoStorage {
       await this.migrateData();
       await this.cleanupOldPhotos();
     } catch (error) {
-      console.error('Error initializing photo storage:', error);
+      logger.error('Error initializing photo storage', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'initDB',
+      });
     }
   }
 
@@ -44,7 +47,10 @@ export class PhotoStorage {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
       request.onerror = () => {
-        console.error('Failed to open database:', request.error);
+        logger.error('Failed to open database', request.error || new Error('Unknown database error'), {
+          component: 'PhotoStorage',
+          action: 'openDB',
+        });
         reject(request.error);
       };
 
@@ -101,12 +107,18 @@ export class PhotoStorage {
 
         request.onsuccess = () => resolve(savedPhoto);
         request.onerror = () => {
-          console.error('Error saving photo:', request.error);
+          logger.error('Error saving photo', request.error || new Error('Unknown save error'), {
+            component: 'PhotoStorage',
+            action: 'savePhoto',
+          });
           reject(new Error('Failed to save photo'));
         };
       });
     } catch (error) {
-      console.error('Error saving photo:', error);
+      logger.error('Error saving photo', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'savePhoto',
+      });
       throw new Error('Failed to save photo');
     }
   }
@@ -126,12 +138,18 @@ export class PhotoStorage {
         };
         
         request.onerror = () => {
-          console.error('Error loading photos:', request.error);
+          logger.error('Error loading photos', request.error || new Error('Unknown load error'), {
+            component: 'PhotoStorage',
+            action: 'loadPhotos',
+          });
           resolve([]); // Return empty array on error
         };
       });
     } catch (error) {
-      console.error('Error loading photos:', error);
+      logger.error('Error loading photos', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'loadPhotos',
+      });
       return [];
     }
   }
@@ -163,12 +181,18 @@ export class PhotoStorage {
 
         request.onsuccess = () => resolve(updatedPhoto);
         request.onerror = () => {
-          console.error('Error updating photo:', request.error);
+          logger.error('Error updating photo', request.error || new Error('Unknown update error'), {
+            component: 'PhotoStorage',
+            action: 'updatePhoto',
+          });
           reject(new Error('Failed to update photo'));
         };
       });
     } catch (error) {
-      console.error('Error updating photo:', error);
+      logger.error('Error updating photo', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'updatePhoto',
+      });
       throw new Error('Failed to update photo');
     }
   }
@@ -187,12 +211,18 @@ export class PhotoStorage {
         };
         
         request.onerror = () => {
-          console.error('Error deleting photo:', request.error);
+          logger.error('Error deleting photo', request.error || new Error('Unknown delete error'), {
+            component: 'PhotoStorage',
+            action: 'deletePhoto',
+          });
           resolve(false);
         };
       });
     } catch (error) {
-      console.error('Error deleting photo:', error);
+      logger.error('Error deleting photo', error instanceof Error ? error : new Error(String(error)), {
+        component: 'PhotoStorage',
+        action: 'deletePhoto',
+      });
       throw new Error('Failed to delete photo');
     }
   }
@@ -218,7 +248,10 @@ export class PhotoStorage {
         };
         
         transaction.onerror = () => {
-          console.error('Error deleting photos:', transaction.error);
+          logger.error('Error deleting photos', transaction.error || new Error('Unknown deletion error'), {
+            component: 'PhotoStorage',
+            action: 'deleteAllPhotos',
+          });
           reject(new Error('Failed to delete photos'));
         };
       });

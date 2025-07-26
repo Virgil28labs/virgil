@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { PhotoGalleryState, SavedPhoto } from '../../../types/camera.types';
 import { usePhotos } from './usePhotos';
 import { timeService } from '../../../services/TimeService';
+import { logger } from '../../../lib/logger';
 
 export const usePhotoGallery = () => {
   const {
@@ -175,7 +176,10 @@ export const usePhotoGallery = () => {
       }
       return photo;
     } catch (err) {
-      console.error('Error saving captured photo:', err);
+      logger.error('Error saving captured photo', err instanceof Error ? err : new Error(String(err)), {
+        component: 'usePhotoGallery',
+        action: 'handleCapture',
+      });
       return null;
     }
   }, [savePhoto, setActiveTab]);

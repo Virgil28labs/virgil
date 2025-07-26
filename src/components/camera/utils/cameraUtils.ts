@@ -1,5 +1,6 @@
 import type { CameraError, CameraSettings } from '../../../types/camera.types';
 import { timeService } from '../../../services/TimeService';
+import { logger } from '../../../lib/logger';
 
 export class CameraUtils {
   static async checkCameraPermission(): Promise<boolean> {
@@ -7,7 +8,10 @@ export class CameraUtils {
       const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
       return result.state === 'granted';
     } catch (_error) {
-      console.warn('Permission API not supported, checking via getUserMedia');
+      logger.warn('Permission API not supported, checking via getUserMedia', {
+        component: 'CameraUtils',
+        action: 'checkCameraPermission',
+      });
       return false;
     }
   }
@@ -89,7 +93,10 @@ export class CameraUtils {
       const devices = await navigator.mediaDevices.enumerateDevices();
       return devices.filter(device => device.kind === 'videoinput');
     } catch (_error) {
-      console.error('Error enumerating camera devices:', _error);
+      logger.error('Error enumerating camera devices', _error instanceof Error ? _error : new Error(String(_error)), {
+        component: 'CameraUtils',
+        action: 'enumerateCameras',
+      });
       return [];
     }
   }
@@ -205,7 +212,10 @@ export class CameraUtils {
       link.click();
       document.body.removeChild(link);
     } catch (_error) {
-      console.error('Error downloading photo:', _error);
+      logger.error('Error downloading photo', _error instanceof Error ? _error : new Error(String(_error)), {
+        component: 'CameraUtils',
+        action: 'downloadPhoto',
+      });
       throw new Error('Failed to download photo');
     }
   }
@@ -227,7 +237,10 @@ export class CameraUtils {
         text: 'Check out this photo I took!',
       });
     } catch (_error) {
-      console.error('Error sharing photo:', _error);
+      logger.error('Error sharing photo', _error instanceof Error ? _error : new Error(String(_error)), {
+        component: 'CameraUtils',
+        action: 'sharePhoto',
+      });
       throw new Error('Failed to share photo');
     }
   }

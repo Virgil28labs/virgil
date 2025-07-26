@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import React, { Component } from 'react';
+import { logger } from '../../lib/logger';
 
 interface Props {
   children: ReactNode
@@ -23,7 +24,14 @@ export class SectionErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(`Error in ${this.props.sectionName || 'section'}:`, error, errorInfo);
+    logger.error(`Error in ${this.props.sectionName || 'section'}`, error, {
+      component: 'SectionErrorBoundary',
+      action: 'componentDidCatch',
+      metadata: {
+        sectionName: this.props.sectionName,
+        errorInfo,
+      },
+    });
   }
 
   handleReset = () => {
