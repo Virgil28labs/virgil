@@ -6,6 +6,7 @@ const fetch = require('node-fetch');
 // Constants
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 const API_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 // Weather-specific rate limiter
 const weatherLimiter = rateLimit({
@@ -83,33 +84,58 @@ const fetchWeatherData = async url => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw {
-      status: response.status,
-      message: errorData.message || 'Failed to fetch weather data',
-    };
+    const error = new Error(errorData.message || 'Failed to fetch weather data');
+    error.status = response.status;
+    throw error;
   }
 
   return response.json();
 };
 
+// Helper function to build API URLs
+const buildApiUrl = (endpoint, params, apiKey) => {
+  const url = new URL(`${API_BASE_URL}/${endpoint}`);
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
+  url.searchParams.append('appid', apiKey);
+  url.searchParams.append('units', 'imperial');
+  return url.toString();
+};
+
+// Helper function to fetch air quality data
+const fetchAirQualityData = async (lat, lon, apiKey) => {
+  try {
+    const url = buildApiUrl('air_pollution', { lat, lon }, apiKey);
+    const data = await fetchWeatherData(url);
+
+    return {
+      aqi: data.list[0].main.aqi,
+      pm2_5: data.list[0].components.pm2_5,
+      pm10: data.list[0].components.pm10,
+      co: data.list[0].components.co,
+      no2: data.list[0].components.no2,
+      o3: data.list[0].components.o3,
+      so2: data.list[0].components.so2,
+    };
+  } catch (_error) {
+    // Return null if air quality fetch fails (non-critical)
+    return null;
+  }
+};
+
 // Process 3-hour forecast data into daily summaries
 const processForecastData = data => {
-  const dailyData = {};
-
-  // Group forecast data by day (using local timezone, not UTC)
-  data.list.forEach(item => {
+  // Group forecast data by day
+  const dailyMap = data.list.reduce((acc, item) => {
     const date = new Date(item.dt * 1000);
-    // Use local date instead of UTC to prevent wrong day display
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const dayOfMonth = String(date.getDate()).padStart(2, '0');
-    const dayKey = `${year}-${month}-${dayOfMonth}`; // Local YYYY-MM-DD format
+    const dayKey = date.toISOString().split('T')[0]; // YYYY-MM-DD format
 
-    if (!dailyData[dayKey]) {
-      dailyData[dayKey] = {
+    if (!acc[dayKey]) {
+      acc[dayKey] = {
         date: dayKey,
         temps: [],
-        conditions: [],
+        conditions: new Map(),
         icons: [],
         descriptions: [],
         humidity: [],
@@ -117,61 +143,50 @@ const processForecastData = data => {
       };
     }
 
-    const day = dailyData[dayKey];
+    const day = acc[dayKey];
     day.temps.push(item.main.temp);
-    day.conditions.push(item.weather[0].main);
     day.icons.push(item.weather[0].icon);
     day.descriptions.push(item.weather[0].description);
     day.humidity.push(item.main.humidity);
     day.windSpeed.push(item.wind.speed);
-  });
+
+    // Count condition occurrences
+    const condition = item.weather[0].main;
+    day.conditions.set(condition, (day.conditions.get(condition) || 0) + 1);
+
+    return acc;
+  }, {});
 
   // Convert to array and calculate daily summaries
-  const forecasts = Object.values(dailyData).map(day => {
-    // Find min/max temperatures
-    const tempMin = Math.round(Math.min(...day.temps));
-    const tempMax = Math.round(Math.max(...day.temps));
+  const forecasts = Object.values(dailyMap)
+    .map(day => {
+      // Find most common condition
+      const mainCondition = [...day.conditions.entries()]
+        .reduce((a, b) => a[1] > b[1] ? a : b)[0];
 
-    // Find most common weather condition
-    const conditionCounts = {};
-    day.conditions.forEach(condition => {
-      conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
-    });
-    const mainCondition = Object.entries(conditionCounts)
-      .sort((a, b) => b[1] - a[1])[0][0];
+      const conditionIndex = day.icons.findIndex((_, i) =>
+        data.list[i]?.weather[0].main === mainCondition,
+      );
 
-    // Find corresponding icon for main condition
-    const conditionIndex = day.conditions.findIndex(c => c === mainCondition);
-    const icon = day.icons[conditionIndex];
-    const description = day.descriptions[conditionIndex];
+      return {
+        date: day.date,
+        tempMin: Math.round(Math.min(...day.temps)),
+        tempMax: Math.round(Math.max(...day.temps)),
+        condition: {
+          main: mainCondition,
+          description: day.descriptions[conditionIndex] || day.descriptions[0],
+          icon: (day.icons[conditionIndex] || day.icons[0]).replace('n', 'd'),
+        },
+        humidity: Math.round(day.humidity.reduce((a, b) => a + b, 0) / day.humidity.length),
+        windSpeed: Math.round(day.windSpeed.reduce((a, b) => a + b, 0) / day.windSpeed.length),
+      };
+    })
+    .slice(0, 5); // Only next 5 days
 
-    // Calculate averages
-    const avgHumidity = Math.round(
-      day.humidity.reduce((a, b) => a + b) / day.humidity.length,
-    );
-    const avgWindSpeed = Math.round(
-      day.windSpeed.reduce((a, b) => a + b) / day.windSpeed.length,
-    );
-
-    return {
-      date: day.date,
-      tempMin,
-      tempMax,
-      condition: {
-        main: mainCondition,
-        description,
-        icon: icon.replace('n', 'd'), // Always use day icons for consistency
-      },
-      humidity: avgHumidity,
-      windSpeed: avgWindSpeed,
-    };
-  });
-
-  // Return only next 5 days
   return {
     cityName: data.city.name,
     country: data.city.country,
-    forecasts: forecasts.slice(0, 5),
+    forecasts,
   };
 };
 
@@ -200,14 +215,12 @@ router.get('/', validateApiKey, async (req, res) => {
       }
 
       cacheKey = `weather-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
-      apiUrl = `${API_BASE_URL}/weather?lat=${latitude}&lon=${longitude}` +
-        `&appid=${req.apiKey}&units=imperial`;
+      apiUrl = buildApiUrl('weather', { lat: latitude, lon: longitude }, req.apiKey);
     } else if (city) {
       // City-based request
       const location = country ? `${city},${country}` : city;
       cacheKey = `weather-city-${location.toLowerCase()}`;
-      apiUrl = `${API_BASE_URL}/weather?q=${encodeURIComponent(location)}` +
-        `&appid=${req.apiKey}&units=imperial`;
+      apiUrl = buildApiUrl('weather', { q: location }, req.apiKey);
     } else {
       return res.status(400).json({
         error: 'Either coordinates (lat, lon) or city name is required',
@@ -224,48 +237,28 @@ router.get('/', validateApiKey, async (req, res) => {
       });
     }
 
-    // Fetch from OpenWeatherMap
-    const data = await fetchWeatherData(apiUrl);
+    // Fetch weather data first
+    const weatherResponse = await fetchWeatherData(apiUrl);
 
-    // Fetch air quality data using coordinates from weather response
-    try {
-      const airQualityUrl = 'http://api.openweathermap.org/data/2.5/air_pollution?' +
-        `lat=${data.coord.lat}&lon=${data.coord.lon}&appid=${req.apiKey}`;
-      const airQualityData = await fetchWeatherData(airQualityUrl);
+    // Fetch air quality data in parallel using coordinates from weather response
+    const [weatherData, airQualityData] = await Promise.all([
+      Promise.resolve(transformWeatherData(weatherResponse)),
+      fetchAirQualityData(weatherResponse.coord.lat, weatherResponse.coord.lon, req.apiKey),
+    ]);
 
-      // Transform weather data and include air quality
-      const weatherData = transformWeatherData(data);
-      weatherData.airQuality = {
-        aqi: airQualityData.list[0].main.aqi,
-        pm2_5: airQualityData.list[0].components.pm2_5,
-        pm10: airQualityData.list[0].components.pm10,
-        co: airQualityData.list[0].components.co,
-        no2: airQualityData.list[0].components.no2,
-        o3: airQualityData.list[0].components.o3,
-        so2: airQualityData.list[0].components.so2,
-      };
-
-      // Update cache
-      updateCache(cacheKey, weatherData);
-
-      res.json({
-        success: true,
-        data: weatherData,
-        cached: false,
-      });
-    } catch (_airQualityError) {
-      // If air quality fails, still return weather data
-      const weatherData = transformWeatherData(data);
-
-      // Update cache
-      updateCache(cacheKey, weatherData);
-
-      res.json({
-        success: true,
-        data: weatherData,
-        cached: false,
-      });
+    // Include air quality data if available
+    if (airQualityData) {
+      weatherData.airQuality = airQualityData;
     }
+
+    // Update cache
+    updateCache(cacheKey, weatherData);
+
+    res.json({
+      success: true,
+      data: weatherData,
+      cached: false,
+    });
 
   } catch (error) {
     if (error.status) {
@@ -307,14 +300,12 @@ router.get('/forecast', validateApiKey, async (req, res) => {
       }
 
       cacheKey = `forecast-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
-      apiUrl = `${API_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}` +
-        `&appid=${req.apiKey}&units=imperial`;
+      apiUrl = buildApiUrl('forecast', { lat: latitude, lon: longitude }, req.apiKey);
     } else if (city) {
       // City-based request
       const location = country ? `${city},${country}` : city;
       cacheKey = `forecast-city-${location.toLowerCase()}`;
-      apiUrl = `${API_BASE_URL}/forecast?q=${encodeURIComponent(location)}` +
-        `&appid=${req.apiKey}&units=imperial`;
+      apiUrl = buildApiUrl('forecast', { q: location }, req.apiKey);
     } else {
       return res.status(400).json({
         error: 'Either coordinates (lat, lon) or city name is required',
@@ -360,84 +351,6 @@ router.get('/forecast', validateApiKey, async (req, res) => {
 });
 
 /**
- * GET /api/v1/weather/air-quality
- * Get current air quality by coordinates
- * Query params: lat, lon
- */
-router.get('/air-quality', validateApiKey, async (req, res) => {
-  try {
-    const { lat, lon } = req.query;
-
-    if (!lat || !lon) {
-      return res.status(400).json({
-        error: 'Coordinates (lat, lon) are required',
-      });
-    }
-
-    const latitude = parseFloat(lat);
-    const longitude = parseFloat(lon);
-
-    if (isNaN(latitude) || isNaN(longitude)) {
-      return res.status(400).json({
-        error: 'Invalid coordinates provided',
-      });
-    }
-
-    const cacheKey = `air-quality-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
-
-    // Check cache
-    const cachedData = checkCache(cacheKey);
-    if (cachedData) {
-      return res.json({
-        success: true,
-        data: cachedData,
-        cached: true,
-      });
-    }
-
-    // Fetch from OpenWeatherMap Air Pollution API
-    const apiUrl = 'http://api.openweathermap.org/data/2.5/air_pollution?' +
-      `lat=${latitude}&lon=${longitude}&appid=${req.apiKey}`;
-
-    const data = await fetchWeatherData(apiUrl);
-
-    // Transform the response
-    const airQualityData = {
-      aqi: data.list[0].main.aqi,
-      pm2_5: data.list[0].components.pm2_5,
-      pm10: data.list[0].components.pm10,
-      co: data.list[0].components.co,
-      no2: data.list[0].components.no2,
-      o3: data.list[0].components.o3,
-      so2: data.list[0].components.so2,
-      timestamp: Date.now(),
-    };
-
-    // Update cache
-    updateCache(cacheKey, airQualityData);
-
-    res.json({
-      success: true,
-      data: airQualityData,
-      cached: false,
-    });
-
-  } catch (error) {
-    if (error.status) {
-      res.status(error.status).json({
-        error: error.message,
-        status: error.status,
-      });
-    } else {
-      res.status(500).json({
-        error: 'Internal server error',
-        message: 'Failed to process air quality request',
-      });
-    }
-  }
-});
-
-/**
  * GET /api/v1/weather/health
  * Health check endpoint
  */
@@ -461,6 +374,6 @@ setInterval(() => {
       weatherCache.delete(key);
     }
   }
-}, 60 * 1000); // Run every minute
+}, CACHE_CLEANUP_INTERVAL); // Run every 5 minutes
 
 module.exports = router;

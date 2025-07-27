@@ -83,8 +83,17 @@
 
   /* Z-Index Scale (document current usage for future refactoring) */
   /* 100: Skip links */
-  /* 1000: Modals, overlays, floating elements */
+  /* 1000: Modals, overlays, floating elements, weather widget expanded */
   /* 2000: Timezone hover panel */
   /* 2999: User profile viewer */
   /* 3000: Highest priority overlays */
+  
+  /* Weather Widget Variables */
+  --weather-widget-padding: 10px 16px;
+  --weather-widget-gap: 12px;
+  --weather-font-temp: 15px;
+  --weather-font-emoji: 20px;
+  --weather-font-condition: 11px;
+  --weather-font-aqi: 13px;
+  --weather-hover-delay: 500ms;
 }

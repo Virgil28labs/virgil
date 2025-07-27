@@ -14,6 +14,7 @@ interface WeatherForecastProps {
  */
 export const WeatherForecast = memo(function WeatherForecast({
   forecast,
+  unit,
 }: WeatherForecastProps) {
   const formatDate = (dateString: string): string => {
     // Parse date string as local date (not UTC)
@@ -48,10 +49,10 @@ export const WeatherForecast = memo(function WeatherForecast({
             </div>
             <div className="forecast-temps">
               <span className="forecast-temp-high">
-                {day.tempMax}°
+                {day.tempMax}°{unit === 'fahrenheit' ? 'F' : 'C'}
               </span>
               <span className="forecast-temp-low">
-                {day.tempMin}°
+                {day.tempMin}°{unit === 'fahrenheit' ? 'F' : 'C'}
               </span>
             </div>
             <div className="forecast-condition">

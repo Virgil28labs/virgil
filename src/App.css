@@ -1847,26 +1847,19 @@ a:focus-visible,
 
 /* Weather Widget Styles */
 .weather-widget {
-  position: fixed !important;
-  top: 20px !important;
-  right: 80px !important;
-  left: auto !important;
-  bottom: auto !important;
+  position: fixed;
+  top: 20px;
+  right: 80px;
   background: rgba(108, 59, 170, 0.08);
   border: 1px solid rgba(108, 59, 170, 0.2);
   border-radius: 14px;
-  padding: 10px 16px;
+  padding: var(--weather-widget-padding);
   cursor: pointer;
-  transition: all 0.3s ease, opacity 0.15s ease;
+  transition: all var(--transition-normal), opacity 0.15s ease;
   z-index: 1000;
   backdrop-filter: blur(12px);
-  min-width: auto;
-  width: auto;
   text-align: center;
   opacity: 1;
-  /* Reset any transform that might be inherited */
-  transform: none !important;
-  /* Enhanced for raccoon interaction */
   will-change: transform, box-shadow, background, border-color;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -1898,10 +1891,10 @@ a:focus-visible,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--weather-widget-gap);
   font-family: 'Montserrat', sans-serif;
-  color: var(--brand-light-gray);
-  transition: opacity 0.2s ease;
+  color: var(--color-text-primary);
+  transition: opacity var(--transition-fast);
 }
 
 .weather-icon-group {
@@ -1912,31 +1905,25 @@ a:focus-visible,
 }
 
 .weather-emoji {
-  font-size: 20px;
+  font-size: var(--weather-font-emoji);
   line-height: 1;
 }
 
 .weather-temp {
-  font-size: 15px;
+  font-size: var(--weather-font-temp);
   font-weight: 600;
-  color: var(--brand-light-gray);
+  color: var(--color-text-primary);
   margin-left: 4px;
 }
 
 .weather-condition {
-  font-size: 11px;
+  font-size: var(--weather-font-condition);
   opacity: 0.7;
   text-transform: capitalize;
   font-weight: 500;
   line-height: 1;
 }
 
-.weather-separator {
-  margin: 0 8px;
-  color: var(--brand-gray);
-  opacity: 0.5;
-  font-size: 16px;
-}
 
 .weather-aqi {
   display: flex;
@@ -1953,9 +1940,9 @@ a:focus-visible,
 }
 
 .aqi-text {
-  font-size: 13px;
+  font-size: var(--weather-font-aqi);
   font-weight: 600;
-  color: var(--brand-gray);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   opacity: 0.8;
   letter-spacing: 0.5px;
@@ -1965,13 +1952,9 @@ a:focus-visible,
 /* Mobile responsiveness for weather widget */
 @media (max-width: 768px) {
   .weather-widget {
-    top: 15px !important;
-    right: 60px !important;
+    top: 15px;
+    right: 60px;
     padding: 8px 14px;
-  }
-  
-  .weather-temp {
-    font-size: 15px;
   }
   
   .weather-emoji {
@@ -1981,22 +1964,14 @@ a:focus-visible,
   .weather-condition {
     display: none;
   }
-  
-  .weather-aqi {
-    display: none;
-  }
 }
 
 /* Very small screens - stack weather below power button */
 @media (max-width: 480px) {
   .weather-widget {
-    top: 60px !important;
-    right: 20px !important;
+    top: 60px;
+    right: 20px;
     padding: 6px 12px;
-  }
-  
-  .weather-temp {
-    font-size: 15px;
   }
   
   .weather-emoji {
@@ -2005,9 +1980,6 @@ a:focus-visible,
 }
 
 /* Weather Forecast Styles */
-.weather-widget-expanded {
-  z-index: 1000;
-}
 
 .weather-forecast-container {
   position: absolute;

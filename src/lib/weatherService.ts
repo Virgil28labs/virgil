@@ -3,9 +3,16 @@ import { dedupeFetch } from './requestDeduplication';
 import { retryWithBackoff } from './retryUtils';
 import { timeService } from '../services/TimeService';
 import { logger } from './logger';
+import { 
+  WEATHER_CACHE_DURATION, 
+  API_RETRY_CONFIG,
+  WEATHER_EMOJI_MAP,
+  WEATHER_CONDITION_RANGES,
+  AQI_COLORS,
+  AQI_DESCRIPTIONS,
+} from '../constants/weather.constants';
 
 const BACKEND_API_BASE = import.meta.env.VITE_LLM_API_URL || 'http://localhost:5002/api/v1';
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 class WeatherService {
   private cache: Map<string, { data: WeatherData; timestamp: number }> = new Map();
@@ -21,7 +28,7 @@ class WeatherService {
 
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < WEATHER_CACHE_DURATION) {
       return cached.data;
     }
 
@@ -52,8 +59,7 @@ class WeatherService {
           return res;
         },
         {
-          maxRetries: 3,
-          initialDelay: 1000,
+          ...API_RETRY_CONFIG,
           onRetry: () => {
             // Retry silently
           },
@@ -94,7 +100,7 @@ class WeatherService {
 
     // Check cache first
     const cached = this.cache.get(cacheKey);
-    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < WEATHER_CACHE_DURATION) {
       return cached.data;
     }
 
@@ -106,16 +112,36 @@ class WeatherService {
 
       const url = `${BACKEND_API_BASE}/weather?${params.toString()}`;
 
-      const response = await dedupeFetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await dedupeFetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          });
 
-      if (!response.ok) {
-        throw new Error(`Weather API error: ${response.status}`);
-      }
+          if (!res.ok) {
+            let errorText = 'Unknown error';
+            try {
+              const errorData = await res.json();
+              errorText = errorData.error || errorData.message || `HTTP ${res.status}`;
+            } catch {
+              errorText = await res.text().catch(() => `HTTP ${res.status}`);
+            }
+            throw new Error(errorText);
+          }
+
+          return res;
+        },
+        {
+          ...API_RETRY_CONFIG,
+          onRetry: () => {
+            // Retry silently
+          },
+        },
+      );
 
       const result = await response.json();
 
@@ -150,7 +176,7 @@ class WeatherService {
 
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
-    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < WEATHER_CACHE_DURATION) {
       return cached.data;
     }
 
@@ -181,8 +207,7 @@ class WeatherService {
           return res;
         },
         {
-          maxRetries: 3,
-          initialDelay: 1000,
+          ...API_RETRY_CONFIG,
           onRetry: () => {
             // Retry silently
           },
@@ -223,7 +248,7 @@ class WeatherService {
 
     // Check cache first
     const cached = this.forecastCache.get(cacheKey);
-    if (cached && timeService.getTimestamp() - cached.timestamp < CACHE_DURATION) {
+    if (cached && timeService.getTimestamp() - cached.timestamp < WEATHER_CACHE_DURATION) {
       return cached.data;
     }
 
@@ -235,16 +260,36 @@ class WeatherService {
 
       const url = `${BACKEND_API_BASE}/weather/forecast?${params.toString()}`;
 
-      const response = await dedupeFetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await dedupeFetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          });
 
-      if (!response.ok) {
-        throw new Error(`Forecast API error: ${response.status}`);
-      }
+          if (!res.ok) {
+            let errorText = 'Unknown error';
+            try {
+              const errorData = await res.json();
+              errorText = errorData.error || errorData.message || `HTTP ${res.status}`;
+            } catch {
+              errorText = await res.text().catch(() => `HTTP ${res.status}`);
+            }
+            throw new Error(errorText);
+          }
+
+          return res;
+        },
+        {
+          ...API_RETRY_CONFIG,
+          onRetry: () => {
+            // Retry silently
+          },
+        },
+      );
 
       const result = await response.json();
 
@@ -293,16 +338,23 @@ class WeatherService {
    * Get weather emoji based on condition
    */
   getWeatherEmoji(conditionId: number): string {
-    if (conditionId >= 200 && conditionId < 300) return '⛈️'; // Thunderstorm
-    if (conditionId >= 300 && conditionId < 400) return '🌦️'; // Drizzle
-    if (conditionId >= 500 && conditionId < 600) return '🌧️'; // Rain
-    if (conditionId >= 600 && conditionId < 700) return '❄️'; // Snow
-    if (conditionId >= 700 && conditionId < 800) return '🌫️'; // Atmosphere
-    if (conditionId === 800) return '☀️'; // Clear
-    if (conditionId === 801) return '🌤️'; // Few clouds
-    if (conditionId === 802) return '⛅'; // Scattered clouds
-    if (conditionId === 803 || conditionId === 804) return '☁️'; // Broken/Overcast clouds
-    return '🌡️'; // Default
+    // Check each weather condition range
+    for (const [conditionType, range] of Object.entries(WEATHER_CONDITION_RANGES)) {
+      if (conditionId >= range.min && conditionId <= range.max) {
+        switch (conditionType) {
+          case 'thunderstorm': return WEATHER_EMOJI_MAP.thunderstorm;
+          case 'drizzle': return WEATHER_EMOJI_MAP.drizzle;
+          case 'rain': return WEATHER_EMOJI_MAP.rain;
+          case 'snow': return WEATHER_EMOJI_MAP.snow;
+          case 'atmosphere': return WEATHER_EMOJI_MAP.atmosphere;
+          case 'clear': return WEATHER_EMOJI_MAP.clear;
+          case 'fewClouds': return WEATHER_EMOJI_MAP['few-clouds'];
+          case 'scatteredClouds': return WEATHER_EMOJI_MAP['scattered-clouds'];
+          case 'clouds': return WEATHER_EMOJI_MAP.clouds;
+        }
+      }
+    }
+    return WEATHER_EMOJI_MAP.default;
   }
 
 
@@ -310,28 +362,14 @@ class WeatherService {
    * Get AQI color based on level
    */
   getAQIColor(aqi: number): string {
-    switch (aqi) {
-      case 1: return '#22c55e'; // green - Good
-      case 2: return '#eab308'; // yellow - Fair
-      case 3: return '#f97316'; // orange - Moderate
-      case 4: return '#ef4444'; // red - Poor
-      case 5: return '#a855f7'; // purple - Very Poor
-      default: return '#6b7280'; // gray - Unknown
-    }
+    return AQI_COLORS[aqi] || '#6b7280'; // gray for unknown
   }
 
   /**
    * Get AQI description
    */
   getAQIDescription(aqi: number): string {
-    switch (aqi) {
-      case 1: return 'Good';
-      case 2: return 'Fair';
-      case 3: return 'Moderate';
-      case 4: return 'Poor';
-      case 5: return 'Very Poor';
-      default: return 'Unknown';
-    }
+    return AQI_DESCRIPTIONS[aqi] || 'Unknown';
   }
 
   /**

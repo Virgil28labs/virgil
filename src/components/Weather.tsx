@@ -3,6 +3,7 @@ import { useWeather } from '../hooks/useWeather';
 import { weatherService } from '../lib/weatherService';
 import { Skeleton } from './ui/skeleton';
 import { WeatherForecast } from './WeatherForecast';
+import { HOVER_DELAY_MS } from '../constants/weather.constants';
 
 /**
  * Weather Component
@@ -20,7 +21,7 @@ export const Weather = memo(function Weather() {
     if (forecast && !hoverTimeoutRef.current) {
       hoverTimeoutRef.current = setTimeout(() => {
         setShowForecast(true);
-      }, 500); // 500ms delay to prevent accidental hovers
+      }, HOVER_DELAY_MS);
     }
   };
 
@@ -46,7 +47,8 @@ export const Weather = memo(function Weather() {
   return (
     <div
       ref={componentRef}
-      className={`weather-widget ${showForecast ? 'weather-widget-expanded' : ''}`}
+      className="weather-widget"
+      style={showForecast ? { zIndex: 1000 } : undefined}
       role="region"
       aria-label="Weather information"
       onMouseEnter={handleMouseEnter}

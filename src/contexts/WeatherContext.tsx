@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { useReducer, useEffect, useCallback, useMemo } from 'react';
+import React, { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import { useLocation } from '../hooks/useLocation';
 import { logger } from '../lib/logger';
 import { timeService } from '../services/TimeService';
+import { WEATHER_CACHE_DURATION, FALLBACK_LOCATION } from '../constants/weather.constants';
 import type {
   WeatherContextType,
   WeatherState,
@@ -71,6 +72,31 @@ interface WeatherProviderProps {
   children: ReactNode;
 }
 
+// Helper function to fetch fallback weather data
+const fetchFallbackWeather = async (
+  dispatch: React.Dispatch<WeatherAction>,
+): Promise<void> => {
+  try {
+    const [weatherData, forecastData] = await Promise.all([
+      weatherService.getWeatherByCoordinates(FALLBACK_LOCATION.lat, FALLBACK_LOCATION.lon),
+      weatherService.getForecastByCoordinates(FALLBACK_LOCATION.lat, FALLBACK_LOCATION.lon)
+        .catch(() => null), // Don't fail if forecast fails
+    ]);
+    
+    dispatch({ type: 'SET_WEATHER_DATA', payload: weatherData });
+    
+    if (forecastData) {
+      dispatch({ type: 'SET_FORECAST_DATA', payload: forecastData });
+    }
+  } catch (error) {
+    logger.error('Failed to fetch fallback weather', error as Error, {
+      component: 'WeatherContext',
+      action: 'fetchFallbackWeather',
+    });
+    dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
+  }
+};
+
 export function WeatherProvider({ children }: WeatherProviderProps) {
   const [state, dispatch] = useReducer(weatherReducer, initialState);
   const { coordinates, ipLocation } = useLocation();
@@ -81,9 +107,9 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       return;
     }
 
-    // Check cache validity (10 minutes)
-    const cacheExpiry = 10 * 60 * 1000;
-    const isCacheValid = state.lastUpdated && (timeService.getTimestamp() - state.lastUpdated) < cacheExpiry;
+    // Check cache validity
+    const isCacheValid = state.lastUpdated && 
+      (timeService.getTimestamp() - state.lastUpdated) < WEATHER_CACHE_DURATION;
 
     if (!forceRefresh && isCacheValid) {
       return;
@@ -91,29 +117,8 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
 
     // Need either coordinates or city to fetch weather
     if (!coordinates && !ipLocation?.city) {
-      // Use San Francisco as fallback location
-      try {
-        const fallbackWeatherData = await weatherService.getWeatherByCoordinates(37.7749, -122.4194);
-        
-        dispatch({ type: 'SET_WEATHER_DATA', payload: fallbackWeatherData });
-
-        // Also fetch forecast for fallback location
-        try {
-          const fallbackForecastData = await weatherService.getForecastByCoordinates(37.7749, -122.4194);
-          dispatch({ type: 'SET_FORECAST_DATA', payload: fallbackForecastData });
-        } catch (forecastError) {
-          logger.error('Failed to fetch fallback forecast', forecastError as Error, {
-            component: 'WeatherContext',
-            action: 'fetchWeatherAndForecast',
-            metadata: { fallback: true },
-          });
-        }
-
-        return;
-      } catch (_fallbackError: unknown) {
-        dispatch({ type: 'SET_ERROR', payload: 'Weather service unavailable' });
-        return;
-      }
+      await fetchFallbackWeather(dispatch);
+      return;
     }
 
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -193,15 +198,14 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
 
     // Initial fetch if we don't have recent data
     const timeSinceLastUpdate = timeService.getTimestamp() - (state.lastUpdated || 0);
-    const cacheExpiry = 10 * 60 * 1000;
-    if (!state.loading && timeSinceLastUpdate > cacheExpiry) {
+    if (!state.loading && timeSinceLastUpdate > WEATHER_CACHE_DURATION) {
       fetchWeather();
     }
 
     // Set up auto-refresh interval
     const interval = setInterval(() => {
       fetchWeather(true);
-    }, cacheExpiry); // 10 minutes
+    }, WEATHER_CACHE_DURATION);
 
     return () => clearInterval(interval);
   }, [coordinates, ipLocation?.city, state.loading, state.lastUpdated, fetchWeather]);
