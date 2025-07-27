@@ -3,7 +3,9 @@ import { useAuth } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
 import { VirgilTextLogo } from './VirgilTextLogo';
 import { DateTime } from './DateTime';
-import { LazyRaccoonMascot, LazyWeather, LazyUserProfileViewer } from './LazyComponents';
+import { LazyRaccoonMascot } from './LazyComponents';
+import { Weather } from './Weather';
+import { UserProfileViewer } from './UserProfileViewer';
 import { DogEmojiButton } from './DogEmojiButton';
 import { GiphyEmojiButton } from './GiphyEmojiButton';
 import { NasaApodButton } from './NasaApodButton';
@@ -143,9 +145,7 @@ export const Dashboard = memo(function Dashboard() {
       <VirgilTextLogo onClick={() => setShowProfileViewer(true)} />
       <DateTime />
       <SectionErrorBoundary sectionName="Weather" fallback={null}>
-        <Suspense fallback={null}>
-          <LazyWeather />
-        </Suspense>
+        <Weather />
       </SectionErrorBoundary>
 
       {/* Power button */}
@@ -287,12 +287,10 @@ export const Dashboard = memo(function Dashboard() {
       <VectorMemoryButton />
 
       {/* User Profile Viewer */}
-      <Suspense fallback={<LoadingFallback message="Loading profile..." size="small" variant="skeleton" />}>
-        <LazyUserProfileViewer
-          isOpen={showProfileViewer}
-          onClose={() => setShowProfileViewer(false)}
-        />
-      </Suspense>
+      <UserProfileViewer
+        isOpen={showProfileViewer}
+        onClose={() => setShowProfileViewer(false)}
+      />
 
       {/* Google Maps Modal */}
       <SectionErrorBoundary sectionName="Maps">

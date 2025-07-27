@@ -61,15 +61,27 @@ export const Weather = memo(function Weather() {
         // Weather data available
         <div onClick={toggleUnit} title={`${data.condition.description} - Click to toggle unit`}>
           <div className="weather-content">
-            <span className="weather-emoji" aria-hidden="true">
-              {weatherService.getWeatherEmoji(data.condition.id || 0)}
-            </span>
+            <div className="weather-icon-group">
+              <span className="weather-emoji" aria-hidden="true">
+                {weatherService.getWeatherEmoji(data.condition.id || 0)}
+              </span>
+              <span className="weather-condition">
+                {data.condition.main}
+              </span>
+            </div>
             <span className="weather-temp">
               {data.temperature}{unit === 'fahrenheit' ? '°F' : '°C'}
             </span>
-            <span className="weather-condition">
-              {data.condition.main}
-            </span>
+            {data.airQuality && (
+              <div className="weather-aqi">
+                <span className="aqi-text">AQI</span>
+                <span 
+                  className="aqi-dot" 
+                  style={{ backgroundColor: weatherService.getAQIColor(data.airQuality.aqi) }}
+                  aria-hidden="true"
+                />
+              </div>
+            )}
           </div>
         </div>
       ) : error && !hasWeather ? (

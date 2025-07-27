@@ -305,6 +305,35 @@ class WeatherService {
     return '🌡️'; // Default
   }
 
+
+  /**
+   * Get AQI color based on level
+   */
+  getAQIColor(aqi: number): string {
+    switch (aqi) {
+      case 1: return '#22c55e'; // green - Good
+      case 2: return '#eab308'; // yellow - Fair
+      case 3: return '#f97316'; // orange - Moderate
+      case 4: return '#ef4444'; // red - Poor
+      case 5: return '#a855f7'; // purple - Very Poor
+      default: return '#6b7280'; // gray - Unknown
+    }
+  }
+
+  /**
+   * Get AQI description
+   */
+  getAQIDescription(aqi: number): string {
+    switch (aqi) {
+      case 1: return 'Good';
+      case 2: return 'Fair';
+      case 3: return 'Moderate';
+      case 4: return 'Poor';
+      case 5: return 'Very Poor';
+      default: return 'Unknown';
+    }
+  }
+
   /**
    * Clear cache
    */

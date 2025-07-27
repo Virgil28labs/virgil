@@ -10,6 +10,16 @@ export interface WeatherCondition {
   icon: string;
 }
 
+export interface AirQualityData {
+  aqi: number; // Air Quality Index (1-5)
+  pm2_5: number; // PM2.5 in μg/m³
+  pm10: number; // PM10 in μg/m³
+  co?: number; // Carbon Monoxide in μg/m³
+  no2?: number; // Nitrogen Dioxide in μg/m³
+  o3?: number; // Ozone in μg/m³
+  so2?: number; // Sulfur Dioxide in μg/m³
+}
+
 export interface WeatherData {
   temperature: number;
   feelsLike: number;
@@ -28,6 +38,7 @@ export interface WeatherData {
   cityName: string;
   country: string;
   timestamp: number;
+  airQuality?: AirQualityData; // Optional air quality data
 }
 
 export interface ForecastDay {

@@ -1,11 +1,12 @@
 import React, { Suspense, useEffect } from 'react';
-import './App.css';
 import { StyleSheetManager } from 'styled-components';
 import isPropValid from '@emotion/is-prop-valid';
+
 import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './hooks/useAuth';
 import { LocationProvider } from './contexts/LocationContext';
 import { WeatherProvider } from './contexts/WeatherContext';
+import { useAuth } from './hooks/useAuth';
+import { useToast } from './hooks/useToast';
 import { AuthPage } from './components/AuthPage';
 import { Dashboard } from './components/Dashboard';
 import { LazyVirgilChatbot } from './components/LazyComponents';
@@ -13,9 +14,9 @@ import { LoadingFallback } from './components/LoadingFallback';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Skeleton } from './components/ui/skeleton';
 import { ToastContainer } from './components/ToastNotification';
-import { useToast } from './hooks/useToast';
 import { StorageMigration } from './services/StorageMigration';
 import { logger } from './lib/logger';
+import './App.css';
 
 // Configure styled-components to filter out problematic props
 const shouldForwardProp = (propName: string) => {

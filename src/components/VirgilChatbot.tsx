@@ -1,6 +1,6 @@
 import { useEffect, useCallback, memo } from 'react';
+
 import { useAuth } from '../hooks/useAuth';
-import type { ModelOption } from '../types/chat.types';
 import { useFocusManagement } from '../hooks/useFocusManagement';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -18,6 +18,7 @@ import {
   ChatProvider,
   useChatContext,
 } from './chat';
+import type { ModelOption } from '../types/chat.types';
 import './VirgilChatbot.css';
 
 // Available models - defined at module level for reuse

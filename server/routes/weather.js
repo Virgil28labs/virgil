@@ -226,16 +226,46 @@ router.get('/', validateApiKey, async (req, res) => {
 
     // Fetch from OpenWeatherMap
     const data = await fetchWeatherData(apiUrl);
-    const weatherData = transformWeatherData(data);
 
-    // Update cache
-    updateCache(cacheKey, weatherData);
+    // Fetch air quality data using coordinates from weather response
+    try {
+      const airQualityUrl = 'http://api.openweathermap.org/data/2.5/air_pollution?' +
+        `lat=${data.coord.lat}&lon=${data.coord.lon}&appid=${req.apiKey}`;
+      const airQualityData = await fetchWeatherData(airQualityUrl);
 
-    res.json({
-      success: true,
-      data: weatherData,
-      cached: false,
-    });
+      // Transform weather data and include air quality
+      const weatherData = transformWeatherData(data);
+      weatherData.airQuality = {
+        aqi: airQualityData.list[0].main.aqi,
+        pm2_5: airQualityData.list[0].components.pm2_5,
+        pm10: airQualityData.list[0].components.pm10,
+        co: airQualityData.list[0].components.co,
+        no2: airQualityData.list[0].components.no2,
+        o3: airQualityData.list[0].components.o3,
+        so2: airQualityData.list[0].components.so2,
+      };
+
+      // Update cache
+      updateCache(cacheKey, weatherData);
+
+      res.json({
+        success: true,
+        data: weatherData,
+        cached: false,
+      });
+    } catch (_airQualityError) {
+      // If air quality fails, still return weather data
+      const weatherData = transformWeatherData(data);
+
+      // Update cache
+      updateCache(cacheKey, weatherData);
+
+      res.json({
+        success: true,
+        data: weatherData,
+        cached: false,
+      });
+    }
 
   } catch (error) {
     if (error.status) {
@@ -324,6 +354,84 @@ router.get('/forecast', validateApiKey, async (req, res) => {
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to process forecast request',
+      });
+    }
+  }
+});
+
+/**
+ * GET /api/v1/weather/air-quality
+ * Get current air quality by coordinates
+ * Query params: lat, lon
+ */
+router.get('/air-quality', validateApiKey, async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({
+        error: 'Coordinates (lat, lon) are required',
+      });
+    }
+
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({
+        error: 'Invalid coordinates provided',
+      });
+    }
+
+    const cacheKey = `air-quality-${latitude.toFixed(2)}-${longitude.toFixed(2)}`;
+
+    // Check cache
+    const cachedData = checkCache(cacheKey);
+    if (cachedData) {
+      return res.json({
+        success: true,
+        data: cachedData,
+        cached: true,
+      });
+    }
+
+    // Fetch from OpenWeatherMap Air Pollution API
+    const apiUrl = 'http://api.openweathermap.org/data/2.5/air_pollution?' +
+      `lat=${latitude}&lon=${longitude}&appid=${req.apiKey}`;
+
+    const data = await fetchWeatherData(apiUrl);
+
+    // Transform the response
+    const airQualityData = {
+      aqi: data.list[0].main.aqi,
+      pm2_5: data.list[0].components.pm2_5,
+      pm10: data.list[0].components.pm10,
+      co: data.list[0].components.co,
+      no2: data.list[0].components.no2,
+      o3: data.list[0].components.o3,
+      so2: data.list[0].components.so2,
+      timestamp: Date.now(),
+    };
+
+    // Update cache
+    updateCache(cacheKey, airQualityData);
+
+    res.json({
+      success: true,
+      data: airQualityData,
+      cached: false,
+    });
+
+  } catch (error) {
+    if (error.status) {
+      res.status(error.status).json({
+        error: error.message,
+        status: error.status,
+      });
+    } else {
+      res.status(500).json({
+        error: 'Internal server error',
+        message: 'Failed to process air quality request',
       });
     }
   }

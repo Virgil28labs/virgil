@@ -94,6 +94,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
       // Use San Francisco as fallback location
       try {
         const fallbackWeatherData = await weatherService.getWeatherByCoordinates(37.7749, -122.4194);
+        
         dispatch({ type: 'SET_WEATHER_DATA', payload: fallbackWeatherData });
 
         // Also fetch forecast for fallback location
@@ -128,7 +129,7 @@ export function WeatherProvider({ children }: WeatherProviderProps) {
           coordinates.longitude,
         );
 
-        // Fetch forecast data in parallel
+        // Fetch forecast data
         try {
           const forecastData = await weatherService.getForecastByCoordinates(
             coordinates.latitude,

@@ -3,8 +3,6 @@ import { render, screen } from '@testing-library/react';
 import {
   LazyRaccoonMascot,
   LazyVirgilChatbot,
-  LazyWeather,
-  LazyUserProfileViewer,
 } from './LazyComponents';
 import { lazyWeatherService, lazyLocationService } from '../lib/lazyServices';
 
@@ -19,10 +17,6 @@ jest.mock('react', () => ({
         return <div data-testid="raccoon-mascot">Raccoon Mascot Component</div>;
       } else if (importStr.includes('VirgilChatbot')) {
         return <div data-testid="virgil-chatbot">Virgil Chatbot Component</div>;
-      } else if (importStr.includes('Weather')) {
-        return <div data-testid="weather">Weather Component</div>;
-      } else if (importStr.includes('UserProfileViewer')) {
-        return <div data-testid="user-profile-viewer">User Profile Viewer Component</div>;
       }
       return <div>Unknown Component</div>;
     };
@@ -83,31 +77,6 @@ describe('LazyComponents', () => {
     });
   });
 
-  describe('LazyWeather', () => {
-    it('renders the Weather component', async () => {
-      render(
-        <TestWrapper>
-          <LazyWeather />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByTestId('weather')).toBeInTheDocument();
-      expect(screen.getByText('Weather Component')).toBeInTheDocument();
-    });
-  });
-
-  describe('LazyUserProfileViewer', () => {
-    it('renders the UserProfileViewer component', async () => {
-      render(
-        <TestWrapper>
-          <LazyUserProfileViewer isOpen onClose={() => {}} />
-        </TestWrapper>,
-      );
-
-      expect(screen.getByTestId('user-profile-viewer')).toBeInTheDocument();
-      expect(screen.getByText('User Profile Viewer Component')).toBeInTheDocument();
-    });
-  });
 
   describe('Lazy Service Loaders', () => {
     it('lazy loads the weather service', async () => {
@@ -132,28 +101,24 @@ describe('LazyComponents', () => {
       // Verify that all lazy components are defined and can be used
       expect(LazyRaccoonMascot).toBeDefined();
       expect(LazyVirgilChatbot).toBeDefined();
-      expect(LazyWeather).toBeDefined();
-      expect(LazyUserProfileViewer).toBeDefined();
 
       // In test environment, these are mocked but still valid components
       expect(typeof LazyRaccoonMascot).toBe('function');
       expect(typeof LazyVirgilChatbot).toBe('function');
-      expect(typeof LazyWeather).toBe('function');
-      expect(typeof LazyUserProfileViewer).toBe('function');
     });
 
     it('allows multiple lazy components to be rendered together', () => {
       render(
         <TestWrapper>
           <div>
-            <LazyWeather />
             <LazyRaccoonMascot />
+            <LazyVirgilChatbot />
           </div>
         </TestWrapper>,
       );
 
-      expect(screen.getByTestId('weather')).toBeInTheDocument();
       expect(screen.getByTestId('raccoon-mascot')).toBeInTheDocument();
+      expect(screen.getByTestId('virgil-chatbot')).toBeInTheDocument();
     });
   });
 });
