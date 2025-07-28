@@ -92,8 +92,8 @@
   --weather-widget-padding: 10px 16px;
   --weather-widget-gap: 12px;
   --weather-font-temp: 15px;
-  --weather-font-emoji: 20px;
-  --weather-font-condition: 11px;
+  --weather-font-emoji: 16px;
+  --weather-font-condition: 9px;
   --weather-font-aqi: 13px;
   --weather-hover-delay: 500ms;
 }

@@ -1,16 +1,13 @@
-import { memo, useRef, useEffect, useState, useCallback } from 'react';
+import { memo, useRef, useEffect, useCallback } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
 import type { StoredConversation } from '../../services/MemoryService';
-import { Skeleton } from '../ui/skeleton';
 import type { User } from '../../types/auth.types';
 import { FormattedText } from '../FormattedText';
-import { LoadingStates } from './LoadingStates';
 import { timeService } from '../../services/TimeService';
 import './chat-interface.css';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
-  isTyping: boolean;
   error: string | null;
   onErrorDismiss: () => void;
   onMarkAsImportant: (message: ChatMessage) => void;
@@ -19,56 +16,27 @@ interface ChatMessagesProps {
   user: User | null;
   lastConversation: StoredConversation | null;
 
-  // Enhanced loading states
-  loadingState?: {
-    type: 'generating' | 'processing' | 'thinking' | 'searching';
-    progress?: number;
-  };
+  // Simple loading state
+  isTyping: boolean;
 }
 
 const ChatMessages = memo(function ChatMessages({
   messages,
-  isTyping,
   error,
   onErrorDismiss,
   onMarkAsImportant,
   user,
   lastConversation,
-  loadingState,
+  isTyping,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
-  const [showLoadingState, setShowLoadingState] = useState(false);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isTyping, loadingState]);
-
-  // Delay showing typing indicator for better UX
-  // Only show skeleton if response takes >300ms to prevent flash on fast responses
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isTyping) {
-      timer = setTimeout(() => setShowTypingIndicator(true), 300);
-    } else {
-      setShowTypingIndicator(false);
-    }
-    return () => clearTimeout(timer);
-  }, [isTyping]);
-
-  // Enhanced loading state management
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (loadingState) {
-      timer = setTimeout(() => setShowLoadingState(true), 200);
-    } else {
-      setShowLoadingState(false);
-    }
-    return () => clearTimeout(timer);
-  }, [loadingState]);
+  }, [messages, isTyping]);
 
   const renderWelcomeMessage = useCallback(() => (
     <div className="welcome-msg">
@@ -137,35 +105,8 @@ const ChatMessages = memo(function ChatMessages({
       {/* Chat messages */}
       {messages.map(renderMessage)}
 
-      {/* Enhanced loading states */}
-      {showLoadingState && loadingState && (
-        <LoadingStates
-          variant="message"
-          type={loadingState.type}
-          progress={loadingState.progress}
-          isVisible
-        />
-      )}
-
-      {/* Simple typing indicator for basic loading */}
-      {showTypingIndicator && !loadingState && (
-        <LoadingStates
-          variant="typing"
-          isVisible
-        />
-      )}
-
-      {/* Fallback skeleton for very fast responses */}
-      {isTyping && !showTypingIndicator && !showLoadingState && (
-        <div className="flex items-center space-x-3 mb-2 px-2" role="status" aria-label="Virgil is typing">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <div className="space-y-1">
-            <Skeleton className="h-3 w-[160px]" />
-            <Skeleton className="h-3 w-[120px]" />
-          </div>
-          <span className="sr-only">Virgil is typing a response</span>
-        </div>
-      )}
+      {/* Ultra-minimal thinking indicator */}
+      {isTyping && <div style={{ padding: '8px 16px', opacity: 0.6 }}>💭</div>}
 
       {/* Error message */}
       {error && renderError()}

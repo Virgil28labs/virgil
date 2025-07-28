@@ -3,7 +3,6 @@ import type React from 'react';
 import { chatService } from '../services/ChatService';
 import { memoryService } from '../services/MemoryService';
 import { vectorMemoryService } from '../services/VectorMemoryService';
-import { useChatApi, type LoadingState } from './useChatApi';
 import type { ChatMessage } from '../types/chat.types';
 import { logger } from '../lib/logger';
 
@@ -24,7 +23,6 @@ interface UseMessageHandlingReturn {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleQuickAction: (action: string) => void;
-  loadingState: LoadingState | null;
   inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
@@ -41,31 +39,6 @@ export function useMessageHandling({
 }: UseMessageHandlingProps): UseMessageHandlingReturn {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Use chat API hook with enhanced loading states
-  const { sendMessage: sendChatMessage, loadingState } = useChatApi({
-    onSuccess: async (message) => {
-      addMessage(message);
-
-      // Save assistant message to continuous conversation
-      try {
-        await memoryService.saveConversation([message]);
-        // Also store in vector memory
-        await vectorMemoryService.storeMessageWithEmbedding(message);
-      } catch (error) {
-        logger.error('Failed to save assistant message', error as Error, {
-          component: 'useMessageHandling',
-          action: 'saveAssistantMessage',
-        });
-      }
-
-      setTimeout(() => inputRef.current?.focus(), 0);
-    },
-    onError: (error) => {
-      setError(error);
-    },
-    onTypingChange: setTyping,
-  });
-
   const sendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
 
@@ -73,24 +46,62 @@ export function useMessageHandling({
     addMessage(userMessage);
     setInput('');
     setError(null);
+    setTyping(true);
 
-    // Save user message to continuous conversation
     try {
+      // Save user message to continuous conversation
       await memoryService.saveConversation([userMessage]);
-      // Also store in vector memory
-      await vectorMemoryService.storeMessageWithEmbedding(userMessage);
-    } catch (error) {
-      logger.error('Failed to save user message', error as Error, {
-        component: 'useMessageHandling',
-        action: 'saveUserMessage',
+      
+      // Store in vector memory (async, don't wait)
+      vectorMemoryService.storeMessageWithEmbedding(userMessage).catch(error => {
+        logger.error('Failed to save user message to vector memory', error as Error, {
+          component: 'useMessageHandling',
+          action: 'saveUserMessage',
+        });
       });
+
+      // Build system prompt
+      const systemPrompt = await createSystemPrompt(messageText);
+
+      // Send to chat API
+      const response = await chatService.sendMessage(
+        messageText,
+        systemPrompt,
+        messages,
+        selectedModel,
+      );
+
+      // Add assistant message
+      addMessage(response);
+      
+      // Save assistant message (async, don't wait)
+      Promise.all([
+        memoryService.saveConversation([response]),
+        vectorMemoryService.storeMessageWithEmbedding(response),
+      ]).catch(error => {
+        logger.error('Failed to save assistant message', error as Error, {
+          component: 'useMessageHandling',
+          action: 'saveAssistantMessage',
+        });
+      });
+
+      setTyping(false);
+      
+      // Refocus input
+      setTimeout(() => inputRef.current?.focus(), 0);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      setError(errorMessage);
+      setTyping(false);
+
+      // Send fallback message
+      const fallbackMessage = chatService.createFallbackMessage();
+      addMessage(fallbackMessage);
+      
+      // Refocus input
+      setTimeout(() => inputRef.current?.focus(), 0);
     }
-
-    setTimeout(() => inputRef.current?.focus(), 0);
-
-    const systemPrompt = await createSystemPrompt(messageText);
-    await sendChatMessage(messageText, systemPrompt, messages, selectedModel);
-  }, [selectedModel, messages, createSystemPrompt, addMessage, setInput, setError, sendChatMessage]);
+  }, [selectedModel, messages, createSystemPrompt, addMessage, setInput, setError, setTyping]);
 
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,7 +126,6 @@ export function useMessageHandling({
     handleSubmit,
     handleKeyDown,
     handleQuickAction,
-    loadingState,
     inputRef,
   };
 }

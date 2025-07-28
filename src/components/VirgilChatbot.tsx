@@ -79,7 +79,6 @@ function VirgilChatbotInner() {
     handleSubmit,
     handleKeyDown,
     handleQuickAction,
-    loadingState,
     inputRef: _inputRef,
   } = useMessageHandling({
     selectedModel: state.selectedModel,
@@ -210,13 +209,12 @@ function VirgilChatbotInner() {
 
       <ChatMessages
         messages={state.messages}
-        isTyping={state.isTyping}
         error={state.error}
         onErrorDismiss={handleErrorDismiss}
         onMarkAsImportant={markAsImportant}
         user={user}
         lastConversation={state.lastConversation}
-        loadingState={loadingState || undefined}
+        isTyping={state.isTyping}
       />
 
       <ChatInput

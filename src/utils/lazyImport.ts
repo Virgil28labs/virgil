@@ -1,5 +1,6 @@
 import { type ComponentType, lazy } from 'react';
 import type React from 'react';
+import { logger } from '../lib/logger';
 
 /**
  * Enhanced lazy import with retry logic and error boundaries
@@ -31,7 +32,11 @@ export function lazyImport<T extends ComponentType<unknown>>(
       throw new Error('No valid export found in module');
     } catch (error) {
       // Log error for debugging
-      console.error(`Failed to lazy load component${componentName ? ` ${componentName}` : ''}:`, error);
+      logger.error(`Failed to lazy load component${componentName ? ` ${componentName}` : ''}`, error as Error, {
+        component: 'lazyImport',
+        action: 'loadComponent',
+        metadata: { componentName },
+      });
       
       // Retry once after a delay
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -50,7 +55,11 @@ export function lazyImport<T extends ComponentType<unknown>>(
         }
         throw new Error('No valid export found in module after retry');
       } catch (retryError) {
-        console.error('Retry failed:', retryError);
+        logger.error('Component lazy load retry failed', retryError as Error, {
+          component: 'lazyImport',
+          action: 'retryLoadComponent',
+          metadata: { componentName },
+        });
         throw retryError;
       }
     }

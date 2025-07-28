@@ -11,6 +11,5 @@ export { ChatProvider } from './ChatContext';
 export { useChatContext } from './useChatContext';
 export { Message } from './Message';
 export { ConversationView } from './ConversationView';
-export { LoadingStates } from './LoadingStates';
 export { AdvancedMemorySearch } from './AdvancedMemorySearch';
 export { BulkMessageActions } from './BulkMessageActions';
