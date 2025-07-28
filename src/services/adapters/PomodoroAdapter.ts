@@ -5,8 +5,8 @@
  * enabling responses about focus sessions, productivity tracking, and timer status.
  */
 
-import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData } from '../DashboardAppService';
 import { dashboardContextService } from '../DashboardContextService';
 import { timeService } from '../TimeService';
 
@@ -26,7 +26,7 @@ interface PomodoroData {
   };
 }
 
-export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
+export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
   readonly appName = 'pomodoro';
   readonly displayName = 'Pomodoro Timer';
   readonly icon = '🍅';
@@ -42,14 +42,13 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     },
   };
 
-  private listeners: ((data: PomodoroData) => void)[] = [];
-
   constructor() {
+    super();
     // Load today's stats from localStorage
-    this.loadTodayStats();
+    this.loadData();
   }
 
-  private loadTodayStats(): void {
+  protected loadData(): void {
     try {
       const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
       const saved = localStorage.getItem(statsKey);
@@ -61,10 +60,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
         };
       }
     } catch (error) {
-      logger.error('Failed to load Pomodoro stats', error as Error, {
-        component: 'PomodoroAdapter',
-        action: 'loadStats',
-      });
+      this.logError('Failed to load Pomodoro stats', error, 'loadData');
     }
   }
 
@@ -73,15 +69,17 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
       localStorage.setItem(statsKey, JSON.stringify(this.currentData.todayStats));
     } catch (error) {
-      logger.error('Failed to save Pomodoro stats', error as Error, {
-        component: 'PomodoroAdapter',
-        action: 'saveStats',
-      });
+      this.logError('Failed to save Pomodoro stats', error, 'saveStats');
     }
   }
 
+  protected transformData(): PomodoroData {
+    return this.currentData;
+  }
+
   getContextData(): AppContextData<PomodoroData> {
-    const summary = this.generateSummary();
+    const data = this.transformData();
+    const summary = this.generateSummary(data);
     const now = timeService.getTimestamp();
     const lastUsed = this.currentData.todayStats.lastSessionTime?.getTime() || 0; // eslint-disable-line no-restricted-syntax
     const isRecent = now - lastUsed < 60 * 60 * 1000; // Active within last hour
@@ -91,7 +89,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
       displayName: this.displayName,
       isActive: this.currentData.isActive || isRecent,
       lastUsed,
-      data: this.currentData,
+      data,
       summary,
       capabilities: [
         'focus-timer',
@@ -104,28 +102,21 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     };
   }
 
-  private generateSummary(): string {
+  protected generateSummary(data: PomodoroData): string {
     const parts: string[] = [];
 
-    if (this.currentData.isRunning && this.currentData.currentSession) {
-      const { timeRemaining, selectedMinutes } = this.currentData.currentSession;
+    if (data.isRunning && data.currentSession) {
+      const { timeRemaining, selectedMinutes } = data.currentSession;
       const minutesLeft = Math.ceil(timeRemaining / 60);
       parts.push(`Focus session active: ${minutesLeft}/${selectedMinutes} minutes remaining`);
-    } else if (this.currentData.todayStats.sessionsCompleted > 0) {
-      parts.push(`${this.currentData.todayStats.sessionsCompleted} sessions completed today`);
-      parts.push(`${this.currentData.todayStats.totalFocusMinutes} minutes focused`);
+    } else if (data.todayStats.sessionsCompleted > 0) {
+      parts.push(`${data.todayStats.sessionsCompleted} sessions completed today`);
+      parts.push(`${data.todayStats.totalFocusMinutes} minutes focused`);
     } else {
       parts.push('No focus sessions today');
     }
 
     return parts.join(', ');
-  }
-
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
   }
 
   getKeywords(): string[] {
@@ -138,7 +129,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     const lowerQuery = query.toLowerCase();
 
     // Current session status
@@ -260,22 +251,11 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
     return 'Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?';
   }
 
-  async search(_query: string): Promise<unknown[]> {
+  override async search(_query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     // Pomodoro doesn't have searchable content, return empty
     return [];
   }
 
-  subscribe(callback: (data: PomodoroData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.currentData);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-    };
-  }
 
   // Methods to update timer state (would be called by PomodoroTimer component)
   updateTimerState(isActive: boolean, isRunning: boolean, sessionData?: {
@@ -312,6 +292,7 @@ export class PomodoroAdapter implements AppDataAdapter<PomodoroData> {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.currentData));
+    const data = this.transformData();
+    this.notifySubscribers(data);
   }
 }

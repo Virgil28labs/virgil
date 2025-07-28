@@ -50,6 +50,7 @@ export interface AppDataAdapter<T = unknown> {
   // Query capabilities
   canAnswer(query: string): boolean;
   getKeywords(): string[];
+  getConfidence?(query: string): number; // Optional - default implementation provided
 
   // Response generation
   getResponse?(query: string): Promise<string>;
@@ -67,6 +68,13 @@ export interface DashboardAppData {
   activeApps: string[];
   lastUpdated: number;
 }
+
+// Confidence thresholds for intent classification
+export const CONFIDENCE_THRESHOLDS = {
+  HIGH: 0.8,     // Direct adapter response
+  MEDIUM: 0.7,   // Enhanced LLM context
+  LOW: 0.7,      // Minimum threshold for canAnswer()
+} as const;
 
 export class DashboardAppService {
   private adapters: Map<string, AppDataAdapter> = new Map();
@@ -207,6 +215,21 @@ export class DashboardAppService {
 
     return relevantApps;
   }
+
+  /**
+   * Get apps with confidence scores for a query
+   * Returns apps sorted by confidence in descending order
+   */
+  getAppsWithConfidence(query: string): Array<{ adapter: AppDataAdapter; confidence: number }> {
+    return Array.from(this.adapters.values())
+      .map(adapter => ({ 
+        adapter, 
+        confidence: adapter.getConfidence ? adapter.getConfidence(query) : 0,
+      }))
+      .filter(item => item.confidence > 0)
+      .sort((a, b) => b.confidence - a.confidence);
+  }
+
 
   /**
    * Detect if a query is asking for cross-app aggregation

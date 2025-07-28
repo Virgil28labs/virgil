@@ -5,8 +5,8 @@
  * for Virgil AI assistant, enabling responses about space images and astronomy.
  */
 
-import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
 interface StoredApod {
   id: string;
@@ -42,22 +42,20 @@ interface NasaApodData {
   };
 }
 
-export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
+export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
   readonly appName = 'nasa';
   readonly displayName = 'NASA APOD';
   readonly icon = '🚀';
 
   private favorites: StoredApod[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
   private readonly STORAGE_KEY = 'virgil_nasa_favorites';
-  private listeners: ((data: NasaApodData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private refreshData(): void {
+  protected loadData(): void {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -68,25 +66,23 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         this.favorites = [];
       }
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch NASA favorites', error as Error, {
-        component: 'NasaApodAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch NASA favorites', error, 'loadData');
       this.favorites = [];
     }
+
+    // Set up storage listener for real-time updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === this.STORAGE_KEY) {
+        this.loadData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
   }
 
-  private ensureFreshData(): void {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      this.refreshData();
-    }
-  }
-
-  getContextData(): AppContextData<NasaApodData> {
-    this.ensureFreshData();
-
+  protected transformData(): NasaApodData {
     // Count media types
     const imageCount = this.favorites.filter(f => f.mediaType === 'image').length;
     const videoCount = this.favorites.filter(f => f.mediaType === 'video').length;
@@ -121,7 +117,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
       savedAt: fav.savedAt,
     }));
 
-    const data: NasaApodData = {
+    return {
       favorites: {
         total: this.favorites.length,
         images: imageCount,
@@ -136,7 +132,11 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
         popularTopics,
       },
     };
+  }
 
+  getContextData(): AppContextData<NasaApodData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
     const isActive = this.favorites.length > 0;
 
@@ -184,7 +184,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
       .map(([topic]) => topic);
   }
 
-  private generateSummary(data: NasaApodData): string {
+  protected generateSummary(data: NasaApodData): string {
     if (data.favorites.total === 0) {
       return 'No space images saved yet';
     }
@@ -203,13 +203,6 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
-
   getKeywords(): string[] {
     return [
       'nasa', 'space', 'astronomy', 'apod', 'galaxy', 'nebula',
@@ -224,7 +217,7 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -401,68 +394,33 @@ export class NasaApodAdapter implements AppDataAdapter<NasaApodData> {
   }
 
   private getTimeAgo(date: Date): string {
-    return timeService.getTimeAgo(date);
+    return this.getRelativeTime(date);
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search in titles and explanations
     this.favorites.forEach(fav => {
-      let relevance = 0;
+      const titleMatch = fav.title.toLowerCase().includes(lowerQuery);
+      const explanationMatch = fav.explanation.toLowerCase().includes(lowerQuery);
 
-      if (fav.title.toLowerCase().includes(lowerQuery)) {
-        relevance += 100;
-      }
-
-      if (fav.explanation.toLowerCase().includes(lowerQuery)) {
-        relevance += 50;
-      }
-
-      if (relevance > 0) {
+      if (titleMatch || explanationMatch) {
         results.push({
-          id: fav.id,
           type: 'nasa-apod',
-          title: fav.title,
-          date: fav.date,
-          mediaType: fav.mediaType,
-          relevance,
+          label: `${fav.title} (${fav.date})`,
+          value: fav.title,
+          field: `nasa.apod-${fav.id}`,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results;
   }
 
-  subscribe(callback: (data: NasaApodData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up storage listener
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.refreshData();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 
   // Cross-app aggregation support
   supportsAggregation(): boolean {

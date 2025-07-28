@@ -6,6 +6,7 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { CONFIDENCE_THRESHOLDS } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 
@@ -19,6 +20,9 @@ export abstract class BaseAdapter<T> implements AppDataAdapter<T> {
   protected subscribers: ((data: T) => void)[] = [];
   protected lastFetchTime = 0;
   protected readonly CACHE_DURATION = 5000; // 5 seconds default
+  
+  // Regex cache for performance optimization
+  private regexCache: Map<string, RegExp> = new Map();
   
   /**
    * Get context data for Virgil - must be implemented by subclasses
@@ -56,11 +60,53 @@ export abstract class BaseAdapter<T> implements AppDataAdapter<T> {
   }
   
   /**
+   * Get confidence score for answering a query (0.0 to 1.0)
+   * Uses word boundary matching for accurate intent classification
+   */
+  getConfidence(query: string): number {
+    const lowerQuery = query.toLowerCase();
+    const keywords = this.getKeywords();
+    let maxConfidence = 0;
+    
+    for (const keyword of keywords) {
+      // Exact word match = high confidence
+      const exactRegex = this.getOrCreateRegex(keyword);
+      if (exactRegex.test(lowerQuery)) {
+        maxConfidence = Math.max(maxConfidence, 0.9);
+      }
+      // Partial match = low confidence (backward compatibility)
+      else if (lowerQuery.includes(keyword)) {
+        maxConfidence = Math.max(maxConfidence, 0.3);
+      }
+    }
+    
+    return maxConfidence;
+  }
+  
+  /**
+   * Get or create a cached regex for a keyword
+   * Improves performance by avoiding repeated regex creation
+   */
+  private getOrCreateRegex(keyword: string): RegExp {
+    const cacheKey = `word_${keyword}`;
+    let regex = this.regexCache.get(cacheKey);
+    
+    if (!regex) {
+      // Escape special regex characters in the keyword
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      regex = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      this.regexCache.set(cacheKey, regex);
+    }
+    
+    return regex;
+  }
+  
+  /**
    * Check if adapter can answer a query
+   * Now uses confidence-based matching with threshold
    */
   canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    return this.getKeywords().some(keyword => lowerQuery.includes(keyword));
+    return this.getConfidence(query) >= CONFIDENCE_THRESHOLDS.LOW;
   }
   
   /**

@@ -5,8 +5,8 @@
  * enabling responses about saved GIFs, memes, and animated content.
  */
 
-import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
 interface GiphyImage {
   id: string;
@@ -48,22 +48,20 @@ interface GiphyData {
   };
 }
 
-export class GiphyAdapter implements AppDataAdapter<GiphyData> {
+export class GiphyAdapter extends BaseAdapter<GiphyData> {
   readonly appName = 'giphy';
   readonly displayName = 'Giphy Gallery';
   readonly icon = '🎬';
 
   private favorites: GiphyImage[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
   private readonly STORAGE_KEY = 'giphy-favorites';
-  private listeners: ((data: GiphyData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private refreshData(): void {
+  protected loadData(): void {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -72,25 +70,23 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
         this.favorites = [];
       }
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch Giphy favorites', error as Error, {
-        component: 'GiphyAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch Giphy favorites', error, 'loadData');
       this.favorites = [];
     }
+
+    // Set up storage listener for real-time updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === this.STORAGE_KEY) {
+        this.loadData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
   }
 
-  private ensureFreshData(): void {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      this.refreshData();
-    }
-  }
-
-  getContextData(): AppContextData<GiphyData> {
-    this.ensureFreshData();
-
+  protected transformData(): GiphyData {
     // Categorize GIFs based on titles
     const categories = this.categorizeGifs();
 
@@ -128,7 +124,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
       savedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
-    const data: GiphyData = {
+    return {
       favorites: {
         total: this.favorites.length,
         categories,
@@ -142,7 +138,11 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
         totalSize,
       },
     };
+  }
 
+  getContextData(): AppContextData<GiphyData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
     const isActive = this.favorites.length > 0;
 
@@ -198,7 +198,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     return categories;
   }
 
-  private generateSummary(data: GiphyData): string {
+  protected generateSummary(data: GiphyData): string {
     if (data.favorites.total === 0) {
       return 'No favorite GIFs saved yet';
     }
@@ -215,13 +215,6 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
-
   getKeywords(): string[] {
     return [
       'gif', 'gifs', 'giphy', 'meme', 'memes', 'animation',
@@ -233,7 +226,7 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -375,55 +368,28 @@ export class GiphyAdapter implements AppDataAdapter<GiphyData> {
     return response;
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search in titles
     this.favorites.forEach(gif => {
       const title = (gif.title || '').toLowerCase();
       if (title.includes(lowerQuery)) {
         results.push({
-          id: gif.id,
           type: 'gif',
-          title: gif.title,
-          rating: gif.rating,
-          relevance: title === lowerQuery ? 100 : 50,
+          label: `${gif.title} (${gif.rating})`  ,
+          value: gif.title || 'Untitled GIF',
+          field: `giphy.gif-${gif.id}`,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results;
   }
 
-  subscribe(callback: (data: GiphyData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up storage listener
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.refreshData();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 
   // Cross-app aggregation support
   supportsAggregation(): boolean {

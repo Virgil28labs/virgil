@@ -5,9 +5,10 @@
  * enabling responses about saved dog images, breeds, and favorites.
  */
 
-import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+
 interface DogImage {
   url: string;
   breed: string;
@@ -34,22 +35,20 @@ interface DogGalleryData {
   };
 }
 
-export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
+export class DogGalleryAdapter extends BaseAdapter<DogGalleryData> {
   readonly appName = 'dog';
   readonly displayName = 'Dog Gallery';
   readonly icon = '🐕';
 
   private favorites: DogImage[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
   private readonly STORAGE_KEY = 'virgil_dog_favorites';
-  private listeners: ((data: DogGalleryData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private refreshData(): void {
+  protected loadData(): void {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -58,25 +57,23 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
         this.favorites = [];
       }
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch dog favorites', error as Error, {
-        component: 'DogGalleryAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch dog favorites', error, 'loadData');
       this.favorites = [];
     }
+
+    // Set up storage listener for real-time updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === this.STORAGE_KEY) {
+        this.loadData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
   }
 
-  private ensureFreshData(): void {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      this.refreshData();
-    }
-  }
-
-  getContextData(): AppContextData<DogGalleryData> {
-    this.ensureFreshData();
-
+  protected transformData(): DogGalleryData {
     // Calculate breed statistics
     const breedCounts: { [breed: string]: number } = {};
     this.favorites.forEach(dog => {
@@ -106,7 +103,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
       addedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
-    const data: DogGalleryData = {
+    return {
       favorites: {
         total: this.favorites.length,
         breeds: breedCounts,
@@ -118,7 +115,11 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
         uniqueBreeds,
       },
     };
+  }
 
+  getContextData(): AppContextData<DogGalleryData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
     const isActive = this.favorites.length > 0;
 
@@ -139,7 +140,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     };
   }
 
-  private generateSummary(data: DogGalleryData): string {
+  protected generateSummary(data: DogGalleryData): string {
     if (data.favorites.total === 0) {
       return 'No favorite dogs saved yet';
     }
@@ -161,13 +162,6 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
-
   getKeywords(): string[] {
     return [
       'dog', 'dogs', 'puppy', 'puppies', 'pup', 'doggo',
@@ -181,7 +175,7 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -335,54 +329,27 @@ export class DogGalleryAdapter implements AppDataAdapter<DogGalleryData> {
     return response;
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search by breed
     this.favorites.forEach(dog => {
       if (dog.breed.toLowerCase().includes(lowerQuery)) {
         results.push({
-          id: dog.id,
-          type: 'dog',
-          breed: dog.breed,
-          url: dog.url,
-          relevance: dog.breed.toLowerCase() === lowerQuery ? 100 : 50,
+          type: 'dog-breed',
+          label: `${dog.breed} (Dog #${dog.id})`,
+          value: dog.breed,
+          field: `dog.breed-${dog.id}`,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results;
   }
 
-  subscribe(callback: (data: DogGalleryData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up storage listener
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.refreshData();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 
   // Cross-app aggregation support
   supportsAggregation(): boolean {

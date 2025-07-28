@@ -5,8 +5,8 @@
  * enabling intelligent responses about user's notes, tasks, and reflections.
  */
 
-import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData } from '../DashboardAppService';
 import type { Entry, TagType, ActionType } from '../../components/notes/types';
 import { notesStorage } from '../../components/notes/storage';
 import { timeService } from '../TimeService';
@@ -31,47 +31,36 @@ interface NotesData {
   lastUpdate: Date | null;
 }
 
-export class NotesAdapter implements AppDataAdapter<NotesData> {
+export class NotesAdapter extends BaseAdapter<NotesData> {
   readonly appName = 'notes';
   readonly displayName = 'Notes';
   readonly icon = '📝';
 
   private entries: Entry[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
-  private listeners: ((data: NotesData) => void)[] = [];
 
   constructor() {
+    super();
     // Initialize data
-    this.refreshData();
+    this.loadData();
   }
 
-  private async refreshData(): Promise<void> {
+  protected async loadData(): Promise<void> {
     try {
       this.entries = await notesStorage.getAllEntries();
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch notes data', error as Error, {
-        component: 'NotesAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch notes data', error, 'loadData');
       this.entries = [];
     }
   }
 
-  private async ensureFreshData(): Promise<void> {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      await this.refreshData();
-    }
-  }
-
-  getContextData(): AppContextData<NotesData> {
-    const now = timeService.getTimestamp();
+  protected transformData(): NotesData {
     const taskStats = this.calculateTaskStats();
     const recentEntries = this.getRecentEntries(5);
-
-    const data: NotesData = {
+    
+    return {
       totalNotes: this.entries.length,
       recentNotes: recentEntries.map(entry => ({
         id: entry.id,
@@ -91,8 +80,14 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
         )
         : null,
     };
+  }
 
+  getContextData(): AppContextData<NotesData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
+    const now = timeService.getTimestamp();
+    const recentEntries = this.getRecentEntries(5);
     const isActive = recentEntries.some(entry =>
       // eslint-disable-next-line no-restricted-syntax
       now - entry.timestamp.getTime() < 30 * 60 * 1000, // Active if used in last 30 minutes
@@ -185,7 +180,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
       .slice(0, count);
   }
 
-  private generateSummary(data: NotesData): string {
+  protected generateSummary(data: NotesData): string {
     const parts: string[] = [];
 
     if (data.totalNotes > 0) {
@@ -209,12 +204,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     return timeService.getTimeAgo(date);
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
 
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
 
   getKeywords(): string[] {
     return [
@@ -229,7 +219,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     await this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -412,7 +402,7 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     return response;
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     await this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
@@ -423,14 +413,15 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     );
 
     return matches.map(entry => ({
-      id: entry.id,
       type: 'note',
-      content: entry.content,
-      timestamp: entry.timestamp,
-      tags: entry.tags,
-      actionType: entry.actionType,
-      relevance: this.calculateRelevance(entry, lowerQuery),
-    })).sort((a, b) => b.relevance - a.relevance);
+      label: entry.content.substring(0, 50) + (entry.content.length > 50 ? '...' : ''),
+      value: `${entry.tags.join(', ')} - ${this.getTimeAgo(entry.timestamp)}`,
+      field: `note.${entry.id}`,
+    })).sort((a, b) => {
+      const relevanceA = this.calculateRelevance(matches.find(e => e.id === a.field.split('.')[1])!, lowerQuery);
+      const relevanceB = this.calculateRelevance(matches.find(e => e.id === b.field.split('.')[1])!, lowerQuery);
+      return relevanceB - relevanceA;
+    });
   }
 
   private calculateRelevance(entry: Entry, query: string): number {
@@ -458,26 +449,4 @@ export class NotesAdapter implements AppDataAdapter<NotesData> {
     return score;
   }
 
-  subscribe(callback: (data: NotesData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up periodic refresh
-    const intervalId = setInterval(() => {
-      this.refreshData();
-    }, 30000); // Refresh every 30 seconds
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      clearInterval(intervalId);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 }

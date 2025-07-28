@@ -27,7 +27,7 @@ import { dashboardAppService } from '../services/DashboardAppService';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { NotesAdapter } from '../services/adapters/NotesAdapter';
 import { PomodoroAdapter } from '../services/adapters/PomodoroAdapter';
-import { StreakAdapter } from '../services/adapters/StreakAdapter';
+import { streakAdapterRefactored } from '../services/adapters/StreakAdapterRefactored';
 import { CameraAdapter } from '../services/adapters/CameraAdapter';
 import { DogGalleryAdapter } from '../services/adapters/DogGalleryAdapter';
 import { NasaApodAdapter } from '../services/adapters/NasaApodAdapter';
@@ -107,7 +107,7 @@ export const Dashboard = memo(function Dashboard() {
   const adapters = useMemo(() => ({
     notes: new NotesAdapter(),
     pomodoro: new PomodoroAdapter(),
-    streak: new StreakAdapter(),
+    streak: streakAdapterRefactored,
     camera: new CameraAdapter(),
     dogGallery: new DogGalleryAdapter(),
     nasaApod: new NasaApodAdapter(),

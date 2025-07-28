@@ -5,8 +5,8 @@
  * enabling responses about saved beats, patterns, and music creation.
  */
 
-import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
 interface SavedPattern {
   pattern: boolean[][];
@@ -38,22 +38,20 @@ interface RhythmMachineData {
   };
 }
 
-export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
+export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
   readonly appName = 'rhythm';
   readonly displayName = 'Rhythm Machine';
   readonly icon = '🥁';
 
   private saveSlots: (SavedPattern | null)[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
   private readonly STORAGE_KEY = 'rhythmMachineSaveSlots';
-  private listeners: ((data: RhythmMachineData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private refreshData(): void {
+  protected loadData(): void {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
@@ -68,20 +66,20 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
         this.saveSlots = [null, null, null, null, null];
       }
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch rhythm patterns', error as Error, {
-        component: 'RhythmMachineAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch rhythm patterns', error, 'loadData');
       this.saveSlots = [null, null, null, null, null];
     }
-  }
 
-  private ensureFreshData(): void {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      this.refreshData();
-    }
+    // Set up storage listener for real-time updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === this.STORAGE_KEY) {
+        this.loadData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
   }
 
   private getCategoryFromDescription(description: string, category?: string): string {
@@ -131,9 +129,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     return 8;
   }
 
-  getContextData(): AppContextData<RhythmMachineData> {
-    this.ensureFreshData();
-
+  protected transformData(): RhythmMachineData {
     const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
 
     // Categorize patterns
@@ -185,7 +181,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
       .slice(0, 3)
       .map(([cat]) => cat);
 
-    const data: RhythmMachineData = {
+    return {
       patterns: {
         total: savedPatterns.length,
         categories,
@@ -199,8 +195,13 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
         genresUsed: Array.from(genresUsed),
       },
     };
+  }
 
+  getContextData(): AppContextData<RhythmMachineData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
+    const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
     const isActive = savedPatterns.length > 0;
 
     return {
@@ -220,7 +221,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     };
   }
 
-  private generateSummary(data: RhythmMachineData): string {
+  protected generateSummary(data: RhythmMachineData): string {
     if (data.patterns.total === 0) {
       return 'No drum patterns saved yet';
     }
@@ -242,12 +243,6 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
 
   getKeywords(): string[] {
     return [
@@ -258,7 +253,7 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -454,14 +449,14 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
   }
 
   private getTimeAgo(date: Date): string {
-    return timeService.getTimeAgo(date);
+    return this.getRelativeTime(date);
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string; relevance?: number }> = [];
 
     const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
 
@@ -480,43 +475,18 @@ export class RhythmMachineAdapter implements AppDataAdapter<RhythmMachineData> {
 
       if (relevance > 0) {
         results.push({
-          id: `slot-${index + 1}`,
           type: 'drum-pattern',
-          description: pattern.description,
-          category,
-          slot: index + 1,
+          label: `${pattern.description} (${category})`,
+          value: pattern.description,
+          field: `rhythm.slot-${index + 1}`,
           relevance,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results
+      .sort((a, b) => (b.relevance || 0) - (a.relevance || 0))
+      .map(({ type, label, value, field }) => ({ type, label, value, field }));
   }
 
-  subscribe(callback: (data: RhythmMachineData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up storage listener
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.refreshData();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 }

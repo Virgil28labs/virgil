@@ -6,7 +6,7 @@
 
 import type { ChatMessage } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
-import { dashboardAppService } from './DashboardAppService';
+import { dashboardAppService, CONFIDENCE_THRESHOLDS } from './DashboardAppService';
 import { dashboardContextService } from './DashboardContextService';
 import { timeService } from './TimeService';
 import { logger } from '../lib/logger';
@@ -54,10 +54,42 @@ export class ChatService {
       throw new Error('Message cannot be empty');
     }
 
-    // Check if any dashboard apps can directly answer this query
-    const appResponse = await dashboardAppService.getResponseForQuery(userMessage);
-    if (appResponse) {
-      return this.createAssistantMessage(appResponse.response);
+    // Check dashboard apps with confidence-based routing
+    const appMatches = dashboardAppService.getAppsWithConfidence(userMessage);
+    
+    if (appMatches.length > 0) {
+      const bestMatch = appMatches[0]; // Already sorted by confidence
+      
+      // Only respond directly if high confidence
+      if (bestMatch.confidence >= CONFIDENCE_THRESHOLDS.HIGH && bestMatch.adapter.getResponse) {
+        try {
+          const response = await bestMatch.adapter.getResponse(userMessage);
+          if (response) {
+            return this.createAssistantMessage(response);
+          }
+        } catch (error) {
+          logger.error(`Error getting response from ${bestMatch.adapter.appName}`, error as Error, {
+            component: 'ChatService',
+            action: 'sendMessage',
+            metadata: { 
+              appName: bestMatch.adapter.appName,
+              confidence: bestMatch.confidence,
+            },
+          });
+        }
+      }
+      // For medium confidence, enhance system prompt with app context
+      else if (bestMatch.confidence >= CONFIDENCE_THRESHOLDS.MEDIUM) {
+        const appContext = bestMatch.adapter.getContextData?.();
+        if (appContext) {
+          // Add relevant app context to the system prompt
+          systemPrompt += `\n\nRelevant App Context: ${appContext.displayName} - ${appContext.summary}`;
+          if (appContext.data) {
+            systemPrompt += '\n(User may be asking about this app\'s data, use this context to provide a more helpful response)';
+          }
+        }
+      }
+      // Low confidence (<0.7) apps are filtered out by canAnswer() in BaseAdapter
     }
 
     // Prepare API messages

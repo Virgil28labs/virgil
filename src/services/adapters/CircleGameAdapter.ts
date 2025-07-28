@@ -5,8 +5,8 @@
  * for Virgil AI assistant, enabling responses about gaming performance.
  */
 
-import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import { logger } from '../../lib/logger';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
 
 interface CircleGameData {
@@ -39,7 +39,7 @@ interface CircleGameData {
   };
 }
 
-export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
+export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
   readonly appName = 'circle';
   readonly displayName = 'Perfect Circle';
   readonly icon = '⭕';
@@ -48,17 +48,15 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
   private attempts = 0;
   private scoreHistory: number[] = [];
   private lastPlayTime = 0;
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
   private readonly SCORE_HISTORY_KEY = 'perfectCircleScoreHistory';
   private readonly LAST_PLAY_KEY = 'perfectCircleLastPlay';
-  private listeners: ((data: CircleGameData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private refreshData(): void {
+  protected async loadData(): Promise<void> {
     try {
       // Load best score
       const savedBest = localStorage.getItem('perfectCircleBestScore');
@@ -77,12 +75,10 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       this.lastPlayTime = savedLastPlay ? parseInt(savedLastPlay, 10) : 0;
 
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch circle game data', error as Error, {
-        component: 'CircleGameAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch circle game data', error, 'loadData');
       this.bestScore = 0;
       this.attempts = 0;
       this.scoreHistory = [];
@@ -90,11 +86,6 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     }
   }
 
-  private ensureFreshData(): void {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      this.refreshData();
-    }
-  }
 
   private calculateAverageScore(): number {
     if (this.scoreHistory.length === 0) return 0;
@@ -147,14 +138,12 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     };
   }
 
-  getContextData(): AppContextData<CircleGameData> {
-    this.ensureFreshData();
-
+  protected transformData(): CircleGameData {
     const averageScore = this.calculateAverageScore();
     const distribution = this.getScoreDistribution();
     const achievements = this.getAchievements();
 
-    const data: CircleGameData = {
+    return {
       scores: {
         best: this.bestScore,
         attempts: this.attempts,
@@ -170,7 +159,11 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
       },
       achievements,
     };
+  }
 
+  getContextData(): AppContextData<CircleGameData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
     const isActive = this.attempts > 0;
 
@@ -191,7 +184,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     };
   }
 
-  private generateSummary(data: CircleGameData): string {
+  protected generateSummary(data: CircleGameData): string {
     if (data.scores.attempts === 0) {
       return 'No circles drawn yet';
     }
@@ -211,12 +204,7 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
 
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
 
   getKeywords(): string[] {
     return [
@@ -227,8 +215,8 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
-    this.ensureFreshData();
+  override async getResponse(query: string): Promise<string> {
+    await this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
     // Score queries
@@ -409,20 +397,19 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<unknown[]> {
-    this.ensureFreshData();
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
+    await this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search for score-related queries
     if (lowerQuery.includes('score') || lowerQuery.includes('best')) {
       results.push({
-        id: 'best-score',
         type: 'game-score',
-        value: this.bestScore,
         label: `Best score: ${this.bestScore}%`,
-        relevance: 100,
+        value: String(this.bestScore),
+        field: 'circle.best-score',
       });
     }
 
@@ -431,44 +418,23 @@ export class CircleGameAdapter implements AppDataAdapter<CircleGameData> {
     Object.entries(achievements).forEach(([key, unlocked]) => {
       if (unlocked && key.toLowerCase().includes(lowerQuery)) {
         results.push({
-          id: `achievement-${key}`,
           type: 'achievement',
-          name: key,
-          unlocked: true,
-          relevance: 80,
+          label: key.replace(/([A-Z])/g, ' $1').trim(),
+          value: 'Unlocked',
+          field: `circle.achievement-${key}`,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results;
   }
 
-  subscribe(callback: (data: CircleGameData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up storage listener
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'perfectCircleBestScore' ||
-          e.key === 'perfectCircleAttempts' ||
-          e.key === this.SCORE_HISTORY_KEY) {
-        this.refreshData();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
+  protected override getCapabilities(): string[] {
+    return [
+      'game-scores',
+      'skill-tracking',
+      'achievement-system',
+      'performance-analysis',
+    ];
   }
 }

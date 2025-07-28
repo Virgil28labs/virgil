@@ -243,14 +243,19 @@ export class StreakAdapter implements AppDataAdapter<StreakData> {
     if (!dateStr) return false;
     const today = dashboardContextService.getLocalDate();
     return dateStr === today;
-  }
-
-  canAnswer(query: string): boolean {
+  }  canAnswer(query: string): boolean {
     const lowerQuery = query.toLowerCase();
     const keywords = this.getKeywords();
-
-    return keywords.some(keyword => lowerQuery.includes(keyword));
+    
+    // Check each keyword with word boundaries for accurate matching
+    return keywords.some(keyword => {
+      const regex = new RegExp(`\b${keyword}\b`, 'i');
+      return regex.test(lowerQuery);
+    });
   }
+
+
+
 
   getKeywords(): string[] {
     return [

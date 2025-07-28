@@ -5,19 +5,23 @@
  * making all profile fields searchable and queryable by Virgil.
  */
 
-import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData } from '../DashboardAppService';
 import type { UserProfile } from '../../hooks/useUserProfile';
 import type { AuthContextValue } from '../../types/auth.types';
 import { timeService } from '../TimeService';
 
-export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
+export class UserProfileAdapter extends BaseAdapter<UserProfile> {
   readonly appName = 'userProfile';
   readonly displayName = 'User Profile';
   readonly icon = '👤';
 
   private profile: UserProfile | null = null;
   private authData: AuthContextValue | null = null;
-  private subscribers: ((data: UserProfile) => void)[] = [];
+
+  constructor() {
+    super();
+  }
 
   /**
    * Update profile data
@@ -25,20 +29,32 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   updateProfile(profile: UserProfile, authData: AuthContextValue): void {
     this.profile = profile;
     this.authData = authData;
-    this.notifySubscribers();
+    const data = this.transformData();
+    this.notifySubscribers(data);
+  }
+
+  protected loadData(): void {
+    // Profile data is updated via updateProfile method, not loaded from storage
+    this.lastFetchTime = timeService.getTimestamp();
+  }
+
+  protected transformData(): UserProfile {
+    return this.profile || this.getEmptyProfile();
   }
 
   /**
    * Get context data for Virgil
    */
   getContextData(): AppContextData<UserProfile> {
+    const data = this.transformData();
+    const summary = this.generateSummary(data);
     return {
       appName: this.appName,
       displayName: this.displayName,
       isActive: true, // Always active when user is logged in
       lastUsed: timeService.getTimestamp(),
-      data: this.profile || this.getEmptyProfile(),
-      summary: this.generateSummary(),
+      data,
+      summary,
       capabilities: [
         'personal information',
         'address lookup',
@@ -50,23 +66,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     };
   }
 
-  /**
-   * Subscribe to profile updates
-   */
-  subscribe(callback: (data: UserProfile) => void): () => void {
-    this.subscribers.push(callback);
-    return () => {
-      this.subscribers = this.subscribers.filter(sub => sub !== callback);
-    };
-  }
 
-  /**
-   * Check if adapter can answer a query
-   */
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    return this.getKeywords().some(keyword => lowerQuery.includes(keyword));
-  }
 
   /**
    * Get searchable keywords
@@ -98,7 +98,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   /**
    * Generate response for a query
    */
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     if (!this.profile) {
       return "I don't have access to your profile information yet. Please make sure you're logged in and have filled out your profile.";
     }
@@ -140,7 +140,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
     // Address queries
     if (lowerQuery.includes('address') || lowerQuery.includes('where do i live')) {
-      if (this.hasCompleteAddress()) {
+      if (this.hasCompleteAddress(this.profile)) {
         const addr = this.profile.address;
         return `Your address is ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}, ${addr.country}.`;
       } else if (this.profile.address.city) {
@@ -196,12 +196,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
   /**
    * Search within profile data
    */
-  async search(query: string): Promise<Array<{
-    type: string;
-    label: string;
-    value: string;
-    field: string;
-  }>> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     if (!this.profile) return [];
 
     const lowerQuery = query.toLowerCase();
@@ -253,21 +248,21 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
 
   // Private helper methods
 
-  private generateSummary(): string {
-    if (!this.profile) return 'No profile data available';
+  protected generateSummary(data: UserProfile): string {
+    if (!data || !this.hasProfileData(data)) return 'No profile data available';
 
     const parts: string[] = [];
 
-    if (this.profile.fullName || this.profile.nickname) {
-      parts.push(`User: ${this.profile.nickname || this.profile.fullName}`);
+    if (data.fullName || data.nickname) {
+      parts.push(`User: ${data.nickname || data.fullName}`);
     }
 
-    if (this.profile.email) {
-      parts.push(`Email: ${this.profile.email}`);
+    if (data.email) {
+      parts.push(`Email: ${data.email}`);
     }
 
-    if (this.hasCompleteAddress()) {
-      parts.push(`Location: ${this.profile.address.city}, ${this.profile.address.state}`);
+    if (this.hasCompleteAddress(data)) {
+      parts.push(`Location: ${data.address.city}, ${data.address.state}`);
     }
 
     return parts.length > 0 ? parts.join(', ') : 'Profile incomplete';
@@ -315,7 +310,7 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     }
 
     // Address
-    if (this.hasCompleteAddress()) {
+    if (this.hasCompleteAddress(this.profile)) {
       const addr = this.profile.address;
       sections.push(`**Address**: ${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}`);
     }
@@ -346,9 +341,10 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
       : "You haven't added any contact information to your profile yet.";
   }
 
-  private hasCompleteAddress(): boolean {
-    if (!this.profile?.address) return false;
-    const addr = this.profile.address;
+  private hasCompleteAddress(profile?: UserProfile): boolean {
+    const p = profile || this.profile;
+    if (!p?.address) return false;
+    const addr = p.address;
     return !!(addr.street && addr.city && addr.state && addr.zip);
   }
 
@@ -384,11 +380,11 @@ export class UserProfileAdapter implements AppDataAdapter<UserProfile> {
     };
   }
 
-  private notifySubscribers(): void {
-    if (this.profile) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.subscribers.forEach(callback => callback(this.profile!));
-    }
+  private hasProfileData(profile: UserProfile): boolean {
+    return !!(profile.fullName || profile.nickname || profile.email || profile.phone || 
+              profile.dateOfBirth || profile.gender || profile.maritalStatus || profile.uniqueId ||
+              profile.address.street || profile.address.city || profile.address.state || 
+              profile.address.zip || profile.address.country);
   }
 }
 

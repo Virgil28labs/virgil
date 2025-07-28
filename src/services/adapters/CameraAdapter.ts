@@ -5,10 +5,10 @@
  * enabling responses about saved photos, favorites, and storage usage.
  */
 
-import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
+import { BaseAdapter } from './BaseAdapter';
+import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { PhotoStorage } from '../../components/camera/utils/photoStorage';
 import type { SavedPhoto } from '../../types/camera.types';
-import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 
 interface CameraData {
@@ -38,41 +38,32 @@ interface CameraData {
   };
 }
 
-export class CameraAdapter implements AppDataAdapter<CameraData> {
+export class CameraAdapter extends BaseAdapter<CameraData> {
   readonly appName = 'camera';
   readonly displayName = 'Camera';
   readonly icon = '📸';
 
   private photos: SavedPhoto[] = [];
-  private lastFetchTime = 0;
-  private readonly CACHE_DURATION = 5000; // 5 seconds
-  private listeners: ((data: CameraData) => void)[] = [];
 
   constructor() {
-    this.refreshData();
+    super();
+    this.loadData();
   }
 
-  private async refreshData(): Promise<void> {
+  protected async loadData(): Promise<void> {
     try {
       this.photos = await PhotoStorage.getAllPhotos();
       this.lastFetchTime = timeService.getTimestamp();
-      this.notifyListeners();
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
-      logger.error('Failed to fetch camera photos', error as Error, {
-        component: 'CameraAdapter',
-        action: 'fetchData',
-      });
+      this.logError('Failed to fetch camera photos', error, 'loadData');
       this.photos = [];
     }
   }
 
-  private async ensureFreshData(): Promise<void> {
-    if (timeService.getTimestamp() - this.lastFetchTime > this.CACHE_DURATION) {
-      await this.refreshData();
-    }
-  }
 
-  getContextData(): AppContextData<CameraData> {
+  protected transformData(): CameraData {
     const todayStart = timeService.startOfDay();
     const weekStart = timeService.subtractDays(timeService.getCurrentDateTime(), 7);
     const monthStart = timeService.subtractMonths(timeService.getCurrentDateTime(), 1);
@@ -101,7 +92,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
       tags: photo.tags,
     }));
 
-    const data: CameraData = {
+    return {
       photos: {
         total: this.photos.length,
         favorites: favorites.length,
@@ -120,8 +111,13 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
         newestPhoto: this.photos.length > 0 ? timeService.fromTimestamp(this.photos[0].timestamp) : undefined,
       },
     };
+  }
 
+  getContextData(): AppContextData<CameraData> {
+    this.ensureFreshData();
+    const data = this.transformData();
     const summary = this.generateSummary(data);
+    const weekCount = data.stats.weekCount;
     const isActive = weekCount > 0; // Active if photos taken in last week
 
     return {
@@ -142,7 +138,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     };
   }
 
-  private generateSummary(data: CameraData): string {
+  protected generateSummary(data: CameraData): string {
     const parts: string[] = [];
 
     if (data.photos.total === 0) {
@@ -164,12 +160,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     return parts.join(', ');
   }
 
-  canAnswer(query: string): boolean {
-    const lowerQuery = query.toLowerCase();
-    const keywords = this.getKeywords();
 
-    return keywords.some(keyword => lowerQuery.includes(keyword));
-  }
 
   getKeywords(): string[] {
     return [
@@ -181,7 +172,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     ];
   }
 
-  async getResponse(query: string): Promise<string> {
+  override async getResponse(query: string): Promise<string> {
     await this.ensureFreshData();
     const lowerQuery = query.toLowerCase();
 
@@ -370,11 +361,11 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     return timeService.getTimeAgo(date);
   }
 
-  async search(query: string): Promise<unknown[]> {
+  override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     await this.ensureFreshData();
 
     const lowerQuery = query.toLowerCase();
-    const results: unknown[] = [];
+    const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search by photo name or tags
     this.photos.forEach(photo => {
@@ -393,42 +384,19 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
       }
 
       if (relevance > 0) {
+        const name = photo.name || `Photo from ${timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}`;
         results.push({
-          id: photo.id,
           type: 'photo',
-          name: photo.name || `Photo from ${timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}`,
-          timestamp: photo.timestamp,
-          isFavorite: photo.isFavorite,
-          relevance,
+          label: name,
+          value: photo.isFavorite ? '⭐ Favorite' : timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp)),
+          field: `camera.${photo.id}`,
         });
       }
     });
 
-    return results.sort((a, b) => (b as { relevance: number }).relevance - (a as { relevance: number }).relevance);
+    return results;
   }
 
-  subscribe(callback: (data: CameraData) => void): () => void {
-    this.listeners.push(callback);
-
-    // Send initial data
-    callback(this.getContextData().data);
-
-    // Set up periodic refresh
-    const intervalId = setInterval(() => {
-      this.refreshData();
-    }, 30000); // Refresh every 30 seconds
-
-    // Return unsubscribe function
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
-      clearInterval(intervalId);
-    };
-  }
-
-  private notifyListeners(): void {
-    const data = this.getContextData().data;
-    this.listeners.forEach(listener => listener(data));
-  }
 
   // Cross-app aggregation support
   supportsAggregation(): boolean {
@@ -436,7 +404,7 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
   }
 
   getAggregateData(): AggregateableData[] {
-    this.ensureFreshData();
+    // Note: ensureFreshData is handled by getContextData which is called first
 
     const aggregateData: AggregateableData[] = [];
 
@@ -458,5 +426,15 @@ export class CameraAdapter implements AppDataAdapter<CameraData> {
     }
 
     return aggregateData;
+  }
+
+  protected override getCapabilities(): string[] {
+    return [
+      'photo-capture',
+      'photo-storage',
+      'favorites-management',
+      'photo-organization',
+      'storage-tracking',
+    ];
   }
 }
