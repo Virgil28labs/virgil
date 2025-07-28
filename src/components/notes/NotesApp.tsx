@@ -60,10 +60,12 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
     }
 
     // Sort by timestamp (newest first)
-    return filtered.sort((a, b) =>
-      // eslint-disable-next-line no-restricted-syntax -- Valid use: sorting by Date timestamps
-      b.timestamp.getTime() - a.timestamp.getTime(),
-    );
+    return filtered.sort((a, b) => {
+      // Compare dates using numeric timestamp values
+      const aTime = a.timestamp.valueOf();
+      const bTime = b.timestamp.valueOf();
+      return bTime - aTime;
+    });
   }, [entries, activeFilter, activeActionFilter, searchQuery]);
 
   const handleAddEntry = useCallback((content: string) => {

@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
 import { CircleErrorBoundary } from './circle/CircleErrorBoundary';
 
@@ -14,7 +14,7 @@ const CircleGameWrapper = ({ onClose }: { onClose: () => void }) => (
   </CircleErrorBoundary>
 );
 
-export const CircleGameButton = () => (
+export const CircleGameButton = memo(() => (
   <EmojiButton
     emoji="⭕"
     ariaLabel="Open Perfect Circle Game - Test your drawing skills!"
@@ -29,4 +29,4 @@ export const CircleGameButton = () => (
     title="Draw Perfect Circle - Can you draw a perfect circle?"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

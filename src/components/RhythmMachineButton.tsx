@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
+import { DashboardAppErrorBoundary } from './common/DashboardAppErrorBoundary';
 
 const RhythmMachineViewer = lazy(() =>
   import('./rhythm/RhythmMachineViewer').then(module => ({
@@ -8,10 +9,12 @@ const RhythmMachineViewer = lazy(() =>
 );
 
 const RhythmMachineWrapper = ({ onClose }: { onClose: () => void }) => (
-  <RhythmMachineViewer isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="Rhythm Machine">
+    <RhythmMachineViewer isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const RhythmMachineButton = () => (
+export const RhythmMachineButton = memo(() => (
   <EmojiButton
     emoji="🥁"
     ariaLabel="Open Rhythm Machine - AI-powered drum sequencer"
@@ -26,4 +29,4 @@ export const RhythmMachineButton = () => (
     title="AI Rhythm Machine - Create beats with AI-powered drum sequencer!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from '../common/EmojiButton';
+import { DashboardAppErrorBoundary } from '../common/DashboardAppErrorBoundary';
 
 const CameraApp = lazy(() =>
   import('./CameraApp').then(module => ({
@@ -8,10 +9,12 @@ const CameraApp = lazy(() =>
 );
 
 const CameraAppWrapper = ({ onClose }: { onClose: () => void }) => (
-  <CameraApp isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="Virgil Camera">
+    <CameraApp isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const CameraEmojiButton = () => (
+export const CameraEmojiButton = memo(() => (
   <EmojiButton
     emoji="📸"
     ariaLabel="Open Virgil Camera"
@@ -26,4 +29,4 @@ export const CameraEmojiButton = () => (
     title="Take selfies with Virgil Camera!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

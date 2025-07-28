@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, Suspense, useRef, useEffect } from 'react';
+import React, { memo, useCallback, useState, Suspense, useRef, useEffect, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
 import { VirgilTextLogo } from './VirgilTextLogo';
@@ -54,6 +54,14 @@ export const Dashboard = memo(function Dashboard() {
     }
   });
 
+  // Memoized callbacks
+  const handleShowProfileViewer = useCallback(() => setShowProfileViewer(true), []);
+  const handleHideProfileViewer = useCallback(() => setShowProfileViewer(false), []);
+  const handleShowMapsModal = useCallback(() => setShowMapsModal(true), []);
+  const handleHideMapsModal = useCallback(() => setShowMapsModal(false), []);
+  const handleShowIPHover = useCallback(() => setShowIPHover(true), []);
+  const handleHideIPHover = useCallback(() => setShowIPHover(false), []);
+
   const toggleElevationUnit = useCallback(() => {
     setElevationUnit(prev => {
       const newUnit = prev === 'meters' ? 'feet' : 'meters';
@@ -95,28 +103,25 @@ export const Dashboard = memo(function Dashboard() {
     },
   });
 
+  // Memoize adapters to prevent recreation on every render
+  const adapters = useMemo(() => ({
+    notes: new NotesAdapter(),
+    pomodoro: new PomodoroAdapter(),
+    streak: new StreakAdapter(),
+    camera: new CameraAdapter(),
+    dogGallery: new DogGalleryAdapter(),
+    nasaApod: new NasaApodAdapter(),
+    giphy: new GiphyAdapter(),
+    rhythmMachine: new RhythmMachineAdapter(),
+    circleGame: new CircleGameAdapter(),
+  }), []);
+
   // Initialize dashboard app adapters
   useEffect(() => {
     // Register app adapters with the dashboard service
-    const notesAdapter = new NotesAdapter();
-    const pomodoroAdapter = new PomodoroAdapter();
-    const streakAdapter = new StreakAdapter();
-    const cameraAdapter = new CameraAdapter();
-    const dogGalleryAdapter = new DogGalleryAdapter();
-    const nasaApodAdapter = new NasaApodAdapter();
-    const giphyAdapter = new GiphyAdapter();
-    const rhythmMachineAdapter = new RhythmMachineAdapter();
-    const circleGameAdapter = new CircleGameAdapter();
-
-    dashboardAppService.registerAdapter(notesAdapter);
-    dashboardAppService.registerAdapter(pomodoroAdapter);
-    dashboardAppService.registerAdapter(streakAdapter);
-    dashboardAppService.registerAdapter(cameraAdapter);
-    dashboardAppService.registerAdapter(dogGalleryAdapter);
-    dashboardAppService.registerAdapter(nasaApodAdapter);
-    dashboardAppService.registerAdapter(giphyAdapter);
-    dashboardAppService.registerAdapter(rhythmMachineAdapter);
-    dashboardAppService.registerAdapter(circleGameAdapter);
+    Object.values(adapters).forEach(adapter => {
+      dashboardAppService.registerAdapter(adapter);
+    });
 
     // Cleanup on unmount
     return () => {
@@ -130,7 +135,7 @@ export const Dashboard = memo(function Dashboard() {
       dashboardAppService.unregisterAdapter('rhythm');
       dashboardAppService.unregisterAdapter('circle');
     };
-  }, []);
+  }, [adapters]);
 
   // Update dashboard context service with device info
   useEffect(() => {
@@ -142,7 +147,7 @@ export const Dashboard = memo(function Dashboard() {
   return (
     <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">
       {/* Fixed positioned elements */}
-      <VirgilTextLogo onClick={() => setShowProfileViewer(true)} />
+      <VirgilTextLogo onClick={handleShowProfileViewer} />
       <DateTime />
       <SectionErrorBoundary sectionName="Weather" fallback={null}>
         <Weather />
@@ -174,7 +179,7 @@ export const Dashboard = memo(function Dashboard() {
               address.street ? (
                 <p
                   className="street-address clickable"
-                  onClick={() => setShowMapsModal(true)}
+                  onClick={handleShowMapsModal}
                   title="Click to view on map"
                 >
                   {address.house_number && `${address.house_number} `}{address.street}
@@ -182,7 +187,7 @@ export const Dashboard = memo(function Dashboard() {
               ) : address.formatted ? (
                 <p
                   className="street-address clickable"
-                  onClick={() => setShowMapsModal(true)}
+                  onClick={handleShowMapsModal}
                   title="Click to view on map"
                 >
                   {address.formatted.split(',').slice(0, 2).join(',').trim()}
@@ -195,7 +200,7 @@ export const Dashboard = memo(function Dashboard() {
             ) : ipLocation?.city ? (
               <p
                 className="street-address clickable"
-                onClick={() => setShowMapsModal(true)}
+                onClick={handleShowMapsModal}
                 title="Click to view on map (IP-based location)"
               >
                 📍 {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}{ipLocation.country ? `, ${ipLocation.country}` : ''}
@@ -210,8 +215,8 @@ export const Dashboard = memo(function Dashboard() {
               <div
                 ref={ipRef}
                 className="ip-hover-container"
-                onMouseEnter={() => setShowIPHover(true)}
-                onMouseLeave={() => setShowIPHover(false)}
+                onMouseEnter={handleShowIPHover}
+                onMouseLeave={handleHideIPHover}
               >
                 <p className="ip-address">{ipLocation.ip}</p>
                 <PositionedIPHoverCard
@@ -289,14 +294,14 @@ export const Dashboard = memo(function Dashboard() {
       {/* User Profile Viewer */}
       <UserProfileViewer
         isOpen={showProfileViewer}
-        onClose={() => setShowProfileViewer(false)}
+        onClose={handleHideProfileViewer}
       />
 
       {/* Google Maps Modal */}
       <SectionErrorBoundary sectionName="Maps">
         <GoogleMapsModal
           isOpen={showMapsModal}
-          onClose={() => setShowMapsModal(false)}
+          onClose={handleHideMapsModal}
           coordinates={coordinates}
           address={address}
         />

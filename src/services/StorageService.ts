@@ -72,6 +72,18 @@ export class StorageService {
   }
 
   /**
+   * Alias for has() method for backward compatibility
+   */
+  static exists(key: string): boolean {
+    try {
+      return localStorage.getItem(key) !== null;
+    } catch (error) {
+      logger.error(`Error checking localStorage key "${key}"`, error as Error, { component: 'StorageService', action: 'exists' });
+      return false;
+    }
+  }
+
+  /**
    * Clears all localStorage data
    */
   static clear(): void {
@@ -89,6 +101,25 @@ export class StorageService {
     try {
       return Object.keys(localStorage);
     } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Alias for keys() method - returns all storage keys
+   */
+  static getKeys(): string[] {
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key !== null) {
+          keys.push(key);
+        }
+      }
+      return keys;
+    } catch (error) {
+      logger.error('Error getting localStorage keys', error as Error, { component: 'StorageService', action: 'getKeys' });
       return [];
     }
   }

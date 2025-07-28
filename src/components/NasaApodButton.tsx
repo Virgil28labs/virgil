@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
+import { DashboardAppErrorBoundary } from './common/DashboardAppErrorBoundary';
 
 const NasaApodViewer = lazy(() =>
   import('./nasa/NasaApodViewer').then(module => ({
@@ -8,10 +9,12 @@ const NasaApodViewer = lazy(() =>
 );
 
 const NasaApodViewerWrapper = ({ onClose }: { onClose: () => void }) => (
-  <NasaApodViewer isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="NASA APOD">
+    <NasaApodViewer isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const NasaApodButton = () => (
+export const NasaApodButton = memo(() => (
   <EmojiButton
     emoji="🔭"
     ariaLabel="Open NASA Astronomy Picture of the Day"
@@ -26,4 +29,4 @@ export const NasaApodButton = () => (
     title="NASA APOD - Discover daily cosmic wonders from NASA's Astronomy Picture of the Day!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

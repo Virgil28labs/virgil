@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
+import { DashboardAppErrorBoundary } from './common/DashboardAppErrorBoundary';
 
 const GiphyGallery = lazy(() =>
   import('./giphy/GiphyGallery').then(module => ({
@@ -8,10 +9,12 @@ const GiphyGallery = lazy(() =>
 );
 
 const GiphyGalleryWrapper = ({ onClose }: { onClose: () => void }) => (
-  <GiphyGallery isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="GIF Gallery">
+    <GiphyGallery isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const GiphyEmojiButton = () => (
+export const GiphyEmojiButton = memo(() => (
   <EmojiButton
     emoji="🎬"
     ariaLabel="Open GIF Gallery"
@@ -26,4 +29,4 @@ export const GiphyEmojiButton = () => (
     title="Open GIF Gallery - Search and save your favorite GIFs!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

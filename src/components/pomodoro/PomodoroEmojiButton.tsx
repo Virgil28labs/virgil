@@ -1,11 +1,15 @@
+import { memo } from 'react';
 import { EmojiButton } from '../common/EmojiButton';
+import { DashboardAppErrorBoundary } from '../common/DashboardAppErrorBoundary';
 import { PomodoroTimer } from './PomodoroTimer';
 
 const PomodoroAppWrapper = ({ onClose }: { onClose: () => void }) => (
-  <PomodoroTimer isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="Pomodoro Timer">
+    <PomodoroTimer isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const PomodoroEmojiButton = () => (
+export const PomodoroEmojiButton = memo(() => (
   <EmojiButton
     emoji="🍅"
     ariaLabel="Open Pomodoro Timer"
@@ -20,4 +24,4 @@ export const PomodoroEmojiButton = () => (
     title="Pomodoro Timer"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
+import { DashboardAppErrorBoundary } from './common/DashboardAppErrorBoundary';
 
 const MinimalHabitTracker = lazy(() =>
   import('./streak/MinimalHabitTracker').then(module => ({
@@ -8,10 +9,12 @@ const MinimalHabitTracker = lazy(() =>
 );
 
 const HabitTrackerWrapper = ({ onClose }: { onClose: () => void }) => (
-  <MinimalHabitTracker isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="Habit Tracker">
+    <MinimalHabitTracker isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const StreakTrackerButton = () => (
+export const StreakTrackerButton = memo(() => (
   <EmojiButton
     emoji="🔥"
     ariaLabel="Open Habit Tracker - Track your daily habits with fire streaks!"
@@ -26,4 +29,4 @@ export const StreakTrackerButton = () => (
     title="Habit Streaks - Track up to 10 habits and build fire streaks!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

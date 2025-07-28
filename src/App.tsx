@@ -16,6 +16,8 @@ import { Skeleton } from './components/ui/skeleton';
 import { ToastContainer } from './components/ToastNotification';
 import { StorageMigration } from './services/StorageMigration';
 import { logger } from './lib/logger';
+// Import errorHandlerService to initialize global error handlers
+import './services/ErrorHandlerService';
 import './App.css';
 
 // Configure styled-components to filter out problematic props

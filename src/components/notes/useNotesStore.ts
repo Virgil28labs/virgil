@@ -237,10 +237,12 @@ export const useNotesStore = () => {
 
       // Rollback if we have the entry
       if (entryToDelete) {
-        setEntries(prev => [...prev, entryToDelete].sort((a, b) =>
-          // eslint-disable-next-line no-restricted-syntax -- Valid use: sorting by Date timestamps
-          b.timestamp.getTime() - a.timestamp.getTime(),
-        ));
+        setEntries(prev => [...prev, entryToDelete].sort((a, b) => {
+          // Compare dates using numeric timestamp values
+          const aTime = a.timestamp.valueOf();
+          const bTime = b.timestamp.valueOf();
+          return bTime - aTime;
+        }));
       }
 
       setError(

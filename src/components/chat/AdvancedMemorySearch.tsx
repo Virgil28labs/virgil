@@ -95,7 +95,8 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           break;
         case 'custom':
           if (filters.customStartDate) {
-            startTime = timeService.parseDate(filters.customStartDate)?.getTime() || 0; // eslint-disable-line no-restricted-syntax -- Valid use: converting parsed Date to timestamp
+            const parsedDate = timeService.parseDate(filters.customStartDate);
+            startTime = parsedDate ? parsedDate.valueOf() : 0;
           }
           break;
       }
@@ -103,7 +104,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
       let endTime = now;
       if (filters.dateRange === 'custom' && filters.customEndDate) {
         const endDate = timeService.parseDate(filters.customEndDate);
-        endTime = endDate ? timeService.addDays(endDate, 1).getTime() : now; // eslint-disable-line no-restricted-syntax -- Valid use: converting Date to timestamp
+        endTime = endDate ? timeService.addDays(endDate, 1).valueOf() : now;
       }
 
       filteredMemories = filteredMemories.filter(memory =>

@@ -218,9 +218,9 @@ export class VectorMemoryService extends MemoryService {
    */
   private createMessageContext(message: ChatMessage): string {
     const dashboardContext = dashboardContextService.getContext();
-    // Need to convert timestamp to Date for formatting
-    // eslint-disable-next-line no-restricted-syntax
-    const time = timeService.formatDateToLocal(new Date(message.timestamp));
+    // Convert timestamp to Date for formatting
+    const parsedDate = timeService.parseDate(message.timestamp);
+    const time = parsedDate ? timeService.formatDateToLocal(parsedDate) : message.timestamp;
 
     let context = `${time}, ${message.role}`;
 

@@ -1,5 +1,6 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from './common/EmojiButton';
+import { DashboardAppErrorBoundary } from './common/DashboardAppErrorBoundary';
 
 const DogGallery = lazy(() =>
   import('./dog/DogGallery').then(module => ({
@@ -8,10 +9,12 @@ const DogGallery = lazy(() =>
 );
 
 const DogGalleryWrapper = ({ onClose }: { onClose: () => void }) => (
-  <DogGallery isOpen onClose={onClose} />
+  <DashboardAppErrorBoundary appName="Doggo Sanctuary">
+    <DogGallery isOpen onClose={onClose} />
+  </DashboardAppErrorBoundary>
 );
 
-export const DogEmojiButton = () => (
+export const DogEmojiButton = memo(() => (
   <EmojiButton
     emoji="🐕"
     ariaLabel="Open Doggo Sanctuary"
@@ -26,4 +29,4 @@ export const DogEmojiButton = () => (
     title="Visit the Doggo Sanctuary!"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

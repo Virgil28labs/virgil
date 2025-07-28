@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, memo } from 'react';
 import { EmojiButton } from '../common/EmojiButton';
 
 const NotesApp = lazy(() =>
@@ -11,7 +11,7 @@ const NotesAppWrapper = ({ onClose }: { onClose: () => void }) => (
   <NotesApp isOpen onClose={onClose} />
 );
 
-export const NotesEmojiButton = () => (
+export const NotesEmojiButton = memo(() => (
   <EmojiButton
     emoji="📝"
     ariaLabel="Open Notes"
@@ -26,4 +26,4 @@ export const NotesEmojiButton = () => (
     title="Notes - Capture your thoughts effortlessly"
     className="opacity-80 hover:opacity-100"
   />
-);
+));

@@ -247,19 +247,7 @@ export class CameraUtils {
 
   static formatTimestamp(timestamp: number): string {
     const date = timeService.fromTimestamp(timestamp);
-    const now = timeService.getCurrentDateTime();
-    const diff = now.getTime() - date.getTime(); // eslint-disable-line no-restricted-syntax
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) {
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    } else if (hours > 0) {
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else {
-      const minutes = Math.floor(diff / (1000 * 60));
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    }
+    return timeService.getTimeAgo(date);
   }
 
   static generatePhotoName(timestamp: number): string {
