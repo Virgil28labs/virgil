@@ -12,6 +12,11 @@ export const PHYSICS_CONSTANTS = {
   WALL_STICK_FORCE: 0.3,
   CHARGE_MAX: 1.5,
   CHARGE_RATE: 0.025, // Increased from 0.015 for 60% faster charging (~1s to full charge)
+  // Smooth movement constants
+  ACCELERATION: 2.0,      // How fast to speed up
+  FRICTION: 0.8,          // How fast to slow down (ground)
+  AIR_CONTROL: 0.3,       // Reduced control multiplier when in air
+  TERMINAL_VELOCITY: 25,  // Maximum fall speed
 } as const;
 
 // Emoji arrays

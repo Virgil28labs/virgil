@@ -152,15 +152,25 @@ export const useRaccoonPhysics = ({
 
       setPosition((prev) => {
         let { x, y } = prev;
-        let vx = 0;
+        let vx = velocity.x;
         let vy = velocity.y;
 
-        // Horizontal movement
+        // Check if on ground or UI element for acceleration calculation
+        const isGrounded = y >= physicsGround || currentUIElement !== null;
+        const acceleration = isGrounded ? PHYSICS_CONSTANTS.ACCELERATION : PHYSICS_CONSTANTS.ACCELERATION * PHYSICS_CONSTANTS.AIR_CONTROL;
+
+        // Horizontal movement with acceleration
         if (keys.current.left) {
-          vx = -PHYSICS_CONSTANTS.MOVE_SPEED;
-        }
-        if (keys.current.right) {
-          vx = PHYSICS_CONSTANTS.MOVE_SPEED;
+          vx = Math.max(vx - acceleration, -PHYSICS_CONSTANTS.MOVE_SPEED);
+        } else if (keys.current.right) {
+          vx = Math.min(vx + acceleration, PHYSICS_CONSTANTS.MOVE_SPEED);
+        } else {
+          // Apply friction when no keys pressed
+          if (Math.abs(vx) > 0.1) {
+            vx *= PHYSICS_CONSTANTS.FRICTION;
+          } else {
+            vx = 0; // Stop completely when very slow
+          }
         }
         x += vx;
 
@@ -194,6 +204,10 @@ export const useRaccoonPhysics = ({
         } else {
           vy += PHYSICS_CONSTANTS.GRAVITY;
         }
+        
+        // Apply terminal velocity cap
+        vy = Math.min(vy, PHYSICS_CONSTANTS.TERMINAL_VELOCITY);
+        
         y += vy;
 
         // UI Element Collision Detection
@@ -306,6 +320,7 @@ export const useRaccoonPhysics = ({
   }, [
     isPickedUp,
     isDragging,
+    velocity.x,
     velocity.y,
     jumpsUsed,
     isOnWall,
@@ -313,6 +328,7 @@ export const useRaccoonPhysics = ({
     charge,
     physicsGround,
     uiElements,
+    currentUIElement,
     onUIElementLanding,
   ]);
 
