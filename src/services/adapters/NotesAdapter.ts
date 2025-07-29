@@ -418,8 +418,11 @@ export class NotesAdapter extends BaseAdapter<NotesData> {
       value: `${entry.tags.join(', ')} - ${this.getTimeAgo(entry.timestamp)}`,
       field: `note.${entry.id}`,
     })).sort((a, b) => {
-      const relevanceA = this.calculateRelevance(matches.find(e => e.id === a.field.split('.')[1])!, lowerQuery);
-      const relevanceB = this.calculateRelevance(matches.find(e => e.id === b.field.split('.')[1])!, lowerQuery);
+      const entryA = matches.find(e => e.id === a.field.split('.')[1]);
+      const entryB = matches.find(e => e.id === b.field.split('.')[1]);
+      if (!entryA || !entryB) return 0;
+      const relevanceA = this.calculateRelevance(entryA, lowerQuery);
+      const relevanceB = this.calculateRelevance(entryB, lowerQuery);
       return relevanceB - relevanceA;
     });
   }

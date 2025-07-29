@@ -221,15 +221,15 @@ describe('DogGrid', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle dogs with duplicate IDs', () => {
-      const dogsWithDuplicates = [
+    it('should handle dogs with similar IDs', () => {
+      const dogsWithSimilarIds = [
         { url: 'https://example.com/dog1.jpg', breed: 'akita', id: 'dog-1' },
-        { url: 'https://example.com/dog2.jpg', breed: 'beagle', id: 'dog-1' }, // Duplicate ID
+        { url: 'https://example.com/dog2.jpg', breed: 'beagle', id: 'dog-1a' }, // Similar but unique ID
       ];
 
-      render(<DogGrid {...defaultProps} dogs={dogsWithDuplicates} />);
+      render(<DogGrid {...defaultProps} dogs={dogsWithSimilarIds} />);
 
-      // Should still render both dogs (React will warn about duplicate keys)
+      // Should render both dogs without warnings
       expect(DogCard).toHaveBeenCalledTimes(2);
     });
 

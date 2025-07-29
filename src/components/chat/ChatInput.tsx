@@ -17,6 +17,7 @@ interface ChatInputProps {
 
   // Focus management
   shouldFocus: boolean;
+  externalInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const ChatInput = memo(function ChatInput({
@@ -30,15 +31,17 @@ const ChatInput = memo(function ChatInput({
   showQuickActions,
   dashboardContext,
   shouldFocus,
+  externalInputRef,
 }: ChatInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const activeRef = externalInputRef || inputRef;
 
   // Focus management
   useEffect(() => {
-    if (shouldFocus && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (shouldFocus && activeRef.current) {
+      setTimeout(() => activeRef.current?.focus(), 100);
     }
-  }, [shouldFocus]);
+  }, [shouldFocus, activeRef]);
 
   // Generate quick actions based on context
   const generateQuickActions = useCallback(() => {
@@ -103,7 +106,7 @@ const ChatInput = memo(function ChatInput({
         <div className="input-wrapper">
           <label htmlFor="chat-input" className="sr-only">Type your message to Virgil</label>
           <input
-            ref={inputRef}
+            ref={activeRef}
             id="chat-input"
             type="text"
             value={input}

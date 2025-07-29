@@ -79,7 +79,7 @@ function VirgilChatbotInner() {
     handleSubmit,
     handleKeyDown,
     handleQuickAction,
-    inputRef: _inputRef,
+    inputRef,
   } = useMessageHandling({
     selectedModel: state.selectedModel,
     messages: state.messages,
@@ -228,6 +228,7 @@ function VirgilChatbotInner() {
         showQuickActions={state.messages.length === 0}
         dashboardContext={state.dashboardContext}
         shouldFocus={state.isOpen}
+        externalInputRef={inputRef}
       />
 
       <MemoryModal
