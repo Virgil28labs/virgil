@@ -130,6 +130,12 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
   }
 
   override async getResponse(query: string): Promise<string> {
+    // Check if user is asking for advice rather than status
+    if (this.isAskingForAdvice(query)) {
+      // User wants productivity advice, not timer status
+      return null; // Let LLM provide contextual advice
+    }
+    
     const lowerQuery = query.toLowerCase();
 
     // Current session status
@@ -140,11 +146,6 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     // Today's productivity stats
     if (lowerQuery.includes('today') || lowerQuery.includes('session') || lowerQuery.includes('productivity')) {
       return this.getTodayStatsResponse();
-    }
-
-    // Focus recommendations
-    if (lowerQuery.includes('should') || lowerQuery.includes('when') || lowerQuery.includes('focus')) {
-      return this.getFocusRecommendation();
     }
 
     // Default response
@@ -205,37 +206,6 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     return response;
   }
 
-  private getFocusRecommendation(): string {
-    const hour = timeService.getHours(timeService.getCurrentDateTime());
-    const { sessionsCompleted } = this.currentData.todayStats;
-
-    // Morning recommendation
-    if (hour >= 6 && hour < 12) {
-      if (sessionsCompleted === 0) {
-        return 'Morning is a great time for focused work! Consider starting with a 25-minute Pomodoro session to kick off your productive day.';
-      }
-      return 'Great morning for deep work! Another 25-minute session can help maintain your focus momentum.';
-    }
-
-    // Afternoon recommendation
-    if (hour >= 12 && hour < 17) {
-      if (sessionsCompleted < 3) {
-        return 'Afternoon is perfect for tackling important tasks. A 25-minute Pomodoro can help you power through!';
-      }
-      return "You've been productive today! Consider a shorter 15-minute session if you need a quick focus boost.";
-    }
-
-    // Evening recommendation
-    if (hour >= 17 && hour < 22) {
-      if (sessionsCompleted >= 6) {
-        return "You've had a very productive day with 6+ sessions! Consider winding down to avoid burnout.";
-      }
-      return 'Evening focus sessions work well for wrapping up tasks. Try a 25-minute session with a relaxing break after.';
-    }
-
-    // Late night
-    return "It's getting late. If you need to work, try a shorter 10-15 minute session to maintain focus without affecting sleep.";
-  }
 
   private getOverviewResponse(): string {
     if (this.currentData.isRunning) {

@@ -106,12 +106,12 @@ export class DynamicContextBuilder {
   /**
    * Builds an enhanced prompt with relevant context based on the user's query
    */
-  static buildEnhancedPrompt(
+  static async buildEnhancedPrompt(
     originalPrompt: string,
     userQuery: string,
     context: DashboardContext,
     suggestions: ContextualSuggestion[] = [],
-  ): EnhancedPrompt {
+  ): Promise<EnhancedPrompt> {
     const relevanceScores = this.calculateRelevance(userQuery);
     const contextUsed: string[] = [];
     let enhancedPrompt = originalPrompt;
@@ -166,10 +166,11 @@ export class DynamicContextBuilder {
     }
 
     // Check if query is asking about dashboard apps
-    const relevantApps = dashboardAppService.findAppsForQuery(userQuery);
-    if (relevantApps.length > 0) {
+    const relevantAppsPromise = dashboardAppService.getAppsWithConfidence(userQuery);
+    const relevantAppsWithConfidence = await relevantAppsPromise;
+    if (relevantAppsWithConfidence.length > 0) {
       const appContext = dashboardAppService.getDetailedContext(
-        relevantApps.map(app => app.appName),
+        relevantAppsWithConfidence.map(item => item.adapter.appName),
       );
       if (appContext) {
         enhancedPrompt += `\n\nDASHBOARD APP DATA:${appContext}`;
@@ -435,6 +436,83 @@ export class DynamicContextBuilder {
 
       return hasRelevantTrigger || suggestion.priority === 'high';
     });
+  }
+
+  /**
+   * Synchronous version of buildEnhancedPrompt without dashboard app data
+   * Used for UI preview where async operations are not supported
+   */
+  static buildEnhancedPromptSync(
+    originalPrompt: string,
+    userQuery: string,
+    context: DashboardContext,
+    suggestions: ContextualSuggestion[] = [],
+  ): EnhancedPrompt {
+    const relevanceScores = this.calculateRelevance(userQuery);
+    const contextUsed: string[] = [];
+    let enhancedPrompt = originalPrompt;
+
+    // Add relevant context sections based on relevance scores
+    const contextSections: string[] = [];
+
+    // Time context (always include basic time info, enhance if relevant)
+    if (relevanceScores.timeContext > 0.1 || this.isTimeQuery(userQuery)) {
+      contextSections.push(this.buildTimeContext(context));
+      contextUsed.push('time');
+    }
+
+    // Location context - always include for direct queries or when relevant
+    if (relevanceScores.locationContext > 0.1 || this.isLocationQuery(userQuery)) {
+      if (context.location.hasGPS || context.location.ipAddress) {
+        contextSections.push(this.buildLocationContext(context));
+        contextUsed.push('location');
+      }
+    }
+
+    // Weather context
+    if (relevanceScores.weatherContext > 0.2 && context.weather.hasData) {
+      contextSections.push(this.buildWeatherContext(context));
+      contextUsed.push('weather');
+    }
+
+    // User context - always include for direct queries or when relevant
+    if (relevanceScores.userContext > 0.1 || this.isUserQuery(userQuery)) {
+      if (context.user.isAuthenticated) {
+        contextSections.push(this.buildUserContext(context));
+        contextUsed.push('user');
+      }
+    }
+
+    // Activity context
+    if (relevanceScores.activityContext > 0.3) {
+      contextSections.push(this.buildActivityContext(context));
+      contextUsed.push('activity');
+    }
+
+    // Device context - always include for direct queries or when relevant
+    if ((relevanceScores.deviceContext > 0.1 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
+      contextSections.push(this.buildDeviceContext(context));
+      contextUsed.push('device');
+    }
+
+    // Add context sections to prompt
+    if (contextSections.length > 0) {
+      const contextString = '\n\nCONTEXTUAL AWARENESS:\n' + contextSections.join('\n');
+      enhancedPrompt = originalPrompt + contextString;
+    }
+
+    // NOTE: Dashboard app data is not included in sync version as it requires async operations
+    
+    // Add relevant suggestions
+    const relevantSuggestions = this.filterRelevantSuggestions(suggestions, relevanceScores);
+
+    return {
+      originalPrompt,
+      enhancedPrompt,
+      contextUsed,
+      relevanceScores,
+      suggestions: relevantSuggestions,
+    };
   }
 
   /**

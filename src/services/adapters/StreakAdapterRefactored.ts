@@ -189,6 +189,12 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
   }
 
   override async getResponse(query: string): Promise<string> {
+    // Check if user is asking for advice rather than status
+    if (this.isAskingForAdvice(query)) {
+      // User wants advice/recommendations, not habit tracking info
+      return null; // Let LLM provide contextual advice
+    }
+    
     const contextData = this.getContextData();
     if (!contextData.isActive || !contextData.data) {
       return this.getInactiveResponse();

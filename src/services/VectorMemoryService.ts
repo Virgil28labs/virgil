@@ -1,6 +1,5 @@
 import { MemoryService } from './MemoryService';
 import { vectorService } from './vectorService';
-import { toastService } from './ToastService';
 import type { ChatMessage } from '../types/chat.types';
 import type { VectorSearchResult } from './vectorService';
 import { timeService } from './TimeService';
@@ -20,12 +19,15 @@ export interface VectorMemory {
 export class VectorMemoryService extends MemoryService {
   private static instance: VectorMemoryService;
   private isVectorServiceHealthy = false;
+  private healthCheckPromise: Promise<void>;
   private readonly MIN_MESSAGE_LENGTH = 50; // Minimum chars to store as vector
   private readonly CONTEXT_SEARCH_LIMIT = 5; // Number of memories to retrieve for context
+  private readonly CONFIDENCE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private confidenceCache = new Map<string, { confidence: number; timestamp: number }>();
 
   constructor() {
     super();
-    this.checkVectorServiceHealth();
+    this.healthCheckPromise = this.checkVectorServiceHealth();
   }
 
   static getInstance(): VectorMemoryService {
@@ -45,6 +47,14 @@ export class VectorMemoryService extends MemoryService {
       });
       this.isVectorServiceHealthy = false;
     }
+  }
+
+  /**
+   * Wait for the health check to complete and return the result
+   */
+  async waitForHealthCheck(): Promise<boolean> {
+    await this.healthCheckPromise;
+    return this.isVectorServiceHealthy;
   }
 
   /**
@@ -99,7 +109,7 @@ export class VectorMemoryService extends MemoryService {
         component: 'VectorMemoryService',
         action: 'searchSimilar',
       });
-      toastService.error('Unable to search memories');
+      // Don't show error to user - this is a background operation
       return [];
     }
   }
@@ -163,13 +173,17 @@ export class VectorMemoryService extends MemoryService {
         await vectorService.store(contentWithContext);
       }
 
-      toastService.success(`Synced ${markedMemories.length} memories`);
+      logger.info(`Synced ${markedMemories.length} memories`, {
+        component: 'VectorMemoryService',
+        action: 'syncMemories',
+        metadata: { count: markedMemories.length },
+      });
     } catch (error) {
       logger.error('Failed to sync memories', error instanceof Error ? error : new Error(String(error)), {
         component: 'VectorMemoryService',
         action: 'syncMemories',
       });
-      toastService.error('Unable to sync memories');
+      // Don't show error to user - this is a background operation
     }
   }
 
@@ -253,6 +267,168 @@ export class VectorMemoryService extends MemoryService {
       context,
       similarity: result.similarity,
     };
+  }
+
+  /**
+   * Store intent embedding for semantic confidence matching
+   */
+  async storeIntentEmbedding(intent: string, examples: string[]): Promise<void> {
+    // Wait for health check to complete
+    await this.healthCheckPromise;
+    
+    if (!this.isVectorServiceHealthy) {
+      logger.warn('Vector service not healthy, skipping intent storage');
+      return;
+    }
+
+    try {
+      // Combine examples into a single text for better embedding
+      const combinedText = examples.join(' | ');
+      const contentWithMetadata = `${combinedText}\n[Intent: ${intent}]`;
+
+      // Store in vector database
+      await vectorService.store(contentWithMetadata);
+
+      logger.info(`Stored intent embedding for: ${intent}`, {
+        component: 'VectorMemoryService',
+        action: 'storeIntent',
+        metadata: { intent, exampleCount: examples.length },
+      });
+    } catch (error) {
+      logger.error('Failed to store intent embedding', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'storeIntent',
+        metadata: { intent },
+      });
+    }
+  }
+
+  /**
+   * Get semantic confidence score for a query against an intent
+   */
+  async getSemanticConfidence(query: string, intent: string): Promise<number> {
+    // Check cache first
+    const cacheKey = `${query}::${intent}`;
+    const cached = this.confidenceCache.get(cacheKey);
+    if (cached && (timeService.getTimestamp() - cached.timestamp < this.CONFIDENCE_CACHE_TTL)) {
+      return cached.confidence;
+    }
+
+    // Wait for health check to complete
+    await this.healthCheckPromise;
+    
+    if (!this.isVectorServiceHealthy) {
+      return 0; // Fallback to keyword matching
+    }
+
+    try {
+      // Search for similar content with intent filter
+      const results = await vectorService.search(query, 1);
+
+      // Filter results that match the intent
+      const intentResults = results.filter(result => 
+        result.content.includes(`[Intent: ${intent}]`),
+      );
+
+      if (intentResults.length === 0) {
+        // Cache the zero result
+        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+        return 0;
+      }
+
+      // Return the similarity score (already 0-1 range)
+      const confidence = intentResults[0].similarity;
+      
+      // Cache the result
+      this.confidenceCache.set(cacheKey, { confidence, timestamp: timeService.getTimestamp() });
+      
+      return confidence;
+    } catch (error) {
+      logger.error('Failed to get semantic confidence', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'getSemanticConfidence',
+        metadata: { intent },
+      });
+      
+      // Cache the fallback
+      this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+      
+      return 0;
+    }
+  }
+
+  /**
+   * Get semantic confidence scores for multiple queries in batch
+   * This reduces API calls from N to 1
+   */
+  async getSemanticConfidenceBatch(
+    queries: Array<{ query: string; intent: string }>,
+  ): Promise<Map<string, number>> {
+    const results = new Map<string, number>();
+    const uncachedQueries: Array<{ query: string; intent: string; cacheKey: string }> = [];
+
+    // Check cache for each query
+    for (const { query, intent } of queries) {
+      const cacheKey = `${query}::${intent}`;
+      const cached = this.confidenceCache.get(cacheKey);
+      
+      if (cached && (timeService.getTimestamp() - cached.timestamp < this.CONFIDENCE_CACHE_TTL)) {
+        results.set(intent, cached.confidence);
+      } else {
+        uncachedQueries.push({ query, intent, cacheKey });
+      }
+    }
+
+    // If all results are cached, return early
+    if (uncachedQueries.length === 0) {
+      return results;
+    }
+
+    // Wait for health check
+    await this.healthCheckPromise;
+    
+    if (!this.isVectorServiceHealthy) {
+      // Return 0 for all uncached queries
+      for (const { intent, cacheKey } of uncachedQueries) {
+        results.set(intent, 0);
+        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+      }
+      return results;
+    }
+
+    try {
+      // Make a single search with the combined query
+      // Use the first query as the search query (they should all be the same user query)
+      const searchQuery = uncachedQueries[0].query;
+      const searchResults = await vectorService.search(searchQuery, 10); // Get more results to match multiple intents
+
+      // Process results for each intent
+      for (const { intent, cacheKey } of uncachedQueries) {
+        const intentResults = searchResults.filter(result => 
+          result.content.includes(`[Intent: ${intent}]`),
+        );
+
+        const confidence = intentResults.length > 0 ? intentResults[0].similarity : 0;
+        results.set(intent, confidence);
+        
+        // Cache the result
+        this.confidenceCache.set(cacheKey, { confidence, timestamp: timeService.getTimestamp() });
+      }
+    } catch (error) {
+      logger.error('Failed to get semantic confidence batch', error instanceof Error ? error : new Error(String(error)), {
+        component: 'VectorMemoryService',
+        action: 'getSemanticConfidenceBatch',
+        metadata: { queryCount: uncachedQueries.length },
+      });
+      
+      // Return 0 for all uncached queries
+      for (const { intent, cacheKey } of uncachedQueries) {
+        results.set(intent, 0);
+        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+      }
+    }
+
+    return results;
   }
 }
 

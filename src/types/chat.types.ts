@@ -12,6 +12,7 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   streaming?: boolean;
+  confidence?: number; // 0.0 to 1.0, only for assistant messages
 }
 
 export interface ModelOption {

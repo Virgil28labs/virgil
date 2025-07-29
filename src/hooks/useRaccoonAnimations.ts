@@ -105,7 +105,7 @@ export const useRaccoonAnimations = ({
     ];
     setSleepingEmojis(initialEmojis);
 
-    // Continue spawning new emojis every 2.5 seconds
+    // Continue spawning new emojis every 8 seconds
     sleepEmojiTimer.current = setInterval(() => {
       setSleepingEmojis(prev => {
         // Keep max 3 emojis, remove oldest and add new one
@@ -193,7 +193,8 @@ export const useRaccoonAnimations = ({
         }
       }
 
-      // Add glow effect to element
+      // Import the helper function at the top of this file
+      // For now, inline the glow effect logic until we extract it to a shared utility
       if (element.element) {
         if (element.isPowerButton) {
           element.element.style.boxShadow = '0 0 25px rgba(239, 176, 194, 1), 0 0 35px rgba(244, 114, 182, 0.8)';

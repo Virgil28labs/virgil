@@ -109,10 +109,135 @@ const ChatHeader = memo(function ChatHeader({
           style={{ cursor: 'pointer', userSelect: 'none' }}
         >
           Virgil
-          {showTooltip && (
+          {showTooltip && dashboardContext && (
+            <div className="tooltip enhanced-context-tooltip">
+              <div className="tooltip-content">
+                <div className="tooltip-header">
+                  <strong>🧠 Virgil's Context Awareness</strong>
+                  <span className="last-updated">Updated: {dashboardContext.currentTime}</span>
+                </div>
+                
+                {/* Time & Location Row */}
+                <div className="context-row">
+                  <div className="context-section">
+                    <span className="context-icon">⏰</span>
+                    <div className="context-details">
+                      <div className="context-label">Time</div>
+                      <div className="context-value">{dashboardContext.currentTime}</div>
+                      <div className="context-meta">{dashboardContext.timeOfDay} • {dashboardContext.dayOfWeek}</div>
+                    </div>
+                  </div>
+                  
+                  {dashboardContext.location.city && (
+                    <div className="context-section">
+                      <span className="context-icon">📍</span>
+                      <div className="context-details">
+                        <div className="context-label">Location</div>
+                        <div className="context-value">{dashboardContext.location.city}</div>
+                        <div className="context-meta">
+                          {dashboardContext.location.region || dashboardContext.location.country || 
+                           (dashboardContext.location.hasGPS ? 'GPS' : 'IP-based')}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Weather & User Row */}
+                {(dashboardContext.weather.hasData || dashboardContext.user.name) && (
+                  <div className="context-row">
+                    {dashboardContext.weather.hasData && (
+                      <div className="context-section">
+                        <span className="context-icon">🌤️</span>
+                        <div className="context-details">
+                          <div className="context-label">Weather</div>
+                          <div className="context-value">
+                            {dashboardContext.weather.temperature}°{dashboardContext.weather.unit === 'fahrenheit' ? 'F' : 'C'}
+                          </div>
+                          <div className="context-meta">{dashboardContext.weather.description}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {dashboardContext.user.isAuthenticated && (
+                      <div className="context-section">
+                        <span className="context-icon">👤</span>
+                        <div className="context-details">
+                          <div className="context-label">User</div>
+                          <div className="context-value">
+                            {dashboardContext.user.profile?.nickname || 
+                             dashboardContext.user.profile?.fullName || 
+                             dashboardContext.user.name || 
+                             'User'}
+                          </div>
+                          <div className="context-meta">
+                            Session: {Math.floor(dashboardContext.activity.timeSpentInSession / 60000)}m
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Device & Apps Row */}
+                {(dashboardContext.device.hasData || (dashboardContext.apps && Object.keys(dashboardContext.apps.apps).size > 0)) && (
+                  <div className="context-row">
+                    {dashboardContext.device.hasData && (
+                      <div className="context-section">
+                        <span className="context-icon">💻</span>
+                        <div className="context-details">
+                          <div className="context-label">Device</div>
+                          <div className="context-value">{dashboardContext.device.browser || 'Browser'}</div>
+                          <div className="context-meta">{dashboardContext.device.os || dashboardContext.environment.deviceType}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {dashboardContext.apps && Object.keys(dashboardContext.apps.apps).size > 0 && (
+                      <div className="context-section">
+                        <span className="context-icon">📱</span>
+                        <div className="context-details">
+                          <div className="context-label">Active Apps</div>
+                          <div className="context-value">{dashboardContext.apps.activeApps.length} active</div>
+                          <div className="context-meta">
+                            {dashboardContext.apps.activeApps.slice(0, 3).join(', ')}
+                            {dashboardContext.apps.activeApps.length > 3 && '...'}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Activity if present */}
+                {dashboardContext.activity.recentActions.length > 0 && (
+                  <div className="context-row">
+                    <div className="context-section full-width">
+                      <span className="context-icon">🎯</span>
+                      <div className="context-details">
+                        <div className="context-label">Recent Activity</div>
+                        <div className="context-value">
+                          {dashboardContext.activity.recentActions[dashboardContext.activity.recentActions.length - 1]}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {systemPromptInfo.hasCustomPrompt && (
+                  <div className="custom-prompt-indicator">
+                    ✏️ Custom prompt active
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Fallback for when no context is available */}
+          {showTooltip && !dashboardContext && (
             <div className="tooltip">
               <div className="tooltip-content">
-                <strong>Current System Prompt:</strong>
+                <strong>System Prompt:</strong>
                 <p>{systemPromptInfo.prompt}</p>
                 {systemPromptInfo.hasCustomPrompt && (
                   <small style={{ color: 'var(--color-active)', marginTop: '8px', display: 'block' }}>

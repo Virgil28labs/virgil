@@ -8,6 +8,7 @@
 
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
+import { vectorMemoryService } from './VectorMemoryService';
 
 export interface AppContextData<T = unknown> {
   appName: string;
@@ -48,12 +49,11 @@ export interface AppDataAdapter<T = unknown> {
   subscribe?(callback: (data: T) => void): () => void;
 
   // Query capabilities
-  canAnswer(query: string): boolean;
   getKeywords(): string[];
-  getConfidence?(query: string): number; // Optional - default implementation provided
+  getConfidence?(query: string): Promise<number>; // Optional - default implementation provided
 
   // Response generation
-  getResponse?(query: string): Promise<string>;
+  getResponse?(query: string): Promise<string | null>;
 
   // Search within app data
   search?(query: string): Promise<unknown[]>;
@@ -73,7 +73,7 @@ export interface DashboardAppData {
 export const CONFIDENCE_THRESHOLDS = {
   HIGH: 0.8,     // Direct adapter response
   MEDIUM: 0.7,   // Enhanced LLM context
-  LOW: 0.7,      // Minimum threshold for canAnswer()
+  LOW: 0.7,      // Minimum threshold for confidence-based routing
 } as const;
 
 export class DashboardAppService {
@@ -201,31 +201,41 @@ export class DashboardAppService {
     }
   }
 
-  /**
-   * Find apps that can answer a specific query
-   */
-  findAppsForQuery(query: string): AppDataAdapter[] {
-    const relevantApps: AppDataAdapter[] = [];
-
-    for (const adapter of this.adapters.values()) {
-      if (adapter.canAnswer(query)) {
-        relevantApps.push(adapter);
-      }
-    }
-
-    return relevantApps;
-  }
 
   /**
    * Get apps with confidence scores for a query
    * Returns apps sorted by confidence in descending order
    */
-  getAppsWithConfidence(query: string): Array<{ adapter: AppDataAdapter; confidence: number }> {
-    return Array.from(this.adapters.values())
-      .map(adapter => ({ 
-        adapter, 
-        confidence: adapter.getConfidence ? adapter.getConfidence(query) : 0,
-      }))
+  async getAppsWithConfidence(query: string): Promise<Array<{ adapter: AppDataAdapter; confidence: number }>> {
+    const adapters = Array.from(this.adapters.values());
+    
+    // Prepare batch queries for semantic confidence
+    const batchQueries = adapters.map(adapter => ({
+      query,
+      intent: adapter.appName,
+    }));
+    
+    // Get all semantic confidences in one batch call
+    const semanticConfidences = await vectorMemoryService.getSemanticConfidenceBatch(batchQueries);
+    
+    // Build results with semantic confidence or keyword fallback
+    const results = await Promise.all(
+      adapters.map(async adapter => {
+        // Get semantic confidence from batch result
+        const semanticScore = semanticConfidences.get(adapter.appName) || 0;
+        
+        // If semantic score is low, use the adapter's getConfidence method
+        // which already handles fallback to keyword matching
+        let confidence = semanticScore;
+        if (semanticScore <= 0.5 && adapter.getConfidence) {
+          confidence = await adapter.getConfidence(query);
+        }
+        
+        return { adapter, confidence };
+      }),
+    );
+    
+    return results
       .filter(item => item.confidence > 0)
       .sort((a, b) => b.confidence - a.confidence);
   }
@@ -279,7 +289,8 @@ export class DashboardAppService {
   private async shouldAggregateResponses(query: string): Promise<{ shouldAggregate: boolean; relevantApps: AppDataAdapter[] }> {
     // First check explicit cross-app keywords
     if (this.isCrossAppQuery(query)) {
-      const relevantApps = this.findAppsForQuery(query);
+      const appMatches = await this.getAppsWithConfidence(query);
+      const relevantApps = appMatches.map(match => match.adapter);
       return { shouldAggregate: true, relevantApps };
     }
 
@@ -290,7 +301,7 @@ export class DashboardAppService {
     }
 
     // Find apps that can answer the query
-    const relevantApps = this.findAppsForQuery(query);
+    const relevantApps = await this.findAppsForQuery(query);
 
     // If multiple apps can provide data, check if they actually have data
     if (relevantApps.length >= 2) {
@@ -483,7 +494,8 @@ export class DashboardAppService {
     // Fall back to single-app logic if not aggregating
     if (relevantApps.length === 0) {
       // Find apps that can answer if we haven't already
-      const apps = this.findAppsForQuery(query);
+      const appMatches = await this.getAppsWithConfidence(query);
+      const apps = appMatches.map(match => match.adapter);
       if (apps.length === 0) return null;
 
       // Use the first app that can provide a response

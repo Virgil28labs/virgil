@@ -125,6 +125,19 @@ const Message = memo(function Message({
       )}
       <div className="msg-content" role="text">
         <FormattedText content={message.content} />
+        {message.role === 'assistant' && message.confidence !== undefined && (
+          <span 
+            className={`confidence-indicator confidence-${
+              message.confidence >= 0.8 ? 'high' : 
+                message.confidence >= 0.7 ? 'medium' : 'low'
+            }`}
+            title={`Confidence: ${Math.round(message.confidence * 100)}%`}
+            aria-label={`Confidence: ${Math.round(message.confidence * 100)}%`}
+          >
+            {message.confidence >= 0.8 ? '✓' : 
+              message.confidence >= 0.7 ? '?' : '⚠'}
+          </span>
+        )}
         <button
           className="remember-btn"
           onClick={() => onMarkAsImportant(message)}
@@ -148,6 +161,19 @@ const Message = memo(function Message({
               minute: '2-digit',
               second: '2-digit',
             }).format(timeService.parseDate(message.timestamp) || timeService.getCurrentDateTime())}
+          </span>
+        )}
+        {message.role === 'assistant' && message.confidence !== undefined && (
+          <span 
+            className={`confidence-indicator confidence-${
+              message.confidence >= 0.8 ? 'high' : 
+                message.confidence >= 0.7 ? 'medium' : 'low'
+            }`}
+            title={`Confidence: ${Math.round(message.confidence * 100)}%`}
+            aria-label={`Confidence: ${Math.round(message.confidence * 100)}%`}
+          >
+            {message.confidence >= 0.8 ? '✓' : 
+              message.confidence >= 0.7 ? '?' : '⚠'}
           </span>
         )}
       </div>

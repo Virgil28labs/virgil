@@ -221,6 +221,13 @@ export class NotesAdapter extends BaseAdapter<NotesData> {
 
   override async getResponse(query: string): Promise<string> {
     await this.ensureFreshData();
+    
+    // Check if user is asking for advice rather than status
+    if (this.isAskingForAdvice(query)) {
+      // User wants advice about note-taking, not note status
+      return null; // Let LLM provide contextual advice
+    }
+    
     const lowerQuery = query.toLowerCase();
 
     // Handle specific query types

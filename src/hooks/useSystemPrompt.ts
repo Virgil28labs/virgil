@@ -79,7 +79,7 @@ export function useSystemPrompt({
     }
 
     if (userQuery && dashboardContext) {
-      const enhancedPrompt = DynamicContextBuilder.buildEnhancedPrompt(
+      const enhancedPrompt = await DynamicContextBuilder.buildEnhancedPrompt(
         systemPrompt,
         userQuery,
         dashboardContext,
@@ -103,7 +103,7 @@ export function useSystemPrompt({
     }
 
     if (userQuery && dashboardContext) {
-      const enhancedPrompt = DynamicContextBuilder.buildEnhancedPrompt(
+      const enhancedPrompt = DynamicContextBuilder.buildEnhancedPromptSync(
         systemPrompt,
         userQuery,
         dashboardContext,

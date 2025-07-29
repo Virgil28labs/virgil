@@ -22,6 +22,7 @@ export interface ChatApiResponse {
   success: boolean;
   message?: {
     content: string;
+    confidence?: number;
   };
   error?: string;
 }
@@ -55,7 +56,7 @@ export class ChatService {
     }
 
     // Check dashboard apps with confidence-based routing
-    const appMatches = dashboardAppService.getAppsWithConfidence(userMessage);
+    const appMatches = await dashboardAppService.getAppsWithConfidence(userMessage);
     
     if (appMatches.length > 0) {
       const bestMatch = appMatches[0]; // Already sorted by confidence
@@ -65,7 +66,7 @@ export class ChatService {
         try {
           const response = await bestMatch.adapter.getResponse(userMessage);
           if (response) {
-            return this.createAssistantMessage(response);
+            return this.createAssistantMessage(response, bestMatch.confidence);
           }
         } catch (error) {
           logger.error(`Error getting response from ${bestMatch.adapter.appName}`, error as Error, {
@@ -89,7 +90,7 @@ export class ChatService {
           }
         }
       }
-      // Low confidence (<0.7) apps are filtered out by canAnswer() in BaseAdapter
+      // Low confidence (<0.7) apps are filtered out by getAppsWithConfidence()
     }
 
     // Prepare API messages
@@ -131,7 +132,7 @@ export class ChatService {
         throw new Error('Invalid response from chat service');
       }
 
-      return this.createAssistantMessage(data.message.content);
+      return this.createAssistantMessage(data.message.content, data.message.confidence);
     } catch (error) {
       logger.error('Failed to send chat message', error as Error, {
         component: 'ChatService',
@@ -149,13 +150,14 @@ export class ChatService {
   /**
    * Create a new assistant message
    */
-  private createAssistantMessage(content: string): ChatMessage {
+  private createAssistantMessage(content: string, confidence?: number): ChatMessage {
     const now = dashboardContextService.getCurrentDateTime();
     return {
       id: `${dashboardContextService.getTimestamp()}-assistant`,
       role: 'assistant',
       content,
       timestamp: timeService.toISOString(now),
+      confidence,
     };
   }
 

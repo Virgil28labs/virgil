@@ -15,6 +15,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Skeleton } from './components/ui/skeleton';
 import { ToastContainer } from './components/ToastNotification';
 import { StorageMigration } from './services/StorageMigration';
+import { intentInitializer } from './services/IntentInitializer';
 import { logger } from './lib/logger';
 // Import errorHandlerService to initialize global error handlers
 import './services/ErrorHandlerService';
@@ -85,8 +86,9 @@ function AppContent(): React.ReactElement {
 function App(): React.ReactElement {
   const { toasts, removeToast } = useToast();
 
-  // Run storage migrations on app startup
+  // Run storage migrations and initialize intents on app startup
   useEffect(() => {
+    // Run storage migrations
     StorageMigration.runMigrations().catch(error => {
       logger.error(
         'Storage migration failed',
@@ -97,6 +99,24 @@ function App(): React.ReactElement {
         },
       );
     });
+
+    // Initialize intent embeddings for semantic confidence scoring with delay
+    // Wait 3 seconds to ensure backend services are ready
+    const initTimeout = setTimeout(() => {
+      intentInitializer.initializeIntents().catch(error => {
+        logger.error(
+          'Intent initialization failed',
+          error instanceof Error ? error : new Error(String(error)),
+          {
+            component: 'App',
+            action: 'initializeIntents',
+          },
+        );
+      });
+    }, 3000);
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(initTimeout);
   }, []);
 
   return (

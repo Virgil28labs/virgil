@@ -43,7 +43,7 @@ export const UI_SELECTORS = [
 // Animation timings
 export const ANIMATION_TIMINGS = {
   SLEEP_TIMEOUT: 10000, // 10 seconds
-  SLEEP_EMOJI_INTERVAL: 2500, // 2.5 seconds
+  SLEEP_EMOJI_INTERVAL: 8000, // 8 seconds - less frequent for subtlety
   SPARKLE_DURATION: 1000, // 1 second
   PICKUP_DROP_DELAY: 2000, // 2 seconds
   TARGET_FPS: 60,
@@ -58,3 +58,64 @@ export const RACCOON_SIZE = {
   WIDTH: 80,
   HEIGHT: 80,
 } as const;
+
+// Visual effect constants
+export const VISUAL_EFFECTS = {
+  SQUASH_DURATION: 200, // Squash effect duration
+  DUST_PARTICLE_DURATION: 500, // Dust particle fade out
+  DUST_CREATION_LIMIT: 100, // Minimum ms between dust particles
+  TRAIL_SPEED_THRESHOLD: 10, // Speed needed for trail effect
+  TRAIL_MAX_POSITIONS: 3, // Maximum trail positions
+  SHADOW_HEIGHT: 20,
+  SHADOW_OFFSET: 10,
+  LANDING_VELOCITY_THRESHOLD: 5, // Velocity for squash effect
+} as const;
+
+// UI constants
+export const UI_CONSTANTS = {
+  UPDATE_INTERVAL: 5000, // UI element detection interval
+  CACHE_DURATION: 1000, // UI cache validity duration
+  CHARGE_BAR_WIDTH: 70,
+  CHARGE_BAR_HEIGHT: 10,
+  CHARGE_BAR_OFFSET: 20,
+  INDICATOR_OFFSET: 15,
+  INDICATOR_OFFSET_WALL: 45,
+  COUNTER_OFFSET: 30,
+} as const;
+
+// Pickup constants  
+export const PICKUP_CONSTANTS = {
+  PICKUP_DURATION: 2000, // Time before drop
+  PICKUP_SCALE: 1.2,
+  PICKUP_ROTATE: 5, // degrees
+  BOUNCE_SCALE: 1.3,
+  BOUNCE_ROTATE: 10, // degrees
+} as const;
+
+// Collision constants
+export const COLLISION_CONSTANTS = {
+  CEILING_CHECK_OFFSET: 20,
+  TEXT_WIDTH_MULTIPLIER: 0.6, // Text width estimation
+  TEXT_BASELINE_MULTIPLIER: 0.8,
+  GROUND_OFFSET: 100, // Distance from bottom
+} as const;
+
+// Animation constants
+export const ANIMATION_CONSTANTS = {
+  IDLE_DURATION: 2000, // 2s for idle animation
+  SITTING_DURATION: 3000, // 3s for sitting animation
+  RUNNING_DURATION: 300, // 0.3s for running animation
+  SLEEPING_BREATH_DURATION: 3000, // 3s for sleeping animation
+  PULSE_GLOW_DURATION: 1000, // 1s for charge glow
+  FLOATING_ZZZ_DURATION: 3000, // 3s for zzz float
+  CHARGE_UPDATE_INTERVAL: 16, // ~60fps for charge update
+} as const;
+
+// Sparkle positions
+export const SPARKLE_POSITIONS = [
+  { top: 0, left: '50%', size: 20, emoji: '✨', delay: 0 },
+  { top: '20%', left: '20%', size: 16, emoji: '⭐', delay: 0.2 },
+  { top: '30%', right: '20%', size: 18, emoji: '💫', delay: 0.4 },
+  { bottom: '20%', left: '30%', size: 14, emoji: '✨', delay: 0.6 },
+  { bottom: '10%', right: '30%', size: 16, emoji: '⭐', delay: 0.8 },
+] as const;
