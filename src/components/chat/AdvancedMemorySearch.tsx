@@ -1,8 +1,8 @@
 import { memo, useState, useCallback, useMemo, useEffect } from 'react';
-import type { MarkedMemory, StoredConversation } from '../../services/MemoryService';
+import type { MarkedMemory, StoredConversation } from '../../services/SupabaseMemoryService';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';
-import './memory-modals.css';
+import './memory-modal-modern.css';
 
 interface SearchFilters {
   query: string;

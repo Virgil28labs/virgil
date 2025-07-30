@@ -1,11 +1,11 @@
 import { memo, useCallback } from 'react';
-import type { StoredConversation } from '../../services/MemoryService';
+import type { StoredConversation } from '../../services/SupabaseMemoryService';
 import type { ChatMessage } from '../../types/chat.types';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';
 import { Message } from './Message';
-import './memory-modals.css';
+import './memory-modal-modern.css';
 
 interface ConversationViewProps {
   conversation: StoredConversation;

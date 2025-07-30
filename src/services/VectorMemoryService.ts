@@ -1,4 +1,4 @@
-import { MemoryService } from './MemoryService';
+import { SupabaseMemoryService } from './SupabaseMemoryService';
 import { vectorService } from './vectorService';
 import type { ChatMessage } from '../types/chat.types';
 import type { VectorSearchResult } from './vectorService';
@@ -16,7 +16,7 @@ export interface VectorMemory {
   similarity?: number;
 }
 
-export class VectorMemoryService extends MemoryService {
+export class VectorMemoryService extends SupabaseMemoryService {
   private static instance: VectorMemoryService;
   private isVectorServiceHealthy = false;
   private healthCheckPromise: Promise<void>;
@@ -157,7 +157,7 @@ export class VectorMemoryService extends MemoryService {
   }
 
   /**
-   * Sync important memories from IndexedDB to vector storage
+   * Sync important memories from Supabase to vector storage
    */
   async syncImportantMemories(): Promise<void> {
     if (!this.isVectorServiceHealthy) {

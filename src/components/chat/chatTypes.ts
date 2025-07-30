@@ -1,5 +1,5 @@
 import type { ChatMessage } from '../../types/chat.types';
-import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
+import type { StoredConversation, MarkedMemory } from '../../services/SupabaseMemoryService';
 import type { DashboardContext, ContextualSuggestion } from '../../services/DashboardContextService';
 
 export interface ChatState {

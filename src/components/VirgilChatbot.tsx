@@ -58,7 +58,7 @@ function VirgilChatbotInner() {
   });
 
   // Use custom hooks for complex logic
-  const { markAsImportant, loadRecentMessages } = useMemoryService({
+  const { markAsImportant, loadRecentMessages, isRealtimeConnected } = useMemoryService({
     dispatch,
     setError,
     dashboardContext: state.dashboardContext,
@@ -196,6 +196,7 @@ function VirgilChatbotInner() {
         markedMemories={state.markedMemories}
         recentConversations={state.recentConversations}
         onMemoryModalOpen={handleMemoryModalOpen}
+        isRealtimeConnected={isRealtimeConnected}
         dashboardContext={state.dashboardContext}
         customSystemPrompt={state.customSystemPrompt}
         onSystemPromptChange={handleSystemPromptChange}

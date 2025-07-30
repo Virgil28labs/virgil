@@ -429,26 +429,7 @@ export class IndexedDBService {
 export const indexedDBService = IndexedDBService.getInstance();
 
 // Register existing databases
-indexedDBService.registerDatabase({
-  name: 'VirgilMemory',
-  version: 1,
-  stores: [
-    {
-      name: 'conversations',
-      keyPath: 'id',
-      indexes: [
-        { name: 'timestamp', keyPath: 'timestamp' },
-      ],
-    },
-    {
-      name: 'memories',
-      keyPath: 'id',
-      indexes: [
-        { name: 'timestamp', keyPath: 'timestamp' },
-      ],
-    },
-  ],
-});
+// Note: VirgilMemory database removed - chat/memory functionality now uses Supabase
 
 indexedDBService.registerDatabase({
   name: 'VirgilCameraDB',

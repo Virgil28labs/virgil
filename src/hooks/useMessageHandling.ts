@@ -1,7 +1,6 @@
 import { useCallback, useRef } from 'react';
 import type React from 'react';
 import { chatService } from '../services/ChatService';
-import { memoryService } from '../services/MemoryService';
 import { vectorMemoryService } from '../services/VectorMemoryService';
 import type { ChatMessage } from '../types/chat.types';
 import { logger } from '../lib/logger';
@@ -50,7 +49,7 @@ export function useMessageHandling({
 
     try {
       // Save user message to continuous conversation
-      await memoryService.saveConversation([userMessage]);
+      await vectorMemoryService.saveConversation([userMessage]);
       
       // Store in vector memory (async, don't wait)
       vectorMemoryService.storeMessageWithEmbedding(userMessage).catch(error => {
@@ -76,7 +75,7 @@ export function useMessageHandling({
       
       // Save assistant message (async, don't wait)
       Promise.all([
-        memoryService.saveConversation([response]),
+        vectorMemoryService.saveConversation([response]),
         vectorMemoryService.storeMessageWithEmbedding(response),
       ]).catch(error => {
         logger.error('Failed to save assistant message', error as Error, {

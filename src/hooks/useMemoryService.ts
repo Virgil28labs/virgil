@@ -1,12 +1,15 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import type { Dispatch } from 'react';
-import { memoryService } from '../services/MemoryService';
+import { vectorMemoryService } from '../services/VectorMemoryService';
 import { DynamicContextBuilder } from '../services/DynamicContextBuilder';
 import { timeService } from '../services/TimeService';
 import type { ChatMessage } from '../types/chat.types';
 import type { DashboardContext } from '../services/DashboardContextService';
 import type { ChatAction } from '../components/chat/chatTypes';
 import { logger } from '../lib/logger';
+import { supabase } from '../lib/supabase';
+import { useRealtimeSync } from './useRealtimeSync';
+import { useAuth } from './useAuth';
 
 interface UseMemoryServiceProps {
   dispatch: Dispatch<ChatAction>;
@@ -18,6 +21,7 @@ interface UseMemoryServiceReturn {
   initializeMemory: () => Promise<void>;
   markAsImportant: (message: ChatMessage) => Promise<void>;
   loadRecentMessages: () => Promise<void>;
+  isRealtimeConnected: boolean;
 }
 
 export function useMemoryService({
@@ -25,17 +29,29 @@ export function useMemoryService({
   setError,
   dashboardContext,
 }: UseMemoryServiceProps): UseMemoryServiceReturn {
+  const { user } = useAuth();
+  const [realtimeEnabled, setRealtimeEnabled] = useState(false);
   // Initialize memory service and load memory data
   const initializeMemory = useCallback(async () => {
     try {
-      await memoryService.init();
+      // Check authentication first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        logger.warn('Skipping memory initialization - no authenticated user', {
+          component: 'useMemoryService',
+          action: 'initializeMemory',
+        });
+        return;
+      }
+
+      await vectorMemoryService.init();
 
       // Load all memory data
       const [lastConv, memories, conversations, context] = await Promise.all([
-        memoryService.getLastConversation(),
-        memoryService.getMarkedMemories(),
-        memoryService.getRecentConversations(10),
-        memoryService.getContextForPrompt(),
+        vectorMemoryService.getLastConversation(),
+        vectorMemoryService.getMarkedMemories(),
+        vectorMemoryService.getRecentConversations(10),
+        vectorMemoryService.getContextForPrompt(),
       ]);
 
       dispatch({
@@ -49,18 +65,43 @@ export function useMemoryService({
         },
       });
     } catch (error) {
-      logger.error('Failed to initialize memory service', error as Error, {
-        component: 'useMemoryService',
-        action: 'initialize',
-      });
+      const err = error as Error & { message?: string; code?: string };
+      
+      // Handle specific error cases
+      if (err?.message?.includes('Authentication error')) {
+        logger.error('Authentication error during memory initialization', err, {
+          component: 'useMemoryService',
+          action: 'initializeMemory',
+        });
+        setError('Authentication error - please refresh the page');
+        
+        // Try to refresh the session
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (!refreshError) {
+          // Retry initialization after refresh
+          logger.info('Session refreshed, retrying memory initialization', {
+            component: 'useMemoryService',
+            action: 'initializeMemory',
+          });
+          setTimeout(() => initializeMemory(), 1000);
+        }
+      } else {
+        logger.error('Failed to initialize memory service', error as Error, {
+          component: 'useMemoryService',
+          action: 'initialize',
+        });
+        
+        // Don't show error for initialization failures - they're handled gracefully
+        // The app can still function without memory service
+      }
     }
-  }, [dispatch]);
+  }, [dispatch, setError]);
 
   // Load recent messages from continuous conversation
   const loadRecentMessages = useCallback(async () => {
     try {
       // Load last 20 messages from continuous conversation for UI
-      const recentMessages = await memoryService.getRecentMessages(20);
+      const recentMessages = await vectorMemoryService.getRecentMessages(20);
       if (recentMessages.length > 0) {
         dispatch({ type: 'SET_MESSAGES', payload: recentMessages });
       }
@@ -79,10 +120,10 @@ export function useMemoryService({
       if (dashboardContext) {
         context = DynamicContextBuilder.createContextSummary(dashboardContext);
       }
-      await memoryService.markAsImportant(message.id, message.content, context);
+      await vectorMemoryService.markAsImportant(message.id, message.content, context);
 
-      const memories = await memoryService.getMarkedMemories();
-      const newContext = await memoryService.getContextForPrompt();
+      const memories = await vectorMemoryService.getMarkedMemories();
+      const newContext = await vectorMemoryService.getContextForPrompt();
 
       dispatch({
         type: 'SET_MEMORY_DATA',
@@ -104,14 +145,107 @@ export function useMemoryService({
     }
   }, [dashboardContext, dispatch, setError]);
 
-  // Initialize on mount
+  // Real-time sync callbacks
+  const handleNewMessage = useCallback((message: ChatMessage) => {
+    // Add the new message to the UI
+    dispatch({ type: 'ADD_MESSAGE', payload: message });
+    
+    logger.info('Real-time message received', {
+      component: 'useMemoryService',
+      action: 'handleNewMessage',
+      metadata: { messageId: message.id },
+    });
+  }, [dispatch]);
+
+  const handleConversationUpdate = useCallback(async () => {
+    // Reload conversation metadata
+    try {
+      const conversation = await vectorMemoryService.getLastConversation();
+      const context = await vectorMemoryService.getContextForPrompt();
+      
+      dispatch({
+        type: 'SET_MEMORY_DATA',
+        payload: {
+          lastConversation: conversation,
+          memoryContext: context,
+        },
+      });
+    } catch (error) {
+      logger.error('Failed to handle conversation update', error as Error, {
+        component: 'useMemoryService',
+        action: 'handleConversationUpdate',
+      });
+    }
+  }, [dispatch]);
+
+  const handleMemoryUpdate = useCallback(async () => {
+    // Reload memories
+    try {
+      const memories = await vectorMemoryService.getMarkedMemories();
+      const context = await vectorMemoryService.getContextForPrompt();
+      
+      dispatch({
+        type: 'SET_MEMORY_DATA',
+        payload: {
+          markedMemories: memories,
+          memoryContext: context,
+        },
+      });
+    } catch (error) {
+      logger.error('Failed to handle memory update', error as Error, {
+        component: 'useMemoryService',
+        action: 'handleMemoryUpdate',
+      });
+    }
+  }, [dispatch]);
+
+  const handleConnectionChange = useCallback((connected: boolean) => {
+    logger.info(`Real-time sync ${connected ? 'connected' : 'disconnected'}`, {
+      component: 'useMemoryService',
+      action: 'handleConnectionChange',
+      metadata: { connected },
+    });
+    
+    if (connected) {
+      // Optionally show a toast notification
+      // toastService.success('Real-time sync connected');
+    }
+  }, []);
+
+  // Use real-time sync
+  const { isConnected } = useRealtimeSync({
+    enabled: realtimeEnabled,
+    userId: user?.id || null,
+    onNewMessage: handleNewMessage,
+    onConversationUpdate: handleConversationUpdate,
+    onMemoryUpdate: handleMemoryUpdate,
+    onMemoryDelete: handleMemoryUpdate, // Reload memories on delete
+    onConnectionChange: handleConnectionChange,
+  });
+
+  // Enable real-time sync after successful initialization
   useEffect(() => {
-    initializeMemory();
+    if (user?.id) {
+      setRealtimeEnabled(true);
+    } else {
+      setRealtimeEnabled(false);
+    }
+  }, [user?.id]);
+
+  // Initialize on mount with a small delay to ensure auth is ready
+  useEffect(() => {
+    // Small delay to ensure authentication context is fully established
+    const initTimer = setTimeout(() => {
+      initializeMemory();
+    }, 500);
+    
+    return () => clearTimeout(initTimer);
   }, [initializeMemory]);
 
   return {
     initializeMemory,
     markAsImportant,
     loadRecentMessages,
+    isRealtimeConnected: isConnected,
   };
 }

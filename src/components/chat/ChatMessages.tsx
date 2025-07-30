@@ -1,6 +1,6 @@
 import { memo, useRef, useEffect, useCallback } from 'react';
 import type { ChatMessage } from '../../types/chat.types';
-import type { StoredConversation } from '../../services/MemoryService';
+import type { StoredConversation } from '../../services/SupabaseMemoryService';
 import type { User } from '../../types/auth.types';
 import { FormattedText } from '../FormattedText';
 import { timeService } from '../../services/TimeService';

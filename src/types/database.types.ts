@@ -241,6 +241,20 @@ export type Database = {
           created_at: string
         }[]
       }
+      search_user_memories_with_id: {
+        Args: {
+          p_user_id: string
+          query_embedding: string
+          match_count?: number
+          threshold?: number
+        }
+        Returns: {
+          id: number
+          content: string
+          similarity: number
+          created_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

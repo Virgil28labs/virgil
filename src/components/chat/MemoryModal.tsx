@@ -1,12 +1,15 @@
 import React, { memo, useState, useCallback, useEffect } from 'react';
-import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
-import { MemoryService, memoryService } from '../../services/MemoryService';
+import ReactDOM from 'react-dom';
+import type { StoredConversation, MarkedMemory } from '../../services/SupabaseMemoryService';
+import { SupabaseMemoryService } from '../../services/SupabaseMemoryService';
+import { vectorMemoryService } from '../../services/VectorMemoryService';
 import { ConversationView } from './ConversationView';
 import { AdvancedMemorySearch } from './AdvancedMemorySearch';
+import { RecentMessagesTab } from './RecentMessagesTab';
 import type { ChatMessage } from '../../types/chat.types';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';
-import './memory-modals.css';
+import './memory-modal-modern.css';
 
 interface MemoryModalProps {
   isOpen: boolean;
@@ -32,6 +35,7 @@ const MemoryModal = memo(function MemoryModal({
   const [selectedConversation, setSelectedConversation] = useState<StoredConversation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdvancedSearchExpanded, setIsAdvancedSearchExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<'memories' | 'recent' | 'history'>('memories');
   const [filteredResults, setFilteredResults] = useState({
     memories: markedMemories,
     conversations: recentConversations,
@@ -48,11 +52,11 @@ const MemoryModal = memo(function MemoryModal({
   const handleDeleteMemory = useCallback(async (memoryId: string) => {
     setIsLoading(true);
     try {
-      await memoryService.forgetMemory(memoryId);
-      const updatedMemories = await memoryService.getMarkedMemories();
+      await vectorMemoryService.forgetMemory(memoryId);
+      const updatedMemories = await vectorMemoryService.getMarkedMemories();
       onMemoriesUpdate(updatedMemories);
 
-      const newContext = await memoryService.getContextForPrompt();
+      const newContext = await vectorMemoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(!!newContext);
     } catch (_error) {
@@ -66,7 +70,7 @@ const MemoryModal = memo(function MemoryModal({
   const handleExportData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await memoryService.exportAllData();
+      const data = await vectorMemoryService.exportAllData();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -86,7 +90,7 @@ const MemoryModal = memo(function MemoryModal({
     if (confirm('Clear all memories and conversations? This cannot be undone.')) {
       setIsLoading(true);
       try {
-        await memoryService.clearAllData();
+        await vectorMemoryService.clearAllData();
         onMemoriesUpdate([]);
         onConversationsUpdate([]);
         onMemoryContextUpdate('');
@@ -116,12 +120,12 @@ const MemoryModal = memo(function MemoryModal({
     setIsLoading(true);
     try {
       const context = `From conversation on ${timeService.formatDateToLocal(timeService.getCurrentDateTime())}`;
-      await memoryService.markAsImportant(message.id, message.content, context);
+      await vectorMemoryService.markAsImportant(message.id, message.content, context);
 
-      const updatedMemories = await memoryService.getMarkedMemories();
+      const updatedMemories = await vectorMemoryService.getMarkedMemories();
       onMemoriesUpdate(updatedMemories);
 
-      const newContext = await memoryService.getContextForPrompt();
+      const newContext = await vectorMemoryService.getContextForPrompt();
       onMemoryContextUpdate(newContext);
       onMemoryIndicatorUpdate(true);
     } catch (_error) {
@@ -150,11 +154,38 @@ const MemoryModal = memo(function MemoryModal({
     setIsAdvancedSearchExpanded(!isAdvancedSearchExpanded);
   }, [isAdvancedSearchExpanded]);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Show conversation detail if a conversation is selected
   if (selectedConversation) {
-    return (
+    return ReactDOM.createPortal(
       <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
         <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
           <ConversationView
@@ -163,15 +194,16 @@ const MemoryModal = memo(function MemoryModal({
             onMarkAsImportant={handleMarkAsImportantFromDetail}
           />
         </div>
-      </div>
+      </div>,
+      document.body,
     );
   }
 
-  return (
+  return ReactDOM.createPortal(
     <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
       <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
         <div className="memory-modal-header">
-          <h3>🧠 Memory & Conversations</h3>
+          <h3>Memory & Conversations</h3>
           <button
             className="close-btn"
             onClick={onClose}
@@ -192,79 +224,126 @@ const MemoryModal = memo(function MemoryModal({
           />
 
           <div className="memory-tabs">
-            <div className="memory-tab active">
-              <h4>📌 Marked Memories ({markedMemories.length})</h4>
-              <div className="memory-list">
-                {filteredResults.memories.length === 0 ? (
-                  <div className="memory-empty">
-                    {filteredResults.memories.length !== markedMemories.length
-                      ? 'No memories found with current search criteria'
-                      : 'No marked memories yet. Click the 💡 button on messages to remember them.'}
-                  </div>
-                ) : (
-                  filteredResults.memories.map(memory => (
-                    <div key={memory.id} className="memory-item">
-                      <div className="memory-content">{memory.content}</div>
-                      <div className="memory-meta">
-                        <span className="memory-context">{memory.context}</span>
-                        <span className="memory-time">
-                          {MemoryService.timeAgo(memory.timestamp)}
-                        </span>
-                        <button
-                          className="memory-delete"
-                          onClick={() => handleDeleteMemory(memory.id)}
-                          title="Forget this memory"
-                          aria-label="Delete this memory"
-                          disabled={isLoading}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+            <div className="memory-tabs-header">
+              <button
+                className={`memory-tab-btn ${activeTab === 'memories' ? 'active' : ''}`}
+                onClick={() => setActiveTab('memories')}
+              >
+                Marked Memories ({markedMemories.length})
+              </button>
+              <button
+                className={`memory-tab-btn ${activeTab === 'recent' ? 'active' : ''}`}
+                onClick={() => setActiveTab('recent')}
+              >
+                Recent Messages
+              </button>
+              <button
+                className={`memory-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+                onClick={() => setActiveTab('history')}
+              >
+                Full Chat History
+              </button>
             </div>
 
-            <div className="memory-tab">
-              <h4>💬 Recent Conversations ({recentConversations.length})</h4>
-              <div className="conversation-list">
-                {filteredResults.conversations.length === 0 ? (
-                  <div className="memory-empty">
-                    {filteredResults.conversations.length !== recentConversations.length
-                      ? 'No conversations found with current search criteria'
-                      : 'No conversations yet.'}
+            <div className="memory-tabs-content">
+              {activeTab === 'memories' && (
+                <div className="memory-tab-panel">
+                  <div className="memory-list">
+                    {filteredResults.memories.length === 0 ? (
+                      <div className="memory-empty">
+                        {filteredResults.memories.length !== markedMemories.length
+                          ? 'No memories found with current search criteria'
+                          : 'No marked memories yet. Mark important messages to remember them.'}
+                      </div>
+                    ) : (
+                      filteredResults.memories.map(memory => (
+                        <div key={memory.id} className="memory-item">
+                          <div className="memory-content">{memory.content}</div>
+                          <div className="memory-meta">
+                            <span className="memory-context">{memory.context}</span>
+                            <span className="memory-time">
+                              {SupabaseMemoryService.timeAgo(memory.timestamp)}
+                            </span>
+                            <button
+                              className="memory-delete"
+                              onClick={() => handleDeleteMemory(memory.id)}
+                              title="Forget this memory"
+                              aria-label="Delete this memory"
+                              disabled={isLoading}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
-                ) : (
-                  filteredResults.conversations.map(conv => (
-                    <div
-                      key={conv.id}
-                      className="conversation-item clickable"
-                      onClick={() => handleConversationClick(conv)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleConversationClick(conv);
-                        }
-                      }}
-                    >
-                      <div className="conversation-preview">
-                        <div className="conversation-first">"{conv.firstMessage}"</div>
-                        <div className="conversation-last">"{conv.lastMessage}"</div>
+                </div>
+              )}
+
+              {activeTab === 'recent' && (
+                <div className="memory-tab-panel">
+                  <RecentMessagesTab
+                    onMarkAsImportant={handleMarkAsImportantFromDetail}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'history' && (
+                <div className="memory-tab-panel">
+                  <div className="chat-history-info">
+                    <h4>Your Complete Chat History</h4>
+                    <p className="history-description">
+                      All your conversations are saved in one continuous thread
+                    </p>
+                  </div>
+                  <div className="conversation-list">
+                    {filteredResults.conversations.length === 0 ? (
+                      <div className="memory-empty">
+                        {filteredResults.conversations.length !== recentConversations.length
+                          ? 'No conversations found with current search criteria'
+                          : 'No conversations yet.'}
                       </div>
-                      <div className="conversation-meta">
-                        <span className="conversation-count">{conv.messageCount} messages</span>
-                        <span className="conversation-time">
-                          {MemoryService.timeAgo(conv.timestamp)}
-                        </span>
-                        <span className="conversation-arrow">→</span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ) : (
+                      filteredResults.conversations.map(conv => (
+                        <div
+                          key={conv.id}
+                          className="conversation-item clickable"
+                          onClick={() => handleConversationClick(conv)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleConversationClick(conv);
+                            }
+                          }}
+                        >
+                          <div className="conversation-stats-card">
+                            <div className="stat-row">
+                              <span className="stat-label">Total Messages:</span>
+                              <span className="stat-value">{conv.messageCount}</span>
+                            </div>
+                            <div className="stat-row">
+                              <span className="stat-label">Started:</span>
+                              <span className="stat-value">
+                                {timeService.formatDateToLocal(timeService.fromTimestamp(conv.timestamp))}
+                              </span>
+                            </div>
+                            <div className="stat-row">
+                              <span className="stat-label">Status:</span>
+                              <span className="stat-value sync-status">✅ Synced across all devices</span>
+                            </div>
+                          </div>
+                          <div className="conversation-action">
+                            <span className="view-all-btn">View All Messages →</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -274,7 +353,7 @@ const MemoryModal = memo(function MemoryModal({
               onClick={handleExportData}
               disabled={isLoading}
             >
-              {isLoading ? '⏳ Exporting...' : '💾 Export All Data'}
+              {isLoading ? 'Exporting...' : 'Export All Data'}
             </button>
 
             <button
@@ -282,12 +361,13 @@ const MemoryModal = memo(function MemoryModal({
               onClick={handleClearAllData}
               disabled={isLoading}
             >
-              {isLoading ? '⏳ Clearing...' : '🗑️ Clear All Data'}
+              {isLoading ? 'Clearing...' : 'Clear All Data'}
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 });
 

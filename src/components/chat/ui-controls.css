@@ -98,6 +98,22 @@
   color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
 }
 
+.sync-pill {
+  transition: all 0.3s ease;
+}
+
+.sync-pill.connected {
+  background: color-mix(in srgb, var(--context-green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--context-green) 25%, transparent);
+  color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
+}
+
+.sync-pill.disconnected {
+  background: color-mix(in srgb, var(--sunset-orange) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sunset-orange) 25%, transparent);
+  color: color-mix(in srgb, var(--sunset-orange) 90%, var(--deep-plum));
+}
+
 .context-pill:hover {
   background: color-mix(in srgb, var(--context-green) 20%, transparent);
   border-color: color-mix(in srgb, var(--context-green) 40%, transparent);

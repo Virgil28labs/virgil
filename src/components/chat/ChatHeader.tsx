@@ -1,7 +1,7 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import type { ModelOption } from '../../types/chat.types';
 import type { DashboardContext } from '../../services/DashboardContextService';
-import type { StoredConversation, MarkedMemory } from '../../services/MemoryService';
+import type { StoredConversation, MarkedMemory } from '../../services/SupabaseMemoryService';
 import { StatusPills } from './StatusPills';
 import { WindowControls } from './WindowControls';
 import { ModelSelector } from './ModelSelector';
@@ -36,6 +36,9 @@ interface ChatHeaderProps {
   // New chat functionality
   onNewChat: () => void;
   messageCount: number;
+  
+  // Real-time sync status
+  isRealtimeConnected?: boolean;
 
   // Clear messages functionality
   onClearMessages: () => void;
@@ -64,6 +67,7 @@ const ChatHeader = memo(function ChatHeader({
   onSystemPromptSave,
   onNewChat,
   messageCount,
+  isRealtimeConnected,
   onClearMessages,
   onExportMessages,
   createSystemPrompt,
@@ -256,6 +260,7 @@ const ChatHeader = memo(function ChatHeader({
           dashboardContext={dashboardContext}
           markedMemoriesCount={markedMemories.length}
           recentConversationsCount={recentConversations.length}
+          isRealtimeConnected={isRealtimeConnected}
         />
 
         {/* Model Selector */}
