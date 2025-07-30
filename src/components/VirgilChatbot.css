@@ -72,6 +72,8 @@
   right: 2rem;
   width: 550px;
   height: 700px;
+  max-height: calc(100vh - 4rem); /* Account for 2rem bottom + 2rem margin */
+  min-height: 400px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -87,13 +89,15 @@
 .virgil-chatbot-container.large {
   width: 700px;
   height: 800px;
+  /* max-height inherited from base class */
 }
 
 .virgil-chatbot-container.fullscreen {
   width: 90vw;
-  height: 85vh;
+  height: auto; /* Let content determine height */
+  max-height: min(85vh, 800px);
+  min-height: 500px;
   max-width: 1200px;
-  max-height: 800px;
   bottom: 7.5vh;
   right: 5vw;
 }
