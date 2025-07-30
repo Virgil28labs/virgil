@@ -192,7 +192,7 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
     // Check if user is asking for advice rather than status
     if (this.isAskingForAdvice(query)) {
       // User wants advice/recommendations, not habit tracking info
-      return null; // Let LLM provide contextual advice
+      return ''; // Let LLM provide contextual advice
     }
     
     const contextData = this.getContextData();

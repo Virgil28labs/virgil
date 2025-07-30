@@ -133,7 +133,7 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     // Check if user is asking for advice rather than status
     if (this.isAskingForAdvice(query)) {
       // User wants productivity advice, not timer status
-      return null; // Let LLM provide contextual advice
+      return ''; // Let LLM provide contextual advice
     }
     
     const lowerQuery = query.toLowerCase();

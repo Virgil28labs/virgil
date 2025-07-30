@@ -1,5 +1,6 @@
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
+import { supabase } from '../lib/supabase';
 
 interface VectorSearchResult {
   id: string;
@@ -13,9 +14,12 @@ interface QueuedRequest<T> {
   reject: (error: Error) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyQueuedRequest = QueuedRequest<any>;
+
 class VectorService {
   private baseUrl: string;
-  private requestQueue: QueuedRequest<unknown>[] = [];
+  private requestQueue: AnyQueuedRequest[] = [];
   private activeRequests = 0;
   private readonly MAX_CONCURRENT_REQUESTS = 2;
   private readonly REQUEST_DELAY_MS = 100; // 100ms between requests
@@ -26,6 +30,22 @@ class VectorService {
 
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5002';
+  }
+
+  /**
+   * Get authorization headers with the current user's session token
+   */
+  private async getAuthHeaders(): Promise<HeadersInit> {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+      throw new Error('No active session');
+    }
+    
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`,
+    };
   }
 
   /**
@@ -95,11 +115,11 @@ class VectorService {
   async store(content: string): Promise<string> {
     return this.executeWithRateLimit(async () => {
       try {
+        const headers = await this.getAuthHeaders();
+        
         const response = await fetch(`${this.baseUrl}/api/v1/vector/store`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({ content }),
         });
 
@@ -123,11 +143,11 @@ class VectorService {
   async search(query: string, limit: number = 10): Promise<VectorSearchResult[]> {
     return this.executeWithRateLimit(async () => {
       try {
+        const headers = await this.getAuthHeaders();
+        
         const response = await fetch(`${this.baseUrl}/api/v1/vector/search`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({ query, limit }),
         });
 

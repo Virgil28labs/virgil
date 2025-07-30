@@ -180,7 +180,7 @@ const ChatHeader = memo(function ChatHeader({
                 )}
                 
                 {/* Device & Apps Row */}
-                {(dashboardContext.device.hasData || (dashboardContext.apps && Object.keys(dashboardContext.apps.apps).size > 0)) && (
+                {(dashboardContext.device.hasData || (dashboardContext.apps && Object.keys(dashboardContext.apps.apps).length > 0)) && (
                   <div className="context-row">
                     {dashboardContext.device.hasData && (
                       <div className="context-section">
@@ -193,7 +193,7 @@ const ChatHeader = memo(function ChatHeader({
                       </div>
                     )}
                     
-                    {dashboardContext.apps && Object.keys(dashboardContext.apps.apps).size > 0 && (
+                    {dashboardContext.apps && Object.keys(dashboardContext.apps.apps).length > 0 && (
                       <div className="context-section">
                         <span className="context-icon">📱</span>
                         <div className="context-details">

@@ -225,7 +225,7 @@ export class NotesAdapter extends BaseAdapter<NotesData> {
     // Check if user is asking for advice rather than status
     if (this.isAskingForAdvice(query)) {
       // User wants advice about note-taking, not note status
-      return null; // Let LLM provide contextual advice
+      return ''; // Let LLM provide contextual advice
     }
     
     const lowerQuery = query.toLowerCase();

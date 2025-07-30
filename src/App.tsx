@@ -36,6 +36,30 @@ const shouldForwardProp = (propName: string) => {
 function AppContent(): React.ReactElement {
   const { user, loading } = useAuth();
 
+  // Initialize intent embeddings for authenticated users
+  useEffect(() => {
+    if (!user) {
+      return; // Don't initialize if no user is authenticated
+    }
+
+    // Wait 3 seconds to ensure backend services are ready
+    const initTimeout = setTimeout(() => {
+      intentInitializer.initializeIntents().catch(error => {
+        logger.error(
+          'Intent initialization failed',
+          error instanceof Error ? error : new Error(String(error)),
+          {
+            component: 'AppContent',
+            action: 'initializeIntents',
+          },
+        );
+      });
+    }, 3000);
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(initTimeout);
+  }, [user]); // Re-run if user changes
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -86,7 +110,7 @@ function AppContent(): React.ReactElement {
 function App(): React.ReactElement {
   const { toasts, removeToast } = useToast();
 
-  // Run storage migrations and initialize intents on app startup
+  // Run storage migrations on app startup
   useEffect(() => {
     // Run storage migrations
     StorageMigration.runMigrations().catch(error => {
@@ -99,24 +123,6 @@ function App(): React.ReactElement {
         },
       );
     });
-
-    // Initialize intent embeddings for semantic confidence scoring with delay
-    // Wait 3 seconds to ensure backend services are ready
-    const initTimeout = setTimeout(() => {
-      intentInitializer.initializeIntents().catch(error => {
-        logger.error(
-          'Intent initialization failed',
-          error instanceof Error ? error : new Error(String(error)),
-          {
-            component: 'App',
-            action: 'initializeIntents',
-          },
-        );
-      });
-    }, 3000);
-
-    // Cleanup timeout on unmount
-    return () => clearTimeout(initTimeout);
   }, []);
 
   return (

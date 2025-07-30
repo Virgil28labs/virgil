@@ -51,6 +51,7 @@ export interface AppDataAdapter<T = unknown> {
   // Query capabilities
   getKeywords(): string[];
   getConfidence?(query: string): Promise<number>; // Optional - default implementation provided
+  queryPatterns?: string[]; // Optional query patterns for matching
 
   // Response generation
   getResponse?(query: string): Promise<string | null>;
@@ -281,6 +282,37 @@ export class DashboardAppService {
     }
 
     return detectedConcepts;
+  }
+
+  /**
+   * Find apps that can provide relevant data for the query
+   */
+  private async findAppsForQuery(query: string): Promise<AppDataAdapter[]> {
+    const relevantApps: AppDataAdapter[] = [];
+    const lowerQuery = query.toLowerCase();
+    
+    for (const adapter of this.adapters.values()) {
+      const adapterData = await this.getAppData(adapter.appName);
+      
+      // Check if adapter is active and can handle the query
+      if (adapterData && adapterData.isActive) {
+        // Check against adapter's query patterns if available
+        const queryPatterns = adapter.queryPatterns || [];
+        const matchesPattern = queryPatterns.some((pattern: string) => 
+          lowerQuery.includes(pattern.toLowerCase()),
+        );
+        
+        // Check if adapter name or display name is mentioned
+        const mentionsApp = lowerQuery.includes(adapter.appName.toLowerCase()) ||
+                          lowerQuery.includes(adapter.displayName.toLowerCase());
+        
+        if (matchesPattern || mentionsApp) {
+          relevantApps.push(adapter);
+        }
+      }
+    }
+    
+    return relevantApps;
   }
 
   /**

@@ -2,9 +2,9 @@
  * Supabase client configuration for Virgil
  * Handles authentication and database operations
  */
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
 import type { User } from '../types/auth.types';
+import type { Database } from '../types/database.types';
 import { logger } from './logger';
 
 const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL;
@@ -19,7 +19,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create typed Supabase client with auth configuration
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,

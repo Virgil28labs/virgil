@@ -3,6 +3,7 @@ const OpenAI = require('openai');
 const { createClient } = require('@supabase/supabase-js');
 const rateLimit = require('express-rate-limit');
 const logger = require('../lib/logger');
+const supabaseAuth = require('../middleware/supabaseAuth');
 
 const router = express.Router();
 
@@ -15,10 +16,15 @@ const vectorLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply rate limiting
+// Apply rate limiting to all routes
 router.use(vectorLimiter);
 
 // Initialize OpenAI
+if (!process.env.OPENAI_API_KEY) {
+  logger.error('Missing OpenAI API key');
+  throw new Error('OpenAI configuration missing');
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -26,83 +32,21 @@ const openai = new OpenAI({
 // Initialize Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+// Error handling for missing environment variables
+if (!supabaseUrl || !supabaseKey) {
+  logger.error('Missing Supabase environment variables', {
+    url: !!supabaseUrl,
+    key: !!supabaseKey,
+    serviceKey: !!process.env.SUPABASE_SERVICE_KEY,
+    anonKey: !!process.env.SUPABASE_ANON_KEY,
+  });
+  throw new Error('Supabase configuration missing');
+}
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Store text with embedding
-router.post('/store', async (req, res) => {
-  try {
-    const { content } = req.body;
-
-    if (!content || typeof content !== 'string') {
-      return res.status(400).json({ error: 'Content must be a non-empty string' });
-    }
-
-    // Generate embedding using OpenAI
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
-      input: content,
-    });
-
-    const { embedding } = embeddingResponse.data[0];
-
-    // Store in Supabase
-    const { data, error } = await supabase
-      .from('memory_vectors')
-      .insert({
-        content,
-        embedding: JSON.stringify(embedding), // pgvector expects JSON array format
-      })
-      .select('id')
-      .single();
-
-    if (error) {
-      logger.error('Supabase error:', error);
-      return res.status(500).json({ error: 'Failed to store memory' });
-    }
-
-    res.json({ id: data.id, message: 'Memory stored successfully' });
-  } catch (error) {
-    logger.error('Store error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Search for similar content
-router.post('/search', async (req, res) => {
-  try {
-    const { query, limit = 10 } = req.body;
-
-    if (!query || typeof query !== 'string') {
-      return res.status(400).json({ error: 'Query must be a non-empty string' });
-    }
-
-    // Generate embedding for the query
-    const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
-      input: query,
-    });
-
-    const queryEmbedding = embeddingResponse.data[0].embedding;
-
-    // Search using Supabase RPC function
-    const { data, error } = await supabase.rpc('match_memories', {
-      query_embedding: queryEmbedding,
-      match_threshold: 0.3, // Adjust based on testing
-      match_count: limit,
-    });
-
-    if (error) {
-      logger.error('Supabase error:', error);
-      return res.status(500).json({ error: 'Failed to search memories' });
-    }
-
-    res.json({ results: data || [] });
-  } catch (error) {
-    logger.error('Search error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
+// Public endpoints (no auth required)
 // Health check
 router.get('/health', async (req, res) => {
   try {
@@ -138,6 +82,86 @@ router.get('/count', async (req, res) => {
     res.json({ count: count || 0 });
   } catch (error) {
     logger.error('Count error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Apply authentication to protected routes
+router.use(supabaseAuth);
+
+// Store text with embedding
+router.post('/store', async (req, res) => {
+  try {
+    const { content } = req.body;
+
+    if (!content || typeof content !== 'string') {
+      return res.status(400).json({ error: 'Content must be a non-empty string' });
+    }
+
+    // Generate embedding using OpenAI
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-ada-002',
+      input: content,
+    });
+
+    const { embedding } = embeddingResponse.data[0];
+
+    // Store in Supabase with user isolation
+    const { data, error } = await supabase
+      .from('memory_vectors')
+      .insert({
+        user_id: req.userId, // From auth middleware
+        content,
+        embedding: JSON.stringify(embedding), // pgvector expects JSON array format
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      logger.error('Supabase error:', error);
+      return res.status(500).json({ error: 'Failed to store memory' });
+    }
+
+    res.json({ id: data.id, message: 'Memory stored successfully' });
+  } catch (error) {
+    logger.error('Store error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Search for similar content
+router.post('/search', async (req, res) => {
+  try {
+    const { query, limit = 10 } = req.body;
+
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({ error: 'Query must be a non-empty string' });
+    }
+
+    // Generate embedding for the query
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-ada-002',
+      input: query,
+    });
+
+    const queryEmbedding = embeddingResponse.data[0].embedding;
+
+    // Search using secure RPC function that enforces user isolation
+    const { data, error } = await supabase.rpc('search_user_memories_with_id', {
+      p_user_id: req.userId, // Pass the user ID from auth middleware
+      query_embedding: queryEmbedding,
+      threshold: 0.3, // Adjust based on testing
+      match_count: limit,
+    });
+
+    if (error) {
+      logger.error('Supabase error:', error);
+      return res.status(500).json({ error: 'Failed to search memories' });
+    }
+
+    res.json({ results: data || [] });
+  } catch (error) {
+    logger.error('Search error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

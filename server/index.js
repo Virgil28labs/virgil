@@ -4,7 +4,16 @@ const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+
 const logger = require('./lib/logger');
+
+// Debug environment variables loading
+logger.info('Environment variables loaded:', {
+  SUPABASE_URL: process.env.SUPABASE_URL ? 'Set' : 'Not set',
+  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY ? 'Set' : 'Not set',
+  NODE_ENV: process.env.NODE_ENV,
+  envPath: require('path').join(__dirname, '../.env'),
+});
 const { errorHandler, NotFoundError } = require('./lib/errors');
 
 const app = express();

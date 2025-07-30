@@ -6,7 +6,6 @@
  */
 
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
-import { CONFIDENCE_THRESHOLDS } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 import { vectorMemoryService } from '../VectorMemoryService';
