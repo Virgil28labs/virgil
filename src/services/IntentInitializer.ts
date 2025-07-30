@@ -6,6 +6,7 @@
  */
 
 import { vectorMemoryService } from './VectorMemoryService';
+import { vectorService } from './vectorService';
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
 
@@ -45,16 +46,11 @@ export class IntentInitializer {
   async initializeIntents(): Promise<void> {
     // If already initialized, return immediately
     if (this.initialized) {
-      logger.debug('Intent embeddings already initialized');
       return;
     }
 
     // If initialization is in progress, return the existing promise
     if (this.initializationPromise) {
-      logger.debug('Intent initialization already in progress, waiting...', {
-        component: 'IntentInitializer',
-        action: 'initializeIntents',
-      });
       return this.initializationPromise;
     }
 
@@ -77,7 +73,6 @@ export class IntentInitializer {
     // Wait for vector service health check
     const isHealthy = await vectorMemoryService.waitForHealthCheck();
     if (!isHealthy) {
-      logger.warn('Vector service not healthy, skipping intent initialization');
       return;
     }
 
@@ -206,7 +201,12 @@ export class IntentInitializer {
         ...intent.keywords.map(keyword => `${keyword} app`),
       ];
 
-      await vectorMemoryService.storeIntentEmbedding(intent.appName, allExamples);
+      // Combine examples into a single text for better embedding
+      const combinedText = allExamples.join(' | ');
+      const contentWithMetadata = `${combinedText}\n[Intent: ${intent.appName}]`;
+
+      // Store in vector database
+      await vectorService.store(contentWithMetadata);
 
       // Stored intent embeddings
     } catch (error) {

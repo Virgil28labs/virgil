@@ -8,7 +8,6 @@
 import type { AppDataAdapter, AppContextData } from '../DashboardAppService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
-import { vectorMemoryService } from '../VectorMemoryService';
 
 export abstract class BaseAdapter<T> implements AppDataAdapter<T> {
   // Required properties that must be implemented by subclasses
@@ -61,23 +60,11 @@ export abstract class BaseAdapter<T> implements AppDataAdapter<T> {
   
   /**
    * Get confidence score for answering a query (0.0 to 1.0)
-   * Uses semantic similarity first, then falls back to keyword matching
+   * Uses keyword matching for confidence scoring
+   * Note: Semantic scoring is now handled by ConfidenceService
    */
   async getConfidence(query: string): Promise<number> {
-    try {
-      // Try semantic search first for more accurate intent matching
-      const semanticScore = await vectorMemoryService.getSemanticConfidence(query, this.appName);
-      
-      // If we have a good semantic match, use it
-      if (semanticScore > 0.5) {
-        return semanticScore;
-      }
-    } catch (error) {
-      // Log error but continue with fallback
-      this.logError('Semantic confidence check failed', error, 'getConfidence');
-    }
-    
-    // Fallback to keyword matching for backward compatibility
+    // Use keyword matching
     return this.getKeywordConfidence(query);
   }
 

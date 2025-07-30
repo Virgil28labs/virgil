@@ -10,7 +10,7 @@ import { timeService } from './TimeService';
 import { vectorMemoryService } from './VectorMemoryService';
 import { queryPreprocessor } from './QueryPreprocessor';
 import { intentInitializer } from './IntentInitializer';
-import type { AppDataAdapter } from './DashboardAppService';
+import type { AppDataAdapter, AppContextData } from './DashboardAppService';
 
 export interface ConfidenceScore {
   adapter: AppDataAdapter;
@@ -94,7 +94,7 @@ export class ConfidenceService {
   async calculateConfidence(
     query: string,
     adapters: AppDataAdapter[],
-    getAppData: (appName: string) => any,
+    getAppData: (appName: string) => AppContextData | null,
     weights?: Partial<ConfidenceWeights>,
   ): Promise<ConfidenceScore[]> {
     // Preprocess the query for better matching
@@ -256,7 +256,7 @@ export class ConfidenceService {
   /**
    * Get context-based confidence score
    */
-  private getContextScore(adapter: AppDataAdapter, getAppData: (appName: string) => any): number {
+  private getContextScore(adapter: AppDataAdapter, getAppData: (appName: string) => AppContextData | null): number {
     const appData = getAppData(adapter.appName);
     if (!appData) return 0;
     
@@ -299,7 +299,13 @@ export class ConfidenceService {
   /**
    * Generate human-readable explanation
    */
-  private generateExplanation(totalScore: number, _factors: any[]): string {
+  private generateExplanation(totalScore: number, _factors: Array<{
+    type: 'semantic' | 'keyword' | 'context';
+    score: number;
+    weight: number;
+    contribution: number;
+    details: string;
+  }>): string {
     if (totalScore >= this.THRESHOLDS.HIGH) {
       return 'Very high confidence match based on strong semantic similarity and keyword matches.';
     } else if (totalScore >= this.THRESHOLDS.MEDIUM) {
