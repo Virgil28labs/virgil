@@ -46,8 +46,8 @@ export function useMemoryService({
 
       await vectorMemoryService.init();
 
-      // Initialize intent embeddings for semantic matching
-      await vectorMemoryService.initializeIntentEmbeddings();
+      // Intent embeddings are initialized by IntentInitializer in App.tsx
+      // to avoid duplicate initialization
 
       // Load all memory data
       const [lastConv, memories, conversations, context] = await Promise.all([

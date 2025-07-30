@@ -55,17 +55,71 @@ export class ChatService {
       throw new Error('Message cannot be empty');
     }
 
+    // Check if this might be a multi-intent query
+    const multiIntentResult = await this.checkMultiIntent(userMessage);
+    
+    if (multiIntentResult) {
+      // Handle multi-intent query
+      logger.info('Multi-intent query detected', {
+        component: 'ChatService',
+        action: 'sendMessage',
+        metadata: {
+          userMessage: userMessage.substring(0, 50),
+          intents: multiIntentResult.intents.map(i => ({ app: i.adapter.appName, confidence: i.confidence })),
+        },
+      });
+      
+      // Create response that addresses multiple intents
+      const multiResponse = await this.handleMultiIntent(userMessage, multiIntentResult.intents);
+      if (multiResponse) {
+        return this.createAssistantMessage(multiResponse, multiIntentResult.avgConfidence);
+      }
+    }
+    
     // Check dashboard apps with confidence-based routing
-    const appMatches = await dashboardAppService.getAppsWithConfidence(userMessage);
+    let appMatches: Array<{ adapter: any; confidence: number }> = [];
+    try {
+      appMatches = await dashboardAppService.getAppsWithConfidence(userMessage);
+    } catch (error) {
+      logger.warn('Failed to get app confidence scores, continuing without app routing', {
+        component: 'ChatService',
+        action: 'sendMessage',
+        metadata: { 
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
+    }
     
     if (appMatches.length > 0) {
       const bestMatch = appMatches[0]; // Already sorted by confidence
+      
+      // Log routing decision
+      logger.info('Chat routing decision', {
+        component: 'ChatService',
+        action: 'sendMessage',
+        metadata: {
+          userMessage: userMessage.substring(0, 50),
+          bestMatchApp: bestMatch.adapter.appName,
+          confidence: bestMatch.confidence,
+          routingDecision: bestMatch.confidence >= CONFIDENCE_THRESHOLDS.HIGH ? 'DIRECT_RESPONSE' :
+            bestMatch.confidence >= CONFIDENCE_THRESHOLDS.MEDIUM ? 'ENHANCED_CONTEXT' : 'NO_ROUTING',
+        },
+      });
       
       // Only respond directly if high confidence
       if (bestMatch.confidence >= CONFIDENCE_THRESHOLDS.HIGH && bestMatch.adapter.getResponse) {
         try {
           const response = await bestMatch.adapter.getResponse(userMessage);
           if (response) {
+            logger.info('Direct adapter response used', {
+              component: 'ChatService',
+              action: 'sendMessage',
+              metadata: {
+                appName: bestMatch.adapter.appName,
+                confidence: bestMatch.confidence,
+                responseLength: response.length,
+              },
+            });
             return this.createAssistantMessage(response, bestMatch.confidence);
           }
         } catch (error) {
@@ -88,9 +142,19 @@ export class ChatService {
           if (appContext.data) {
             systemPrompt += '\n(User may be asking about this app\'s data, use this context to provide a more helpful response)';
           }
+          
+          logger.debug('Enhanced context with app data', {
+            component: 'ChatService',
+            action: 'sendMessage',
+            metadata: {
+              appName: bestMatch.adapter.appName,
+              confidence: bestMatch.confidence,
+              contextAdded: true,
+            },
+          });
         }
       }
-      // Low confidence (<0.7) apps are filtered out by getAppsWithConfidence()
+      // Low confidence (<0.5) apps are filtered out by getAppsWithConfidence()
     }
 
     // Prepare API messages
@@ -185,6 +249,87 @@ export class ChatService {
       content: "I'm having trouble connecting right now. Please try again in a moment!",
       timestamp: timeService.toISOString(now),
     };
+  }
+  
+  /**
+   * Check if a query contains multiple intents
+   */
+  private async checkMultiIntent(query: string): Promise<{ intents: Array<{ adapter: any; confidence: number }>; avgConfidence: number } | null> {
+    // Common multi-intent patterns
+    const multiPatterns = [
+      /\band\b/i,
+      /,\s*and\s*/i,
+      /\balso\b/i,
+      /\bplus\b/i,
+      /\bas well as\b/i,
+      /\bthen\b/i,
+      /\bafter that\b/i,
+    ];
+    
+    // Check if query matches multi-intent patterns
+    const hasMultiPattern = multiPatterns.some(pattern => pattern.test(query));
+    if (!hasMultiPattern) return null;
+    
+    // Get all app matches
+    let allMatches: Array<{ adapter: any; confidence: number }> = [];
+    try {
+      allMatches = await dashboardAppService.getAppsWithConfidence(query);
+    } catch (error) {
+      logger.debug('Failed to check multi-intent during initialization', {
+        component: 'ChatService',
+        action: 'checkMultiIntent',
+        metadata: { error: error instanceof Error ? error.message : String(error) },
+      });
+      return null;
+    }
+    
+    // Filter for apps with at least medium confidence
+    const significantMatches = allMatches.filter(match => match.confidence >= CONFIDENCE_THRESHOLDS.MEDIUM);
+    
+    // If we have 2+ significant matches, it's likely multi-intent
+    if (significantMatches.length >= 2) {
+      const avgConfidence = significantMatches.reduce((sum, m) => sum + m.confidence, 0) / significantMatches.length;
+      return {
+        intents: significantMatches,
+        avgConfidence,
+      };
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Handle multi-intent queries by aggregating responses
+   */
+  private async handleMultiIntent(query: string, intents: Array<{ adapter: any; confidence: number }>): Promise<string | null> {
+    const responses: string[] = [];
+    
+    // Try to get responses from each intent
+    for (const intent of intents) {
+      if (intent.adapter.getResponse) {
+        try {
+          const response = await intent.adapter.getResponse(query);
+          if (response) {
+            responses.push(`**${intent.adapter.displayName}**: ${response}`);
+          }
+        } catch (error) {
+          logger.error(`Error getting multi-intent response from ${intent.adapter.appName}`, error as Error, {
+            component: 'ChatService',
+            action: 'handleMultiIntent',
+          });
+        }
+      }
+    }
+    
+    // If we got multiple responses, combine them
+    if (responses.length > 1) {
+      return responses.join('\n\n');
+    } else if (responses.length === 1) {
+      // Single response, return without formatting
+      return responses[0].replace(/^\*\*.*?\*\*:\s*/, '');
+    }
+    
+    return null;
   }
 
   /**

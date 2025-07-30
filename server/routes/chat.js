@@ -26,13 +26,33 @@ function calculateConfidenceFromLogprobs(logprobs) {
     return 0.8; // Default confidence if no logprobs available
   }
 
-  // Calculate average log probability across all tokens
-  const avgLogprob = logprobs.content.reduce((sum, token) =>
-    sum + (token.logprob || 0), 0) / logprobs.content.length;
+  // Calculate statistics across all tokens
+  const logprobValues = logprobs.content.map(token => token.logprob || 0);
+  const avgLogprob = logprobValues.reduce((sum, val) => sum + val, 0) / logprobValues.length;
 
-  // Convert log probability to a 0-1 confidence score
-  // exp(avgLogprob) gives us the average probability
-  return Math.min(Math.max(Math.exp(avgLogprob), 0), 1.0);
+  // Calculate variance to understand model uncertainty
+  const variance = logprobValues.reduce((sum, val) =>
+    sum + Math.pow(val - avgLogprob, 2), 0) / logprobValues.length;
+  const stdDev = Math.sqrt(variance);
+
+  // Convert average log probability to probability (0-1)
+  const avgProb = Math.exp(avgLogprob);
+
+  // Apply penalties for high variance (model uncertainty)
+  // Higher variance = lower confidence
+  const variancePenalty = Math.exp(-stdDev * 0.5);
+
+  // Combine average probability with variance penalty
+  let confidence = avgProb * variancePenalty;
+
+  // Apply response length normalization
+  // Very short responses might have artificially high confidence
+  const lengthFactor = Math.min(logprobValues.length / 10, 1);
+  confidence = confidence * (0.7 + 0.3 * lengthFactor);
+
+  // Ensure minimum confidence of 0.1 (never fully uncertain)
+  // and maximum of 0.95 (never fully certain)
+  return Math.min(Math.max(confidence, 0.1), 0.95);
 }
 
 /**

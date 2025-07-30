@@ -42,22 +42,17 @@ function AppContent(): React.ReactElement {
       return; // Don't initialize if no user is authenticated
     }
 
-    // Wait 3 seconds to ensure backend services are ready
-    const initTimeout = setTimeout(() => {
-      intentInitializer.initializeIntents().catch(error => {
-        logger.error(
-          'Intent initialization failed',
-          error instanceof Error ? error : new Error(String(error)),
-          {
-            component: 'AppContent',
-            action: 'initializeIntents',
-          },
-        );
-      });
-    }, 3000);
-
-    // Cleanup timeout on unmount
-    return () => clearTimeout(initTimeout);
+    // Initialize intents immediately
+    intentInitializer.initializeIntents().catch(error => {
+      logger.error(
+        'Intent initialization failed',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'AppContent',
+          action: 'initializeIntents',
+        },
+      );
+    });
   }, [user]); // Re-run if user changes
 
   if (loading) {

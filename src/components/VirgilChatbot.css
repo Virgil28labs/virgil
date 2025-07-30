@@ -527,14 +527,14 @@
   border: 1px solid rgba(108, 59, 170, 0.08);
 }
 
-/* Messages */
-.message {
+/* Messages - Styles moved to chat-interface.css used by ChatMessages component */
+/* .message {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
   margin-bottom: 0.5rem;
   animation: fadeIn 0.3s ease-out;
-}
+} */
 
 @keyframes fadeIn {
   from {
@@ -547,16 +547,17 @@
   }
 }
 
-.user-msg {
+/* .user-msg {
   flex-direction: row-reverse;
   justify-content: flex-start;
 }
 
 .assistant-msg {
   flex-direction: row;
-}
+} */
 
-.msg-avatar {
+/* Avatar styles moved to chat-interface.css */
+/* .msg-avatar {
   width: 32px;
   height: 32px;
   min-width: 32px;
@@ -574,9 +575,10 @@
   font-family: 'Montserrat', sans-serif !important;
   font-size: 1rem !important;
   text-transform: uppercase !important;
-}
+} */
 
-.msg-content {
+/* Message content styles moved to chat-interface.css */
+/* .msg-content {
   background: var(--color-chat-bg);
   color: var(--brand-dark-purple);
   padding: 0.75rem 1rem;
@@ -599,58 +601,9 @@
 
 .assistant-msg .msg-content {
   border-bottom-left-radius: 4px;
-}
+} */
 
-/* Remember this button */
-.remember-btn {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(108, 59, 170, 0.2);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.2s ease;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.message:hover .remember-btn {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.remember-btn:hover {
-  background: var(--brand-accent-purple);
-  color: white;
-  border-color: var(--brand-accent-purple);
-  transform: scale(1.1);
-}
-
-.remember-btn:active {
-  transform: scale(0.9);
-}
-
-/* User message remember button (different positioning) */
-.user-msg .remember-btn {
-  left: 0.25rem;
-  right: auto;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--brand-accent-purple);
-}
-
-.user-msg .remember-btn:hover {
-  background: white;
-  color: var(--brand-dark-purple);
-}
+/* Remember button styles moved to chat-interface.css to avoid duplication */
 
 /* Typing indicator */
 .typing-dots {
@@ -1288,6 +1241,31 @@
    Optimized for web-only experience
    ======================================== */
 
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* GPU acceleration for smooth animations */
+@supports (will-change: transform) {
+  .chatbot-open,
+  .chatbot-close,
+  .model-selector,
+  .profile-selector,
+  .model-option,
+  .model-dropdown {
+    will-change: transform;
+  }
+}
+
+/* Force hardware acceleration on animated elements */
+.chatbot-modal,
+.profile-dropdown,
+.model-dropdown {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
 /* Enhanced hover states for desktop */
 @media (hover: hover) {
   /* Smooth hover transitions */
@@ -1317,12 +1295,14 @@
     transition: transform 0.1s ease;
   }
   
-  /* Enhanced message hover */
-  .message:hover {
-    background: rgba(108, 59, 170, 0.02);
+  /* Enhanced message hover - smooth background transition without layout shift */
+  .message {
+    transition: background-color 0.2s ease;
     border-radius: 12px;
-    margin: -4px;
-    padding: 4px;
+  }
+  
+  .message:hover {
+    background-color: rgba(108, 59, 170, 0.02);
   }
   
   /* Smooth model selector hover */

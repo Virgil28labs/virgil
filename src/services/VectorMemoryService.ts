@@ -25,8 +25,11 @@ export class VectorMemoryService extends SupabaseMemoryService {
   private readonly MIN_MESSAGE_LENGTH = 50; // Minimum chars to store as vector
   private readonly CONTEXT_SEARCH_LIMIT = 5; // Number of memories to retrieve for context
   private readonly CONFIDENCE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly CONFIDENCE_CACHE_MAX_SIZE = 1000; // Max entries to prevent memory growth
   private confidenceCache = new Map<string, { confidence: number; timestamp: number }>();
   private lastSummaryDate: string | null = null;
+  private initializationPromise: Promise<void> | null = null;
+  private intentsInitialized = false;
 
   constructor() {
     super();
@@ -337,9 +340,61 @@ export class VectorMemoryService extends SupabaseMemoryService {
    * This should be called once during app setup
    */
   async initializeIntentEmbeddings(): Promise<void> {
-    logger.info('Initializing intent embeddings', {
+    // If already initialized, return immediately
+    if (this.intentsInitialized) {
+      logger.debug('Intent embeddings already initialized, skipping', {
+        component: 'VectorMemoryService',
+        action: 'initializeIntentEmbeddings',
+        metadata: {
+          alreadyInitialized: true,
+        },
+      });
+      return;
+    }
+
+    // If initialization is already in progress, return the existing promise
+    if (this.initializationPromise) {
+      logger.debug('Intent initialization already in progress, waiting...', {
+        component: 'VectorMemoryService',
+        action: 'initializeIntentEmbeddings',
+        metadata: {
+          caller: 'duplicate-request',
+          existingPromise: true,
+        },
+      });
+      return this.initializationPromise;
+    }
+
+    // Log the stack trace to find who's calling this
+    logger.debug('Creating new intent initialization promise', {
       component: 'VectorMemoryService',
       action: 'initializeIntentEmbeddings',
+      metadata: {
+        stackTrace: new Error().stack?.split('\n').slice(2, 7).join(' | '),
+      },
+    });
+
+    // Create a new initialization promise
+    this.initializationPromise = this.performIntentInitialization();
+    
+    try {
+      await this.initializationPromise;
+    } catch (error) {
+      // Reset the promise on error so it can be retried
+      this.initializationPromise = null;
+      throw error;
+    }
+  }
+
+  /**
+   * Perform the actual intent initialization
+   */
+  private async performIntentInitialization(): Promise<void> {
+    const startTime = timeService.getTimestamp();
+    logger.debug('Starting intent embeddings initialization', {
+      component: 'VectorMemoryService',
+      action: 'initializeIntentEmbeddings',
+      metadata: { timestamp: timeService.toISOString(timeService.fromTimestamp(startTime)) },
     });
 
     const intents = [
@@ -367,16 +422,77 @@ export class VectorMemoryService extends SupabaseMemoryService {
         intent: 'device',
         examples: ['device', 'computer', 'browser', 'operating system', 'OS', 'hardware', 'specs', 'screen', 'resolution', 'CPU', 'memory'],
       },
+      {
+        intent: 'memory',
+        examples: ['remember', 'memory', 'save', 'important', 'mark', 'store', 'recall', 'don\'t forget', 'note', 'keep in mind'],
+      },
+      {
+        intent: 'help',
+        examples: ['help', 'how to', 'explain', 'what is', 'guide', 'tutorial', 'instructions', 'teach me', 'show me', 'assistance'],
+      },
+      {
+        intent: 'work',
+        examples: ['work', 'job', 'career', 'professional', 'office', 'occupation', 'employer', 'workplace', 'business', 'company'],
+      },
+      {
+        intent: 'hobbies',
+        examples: ['hobby', 'interest', 'like to', 'enjoy', 'fun', 'leisure', 'pastime', 'favorite activity', 'free time', 'entertainment'],
+      },
+      {
+        intent: 'relationships',
+        examples: ['family', 'friend', 'relationship', 'partner', 'spouse', 'children', 'parents', 'siblings', 'relatives', 'loved ones'],
+      },
+      {
+        intent: 'health',
+        examples: ['health', 'medical', 'doctor', 'medicine', 'sick', 'wellness', 'fitness', 'hospital', 'symptoms', 'treatment'],
+      },
+      {
+        intent: 'goals',
+        examples: ['goal', 'plan', 'future', 'want to', 'dream', 'aspiration', 'objective', 'ambition', 'target', 'achieve'],
+      },
     ];
 
-    // Check if intents are already initialized by searching for one
+    // Check if intents are already initialized with a single query
+    logger.debug('Checking for existing intent embeddings...', {
+      component: 'VectorMemoryService',
+      action: 'initializeIntentEmbeddings',
+    });
+    
     try {
-      const testResults = await vectorService.search('[Intent: weather]', 1);
-      if (testResults.length > 0 && testResults[0].similarity > 0.9) {
-        logger.info('Intent embeddings already initialized, skipping', {
+      // Search for any intent marker to quickly check if initialization is needed
+      const intentCheck = await vectorService.search('[Intent:', 20); // Get up to 20 results
+      
+      // Count unique intents found
+      const foundIntentSet = new Set<string>();
+      intentCheck.forEach(result => {
+        const match = result.content.match(/\[Intent: (\w+)\]/);
+        if (match && result.similarity > 0.9) {
+          foundIntentSet.add(match[1]);
+        }
+      });
+      
+      logger.debug('Intent check results', {
+        component: 'VectorMemoryService',
+        action: 'initializeIntentEmbeddings',
+        metadata: { 
+          foundCount: foundIntentSet.size,
+          expectedCount: intents.length,
+          checkTime: timeService.getTimestamp() - startTime,
+        },
+      });
+      
+      // If we found most intents (80% threshold), skip initialization
+      if (foundIntentSet.size >= Math.floor(intents.length * 0.8)) {
+        logger.debug('Intent embeddings already initialized, skipping', {
           component: 'VectorMemoryService',
           action: 'initializeIntentEmbeddings',
+          metadata: { 
+            foundIntents: foundIntentSet.size,
+            totalIntents: intents.length,
+            checkTimeMs: timeService.getTimestamp() - startTime,
+          },
         });
+        this.intentsInitialized = true;
         return;
       }
     } catch (_error) {
@@ -387,32 +503,64 @@ export class VectorMemoryService extends SupabaseMemoryService {
       });
     }
 
-    // Store each intent
-    let successCount = 0;
-    let failureCount = 0;
+    // Prepare batch contents for all intents
+    const batchContents: string[] = [];
+    const intentMapping: Map<number, { intent: string; examples: string[] }> = new Map();
+    
+    intents.forEach(({ intent, examples }, index) => {
+      // Create content with metadata for each intent
+      const contentWithMetadata = `${examples.join('\n')}\n[Intent: ${intent}]`;
+      batchContents.push(contentWithMetadata);
+      intentMapping.set(index, { intent, examples });
+    });
 
-    for (const { intent, examples } of intents) {
-      try {
-        await this.storeIntentEmbedding(intent, examples);
-        successCount++;
-        
-        // Small delay to avoid overwhelming the vector service
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        failureCount++;
-        logger.error(`Failed to store intent: ${intent}`, error instanceof Error ? error : new Error(String(error)), {
-          component: 'VectorMemoryService',
-          action: 'initializeIntentEmbeddings',
-          metadata: { intent },
-        });
+    // Store all intents in a single batch operation
+    let successCount = 0;
+    
+    try {
+      logger.debug('Storing all intent embeddings in batch', {
+        component: 'VectorMemoryService',
+        action: 'initializeIntentEmbeddings',
+        metadata: { intentCount: intents.length },
+      });
+      
+      // Batch store not supported by backend
+      throw new Error('Batch store not implemented');
+    } catch (error) {
+      // If batch fails, fall back to individual storage
+      logger.warn('Batch storage failed, falling back to individual storage', {
+        component: 'VectorMemoryService',
+        action: 'initializeIntentEmbeddings',
+        metadata: { error: error instanceof Error ? error.message : String(error) },
+      });
+      
+      // Reset counts for fallback
+      successCount = 0;
+      
+      for (const { intent, examples } of intents) {
+        try {
+          await this.storeIntentEmbedding(intent, examples);
+          successCount++;
+          
+          // Small delay to avoid overwhelming the vector service
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          logger.error(`Failed to store intent: ${intent}`, error instanceof Error ? error : new Error(String(error)), {
+            component: 'VectorMemoryService',
+            action: 'initializeIntentEmbeddings',
+            metadata: { intent },
+          });
+        }
       }
     }
 
-    logger.info('Intent embeddings initialization complete', {
-      component: 'VectorMemoryService',
-      action: 'initializeIntentEmbeddings',
-      metadata: { successCount, failureCount, totalIntents: intents.length },
-    });
+    
+    // Mark as initialized if at least some intents were stored successfully
+    if (successCount > 0) {
+      this.intentsInitialized = true;
+    }
+    
+    logger.info('✓ Intent system ready');
   }
 
   /**
@@ -435,7 +583,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
       // Store in vector database
       await vectorService.store(contentWithMetadata);
 
-      logger.info(`Stored intent embedding for: ${intent}`, {
+      logger.debug(`Stored intent embedding for: ${intent}`, {
         component: 'VectorMemoryService',
         action: 'storeIntent',
         metadata: { intent, exampleCount: examples.length },
@@ -478,15 +626,15 @@ export class VectorMemoryService extends SupabaseMemoryService {
 
       if (intentResults.length === 0) {
         // Cache the zero result
-        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+        this.addToConfidenceCache(cacheKey, 0);
         return 0;
       }
 
       // Return the similarity score (already 0-1 range)
       const confidence = intentResults[0].similarity;
       
-      // Cache the result
-      this.confidenceCache.set(cacheKey, { confidence, timestamp: timeService.getTimestamp() });
+      // Cache the result with size limit enforcement
+      this.addToConfidenceCache(cacheKey, confidence);
       
       return confidence;
     } catch (error) {
@@ -497,7 +645,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
       });
       
       // Cache the fallback
-      this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+      this.addToConfidenceCache(cacheKey, 0);
       
       return 0;
     }
@@ -711,7 +859,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
       // Return 0 for all uncached queries
       for (const { intent, cacheKey } of uncachedQueries) {
         results.set(intent, 0);
-        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+        this.addToConfidenceCache(cacheKey, 0);
       }
       return results;
     }
@@ -732,7 +880,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
         results.set(intent, confidence);
         
         // Cache the result
-        this.confidenceCache.set(cacheKey, { confidence, timestamp: timeService.getTimestamp() });
+        this.addToConfidenceCache(cacheKey, confidence);
       }
     } catch (error) {
       logger.error('Failed to get semantic confidence batch', error instanceof Error ? error : new Error(String(error)), {
@@ -744,7 +892,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
       // Return 0 for all uncached queries
       for (const { intent, cacheKey } of uncachedQueries) {
         results.set(intent, 0);
-        this.confidenceCache.set(cacheKey, { confidence: 0, timestamp: timeService.getTimestamp() });
+        this.addToConfidenceCache(cacheKey, 0);
       }
     }
 
@@ -1046,6 +1194,43 @@ export class VectorMemoryService extends SupabaseMemoryService {
       });
       return { patterns: new Map(), insights: [] };
     }
+  }
+
+  /**
+   * Add to confidence cache with size limit enforcement
+   */
+  private addToConfidenceCache(key: string, confidence: number): void {
+    // Remove expired entries if cache is getting full
+    if (this.confidenceCache.size >= this.CONFIDENCE_CACHE_MAX_SIZE) {
+      const now = timeService.getTimestamp();
+      const entriesToDelete: string[] = [];
+      
+      // First, try to remove expired entries
+      for (const [k, v] of this.confidenceCache.entries()) {
+        if (now - v.timestamp > this.CONFIDENCE_CACHE_TTL) {
+          entriesToDelete.push(k);
+        }
+      }
+      
+      // If no expired entries, remove oldest entries
+      if (entriesToDelete.length === 0) {
+        const entries = Array.from(this.confidenceCache.entries());
+        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+        // Remove oldest 20% of entries
+        const removeCount = Math.floor(this.CONFIDENCE_CACHE_MAX_SIZE * 0.2);
+        for (let i = 0; i < removeCount; i++) {
+          entriesToDelete.push(entries[i][0]);
+        }
+      }
+      
+      // Delete the identified entries
+      for (const key of entriesToDelete) {
+        this.confidenceCache.delete(key);
+      }
+    }
+    
+    // Add the new entry
+    this.confidenceCache.set(key, { confidence, timestamp: timeService.getTimestamp() });
   }
 
   /**

@@ -8,7 +8,7 @@
 
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
-import { vectorMemoryService } from './VectorMemoryService';
+import { confidenceService } from './ConfidenceService';
 
 export interface AppContextData<T = unknown> {
   appName: string;
@@ -70,11 +70,11 @@ export interface DashboardAppData {
   lastUpdated: number;
 }
 
-// Confidence thresholds for intent classification
+// Confidence thresholds for intent classification (optimized for hybrid scoring)
 export const CONFIDENCE_THRESHOLDS = {
-  HIGH: 0.8,     // Direct adapter response
-  MEDIUM: 0.7,   // Enhanced LLM context
-  LOW: 0.7,      // Minimum threshold for confidence-based routing
+  HIGH: 0.85,    // Very confident match - direct adapter response
+  MEDIUM: 0.65,  // Good match - enhanced LLM context
+  LOW: 0.45,     // Possible match - minimum threshold for confidence-based routing
 } as const;
 
 export class DashboardAppService {
@@ -206,39 +206,53 @@ export class DashboardAppService {
   /**
    * Get apps with confidence scores for a query
    * Returns apps sorted by confidence in descending order
+   * Now uses the unified ConfidenceService for all calculations
    */
   async getAppsWithConfidence(query: string): Promise<Array<{ adapter: AppDataAdapter; confidence: number }>> {
     const adapters = Array.from(this.adapters.values());
     
-    // Prepare batch queries for semantic confidence
-    const batchQueries = adapters.map(adapter => ({
+    // Use the unified ConfidenceService
+    const confidenceScores = await confidenceService.calculateConfidence(
       query,
-      intent: adapter.appName,
-    }));
-    
-    // Get all semantic confidences in one batch call
-    const semanticConfidences = await vectorMemoryService.getSemanticConfidenceBatch(batchQueries);
-    
-    // Build results with semantic confidence or keyword fallback
-    const results = await Promise.all(
-      adapters.map(async adapter => {
-        // Get semantic confidence from batch result
-        const semanticScore = semanticConfidences.get(adapter.appName) || 0;
-        
-        // If semantic score is low, use the adapter's getConfidence method
-        // which already handles fallback to keyword matching
-        let confidence = semanticScore;
-        if (semanticScore <= 0.5 && adapter.getConfidence) {
-          confidence = await adapter.getConfidence(query);
-        }
-        
-        return { adapter, confidence };
-      }),
+      adapters,
+      (appName: string) => this.getAppData(appName),
     );
     
-    return results
-      .filter(item => item.confidence > 0)
-      .sort((a, b) => b.confidence - a.confidence);
+    // Convert to the expected format
+    const results = confidenceScores
+      .filter(score => score.totalScore > 0.1)
+      .map(score => ({
+        adapter: score.adapter,
+        confidence: score.totalScore,
+      }));
+    
+    return results;
+  }
+  
+  /**
+   * Get detailed confidence explanation for debugging
+   * @param query The query to analyze
+   * @param appName The app to explain confidence for
+   */
+  async explainConfidence(query: string, appName: string): Promise<string | null> {
+    const adapter = this.adapters.get(appName);
+    if (!adapter) return null;
+    
+    try {
+      // Get confidence scores
+      const scores = await confidenceService.calculateConfidence(
+        query,
+        [adapter],
+        (name: string) => this.getAppData(name),
+      );
+      
+      if (scores.length === 0) return null;
+      
+      const explanation = confidenceService.explainConfidence(query, scores[0]);
+      return JSON.stringify(explanation, null, 2);
+    } catch {
+      return null;
+    }
   }
 
 
@@ -703,6 +717,9 @@ export class DashboardAppService {
     } else {
       this.cache.clear();
     }
+    
+    // Also clear confidence cache in ConfidenceService when app state changes
+    confidenceService.clearCache();
   }
 
   private notifyListeners(): void {
@@ -714,6 +731,7 @@ export class DashboardAppService {
   destroy(): void {
     this.adapters.clear();
     this.cache.clear();
+    confidenceService.clearCache();
     this.listeners = [];
   }
 }

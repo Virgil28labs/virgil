@@ -140,6 +140,7 @@ class VectorService {
     });
   }
 
+
   async search(query: string, limit: number = 10): Promise<VectorSearchResult[]> {
     return this.executeWithRateLimit(async () => {
       try {

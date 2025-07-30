@@ -273,6 +273,7 @@
   gap: 0.75rem;
   margin-bottom: 0.5rem;
   animation: fadeIn 0.3s ease-out;
+  transition: background-color 0.2s ease;
 }
 
 .user-msg {
@@ -317,6 +318,7 @@
   word-wrap: break-word;
   position: relative;
   text-align: left;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .user-msg .msg-content {
@@ -347,7 +349,9 @@
   font-size: 0.8rem;
   opacity: 0;
   transform: scale(0.8);
+  transform-origin: center;
   transition: all 0.2s ease;
+  will-change: transform, opacity;
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -1067,6 +1071,39 @@
 /* ========================================
    Desktop-only: No mobile fixes needed
    ======================================== */
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* Optimize frequently animated elements for GPU acceleration */
+.send-btn,
+.window-btn,
+.status-pill,
+.memory-tab-btn,
+.memory-action-btn,
+.profile-action,
+.bulk-action-btn {
+  will-change: transform;
+}
+
+/* Optimize hover states for smooth transitions */
+.message-action-btn,
+.quick-btn {
+  will-change: transform, background-color;
+}
+
+/* Optimize tooltip animations */
+.tooltip,
+.enhanced-context-tooltip {
+  will-change: opacity, transform;
+}
+
+/* Ensure smooth scrolling performance */
+.messages-area {
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* ========================================
    DESKTOP KEYBOARD SHORTCUTS
