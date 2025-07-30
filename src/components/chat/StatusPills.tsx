@@ -17,7 +17,7 @@ const StatusPills = memo(function StatusPills({
   dashboardContext: _dashboardContext,
   markedMemoriesCount,
   recentConversationsCount: _recentConversationsCount, // Not used in continuous conversation model
-  isRealtimeConnected: _isRealtimeConnected,
+  isRealtimeConnected,
 }: StatusPillsProps) {
   // Only show the status pills area if memory is available
   if (!showMemoryIndicator) {
@@ -37,6 +37,14 @@ const StatusPills = memo(function StatusPills({
         >
           🧠 MEM
         </button>
+      )}
+      {isRealtimeConnected !== undefined && (
+        <div 
+          className={`status-pill sync-status ${isRealtimeConnected ? 'connected' : 'disconnected'}`}
+          title={isRealtimeConnected ? 'Sync connected' : 'Sync disconnected'}
+        >
+          {isRealtimeConnected ? '🔄' : '⚠️'}
+        </div>
       )}
     </div>
   );

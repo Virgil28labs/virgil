@@ -11,6 +11,7 @@ import { vectorMemoryService } from './VectorMemoryService';
 import { queryPreprocessor } from './QueryPreprocessor';
 import { intentInitializer } from './IntentInitializer';
 import type { AppDataAdapter, AppContextData } from './DashboardAppService';
+import { CONFIDENCE_CACHE_TTL } from '../constants/timing';
 
 export interface ConfidenceScore {
   adapter: AppDataAdapter;
@@ -62,7 +63,7 @@ export class ConfidenceService {
   
   // Cache configuration
   private cache: Map<string, CacheEntry> = new Map();
-  private readonly CACHE_TTL = 60000; // 60 seconds
+  private readonly CACHE_TTL = CONFIDENCE_CACHE_TTL;
   private readonly MAX_CACHE_SIZE = 100;
   
   // Default weights for hybrid scoring

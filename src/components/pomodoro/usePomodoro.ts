@@ -1,5 +1,6 @@
 import { useReducer, useEffect, useRef, useCallback } from 'react';
 import { logger } from '../../lib/logger';
+import { dashboardContextService } from '../../services/DashboardContextService';
 
 // State types
 interface TimerState {
@@ -7,6 +8,14 @@ interface TimerState {
   timeRemaining: number;
   isRunning: boolean;
   soundEnabled: boolean;
+  sessionType: 'work' | 'shortBreak' | 'longBreak';
+  sessionCount: number;
+  dailyStats: {
+    totalMinutes: number;
+    completedSessions: number;
+    currentStreak: number;
+  };
+  currentTask: string;
 }
 
 type TimerAction =
@@ -16,7 +25,11 @@ type TimerAction =
   | { type: 'RESET' }
   | { type: 'TICK' }
   | { type: 'TOGGLE_SOUND' }
-  | { type: 'COMPLETE' };
+  | { type: 'COMPLETE' }
+  | { type: 'SET_SESSION_TYPE'; sessionType: 'work' | 'shortBreak' | 'longBreak' }
+  | { type: 'SET_TASK'; task: string }
+  | { type: 'UPDATE_DAILY_STATS' }
+  | { type: 'LOAD_DAILY_STATS'; stats: TimerState['dailyStats'] };
 
 // Reducer
 function timerReducer(state: TimerState, action: TimerAction): TimerState {
@@ -45,8 +58,50 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
       };
     case 'TOGGLE_SOUND':
       return { ...state, soundEnabled: !state.soundEnabled };
-    case 'COMPLETE':
-      return { ...state, isRunning: false };
+    case 'COMPLETE': {
+      // Update session count and stats
+      const isWorkSession = state.sessionType === 'work';
+      let nextSessionCount = state.sessionCount;
+      
+      // Only increment session count after completing a work session
+      if (isWorkSession) {
+        nextSessionCount = state.sessionCount >= 4 ? 1 : state.sessionCount + 1;
+      }
+      
+      return {
+        ...state,
+        isRunning: false,
+        sessionCount: nextSessionCount,
+        dailyStats: isWorkSession ? {
+          ...state.dailyStats,
+          totalMinutes: state.dailyStats.totalMinutes + state.selectedMinutes,
+          completedSessions: state.dailyStats.completedSessions + 1,
+        } : state.dailyStats,
+      };
+    }
+    case 'SET_SESSION_TYPE': {
+      const minutes = action.sessionType === 'work' ? 25 : 
+        action.sessionType === 'shortBreak' ? 5 : 15;
+      return {
+        ...state,
+        sessionType: action.sessionType,
+        selectedMinutes: minutes,
+        timeRemaining: minutes * 60,
+        isRunning: false,
+      };
+    }
+    case 'SET_TASK':
+      return { ...state, currentTask: action.task };
+    case 'UPDATE_DAILY_STATS':
+      return {
+        ...state,
+        dailyStats: {
+          ...state.dailyStats,
+          currentStreak: state.dailyStats.currentStreak + 1,
+        },
+      };
+    case 'LOAD_DAILY_STATS':
+      return { ...state, dailyStats: action.stats };
     default:
       return state;
   }
@@ -58,10 +113,45 @@ export function usePomodoro(defaultMinutes: number = 25) {
     timeRemaining: defaultMinutes * 60,
     isRunning: false,
     soundEnabled: true,
+    sessionType: 'work',
+    sessionCount: 1,
+    dailyStats: {
+      totalMinutes: 0,
+      completedSessions: 0,
+      currentStreak: 0,
+    },
+    currentTask: '',
   });
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load daily stats from localStorage
+  useEffect(() => {
+    const today = dashboardContextService.getLocalDate();
+    const statsKey = `pomodoro-daily-stats-${today}`;
+    const savedStats = localStorage.getItem(statsKey);
+    
+    if (savedStats) {
+      try {
+        const stats = JSON.parse(savedStats);
+        dispatch({ type: 'LOAD_DAILY_STATS', stats });
+      } catch (error) {
+        logger.error('Failed to load daily stats', error as Error, {
+          component: 'usePomodoro',
+          action: 'loadDailyStats',
+        });
+      }
+    }
+  }, []);
+
+  // Save daily stats to localStorage
+  useEffect(() => {
+    const today = dashboardContextService.getLocalDate();
+    const statsKey = `pomodoro-daily-stats-${today}`;
+    
+    localStorage.setItem(statsKey, JSON.stringify(state.dailyStats));
+  }, [state.dailyStats]);
 
   // Initialize audio context
   useEffect(() => {
@@ -106,11 +196,27 @@ export function usePomodoro(defaultMinutes: number = 25) {
   // Timer completion
   const handleComplete = useCallback(() => {
     dispatch({ type: 'COMPLETE' });
+    
     // Play completion sound (3 beeps)
     playSound(1000, 150);
     setTimeout(() => playSound(1000, 150), 200);
     setTimeout(() => playSound(1000, 150), 400);
-  }, [playSound]);
+    
+    // Auto-switch to break after work session
+    setTimeout(() => {
+      if (state.sessionType === 'work') {
+        // Take long break after completing 4th work session
+        const shouldTakeLongBreak = state.sessionCount === 4;
+        dispatch({ 
+          type: 'SET_SESSION_TYPE', 
+          sessionType: shouldTakeLongBreak ? 'longBreak' : 'shortBreak',
+        });
+      } else {
+        // After break, switch back to work
+        dispatch({ type: 'SET_SESSION_TYPE', sessionType: 'work' });
+      }
+    }, 600);
+  }, [playSound, state.sessionType, state.sessionCount]);
 
   // Timer tick
   useEffect(() => {
@@ -171,5 +277,8 @@ export function usePomodoro(defaultMinutes: number = 25) {
     pause: () => dispatch({ type: 'PAUSE' }),
     reset: () => dispatch({ type: 'RESET' }),
     toggleSound: () => dispatch({ type: 'TOGGLE_SOUND' }),
+    setSessionType: (sessionType: 'work' | 'shortBreak' | 'longBreak') => 
+      dispatch({ type: 'SET_SESSION_TYPE', sessionType }),
+    setTask: (task: string) => dispatch({ type: 'SET_TASK', task }),
   };
 }

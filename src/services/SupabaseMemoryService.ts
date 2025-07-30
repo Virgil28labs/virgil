@@ -5,6 +5,7 @@ import { toastService } from './ToastService';
 import { dashboardContextService } from './DashboardContextService';
 import { timeService } from './TimeService';
 import { logger } from '../lib/logger';
+import { MEMORY_CONTEXT_CACHE_DURATION } from '../constants/timing';
 
 export interface StoredConversation {
   id: string;
@@ -33,7 +34,7 @@ export class SupabaseMemoryService {
   private recentMessagesCache: ChatMessage[] = [];
   private contextCache: string = '';
   private contextCacheTimestamp: number = 0;
-  private readonly CONTEXT_CACHE_DURATION = 30000; // 30 seconds
+  private readonly CONTEXT_CACHE_DURATION = MEMORY_CONTEXT_CACHE_DURATION;
   private memoriesCache: MarkedMemory[] | null = null;
   private conversationMetaCache: Omit<StoredConversation, 'messages'> | null = null;
 

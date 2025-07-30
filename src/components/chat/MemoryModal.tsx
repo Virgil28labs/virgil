@@ -9,6 +9,7 @@ import { RecentMessagesTab } from './RecentMessagesTab';
 import type { ChatMessage } from '../../types/chat.types';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';
+import { logger } from '../../lib/logger';
 import './memory-modal-modern.css';
 
 interface MemoryModalProps {
@@ -163,7 +164,10 @@ const MemoryModal = memo(function MemoryModal({
           const patterns = await vectorMemoryService.getUserPatterns();
           setPatternInsights(patterns);
         } catch (error) {
-          console.error('Failed to load enhanced memory features:', error);
+          logger.error('Failed to load enhanced memory features', error as Error, {
+            component: 'MemoryModal',
+            action: 'loadEnhancedFeatures',
+          });
         }
       }
     };
@@ -199,7 +203,10 @@ const MemoryModal = memo(function MemoryModal({
       // Switch to summaries tab to show the result
       setActiveTab('summaries');
     } catch (error) {
-      console.error('Failed to generate daily summary:', error);
+      logger.error('Failed to generate daily summary', error as Error, {
+        component: 'MemoryModal',
+        action: 'handleGenerateDailySummary',
+      });
     } finally {
       setIsLoading(false);
     }

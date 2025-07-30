@@ -98,6 +98,25 @@
   color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
 }
 
+.sync-status {
+  width: auto;
+  min-width: 30px;
+  padding: 0 8px;
+  cursor: default;
+}
+
+.sync-status.connected {
+  background: color-mix(in srgb, var(--success-green, #4caf50) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success-green, #4caf50) 25%, transparent);
+  color: var(--success-green, #4caf50);
+}
+
+.sync-status.disconnected {
+  background: color-mix(in srgb, var(--warning-orange, #ff9800) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning-orange, #ff9800) 25%, transparent);
+  color: var(--warning-orange, #ff9800);
+}
+
 .sync-pill {
   transition: all 0.3s ease;
 }

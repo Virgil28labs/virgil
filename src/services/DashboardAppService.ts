@@ -9,6 +9,7 @@
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
 import { confidenceService } from './ConfidenceService';
+import { CACHE_DURATION_SHORT } from '../constants/timing';
 
 export interface AppContextData<T = unknown> {
   appName: string;
@@ -81,7 +82,7 @@ export class DashboardAppService {
   private adapters: Map<string, AppDataAdapter> = new Map();
   private listeners: ((data: DashboardAppData) => void)[] = [];
   private cache: Map<string, { data: AppContextData; timestamp: number }> = new Map();
-  private readonly CACHE_TTL = 5000; // 5 seconds cache
+  private readonly CACHE_TTL = CACHE_DURATION_SHORT;
 
   // Define cross-app concepts that naturally span multiple apps
   private readonly crossAppConcepts: CrossAppConcept[] = [

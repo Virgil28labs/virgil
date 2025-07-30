@@ -26,7 +26,7 @@ import { PositionedIPHoverCard } from './location/IPHoverCard';
 import { dashboardAppService } from '../services/DashboardAppService';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { NotesAdapter } from '../services/adapters/NotesAdapter';
-import { PomodoroAdapter } from '../services/adapters/PomodoroAdapter';
+import { pomodoroAdapter } from '../services/adapters/PomodoroAdapter';
 import { streakAdapterRefactored } from '../services/adapters/StreakAdapterRefactored';
 import { CameraAdapter } from '../services/adapters/CameraAdapter';
 import { DogGalleryAdapter } from '../services/adapters/DogGalleryAdapter';
@@ -106,7 +106,7 @@ export const Dashboard = memo(function Dashboard() {
   // Memoize adapters to prevent recreation on every render
   const adapters = useMemo(() => ({
     notes: new NotesAdapter(),
-    pomodoro: new PomodoroAdapter(),
+    pomodoro: pomodoroAdapter,
     streak: streakAdapterRefactored,
     camera: new CameraAdapter(),
     dogGallery: new DogGalleryAdapter(),

@@ -2,6 +2,7 @@ import { memo, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../ui/button';
 import { usePomodoro } from './usePomodoro';
+import { pomodoroAdapter } from '../../services/adapters/PomodoroAdapter';
 import './Pomodoro.css';
 
 interface PomodoroTimerProps {
@@ -23,7 +24,27 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
     pause,
     reset,
     toggleSound,
+    setSessionType,
+    setTask,
   } = usePomodoro(DEFAULT_MINUTES);
+
+  // Update PomodoroAdapter with timer state
+  useEffect(() => {
+    pomodoroAdapter.updateTimerState(isOpen, state.isRunning, {
+      selectedMinutes: state.selectedMinutes,
+      timeRemaining: state.timeRemaining,
+      sessionType: state.sessionType,
+      sessionCount: state.sessionCount,
+      currentTask: state.currentTask || undefined,
+    });
+  }, [isOpen, state]);
+
+  // Handle session completion
+  useEffect(() => {
+    if (state.timeRemaining === 0 && !state.isRunning) {
+      pomodoroAdapter.completeSession(state.selectedMinutes, state.sessionType);
+    }
+  }, [state.timeRemaining, state.isRunning, state.selectedMinutes, state.sessionType]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -52,6 +73,40 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
 
   if (!isOpen) return null;
 
+  // Session type badge component
+  const SessionBadge = () => {
+    const sessionLabels = {
+      work: 'Focus Session',
+      shortBreak: 'Short Break',
+      longBreak: 'Long Break',
+    };
+    
+    return (
+      <div className={`session-badge session-${state.sessionType}`}>
+        {sessionLabels[state.sessionType]}
+      </div>
+    );
+  };
+
+  // Daily stats component
+  const DailyStats = () => (
+    <div className="daily-stats">
+      {state.dailyStats.totalMinutes} min today • {state.dailyStats.completedSessions} sessions done
+    </div>
+  );
+
+  // Task input component
+  const TaskInput = () => (
+    <input
+      type="text"
+      className="task-input"
+      placeholder="What are you working on?"
+      value={state.currentTask}
+      onChange={(e) => setTask(e.target.value)}
+      disabled={state.isRunning}
+    />
+  );
+
   return (
     <Modal
       isOpen={isOpen}
@@ -61,34 +116,30 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
       size="small"
     >
       <div className="pomodoro-content">
-        {/* Time Display */}
-        <div className="time-display">{formatTime(state.timeRemaining)}</div>
-
-        {/* Simple Progress Circle */}
-        <div className="progress-container">
-          <svg className="progress-ring" width="200" height="200">
-            <circle
-              className="progress-ring-bg"
-              cx="100"
-              cy="100"
-              r="88"
-              fill="none"
-              stroke="rgba(178, 165, 193, 0.2)"
-              strokeWidth="8"
+        {/* Central display area */}
+        <div className={`pomodoro-display pomodoro-${state.sessionType}`}>
+          <SessionBadge />
+          
+          {/* Large timer display */}
+          <div className="timer-large">{formatTime(state.timeRemaining)}</div>
+          
+          {/* Progress bar */}
+          <div className="progress-bar">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${progress}%` }}
             />
-            <circle
-              className="progress-ring-fill"
-              cx="100"
-              cy="100"
-              r="88"
-              fill="none"
-              stroke="#6c3baa"
-              strokeWidth="8"
-              strokeDasharray={`${2 * Math.PI * 88}`}
-              strokeDashoffset={`${2 * Math.PI * 88 * (1 - progress / 100)}`}
-              transform="rotate(-90 100 100)"
-            />
-          </svg>
+          </div>
+          
+          {/* Session info */}
+          <div className="session-info">
+            Session {state.sessionCount} of 4
+          </div>
+          
+          <DailyStats />
+          
+          {/* Task input */}
+          {!state.isRunning && <TaskInput />}
         </div>
 
         {/* Preset Buttons */}
@@ -97,13 +148,23 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
             {PRESET_TIMES.map(minutes => (
               <Button
                 key={minutes}
-                variant={state.selectedMinutes === minutes ? 'default' : 'outline'}
+                variant={state.selectedMinutes === minutes && state.sessionType === 'work' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setMinutes(minutes)}
+                onClick={() => {
+                  setSessionType('work');
+                  setMinutes(minutes);
+                }}
               >
                 {minutes}m
               </Button>
             ))}
+            <Button
+              variant={state.sessionType !== 'work' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSessionType('shortBreak')}
+            >
+              Break
+            </Button>
           </div>
         )}
 

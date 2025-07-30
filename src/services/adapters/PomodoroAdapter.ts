@@ -18,10 +18,14 @@ interface PomodoroData {
     timeRemaining: number;
     progress: number;
     phase: 'setup' | 'running' | 'paused' | 'completed';
+    sessionType: 'work' | 'shortBreak' | 'longBreak';
+    sessionCount: number; // 1-4 for work sessions
+    currentTask?: string;
   } | null;
   todayStats: {
-    sessionsCompleted: number;
-    totalFocusMinutes: number;
+    totalMinutes: number;
+    completedSessions: number;
+    currentStreak: number;
     lastSessionTime: Date | null;
   };
 }
@@ -36,8 +40,9 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     isRunning: false,
     currentSession: null,
     todayStats: {
-      sessionsCompleted: 0,
-      totalFocusMinutes: 0,
+      totalMinutes: 0,
+      completedSessions: 0,
+      currentStreak: 0,
       lastSessionTime: null,
     },
   };
@@ -50,12 +55,15 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
 
   protected loadData(): void {
     try {
-      const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
+      const today = dashboardContextService.getLocalDate();
+      const statsKey = `pomodoro-daily-stats-${today}`;
       const saved = localStorage.getItem(statsKey);
       if (saved) {
         const stats = JSON.parse(saved);
         this.currentData.todayStats = {
-          ...stats,
+          totalMinutes: stats.totalMinutes || 0,
+          completedSessions: stats.completedSessions || 0,
+          currentStreak: stats.currentStreak || 0,
           lastSessionTime: stats.lastSessionTime ? timeService.fromTimestamp(stats.lastSessionTime) : null,
         };
       }
@@ -66,8 +74,13 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
 
   private saveTodayStats(): void {
     try {
-      const statsKey = `pomodoro-stats-${dashboardContextService.getLocalDate()}`;
-      localStorage.setItem(statsKey, JSON.stringify(this.currentData.todayStats));
+      const today = dashboardContextService.getLocalDate();
+      const statsKey = `pomodoro-daily-stats-${today}`;
+      const statsToSave = {
+        ...this.currentData.todayStats,
+        lastSessionTime: this.currentData.todayStats.lastSessionTime ? timeService.getTimestamp() : null,
+      };
+      localStorage.setItem(statsKey, JSON.stringify(statsToSave));
     } catch (error) {
       this.logError('Failed to save Pomodoro stats', error, 'saveStats');
     }
@@ -106,12 +119,21 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     const parts: string[] = [];
 
     if (data.isRunning && data.currentSession) {
-      const { timeRemaining, selectedMinutes } = data.currentSession;
+      const { timeRemaining, selectedMinutes, sessionType, currentTask } = data.currentSession;
       const minutesLeft = Math.ceil(timeRemaining / 60);
-      parts.push(`Focus session active: ${minutesLeft}/${selectedMinutes} minutes remaining`);
-    } else if (data.todayStats.sessionsCompleted > 0) {
-      parts.push(`${data.todayStats.sessionsCompleted} sessions completed today`);
-      parts.push(`${data.todayStats.totalFocusMinutes} minutes focused`);
+      const sessionLabel = sessionType === 'work' ? 'Focus' : sessionType === 'shortBreak' ? 'Short break' : 'Long break';
+      
+      let sessionInfo = `${sessionLabel} active: ${minutesLeft}/${selectedMinutes} minutes remaining`;
+      if (currentTask && sessionType === 'work') {
+        sessionInfo += ` - Working on: "${currentTask}"`;
+      }
+      parts.push(sessionInfo);
+    } else if (data.todayStats.completedSessions > 0) {
+      parts.push(`${data.todayStats.completedSessions} sessions completed today`);
+      parts.push(`${data.todayStats.totalMinutes} minutes focused`);
+      if (data.todayStats.currentStreak > 0) {
+        parts.push(`Current streak: ${data.todayStats.currentStreak}`);
+      }
     } else {
       parts.push('No focus sessions today');
     }
@@ -124,8 +146,10 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
       'pomodoro', 'timer', 'focus', 'focused', 'focusing',
       'session', 'sessions', 'productivity',
       'work', 'working', 'concentrate', 'concentration',
-      'break', 'breaks', 'time left', 'remaining',
-      'completed', 'finish', 'done',
+      'break', 'breaks', 'short break', 'long break',
+      'time left', 'remaining', 'task', 'current task',
+      'completed', 'finish', 'done', 'streak',
+      'work session', 'break time', 'focus time',
     ];
   }
 
@@ -158,37 +182,55 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     }
 
     if (this.currentData.isRunning && this.currentData.currentSession) {
-      const { timeRemaining, selectedMinutes, progress } = this.currentData.currentSession;
+      const { timeRemaining, selectedMinutes, progress, sessionType, sessionCount, currentTask } = this.currentData.currentSession;
       const minutesLeft = Math.floor(timeRemaining / 60);
       const secondsLeft = timeRemaining % 60;
-
-      if (progress > 90) {
-        return `Almost done! Just ${minutesLeft}:${secondsLeft.toString().padStart(2, '0')} left in your ${selectedMinutes}-minute focus session. Finish strong! 🏁`;
-      } else if (progress > 50) {
-        return `${minutesLeft}:${secondsLeft.toString().padStart(2, '0')} remaining in your ${selectedMinutes}-minute session. You're over halfway there! 💪`;
+      const timeStr = `${minutesLeft}:${secondsLeft.toString().padStart(2, '0')}`;
+      
+      if (sessionType === 'work') {
+        let response = '';
+        if (progress > 90) {
+          response = `Almost done! Just ${timeStr} left in your ${selectedMinutes}-minute focus session. Finish strong! 🏁`;
+        } else if (progress > 50) {
+          response = `${timeStr} remaining in your ${selectedMinutes}-minute focus session (Session ${sessionCount} of 4). You're over halfway there! 💪`;
+        } else {
+          response = `${timeStr} remaining in your ${selectedMinutes}-minute focus session. Stay focused! 🎯`;
+        }
+        
+        if (currentTask) {
+          response += `\nWorking on: "${currentTask}"`;
+        }
+        return response;
+      } else if (sessionType === 'shortBreak') {
+        return `${timeStr} left in your short break. Relax and recharge! 🌿`;
       } else {
-        return `${minutesLeft}:${secondsLeft.toString().padStart(2, '0')} remaining in your ${selectedMinutes}-minute focus session. Stay focused! 🎯`;
+        return `${timeStr} left in your long break. Great job completing 4 focus sessions! 🎉`;
       }
     }
 
     if (this.currentData.currentSession?.phase === 'paused') {
-      const { timeRemaining } = this.currentData.currentSession;
+      const { timeRemaining, sessionType } = this.currentData.currentSession;
       const minutesLeft = Math.floor(timeRemaining / 60);
-      return `Timer is paused with ${minutesLeft} minutes remaining. Ready to continue?`;
+      const sessionLabel = sessionType === 'work' ? 'focus session' : sessionType === 'shortBreak' ? 'short break' : 'long break';
+      return `Timer is paused with ${minutesLeft} minutes remaining in your ${sessionLabel}. Ready to continue?`;
     }
 
     return "Timer is set up but not started yet. Click start when you're ready to focus!";
   }
 
   private getTodayStatsResponse(): string {
-    const { sessionsCompleted, totalFocusMinutes, lastSessionTime } = this.currentData.todayStats;
+    const { completedSessions, totalMinutes, currentStreak, lastSessionTime } = this.currentData.todayStats;
 
-    if (sessionsCompleted === 0) {
+    if (completedSessions === 0) {
       return "You haven't completed any Pomodoro sessions today. Ready to start your first focus session?";
     }
 
-    let response = `Great productivity today! You've completed ${sessionsCompleted} Pomodoro session${sessionsCompleted > 1 ? 's' : ''} `;
-    response += `for a total of ${totalFocusMinutes} minutes of focused work. `;
+    let response = `Great productivity today! You've completed ${completedSessions} Pomodoro session${completedSessions > 1 ? 's' : ''} `;
+    response += `for a total of ${totalMinutes} minutes of focused work. `;
+    
+    if (currentStreak > 0) {
+      response += `You're on a ${currentStreak}-session streak! `;
+    }
 
     if (lastSessionTime) {
       const timeSinceLastSession = timeService.getTimestamp() - lastSessionTime.getTime(); // eslint-disable-line no-restricted-syntax
@@ -212,13 +254,13 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
       return this.getTimerStatusResponse();
     }
 
-    const { sessionsCompleted, totalFocusMinutes } = this.currentData.todayStats;
+    const { completedSessions, totalMinutes } = this.currentData.todayStats;
 
-    if (sessionsCompleted > 0) {
-      return `Pomodoro Timer: ${sessionsCompleted} sessions completed today (${totalFocusMinutes} minutes total). ${this.currentData.isActive ? 'Timer is open and ready!' : 'Open the timer to start another session.'}`;
+    if (completedSessions > 0) {
+      return `Pomodoro Timer: ${completedSessions} sessions completed today (${totalMinutes} minutes total). ${this.currentData.isActive ? 'Timer is open and ready!' : 'Open the timer to start another session.'}`;
     }
 
-    return 'Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods. Ready to boost your productivity?';
+    return 'Pomodoro Timer helps you focus with timed work sessions. The classic technique uses 25-minute focus periods followed by short breaks. After 4 work sessions, you earn a longer break. Ready to boost your productivity?';
   }
 
   override async search(): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
@@ -231,6 +273,9 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
   updateTimerState(isActive: boolean, isRunning: boolean, sessionData?: {
     selectedMinutes: number;
     timeRemaining: number;
+    sessionType: 'work' | 'shortBreak' | 'longBreak';
+    sessionCount: number;
+    currentTask?: string;
   }): void {
     this.currentData.isActive = isActive;
     this.currentData.isRunning = isRunning;
@@ -249,14 +294,19 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     this.notifyListeners();
   }
 
-  completeSession(minutes: number): void {
-    this.currentData.todayStats.sessionsCompleted++;
-    this.currentData.todayStats.totalFocusMinutes += minutes;
+  completeSession(minutes: number, sessionType: 'work' | 'shortBreak' | 'longBreak'): void {
+    // Only count work sessions for stats
+    if (sessionType === 'work') {
+      this.currentData.todayStats.completedSessions++;
+      this.currentData.todayStats.totalMinutes += minutes;
+      this.currentData.todayStats.currentStreak++;
+    }
+    
     this.currentData.todayStats.lastSessionTime = timeService.getCurrentDateTime();
     this.saveTodayStats();
 
     this.currentData.isRunning = false;
-    this.currentData.currentSession = null;
+    // Don't clear currentSession here, let the component handle it
 
     this.notifyListeners();
   }
@@ -266,3 +316,6 @@ export class PomodoroAdapter extends BaseAdapter<PomodoroData> {
     this.notifySubscribers(data);
   }
 }
+
+// Singleton instance
+export const pomodoroAdapter = new PomodoroAdapter();
