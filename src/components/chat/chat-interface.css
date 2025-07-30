@@ -218,13 +218,7 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* Responsive adjustments */
-@media (max-width: 500px) {
-  .enhanced-context-tooltip {
-    width: calc(100vw - 40px);
-    max-width: 420px;
-  }
-}
+/* Desktop-only: No responsive adjustments needed */
 
 /* ========================================
    CHAT MESSAGES COMPONENT
@@ -648,7 +642,7 @@
 .profile-dropdown {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   background: white;
   border: 1px solid var(--color-border);
   border-radius: 12px;
@@ -656,6 +650,8 @@
   margin-top: 0.5rem;
   z-index: 1003;
   min-width: 280px;
+  max-width: min(400px, calc(100vw - 2rem));
+  max-height: calc(100vh - 100px);
   overflow: hidden;
   animation: slideDown 0.2s ease-out;
 }
@@ -663,6 +659,8 @@
 .profile-section {
   padding: 1.25rem 1rem;
   border-bottom: 1px solid var(--color-border);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 
 .profile-section:last-child {
@@ -691,6 +689,7 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   line-height: 1.3;
   resize: vertical;
+  max-height: 200px;
   min-height: 100px;
   transition: border-color 0.2s ease;
   margin-bottom: 10px;
@@ -971,6 +970,40 @@
   }
 }
 
+/* Desktop-specific smooth animations */
+@keyframes smoothPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gentleShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+/* Apply smooth animations to interactive elements */
+@media (hover: hover) {
+  .send-btn:disabled {
+    animation: smoothPulse 2s ease-in-out infinite;
+    opacity: 0.4;
+  }
+  
+  .error-msg {
+    animation: gentleShake 0.5s ease-in-out;
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  .status-pill,
+  .model-selector,
+  .profile-selector,
+  .window-btn,
+  button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
 /* ========================================
    SHARED UTILITIES
    ======================================== */
@@ -988,178 +1021,6 @@
   border: 0;
 }
 
-/* ========================================
-   MOBILE RESPONSIVENESS
-   ======================================== */
-
-@media (max-width: 480px) {
-  /* Chat Header */
-  .chatbot-header {
-    padding: 0.75rem;
-  }
-  
-  .header-left {
-    gap: 4px;
-  }
-  
-  .assistant-name {
-    font-size: 1rem;
-  }
-  
-  .tooltip {
-    width: 250px;
-    padding: 0.5rem;
-  }
-  
-  .tooltip-content p {
-    font-size: 0.8rem;
-  }
-
-  /* Chat Messages */
-  .messages-area {
-    padding: 0.75rem 0.75rem 0.5rem;
-  }
-  
-  .message {
-    max-width: 90%;
-  }
-  
-  .msg-content {
-    font-size: 0.8rem;
-    padding: 0.6rem 0.8rem;
-  }
-  
-  .msg-avatar {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-  }
-  
-  .chatbot-avatar-v {
-    font-size: 0.9rem !important;
-  }
-  
-  .remember-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-  }
-
-  /* Bulk Message Actions */
-  .bulk-message-actions {
-    padding: 0.75rem;
-  }
-  
-  .bulk-actions-buttons {
-    gap: 0.5rem;
-  }
-  
-  .bulk-action-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    min-width: 80px;
-  }
-  
-  .selection-info {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-  
-  .selection-count {
-    font-size: 0.8rem;
-  }
-
-  /* Profile Dropdown */
-  .profile-dropdown {
-    right: -1rem;
-    left: -1rem;
-    min-width: auto;
-    margin-top: 0.25rem;
-  }
-  
-  .profile-section {
-    padding: 0.75rem;
-  }
-  
-  .section-title {
-    font-size: 0.8rem;
-  }
-  
-  .profile-action {
-    padding: 0.6rem;
-    font-size: 0.8rem;
-  }
-  
-  .chatbot-prompt-textarea {
-    font-size: 11px;
-  }
-
-  /* Chat Input */
-  .input-area {
-    padding: 0.5rem 0.75rem 0.75rem;
-  }
-  
-  .input-wrapper {
-    padding: 0.2rem;
-  }
-  
-  .msg-input {
-    padding: 0.6rem 0.8rem;
-    font-size: 0.9rem;
-  }
-  
-  .send-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    font-size: 1rem;
-  }
-  
-  .quick-actions {
-    padding: 0 0.75rem 0.75rem;
-  }
-  
-  .quick-btn {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 640px) {
-  /* Bulk Message Actions - Additional mobile styles */
-  .selection-info {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-  
-  .selection-count {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  /* Bulk Message Actions - Smallest screens */
-  .bulk-actions-buttons {
-    justify-content: stretch;
-  }
-  
-  .bulk-action-btn {
-    flex: 1;
-    min-width: auto;
-  }
-  
-  .bulk-actions-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
-  }
-  
-  .close-bulk-actions {
-    align-self: flex-end;
-  }
-}
 
 /* ========================================
    ACCESSIBILITY
@@ -1200,5 +1061,83 @@
   .remember-btn:hover,
   .remember-btn:active {
     transform: none;
+  }
+}
+
+/* ========================================
+   Desktop-only: No mobile fixes needed
+   ======================================== */
+
+/* ========================================
+   DESKTOP KEYBOARD SHORTCUTS
+   ======================================== */
+
+/* Keyboard shortcut hints on hover */
+@media (hover: hover) {
+  /* Show keyboard hints on hover */
+  .send-btn::after {
+    content: "⏎";
+    position: absolute;
+    top: -20px;
+    right: 0;
+    font-size: 11px;
+    color: var(--brand-medium-gray);
+    background: var(--off-white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .send-btn:hover::after {
+    opacity: 1;
+  }
+  
+  /* New chat shortcut hint */
+  .new-chat-pill::after {
+    content: "Ctrl+N";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--brand-medium-gray);
+    background: var(--off-white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+  }
+  
+  .new-chat-pill:hover::after {
+    opacity: 1;
+  }
+  
+  /* Memory modal shortcut hint */
+  .memory-pill::after {
+    content: "Ctrl+M";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--brand-medium-gray);
+    background: var(--off-white);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+  }
+  
+  .memory-pill:hover::after {
+    opacity: 1;
   }
 }

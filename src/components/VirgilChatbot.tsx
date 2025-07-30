@@ -25,7 +25,7 @@ import './VirgilChatbot.css';
 const AVAILABLE_MODELS: ModelOption[] = [
   { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', description: 'Fast and efficient' },
   { id: 'gpt-4.1', name: 'GPT-4.1', description: 'Most capable model' },
-  { id: 'o4-mini', name: 'o4 Mini', description: 'Optimized reasoning' },
+  { id: 'gpt-4o-mini', name: 'o4 Mini', description: 'Optimized reasoning' },
 ];
 
 // Inner component that uses the context
@@ -72,6 +72,7 @@ function VirgilChatbotInner() {
     memoryContext: state.memoryContext,
     dashboardContext: state.dashboardContext,
     contextualSuggestions: state.contextualSuggestions,
+    messages: state.messages,
   });
 
   const {

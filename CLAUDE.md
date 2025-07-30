@@ -4,7 +4,7 @@
 Build **legendary code** - production-ready, performant, and beautiful. Every line should be clean, optimized, and bulletproof. Other developers should want to reference this codebase.
 
 ## Project: Virgil
-React/TypeScript app with physics raccoon, weather, location, LLM chat.
+React/TypeScript web app with physics raccoon, weather, location, LLM chat.
 **Context**: Ben is learning - explain clearly while maintaining exceptional standards.
 
 ## Tech Stack

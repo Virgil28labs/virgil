@@ -46,6 +46,9 @@ export function useMemoryService({
 
       await vectorMemoryService.init();
 
+      // Initialize intent embeddings for semantic matching
+      await vectorMemoryService.initializeIntentEmbeddings();
+
       // Load all memory data
       const [lastConv, memories, conversations, context] = await Promise.all([
         vectorMemoryService.getLastConversation(),

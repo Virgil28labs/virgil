@@ -4,6 +4,7 @@ import { dashboardContextService } from '../services/DashboardContextService';
 import { vectorMemoryService } from '../services/VectorMemoryService';
 import type { DashboardContext, ContextualSuggestion } from '../services/DashboardContextService';
 import type { User } from '../types/auth.types';
+import type { ChatMessage } from '../types/chat.types';
 import { logger } from '../lib/logger';
 
 interface UseSystemPromptProps {
@@ -12,6 +13,7 @@ interface UseSystemPromptProps {
   memoryContext: string;
   dashboardContext: DashboardContext | null;
   contextualSuggestions: ContextualSuggestion[];
+  messages?: ChatMessage[];
 }
 
 interface UseSystemPromptReturn {
@@ -27,6 +29,7 @@ export function useSystemPrompt({
   memoryContext,
   dashboardContext,
   contextualSuggestions,
+  messages = [],
 }: UseSystemPromptProps): UseSystemPromptReturn {
   // Time of day from dashboard context (automatically updates via timeOfDay field)
   const timeOfDay = useMemo(() => {
@@ -53,8 +56,30 @@ export function useSystemPrompt({
     return { basePrompt, staticUserContext };
   }, [user, locationContext, timeOfDay, customSystemPrompt]);
 
+  // Build conversation context from recent messages
+  const buildConversationContext = useCallback(() => {
+    // Include last 3 exchanges (6 messages) for context
+    const recentMessages = messages.slice(-6).filter(msg => msg.role !== 'system');
+    
+    if (recentMessages.length === 0) return '';
+
+    let conversationContext = '\n\nRecent conversation:';
+    recentMessages.forEach(msg => {
+      const role = msg.role === 'user' ? 'User' : 'Assistant';
+      conversationContext += `\n${role}: ${msg.content.slice(0, 200)}${msg.content.length > 200 ? '...' : ''}`;
+    });
+
+    return conversationContext;
+  }, [messages]);
+
   const createSystemPrompt = useCallback(async (userQuery?: string) => {
     let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
+
+    // Add conversation continuity
+    const conversationContext = buildConversationContext();
+    if (conversationContext) {
+      systemPrompt += conversationContext;
+    }
 
     // Get enhanced context with vector memories if user query is provided
     if (userQuery) {
@@ -92,11 +117,17 @@ export function useSystemPrompt({
     const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
 
     return systemPrompt + responseRules;
-  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
+  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions, buildConversationContext]);
 
   // Synchronous version for UI preview (without vector memory)
   const createSystemPromptSync = useCallback((userQuery?: string) => {
     let systemPrompt = `${staticPromptParts.basePrompt} ${staticPromptParts.staticUserContext}`;
+
+    // Add conversation continuity
+    const conversationContext = buildConversationContext();
+    if (conversationContext) {
+      systemPrompt += conversationContext;
+    }
 
     if (memoryContext) {
       systemPrompt += `\n\nMemory:${memoryContext}`;
@@ -115,7 +146,7 @@ export function useSystemPrompt({
     const responseRules = '\n\nBe conversational, concise, and use available context naturally.';
 
     return systemPrompt + responseRules;
-  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions]);
+  }, [staticPromptParts, memoryContext, dashboardContext, contextualSuggestions, buildConversationContext]);
 
   return {
     createSystemPrompt,

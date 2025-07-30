@@ -70,8 +70,8 @@
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  width: 450px;
-  height: 600px;
+  width: 550px;
+  height: 700px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -85,8 +85,8 @@
 
 /* Window size variants */
 .virgil-chatbot-container.large {
-  width: 600px;
-  height: 700px;
+  width: 700px;
+  height: 800px;
 }
 
 .virgil-chatbot-container.fullscreen {
@@ -903,6 +903,7 @@
   margin-top: 0.5rem;
   z-index: 1003;
   min-width: 280px;
+  max-width: min(400px, calc(100vw - 2rem));
   overflow: hidden;
   animation: slideDown 0.2s ease-out;
 }
@@ -1112,63 +1113,6 @@
   font-weight: 600;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 480px) {
-  .virgil-chatbot-container {
-    width: calc(100vw - 2rem);
-    right: 1rem;
-    bottom: 1rem;
-    height: 400px;
-  }
-  
-  .virgil-chatbot-container.large {
-    width: calc(100vw - 2rem);
-    height: calc(100vh - 4rem);
-    max-height: 600px;
-  }
-  
-  .virgil-chatbot-container.fullscreen {
-    width: calc(100vw - 1rem);
-    height: calc(100vh - 2rem);
-    bottom: 0.5rem;
-    right: 0.5rem;
-    max-width: none;
-    max-height: none;
-  }
-  
-  .virgil-chatbot-bubble {
-    right: 1rem;
-    bottom: 1rem;
-  }
-  
-  .message {
-    max-width: 90%;
-  }
-  
-  .profile-dropdown {
-    right: -1rem;
-    left: -1rem;
-    min-width: auto;
-    margin-top: 0.25rem;
-  }
-  
-  .profile-section {
-    padding: 0.75rem;
-  }
-  
-  .section-title {
-    font-size: 0.8rem;
-  }
-  
-  .item-text {
-    font-size: 0.8rem;
-  }
-  
-  .profile-action {
-    padding: 0.6rem;
-    font-size: 0.8rem;
-  }
-}
 
 /* Recent Messages Tab Styles */
 .recent-messages-tab {
@@ -1337,4 +1281,58 @@
   color: var(--brand-accent-purple);
   font-weight: 600;
   font-size: 0.875rem;
+}
+
+/* ========================================
+   DESKTOP ENHANCEMENTS
+   Optimized for web-only experience
+   ======================================== */
+
+/* Enhanced hover states for desktop */
+@media (hover: hover) {
+  /* Smooth hover transitions */
+  .status-pill,
+  .window-btn,
+  .model-selector,
+  .profile-selector,
+  .memory-tab-btn,
+  .memory-action-btn,
+  .quick-btn,
+  .send-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Elevated hover effects */
+  .status-pill:hover,
+  .window-btn:hover,
+  .memory-tab-btn:hover,
+  .memory-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 59, 170, 0.15);
+  }
+  
+  /* Active state feedback */
+  button:active {
+    transform: translateY(0);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Enhanced message hover */
+  .message:hover {
+    background: rgba(108, 59, 170, 0.02);
+    border-radius: 12px;
+    margin: -4px;
+    padding: 4px;
+  }
+  
+  /* Smooth model selector hover */
+  .model-selector:hover {
+    border-color: var(--brand-accent-purple);
+    box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.1);
+  }
+  
+  /* Profile dropdown hover enhancement */
+  .profile-action:hover {
+    transform: translateX(4px);
+  }
 }

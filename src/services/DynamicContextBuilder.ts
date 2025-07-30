@@ -8,6 +8,7 @@
 import type { DashboardContext, ContextualSuggestion } from './DashboardContextService';
 import { dashboardAppService } from './DashboardAppService';
 import { timeService } from './TimeService';
+import { vectorMemoryService } from './VectorMemoryService';
 
 export interface ContextRelevance {
   timeContext: number;      // 0-1 relevance score
@@ -67,7 +68,45 @@ export class DynamicContextBuilder {
   /**
    * Analyzes a user query and calculates relevance scores for different context types
    */
-  static calculateRelevance(query: string): ContextRelevance {
+  static async calculateRelevance(query: string): Promise<ContextRelevance> {
+    const normalizedQuery = query.toLowerCase();
+    const words = normalizedQuery.split(/\s+/);
+
+    // Try semantic matching first
+    const semanticQueries = [
+      { query, intent: 'time' },
+      { query, intent: 'location' },
+      { query, intent: 'weather' },
+      { query, intent: 'user' },
+      { query, intent: 'activity' },
+      { query, intent: 'device' },
+    ];
+
+    const semanticScores = await vectorMemoryService.getSemanticConfidenceBatch(semanticQueries);
+
+    // Get semantic scores with keyword fallback
+    const timeScore = semanticScores.get('time') || this.calculateKeywordRelevance(words, this.TIME_KEYWORDS);
+    const locationScore = semanticScores.get('location') || this.calculateKeywordRelevance(words, this.LOCATION_KEYWORDS);
+    const weatherScore = semanticScores.get('weather') || this.calculateKeywordRelevance(words, this.WEATHER_KEYWORDS);
+    const userScore = semanticScores.get('user') || this.calculateKeywordRelevance(words, this.USER_KEYWORDS);
+    const activityScore = semanticScores.get('activity') || this.calculateKeywordRelevance(words, this.ACTIVITY_KEYWORDS);
+    const deviceScore = semanticScores.get('device') || this.calculateKeywordRelevance(words, this.DEVICE_KEYWORDS);
+
+    return {
+      timeContext: timeScore,
+      locationContext: locationScore,
+      weatherContext: weatherScore,
+      userContext: userScore,
+      activityContext: activityScore,
+      deviceContext: deviceScore,
+    };
+  }
+
+  /**
+   * Synchronous version of calculateRelevance using only keyword matching
+   * Used for UI preview where async operations are not supported
+   */
+  static calculateRelevanceSync(query: string): ContextRelevance {
     const normalizedQuery = query.toLowerCase();
     const words = normalizedQuery.split(/\s+/);
 
@@ -112,49 +151,49 @@ export class DynamicContextBuilder {
     context: DashboardContext,
     suggestions: ContextualSuggestion[] = [],
   ): Promise<EnhancedPrompt> {
-    const relevanceScores = this.calculateRelevance(userQuery);
+    const relevanceScores = await this.calculateRelevance(userQuery);
     const contextUsed: string[] = [];
     let enhancedPrompt = originalPrompt;
 
     // Add relevant context sections based on relevance scores
     const contextSections: string[] = [];
 
-    // Time context (always include basic time info, enhance if relevant)
-    if (relevanceScores.timeContext > 0.1 || this.isTimeQuery(userQuery)) {
+    // Time context - only include if semantic confidence is high or direct query
+    if (relevanceScores.timeContext > 0.5 || this.isTimeQuery(userQuery)) {
       contextSections.push(this.buildTimeContext(context));
       contextUsed.push('time');
     }
 
-    // Location context - always include for direct queries or when relevant
-    if (relevanceScores.locationContext > 0.1 || this.isLocationQuery(userQuery)) {
+    // Location context - only include if semantic confidence is high or direct query
+    if (relevanceScores.locationContext > 0.5 || this.isLocationQuery(userQuery)) {
       if (context.location.hasGPS || context.location.ipAddress) {
         contextSections.push(this.buildLocationContext(context));
         contextUsed.push('location');
       }
     }
 
-    // Weather context
-    if (relevanceScores.weatherContext > 0.2 && context.weather.hasData) {
+    // Weather context - require higher confidence
+    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData) {
       contextSections.push(this.buildWeatherContext(context));
       contextUsed.push('weather');
     }
 
-    // User context - always include for direct queries or when relevant
-    if (relevanceScores.userContext > 0.1 || this.isUserQuery(userQuery)) {
+    // User context - only include if semantic confidence is high or direct query
+    if (relevanceScores.userContext > 0.5 || this.isUserQuery(userQuery)) {
       if (context.user.isAuthenticated) {
         contextSections.push(this.buildUserContext(context));
         contextUsed.push('user');
       }
     }
 
-    // Activity context
-    if (relevanceScores.activityContext > 0.3) {
+    // Activity context - require higher confidence
+    if (relevanceScores.activityContext > 0.6) {
       contextSections.push(this.buildActivityContext(context));
       contextUsed.push('activity');
     }
 
-    // Device context - always include for direct queries or when relevant
-    if ((relevanceScores.deviceContext > 0.1 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
+    // Device context - only include if semantic confidence is high or direct query
+    if ((relevanceScores.deviceContext > 0.5 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
       contextSections.push(this.buildDeviceContext(context));
       contextUsed.push('device');
     }
@@ -448,49 +487,49 @@ export class DynamicContextBuilder {
     context: DashboardContext,
     suggestions: ContextualSuggestion[] = [],
   ): EnhancedPrompt {
-    const relevanceScores = this.calculateRelevance(userQuery);
+    const relevanceScores = this.calculateRelevanceSync(userQuery);
     const contextUsed: string[] = [];
     let enhancedPrompt = originalPrompt;
 
     // Add relevant context sections based on relevance scores
     const contextSections: string[] = [];
 
-    // Time context (always include basic time info, enhance if relevant)
-    if (relevanceScores.timeContext > 0.1 || this.isTimeQuery(userQuery)) {
+    // Time context - only include if semantic confidence is high or direct query
+    if (relevanceScores.timeContext > 0.5 || this.isTimeQuery(userQuery)) {
       contextSections.push(this.buildTimeContext(context));
       contextUsed.push('time');
     }
 
-    // Location context - always include for direct queries or when relevant
-    if (relevanceScores.locationContext > 0.1 || this.isLocationQuery(userQuery)) {
+    // Location context - only include if semantic confidence is high or direct query
+    if (relevanceScores.locationContext > 0.5 || this.isLocationQuery(userQuery)) {
       if (context.location.hasGPS || context.location.ipAddress) {
         contextSections.push(this.buildLocationContext(context));
         contextUsed.push('location');
       }
     }
 
-    // Weather context
-    if (relevanceScores.weatherContext > 0.2 && context.weather.hasData) {
+    // Weather context - require higher confidence
+    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData) {
       contextSections.push(this.buildWeatherContext(context));
       contextUsed.push('weather');
     }
 
-    // User context - always include for direct queries or when relevant
-    if (relevanceScores.userContext > 0.1 || this.isUserQuery(userQuery)) {
+    // User context - only include if semantic confidence is high or direct query
+    if (relevanceScores.userContext > 0.5 || this.isUserQuery(userQuery)) {
       if (context.user.isAuthenticated) {
         contextSections.push(this.buildUserContext(context));
         contextUsed.push('user');
       }
     }
 
-    // Activity context
-    if (relevanceScores.activityContext > 0.3) {
+    // Activity context - require higher confidence
+    if (relevanceScores.activityContext > 0.6) {
       contextSections.push(this.buildActivityContext(context));
       contextUsed.push('activity');
     }
 
-    // Device context - always include for direct queries or when relevant
-    if ((relevanceScores.deviceContext > 0.1 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
+    // Device context - only include if semantic confidence is high or direct query
+    if ((relevanceScores.deviceContext > 0.5 || this.isDeviceQuery(userQuery)) && context.device.hasData) {
       contextSections.push(this.buildDeviceContext(context));
       contextUsed.push('device');
     }

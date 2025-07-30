@@ -25,6 +25,7 @@
   --brand-medium-gray: var(--silver-grey);
   --brand-accent-purple: var(--violet-purple);
   --brand-accent-pink: var(--soft-pink);
+  --primary-accent: var(--violet-purple);
   
   /* Semantic Colors */
   --color-background: var(--deep-plum);

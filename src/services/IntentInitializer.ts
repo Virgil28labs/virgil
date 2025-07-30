@@ -44,9 +44,13 @@ export class IntentInitializer {
       return;
     }
 
-    logger.info('Initializing intent embeddings for dashboard adapters...');
+    logger.info('Initializing intent embeddings...');
 
     try {
+      // First, initialize core intent embeddings for basic intents
+      // (weather, time, location, user, activity, device)
+      await vectorMemoryService.initializeIntentEmbeddings();
+      logger.info('Core intent embeddings initialized');
       // Define intents for each adapter with example queries
       const adapterIntents: AdapterIntent[] = [
         {
