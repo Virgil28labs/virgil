@@ -7,6 +7,7 @@
 import type { ChatMessage } from '../types/chat.types';
 import { dedupeFetch } from '../lib/requestDeduplication';
 import { dashboardAppService, CONFIDENCE_THRESHOLDS } from './DashboardAppService';
+import type { AppDataAdapter } from './DashboardAppService';
 import { dashboardContextService } from './DashboardContextService';
 import { timeService } from './TimeService';
 import { logger } from '../lib/logger';
@@ -77,7 +78,7 @@ export class ChatService {
     }
     
     // Check dashboard apps with confidence-based routing
-    let appMatches: Array<{ adapter: any; confidence: number }> = [];
+    let appMatches: Array<{ adapter: AppDataAdapter; confidence: number }> = [];
     try {
       appMatches = await dashboardAppService.getAppsWithConfidence(userMessage);
     } catch (error) {
@@ -254,7 +255,7 @@ export class ChatService {
   /**
    * Check if a query contains multiple intents
    */
-  private async checkMultiIntent(query: string): Promise<{ intents: Array<{ adapter: any; confidence: number }>; avgConfidence: number } | null> {
+  private async checkMultiIntent(query: string): Promise<{ intents: Array<{ adapter: AppDataAdapter; confidence: number }>; avgConfidence: number } | null> {
     // Common multi-intent patterns
     const multiPatterns = [
       /\band\b/i,
@@ -271,7 +272,7 @@ export class ChatService {
     if (!hasMultiPattern) return null;
     
     // Get all app matches
-    let allMatches: Array<{ adapter: any; confidence: number }> = [];
+    let allMatches: Array<{ adapter: AppDataAdapter; confidence: number }> = [];
     try {
       allMatches = await dashboardAppService.getAppsWithConfidence(query);
     } catch (error) {
@@ -301,7 +302,7 @@ export class ChatService {
   /**
    * Handle multi-intent queries by aggregating responses
    */
-  private async handleMultiIntent(query: string, intents: Array<{ adapter: any; confidence: number }>): Promise<string | null> {
+  private async handleMultiIntent(query: string, intents: Array<{ adapter: AppDataAdapter; confidence: number }>): Promise<string | null> {
     const responses: string[] = [];
     
     // Try to get responses from each intent

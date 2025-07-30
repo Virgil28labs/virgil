@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../ui/button';
 import { usePomodoro } from './usePomodoro';
@@ -24,6 +24,31 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
     reset,
     toggleSound,
   } = usePomodoro(DEFAULT_MINUTES);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent): void => {
+      // Prevent shortcuts when typing in inputs
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (state.isRunning) {
+          pause();
+        } else if (state.timeRemaining > 0) {
+          start();
+        }
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyPress);
+      return () => window.removeEventListener('keydown', handleKeyPress);
+    }
+    return undefined;
+  }, [isOpen, state.isRunning, state.timeRemaining, start, pause]);
 
   if (!isOpen) return null;
 
@@ -111,6 +136,27 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
           >
             {state.soundEnabled ? '🔊' : '🔇'}
           </Button>
+        </div>
+
+        {/* Keyboard hint */}
+        <div style={{ 
+          fontSize: '12px', 
+          color: 'rgba(255, 255, 255, 0.6)', 
+          marginTop: '1rem',
+          textAlign: 'center',
+        }}
+        >
+          Press {' '}
+          <kbd style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+            padding: '2px 6px', 
+            borderRadius: '3px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          }}
+          >
+            Space
+          </kbd>
+          {' '} to start/pause
         </div>
       </div>
     </Modal>

@@ -200,7 +200,7 @@ export class ConfidenceService {
       details: this.getContextExplanation(score.breakdown.context, score.metadata),
     });
     
-    const explanation = this.generateExplanation(score.totalScore, factors);
+    const explanation = this.generateExplanation(score.totalScore);
     
     return {
       query,
@@ -299,13 +299,7 @@ export class ConfidenceService {
   /**
    * Generate human-readable explanation
    */
-  private generateExplanation(totalScore: number, _factors: Array<{
-    type: 'semantic' | 'keyword' | 'context';
-    score: number;
-    weight: number;
-    contribution: number;
-    details: string;
-  }>): string {
+  private generateExplanation(totalScore: number): string {
     if (totalScore >= this.THRESHOLDS.HIGH) {
       return 'Very high confidence match based on strong semantic similarity and keyword matches.';
     } else if (totalScore >= this.THRESHOLDS.MEDIUM) {

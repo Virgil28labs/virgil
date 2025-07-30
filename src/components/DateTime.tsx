@@ -31,8 +31,8 @@ export const DateTime = memo(function DateTime() {
         hour12: false,
       });
     },
-    date: (_date: Date): string => timeService.formatDate(_date),
-    day: (_date: Date): string => timeService.getDayOfWeek(),
+    date: (date: Date): string => timeService.formatDate(date),
+    day: (): string => timeService.getDayOfWeek(),
   }), []);
 
   return (
@@ -54,7 +54,7 @@ export const DateTime = memo(function DateTime() {
           })()}
         </div>
         <div className="date">{formatters.date(currentTime)}</div>
-        <div className="day">{formatters.day(currentTime)}</div>
+        <div className="day">{formatters.day()}</div>
       </div>
     </TimezoneWidget>
   );

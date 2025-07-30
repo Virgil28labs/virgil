@@ -135,15 +135,31 @@ export function usePomodoro(defaultMinutes: number = 25) {
     };
   }, [state.isRunning, state.timeRemaining, handleComplete]);
 
-  // Calculate progress
-  const progress = ((state.selectedMinutes * 60 - state.timeRemaining) / (state.selectedMinutes * 60)) * 100;
-
   // Format time display
-  const formatTime = (seconds: number): string => {
+  const formatTime = useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
+
+  // Update browser tab title with countdown
+  useEffect(() => {
+    const originalTitle = document.title;
+    
+    if (state.isRunning && state.timeRemaining > 0) {
+      document.title = `🍅 ${formatTime(state.timeRemaining)} - Virgil`;
+    } else if (state.timeRemaining === 0) {
+      // Flash title when complete
+      document.title = '✅ Complete! - Virgil';
+    }
+    
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [state.isRunning, state.timeRemaining, formatTime]);
+
+  // Calculate progress
+  const progress = ((state.selectedMinutes * 60 - state.timeRemaining) / (state.selectedMinutes * 60)) * 100;
 
   return {
     state,

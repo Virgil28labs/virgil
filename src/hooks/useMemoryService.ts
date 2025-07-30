@@ -53,7 +53,7 @@ export function useMemoryService({
       const [lastConv, memories, conversations, context] = await Promise.all([
         vectorMemoryService.getLastConversation(),
         vectorMemoryService.getMarkedMemories(),
-        vectorMemoryService.getRecentConversations(10),
+        vectorMemoryService.getRecentConversations(),
         vectorMemoryService.getContextForPrompt(),
       ]);
 

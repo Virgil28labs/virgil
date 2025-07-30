@@ -15,9 +15,9 @@ jest.mock('../../lib/logger', () => ({
 
 // Mock IndexedDB (fallback)
 const mockIndexedDB = {
-  messages: [] as any[],
-  conversations: [] as any[],
-  memories: [] as any[],
+  messages: [] as Array<{ id: string; content: string; role: string; timestamp: string }>,
+  conversations: [] as Array<{ id: string; title: string; messages: Array<{ id: string; content: string; role: string; timestamp: string }> }>,
+  memories: [] as Array<{ id: string; content: string; context: string; timestamp: number; tag?: string }>,
 };
 
 jest.mock('../IndexedDBService', () => ({
@@ -100,8 +100,9 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
     mockIndexedDB.memories = [];
     
     // Setup Supabase mocks
-    mockSupabase.auth = mockAuth as any;
-    mockSupabase.from = jest.fn((table) => createMockQueryBuilder(table)) as any;
+    mockSupabase.auth = mockAuth as unknown as typeof supabase.auth;
+    // @ts-expect-error - Mock type doesn't match Supabase's complex type
+    mockSupabase.from = jest.fn((table) => createMockQueryBuilder(table));
     
     // Create new service instance
     service = new SupabaseMemoryService();
@@ -127,7 +128,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.refreshSession.mockResolvedValue({ data: { session: {} }, error: null });
       
       const queryBuilder = createMockQueryBuilder('messages');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       // First call fails with 401
       queryBuilder.select.mockReturnValueOnce({
@@ -156,7 +157,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.getUser.mockResolvedValue({ data: { user: user1 }, error: null });
       
       const conversationBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(conversationBuilder as any);
+      mockSupabase.from.mockReturnValue(conversationBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       conversationBuilder.upsert.mockResolvedValue({ error: null });
       
@@ -165,7 +166,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should only fetch messages for the authenticated user', async () => {
       const queryBuilder = createMockQueryBuilder('messages');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       queryBuilder.select.mockResolvedValue({
         data: [
@@ -184,7 +185,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should only fetch conversations for the authenticated user', async () => {
       const queryBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       queryBuilder.select.mockResolvedValue({
         data: [
@@ -194,7 +195,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
         error: null,
       });
       
-      await service.getRecentConversations(5);
+      await service.getRecentConversations();
       
       // Verify the query includes user filter
       expect(queryBuilder.eq).toHaveBeenCalledWith('user_id', user1.id);
@@ -202,7 +203,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should only fetch memories for the authenticated user', async () => {
       const queryBuilder = createMockQueryBuilder('memories');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       queryBuilder.select.mockResolvedValue({
         data: [
@@ -224,7 +225,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.getUser.mockResolvedValue({ data: { user: user1 }, error: null });
       
       const conversationBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(conversationBuilder as any);
+      mockSupabase.from.mockReturnValue(conversationBuilder as ReturnType<typeof createMockQueryBuilder>);
       conversationBuilder.upsert.mockResolvedValue({ error: null });
       
       await service.init();
@@ -232,7 +233,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should handle RLS policy violations gracefully', async () => {
       const queryBuilder = createMockQueryBuilder('messages');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       queryBuilder.insert.mockResolvedValue({
         error: { code: '42501', message: 'new row violates row-level security policy' },
@@ -261,7 +262,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
     it('should not allow cross-user data access', async () => {
       // Try to access another user's data
       const queryBuilder = createMockQueryBuilder('memories');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       // RLS should prevent this
       queryBuilder.select.mockResolvedValue({
@@ -289,7 +290,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.getUser.mockResolvedValue({ data: { user: user1 }, error: null });
       
       const conversationBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(conversationBuilder as any);
+      mockSupabase.from.mockReturnValue(conversationBuilder as ReturnType<typeof createMockQueryBuilder>);
       conversationBuilder.upsert.mockResolvedValue({ error: null });
       
       await service.init();
@@ -315,13 +316,13 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.getUser.mockResolvedValue({ data: { user: user1 }, error: null });
       
       const conversationBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(conversationBuilder as any);
+      mockSupabase.from.mockReturnValue(conversationBuilder as ReturnType<typeof createMockQueryBuilder>);
       conversationBuilder.upsert.mockResolvedValue({ error: null });
       
       await service.init();
       
       const messageBuilder = createMockQueryBuilder('messages');
-      mockSupabase.from.mockReturnValue(messageBuilder as any);
+      mockSupabase.from.mockReturnValue(messageBuilder as ReturnType<typeof createMockQueryBuilder>);
       messageBuilder.insert.mockResolvedValue({ error: null });
       
       // Simulate concurrent message additions
@@ -348,7 +349,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
       mockAuth.getUser.mockResolvedValue({ data: { user: user1 }, error: null });
       
       const conversationBuilder = createMockQueryBuilder('conversations');
-      mockSupabase.from.mockReturnValue(conversationBuilder as any);
+      mockSupabase.from.mockReturnValue(conversationBuilder as ReturnType<typeof createMockQueryBuilder>);
       conversationBuilder.upsert.mockResolvedValue({ error: null });
       
       await service.init();
@@ -356,7 +357,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should maintain conversation continuity within user scope', async () => {
       const queryBuilder = createMockQueryBuilder('messages');
-      mockSupabase.from.mockReturnValue(queryBuilder as any);
+      mockSupabase.from.mockReturnValue(queryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       queryBuilder.select.mockResolvedValue({
         data: [
@@ -389,7 +390,7 @@ describe('SupabaseMemoryService - Multi-User Isolation', () => {
 
     it('should enforce unique constraints per user', async () => {
       const memoryBuilder = createMockQueryBuilder('memories');
-      mockSupabase.from.mockReturnValue(memoryBuilder as any);
+      mockSupabase.from.mockReturnValue(memoryBuilder as ReturnType<typeof createMockQueryBuilder>);
       
       // First insert succeeds
       memoryBuilder.insert.mockResolvedValueOnce({ error: null });

@@ -243,7 +243,7 @@ export class MemoryService {
     return this.getContinuousConversation();
   }
 
-  async getRecentConversations(_limit: number = 5): Promise<StoredConversation[]> {
+  async getRecentConversations(): Promise<StoredConversation[]> {
     // In continuous conversation model, return the single conversation
     const conversation = await this.getContinuousConversation();
     return conversation ? [conversation] : [];
@@ -282,7 +282,7 @@ export class MemoryService {
   async searchConversations(query: string): Promise<StoredConversation[]> {
     if (!this.db || !query.trim()) return [];
 
-    const conversations = await this.getRecentConversations(100);
+    const conversations = await this.getRecentConversations();
     const searchTerm = query.toLowerCase();
 
     return conversations.filter(conv =>
@@ -389,7 +389,7 @@ export class MemoryService {
 
   async exportAllData(): Promise<{ conversations: StoredConversation[]; memories: MarkedMemory[] }> {
     try {
-      const conversations = await this.getRecentConversations(1000);
+      const conversations = await this.getRecentConversations();
       const memories = await this.getMarkedMemories();
 
       toastService.memorySuccess('export');

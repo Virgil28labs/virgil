@@ -633,7 +633,7 @@ export class SupabaseMemoryService {
     return this.getContinuousConversation();
   }
 
-  async getRecentConversations(_limit: number = 5): Promise<StoredConversation[]> {
+  async getRecentConversations(): Promise<StoredConversation[]> {
     const conversation = await this.getContinuousConversation();
     return conversation ? [conversation] : [];
   }

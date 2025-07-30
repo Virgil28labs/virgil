@@ -24,7 +24,7 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
       on: jest.fn().mockReturnThis(),
       subscribe: jest.fn().mockReturnThis(),
       unsubscribe: jest.fn().mockResolvedValue('ok'),
-    } as any;
+    } as unknown as jest.Mocked<RealtimeChannel>;
     
     mockSupabase.channel = jest.fn().mockReturnValue(mockChannel);
     mockSupabase.removeChannel = jest.fn();
@@ -131,10 +131,10 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
   it('should handle new message events from same user only', async () => {
     const userId = 'user-123';
     const onNewMessage = jest.fn();
-    let messageHandler: Function;
+    let messageHandler: Function | undefined;
     
     mockChannel.on.mockImplementation((_event, config, handler) => {
-      if ((config as any).table === 'messages') {
+      if ((config as { table?: string }).table === 'messages') {
         messageHandler = handler;
       }
       return mockChannel;
@@ -157,10 +157,12 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
     };
     
     await act(async () => {
-      messageHandler!({
-        eventType: 'INSERT',
-        new: newMessage,
-      });
+      if (messageHandler) {
+        messageHandler({
+          eventType: 'INSERT',
+          new: newMessage,
+        });
+      }
     });
     
     expect(onNewMessage).toHaveBeenCalledWith(expect.objectContaining({
@@ -189,14 +191,18 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
     
     // Simulate successful connection
     await act(async () => {
-      subscribeCallback!('SUBSCRIBED');
+      if (subscribeCallback) {
+        subscribeCallback('SUBSCRIBED');
+      }
     });
     
     expect(onConnectionChange).toHaveBeenCalledWith(true);
     
     // Simulate disconnection
     await act(async () => {
-      subscribeCallback!('CLOSED');
+      if (subscribeCallback) {
+        subscribeCallback('CLOSED');
+      }
     });
     
     expect(onConnectionChange).toHaveBeenCalledWith(false);
@@ -205,10 +211,10 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
   it('should handle memory deletion events', async () => {
     const userId = 'user-123';
     const onMemoryDelete = jest.fn();
-    let memoryHandler: Function;
+    let memoryHandler: Function | undefined;
     
     mockChannel.on.mockImplementation((_event, config, handler) => {
-      if ((config as any).table === 'memories') {
+      if ((config as { table?: string }).table === 'memories') {
         memoryHandler = handler;
       }
       return mockChannel;
@@ -222,14 +228,16 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
     
     // Simulate memory deletion
     await act(async () => {
-      memoryHandler!({
-        eventType: 'DELETE',
-        old: {
-          id: 'mem-1',
-          user_id: userId,
-          local_id: 'local-mem-1',
-        },
-      });
+      if (memoryHandler) {
+        memoryHandler({
+          eventType: 'DELETE',
+          old: {
+            id: 'mem-1',
+            user_id: userId,
+            local_id: 'local-mem-1',
+          },
+        });
+      }
     });
     
     expect(onMemoryDelete).toHaveBeenCalledWith('mem-1');
@@ -293,7 +301,9 @@ describe('useRealtimeSync - Multi-Device Synchronization', () => {
     
     // Simulate channel error
     await act(async () => {
-      subscribeCallback!('CHANNEL_ERROR');
+      if (subscribeCallback) {
+        subscribeCallback('CHANNEL_ERROR');
+      }
     });
     
     // Should attempt reconnection after delay

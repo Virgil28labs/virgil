@@ -232,7 +232,7 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
 
     // Count queries
     if (lowerQuery.includes('how many') || lowerQuery.includes('count')) {
-      return this.getCountResponse(lowerQuery);
+      return this.getCountResponse();
     }
 
     // Category queries
@@ -257,7 +257,7 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
     return this.getOverviewResponse();
   }
 
-  private getCountResponse(_query: string): string {
+  private getCountResponse(): string {
     const contextData = this.getContextData();
     const data = contextData.data;
 

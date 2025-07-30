@@ -183,7 +183,7 @@ export class IntentInitializer {
       try {
         await this.storeAdapterIntent(intent);
         successCount++;
-      } catch (_err) {
+      } catch {
         // Individual errors already logged in storeAdapterIntent
       }
     }
