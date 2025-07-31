@@ -1,0 +1,1602 @@
+<testsuites id="" name="" tests="390" failures="0" skipped="390" errors="0" time="0.19496900000000006">
+<testsuite name="auth.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="chromium" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="Authentication Flow › Login Process › should display login form on unauthenticated access" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should login successfully with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should show error for invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should require password field" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should register new user successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should show error for existing email" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should maintain session across page reloads" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should logout successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should handle session expiry" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should support keyboard navigation" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should submit form with Enter key" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should have proper ARIA labels" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle network errors gracefully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle server errors" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="chat.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="chromium" tests="24" failures="0" skipped="24" time="0" errors="0">
+<testcase name="Chat Functionality › Basic Chat Interface › should display chat interface correctly" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should enable send button only when message is typed" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should focus message input on page load" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send simple message successfully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send message with Enter key" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle multiline messages with Shift+Enter" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle special characters and emojis" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle long messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle code snippets" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should display message timestamps" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should scroll to latest message" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should persist chat history across page reloads" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should clear chat history" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should show typing indicator during response" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should disable input during response generation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Multi-Intent Queries › should handle multi-intent queries" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle network errors gracefully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle server errors" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should retry failed messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should announce new messages to screen readers" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should maintain focus management" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Performance › should handle large chat histories efficiently" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="chromium" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display dashboard with all main components" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should show loading states during data fetch" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display real data from APIs" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should open app details on card click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app context menu on right click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should support drag and drop reordering" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app statistics and usage data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should search across app content" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should filter by app categories" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should clear search and filters" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should update weather data automatically" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should show notification for new data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should adapt to mobile viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle tablet viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle desktop viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should navigate between dashboard sections" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should maintain state during navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle API failures gracefully" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle partial data failures" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should retry failed requests" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support Enter key to activate cards" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should provide screen reader announcements" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should load dashboard quickly" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should handle many app cards efficiently" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="chromium" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="Integration Workflows › Complete User Journey › should complete full user onboarding flow" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Complete User Journey › should persist user state across browser restart" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should integrate dashboard data with chat queries" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should handle multi-app queries from chat" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should navigate from chat to relevant dashboard apps" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should sync chat history across devices/sessions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle offline/online state transitions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle data conflicts and resolution" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should recover from network interruptions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should handle partial system failures gracefully" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should handle large datasets efficiently" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should maintain performance with concurrent operations" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="firefox" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="Authentication Flow › Login Process › should display login form on unauthenticated access" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should login successfully with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should show error for invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should require password field" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should register new user successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should show error for existing email" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should maintain session across page reloads" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should logout successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should handle session expiry" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should support keyboard navigation" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should submit form with Enter key" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should have proper ARIA labels" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle network errors gracefully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle server errors" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="chat.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="firefox" tests="24" failures="0" skipped="24" time="0" errors="0">
+<testcase name="Chat Functionality › Basic Chat Interface › should display chat interface correctly" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should enable send button only when message is typed" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should focus message input on page load" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send simple message successfully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send message with Enter key" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle multiline messages with Shift+Enter" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle special characters and emojis" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle long messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle code snippets" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should display message timestamps" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should scroll to latest message" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should persist chat history across page reloads" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should clear chat history" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should show typing indicator during response" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should disable input during response generation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Multi-Intent Queries › should handle multi-intent queries" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle network errors gracefully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle server errors" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should retry failed messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should announce new messages to screen readers" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should maintain focus management" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Performance › should handle large chat histories efficiently" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="firefox" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display dashboard with all main components" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should show loading states during data fetch" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display real data from APIs" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should open app details on card click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app context menu on right click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should support drag and drop reordering" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app statistics and usage data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should search across app content" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should filter by app categories" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should clear search and filters" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should update weather data automatically" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should show notification for new data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should adapt to mobile viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle tablet viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle desktop viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should navigate between dashboard sections" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should maintain state during navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle API failures gracefully" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle partial data failures" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should retry failed requests" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support Enter key to activate cards" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should provide screen reader announcements" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should load dashboard quickly" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should handle many app cards efficiently" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="firefox" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="Integration Workflows › Complete User Journey › should complete full user onboarding flow" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Complete User Journey › should persist user state across browser restart" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should integrate dashboard data with chat queries" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should handle multi-app queries from chat" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should navigate from chat to relevant dashboard apps" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should sync chat history across devices/sessions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle offline/online state transitions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle data conflicts and resolution" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should recover from network interruptions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should handle partial system failures gracefully" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should handle large datasets efficiently" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should maintain performance with concurrent operations" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="webkit" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="Authentication Flow › Login Process › should display login form on unauthenticated access" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should login successfully with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should show error for invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should require password field" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should register new user successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should show error for existing email" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should maintain session across page reloads" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should logout successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should handle session expiry" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should support keyboard navigation" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should submit form with Enter key" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should have proper ARIA labels" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle network errors gracefully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle server errors" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="chat.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="webkit" tests="24" failures="0" skipped="24" time="0" errors="0">
+<testcase name="Chat Functionality › Basic Chat Interface › should display chat interface correctly" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should enable send button only when message is typed" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should focus message input on page load" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send simple message successfully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send message with Enter key" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle multiline messages with Shift+Enter" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle special characters and emojis" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle long messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle code snippets" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should display message timestamps" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should scroll to latest message" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should persist chat history across page reloads" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should clear chat history" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should show typing indicator during response" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should disable input during response generation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Multi-Intent Queries › should handle multi-intent queries" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle network errors gracefully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle server errors" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should retry failed messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should announce new messages to screen readers" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should maintain focus management" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Performance › should handle large chat histories efficiently" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="webkit" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display dashboard with all main components" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should show loading states during data fetch" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display real data from APIs" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should open app details on card click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app context menu on right click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should support drag and drop reordering" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app statistics and usage data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should search across app content" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should filter by app categories" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should clear search and filters" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should update weather data automatically" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should show notification for new data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should adapt to mobile viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle tablet viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle desktop viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should navigate between dashboard sections" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should maintain state during navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle API failures gracefully" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle partial data failures" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should retry failed requests" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support Enter key to activate cards" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should provide screen reader announcements" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should load dashboard quickly" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should handle many app cards efficiently" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="webkit" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="Integration Workflows › Complete User Journey › should complete full user onboarding flow" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Complete User Journey › should persist user state across browser restart" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should integrate dashboard data with chat queries" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should handle multi-app queries from chat" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should navigate from chat to relevant dashboard apps" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should sync chat history across devices/sessions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle offline/online state transitions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle data conflicts and resolution" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should recover from network interruptions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should handle partial system failures gracefully" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should handle large datasets efficiently" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should maintain performance with concurrent operations" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Chrome" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="Authentication Flow › Login Process › should display login form on unauthenticated access" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should login successfully with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should show error for invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should require password field" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should register new user successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should show error for existing email" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should maintain session across page reloads" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should logout successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should handle session expiry" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should support keyboard navigation" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should submit form with Enter key" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should have proper ARIA labels" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle network errors gracefully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle server errors" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="chat.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Chrome" tests="24" failures="0" skipped="24" time="0" errors="0">
+<testcase name="Chat Functionality › Basic Chat Interface › should display chat interface correctly" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should enable send button only when message is typed" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should focus message input on page load" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send simple message successfully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send message with Enter key" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle multiline messages with Shift+Enter" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle special characters and emojis" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle long messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle code snippets" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should display message timestamps" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should scroll to latest message" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should persist chat history across page reloads" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should clear chat history" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should show typing indicator during response" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should disable input during response generation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Multi-Intent Queries › should handle multi-intent queries" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle network errors gracefully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle server errors" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should retry failed messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should announce new messages to screen readers" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should maintain focus management" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Performance › should handle large chat histories efficiently" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Chrome" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display dashboard with all main components" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should show loading states during data fetch" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display real data from APIs" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should open app details on card click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app context menu on right click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should support drag and drop reordering" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app statistics and usage data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should search across app content" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should filter by app categories" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should clear search and filters" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should update weather data automatically" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should show notification for new data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should adapt to mobile viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle tablet viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle desktop viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should navigate between dashboard sections" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should maintain state during navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle API failures gracefully" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle partial data failures" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should retry failed requests" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support Enter key to activate cards" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should provide screen reader announcements" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should load dashboard quickly" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should handle many app cards efficiently" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Chrome" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="Integration Workflows › Complete User Journey › should complete full user onboarding flow" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Complete User Journey › should persist user state across browser restart" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should integrate dashboard data with chat queries" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should handle multi-app queries from chat" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should navigate from chat to relevant dashboard apps" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should sync chat history across devices/sessions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle offline/online state transitions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle data conflicts and resolution" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should recover from network interruptions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should handle partial system failures gracefully" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should handle large datasets efficiently" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should maintain performance with concurrent operations" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Safari" tests="16" failures="0" skipped="16" time="0" errors="0">
+<testcase name="Authentication Flow › Login Process › should display login form on unauthenticated access" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should login successfully with valid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should show error for invalid credentials" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should validate email format" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Login Process › should require password field" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should register new user successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should show error for existing email" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Registration Process › should validate password strength" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should maintain session across page reloads" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should logout successfully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Session Management › should handle session expiry" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should support keyboard navigation" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should submit form with Enter key" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Accessibility &amp; UX › should have proper ARIA labels" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle network errors gracefully" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Authentication Flow › Error Handling › should handle server errors" classname="auth.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="chat.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Safari" tests="24" failures="0" skipped="24" time="0" errors="0">
+<testcase name="Chat Functionality › Basic Chat Interface › should display chat interface correctly" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should enable send button only when message is typed" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Basic Chat Interface › should focus message input on page load" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send simple message successfully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should send message with Enter key" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle multiline messages with Shift+Enter" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle special characters and emojis" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle long messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Sending › should handle code snippets" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should display message timestamps" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should scroll to latest message" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should persist chat history across page reloads" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Message Display &amp; History › should clear chat history" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should show typing indicator during response" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Streaming Responses › should disable input during response generation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Multi-Intent Queries › should handle multi-intent queries" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle network errors gracefully" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should handle server errors" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Error Handling › should retry failed messages" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should announce new messages to screen readers" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Accessibility &amp; UX › should maintain focus management" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Chat Functionality › Performance › should handle large chat histories efficiently" classname="chat.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="dashboard.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Safari" tests="26" failures="0" skipped="26" time="0" errors="0">
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display dashboard with all main components" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should show loading states during data fetch" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Dashboard Loading &amp; Display › should display real data from APIs" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should open app details on card click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app context menu on right click" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should support drag and drop reordering" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › App Card Interactions › should show app statistics and usage data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should search across app content" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should filter by app categories" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Search &amp; Filtering › should clear search and filters" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should update weather data automatically" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Real-time Updates › should show notification for new data" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should adapt to mobile viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle tablet viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Responsive Design › should handle desktop viewport" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should navigate between dashboard sections" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Navigation &amp; Routing › should maintain state during navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle API failures gracefully" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should handle partial data failures" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Error Handling › should retry failed requests" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support keyboard navigation" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should support Enter key to activate cards" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should have proper ARIA labels" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Accessibility &amp; UX › should provide screen reader announcements" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should load dashboard quickly" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Dashboard Functionality › Performance › should handle many app cards efficiently" classname="dashboard.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-07-31T18:12:48.539Z" hostname="Mobile Safari" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="Integration Workflows › Complete User Journey › should complete full user onboarding flow" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Complete User Journey › should persist user state across browser restart" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should integrate dashboard data with chat queries" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should handle multi-app queries from chat" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Cross-Feature Integration › should navigate from chat to relevant dashboard apps" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should sync chat history across devices/sessions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle offline/online state transitions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Data Persistence &amp; Sync › should handle data conflicts and resolution" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should recover from network interruptions" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Error Recovery &amp; Resilience › should handle partial system failures gracefully" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should handle large datasets efficiently" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Integration Workflows › Performance &amp; Scalability › should maintain performance with concurrent operations" classname="integration.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>
