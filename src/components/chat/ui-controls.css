@@ -238,7 +238,7 @@
   border-radius: 8px;
   box-shadow: var(--elevation-md);
   margin-top: 2px;
-  z-index: 1002;
+  z-index: 1050;
   overflow: hidden;
   animation: slideDown var(--transition-fast) ease-out;
   /* Compact mini-list design */

@@ -80,7 +80,7 @@
   display: flex;
   flex-direction: column;
   z-index: 1001;
-  overflow: hidden;
+  overflow: visible;
   animation: slideUp 0.3s ease-out;
   transition: all 0.3s ease;
 }
@@ -123,6 +123,10 @@
   align-items: center;
   justify-content: flex-start;
   /* Stable left-aligned layout prevents shifting */
+  border-radius: 16px 16px 0 0;
+  overflow: visible;
+  position: relative;
+  z-index: 100;
 }
 
 .header-left {
@@ -379,7 +383,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-top: 2px;
-  z-index: 1002;
+  z-index: 1050;
   overflow: hidden;
   animation: slideDown 0.15s ease-out;
   /* Compact mini-list design */
@@ -492,6 +496,7 @@
 .messages-area {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 1rem 1rem 0.5rem;
   display: flex;
   flex-direction: column;
@@ -712,6 +717,8 @@
   padding: 0.75rem 1rem 1rem;
   background: white;
   border-top: 1px solid var(--color-border-light);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
 }
 
 .input-wrapper {
@@ -858,7 +865,7 @@
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   margin-top: 0.5rem;
-  z-index: 1003;
+  z-index: 1050;
   min-width: 280px;
   max-width: min(400px, calc(100vw - 2rem));
   overflow: hidden;
@@ -1263,8 +1270,7 @@
 
 /* Force hardware acceleration on animated elements */
 .chatbot-modal,
-.profile-dropdown,
-.model-dropdown {
+.profile-dropdown {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
