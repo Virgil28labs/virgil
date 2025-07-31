@@ -1,0 +1,148 @@
+/* Recent Messages Tab Component Styles */
+
+.recentMessagesTab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+/* Loading State */
+.recentMessagesLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--silver-grey);
+  font-size: 14px;
+}
+
+.loadingSpinner {
+  font-size: 18px;
+  animation: spin 1s linear infinite;
+}
+
+/* Info Section */
+.recentMessagesInfo {
+  background: var(--brand-charcoal);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--silver-grey);
+}
+
+.saveIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--off-white);
+  font-size: 14px;
+}
+
+.statusIcon {
+  color: var(--success-green);
+  font-size: 10px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.syncInfo {
+  margin: 0;
+  color: var(--silver-grey);
+  font-size: 13px;
+}
+
+/* Messages List */
+.recentMessagesList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messagesEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--silver-grey);
+  font-size: 14px;
+}
+
+.messagesEmpty p {
+  margin: 0;
+}
+
+.messagesHeader {
+  padding: 0.75rem;
+  background: var(--brand-charcoal);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.messageCount {
+  color: var(--silver-grey);
+  font-size: 13px;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+/* Scrollbar Styling */
+.messagesContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messagesContainer::-webkit-scrollbar-track {
+  background: var(--brand-charcoal);
+  border-radius: 3px;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb {
+  background: var(--silver-grey);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-medium-gray);
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .loadingSpinner {
+    animation: none;
+  }
+  
+  .statusIcon {
+    animation: none;
+  }
+}

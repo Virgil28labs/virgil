@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import type { DashboardContext } from '../../services/DashboardContextService';
-import './ui-controls.css';
+import type { DashboardContext } from '../../../services/DashboardContextService';
+import styles from './StatusPills.module.css';
 
 interface StatusPillsProps {
   showMemoryIndicator: boolean;
@@ -28,10 +28,10 @@ const StatusPills = memo(function StatusPills({
   const memoryTitle = `Memory & Conversations (${markedMemoriesCount} marked memories)`;
 
   return (
-    <div className="status-cluster">
+    <div className={styles.cluster}>
       {showMemoryIndicator && (
         <button
-          className="status-pill memory-pill"
+          className={styles.memoryPill}
           onClick={onMemoryClick}
           title={memoryTitle}
         >
@@ -40,7 +40,7 @@ const StatusPills = memo(function StatusPills({
       )}
       {isRealtimeConnected !== undefined && (
         <div 
-          className={`status-pill sync-status ${isRealtimeConnected ? 'connected' : 'disconnected'}`}
+          className={isRealtimeConnected ? styles.syncConnected : styles.syncDisconnected}
           title={isRealtimeConnected ? 'Sync connected' : 'Sync disconnected'}
         >
           {isRealtimeConnected ? '🔄' : '⚠️'}

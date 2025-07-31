@@ -1,0 +1,293 @@
+/**
+ * Chat Header Component Styles
+ * 
+ * Main header containing logo, status pills, controls
+ */
+
+/* Header Container */
+.header {
+  background: var(--off-white);
+  border-bottom: 1px solid var(--silver-grey);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 100;
+}
+
+/* Left Section - Logo and Controls */
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Right Section - Window Controls */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* Assistant Name/Logo */
+.assistantName {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--violet-purple);
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.assistantName:hover {
+  color: var(--deep-plum);
+}
+
+.assistantName:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* New Chat Button */
+.newChatButton {
+  width: 54px;
+  height: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  background: rgba(255, 159, 67, 0.12);
+  border: 1px solid rgba(255, 159, 67, 0.25);
+  color: rgba(255, 159, 67, 0.9);
+}
+
+.newChatButton:hover {
+  background: rgba(255, 159, 67, 0.2);
+  border-color: rgba(255, 159, 67, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 159, 67, 0.15);
+}
+
+/* Base Tooltip */
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1002;
+  background: var(--deep-plum);
+  color: white;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--deep-plum);
+}
+
+/* Enhanced Context Tooltip */
+.enhancedTooltip {
+  composes: tooltip;
+  width: 420px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Tooltip Content */
+.tooltipContent strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--soft-pink);
+}
+
+.tooltipContent p {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+/* Tooltip Header */
+.tooltipHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltipHeader strong {
+  font-size: 1rem;
+  color: var(--soft-pink);
+  margin: 0;
+}
+
+.lastUpdated {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Context Grid Layout */
+.contextRow {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.contextRow:last-child {
+  border-bottom: none;
+}
+
+.contextSection {
+  flex: 1;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  min-width: 0;
+  transition: background-color 0.2s ease;
+  border-radius: 6px;
+  padding: 4px;
+  margin: -4px;
+}
+
+.contextSection:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.contextSectionFull {
+  composes: contextSection;
+  flex: 1 1 100%;
+}
+
+.contextSection:empty {
+  display: none;
+}
+
+/* Context Elements */
+.contextIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.contextDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.contextLabel {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.contextValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0.125rem 0;
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contextMeta {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Custom Prompt Indicator */
+.customPromptIndicator {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.8rem;
+  color: var(--amber-orange);
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar styling */
+.enhancedTooltip::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enhancedTooltip::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.enhancedTooltip::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.enhancedTooltip::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem;
+  }
+  
+  .assistantName {
+    font-size: 1rem;
+  }
+  
+  .newChatButton {
+    width: 48px;
+    height: 18px;
+    font-size: 9px;
+  }
+  
+  .tooltip,
+  .enhancedTooltip {
+    width: 280px;
+    max-width: calc(100vw - 2rem);
+  }
+}

@@ -1,0 +1,218 @@
+/**
+ * Bulk Message Actions Component Styles
+ * 
+ * Toolbar for bulk operations on selected messages
+ */
+
+/* Main Container */
+.bulkMessageActions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--off-white);
+  border-top: 2px solid var(--violet-purple);
+  box-shadow: var(--elevation-lg);
+  padding: 1rem;
+  z-index: 1001;
+  animation: slideUp var(--transition-normal) ease-out;
+}
+
+/* Header Section */
+.bulkActionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.selectionInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.selectionCount {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--deep-plum);
+}
+
+.selectAllButton {
+  background: none;
+  border: 1px solid var(--silver-grey);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  color: var(--violet-purple);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.selectAllButton:hover {
+  background: color-mix(in srgb, var(--violet-purple) 10%, transparent);
+  border-color: var(--violet-purple);
+}
+
+.closeBulkActions {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--silver-grey);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.closeBulkActions:hover {
+  background: color-mix(in srgb, var(--silver-grey) 20%, transparent);
+  color: var(--deep-plum);
+}
+
+/* Action Buttons */
+.bulkActionsButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bulkActionButton {
+  background: var(--off-white);
+  border: 1px solid var(--silver-grey);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.bulkActionButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-md);
+}
+
+.bulkActionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Specific button styles */
+.copyButton {
+  composes: bulkActionButton;
+}
+
+.copyButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--context-green) 10%, var(--off-white));
+  border-color: var(--context-green);
+  color: var(--context-green);
+}
+
+.shareButton {
+  composes: bulkActionButton;
+}
+
+.shareButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--lavender) 10%, var(--off-white));
+  border-color: var(--lavender);
+  color: var(--lavender);
+}
+
+.exportButton {
+  composes: bulkActionButton;
+}
+
+.exportButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--deep-plum) 10%, var(--off-white));
+  border-color: var(--deep-plum);
+  color: var(--deep-plum);
+}
+
+.importantButton {
+  composes: bulkActionButton;
+}
+
+.importantButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--soft-pink) 10%, var(--off-white));
+  border-color: var(--soft-pink);
+  color: var(--soft-pink);
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Accessibility */
+@media (prefers-contrast: high) {
+  .bulkMessageActions {
+    border-top: 3px solid var(--violet-purple);
+  }
+  
+  .bulkActionButton {
+    border: 2px solid var(--silver-grey);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulkMessageActions {
+    animation: none;
+  }
+  
+  .bulkActionButton:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .bulkMessageActions {
+    padding: 0.75rem;
+  }
+  
+  .bulkActionsHeader {
+    margin-bottom: 0.75rem;
+  }
+  
+  .selectionInfo {
+    gap: 0.75rem;
+  }
+  
+  .selectionCount {
+    font-size: 0.85rem;
+  }
+  
+  .selectAllButton {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .closeBulkActions {
+    font-size: 1rem;
+    padding: 0.25rem;
+  }
+  
+  .bulkActionsButtons {
+    gap: 0.5rem;
+  }
+  
+  .bulkActionButton {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    min-width: 90px;
+  }
+}

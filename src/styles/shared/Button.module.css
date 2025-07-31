@@ -1,0 +1,153 @@
+/**
+ * Shared Button Styles
+ * 
+ * Reusable button patterns used across the application
+ * Import in components: import buttonStyles from '@/styles/shared/Button.module.css'
+ */
+
+/* Base Button Styles */
+.base {
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.base:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+}
+
+/* Pill Style (used in status pills and model selector) */
+.pill {
+  composes: base;
+  height: 20px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 0 0.75rem;
+  flex-shrink: 0;
+}
+
+.pillCompact {
+  composes: pill;
+  width: 54px;
+  padding: 0;
+}
+
+/* Icon Button Style */
+.icon {
+  composes: base;
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  padding: 0;
+  color: var(--silver-grey);
+}
+
+.icon:hover {
+  background: var(--off-white);
+  color: var(--deep-plum);
+}
+
+/* Color Variants */
+.variantGhost {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.variantSubtle {
+  border: 1px solid;
+}
+
+/* Subtle color mixing for pills */
+.colorPrimary {
+  background: color-mix(in srgb, var(--violet-purple) 12%, transparent);
+  border-color: color-mix(in srgb, var(--violet-purple) 25%, transparent);
+  color: color-mix(in srgb, var(--violet-purple) 90%, var(--deep-plum));
+}
+
+.colorPrimary:hover {
+  background: color-mix(in srgb, var(--violet-purple) 20%, transparent);
+  border-color: color-mix(in srgb, var(--violet-purple) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.colorSuccess {
+  background: color-mix(in srgb, var(--context-green) 12%, transparent);
+  border-color: color-mix(in srgb, var(--context-green) 25%, transparent);
+  color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
+}
+
+.colorSuccess:hover {
+  background: color-mix(in srgb, var(--context-green) 20%, transparent);
+  border-color: color-mix(in srgb, var(--context-green) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.colorAccent {
+  background: color-mix(in srgb, var(--soft-pink) 12%, transparent);
+  border-color: color-mix(in srgb, var(--soft-pink) 25%, transparent);
+  color: color-mix(in srgb, var(--soft-pink) 90%, var(--deep-plum));
+}
+
+.colorAccent:hover {
+  background: color-mix(in srgb, var(--soft-pink) 20%, transparent);
+  border-color: color-mix(in srgb, var(--soft-pink) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.colorSecondary {
+  background: color-mix(in srgb, var(--lavender) 12%, transparent);
+  border-color: color-mix(in srgb, var(--lavender) 25%, transparent);
+  color: color-mix(in srgb, var(--lavender) 90%, var(--deep-plum));
+}
+
+.colorSecondary:hover {
+  background: color-mix(in srgb, var(--lavender) 20%, transparent);
+  border-color: color-mix(in srgb, var(--lavender) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+.colorNeutral {
+  background: color-mix(in srgb, var(--silver-grey) 12%, var(--off-white));
+  border-color: color-mix(in srgb, var(--silver-grey) 25%, var(--off-white));
+  color: color-mix(in srgb, var(--silver-grey) 90%, var(--deep-plum));
+}
+
+.colorNeutral:hover {
+  background: color-mix(in srgb, var(--silver-grey) 20%, var(--off-white));
+  border-color: color-mix(in srgb, var(--silver-grey) 40%, var(--off-white));
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .pill {
+    height: 18px;
+    font-size: 9px;
+  }
+  
+  .pillCompact {
+    width: 48px;
+  }
+  
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}

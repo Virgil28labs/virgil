@@ -1,0 +1,279 @@
+/* Advanced Memory Search Component Styles */
+
+.advancedMemorySearch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--brand-charcoal);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Header */
+.searchHeader {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchInputContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  background: var(--brand-gray);
+  border: 1px solid var(--silver-grey);
+  border-radius: 8px;
+  color: var(--off-white);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--violet-purple);
+  box-shadow: 0 0 0 3px rgba(178, 77, 216, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--brand-medium-gray);
+}
+
+.advancedToggle {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--silver-grey);
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.advancedToggle:hover {
+  color: var(--off-white);
+}
+
+.advancedToggle:focus {
+  outline: none;
+  color: var(--violet-purple);
+}
+
+.clearFilters {
+  padding: 0.5rem 1rem;
+  background: var(--brand-gray);
+  border: 1px solid var(--silver-grey);
+  border-radius: 6px;
+  color: var(--off-white);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clearFilters:hover {
+  background: var(--brand-gray-dark);
+  border-color: var(--violet-purple);
+}
+
+.clearFilters:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(178, 77, 216, 0.1);
+}
+
+/* Advanced Filters */
+.advancedFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--brand-gray);
+  border-radius: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+.filterRow {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-size: 12px;
+  color: var(--silver-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filterGroup select {
+  padding: 0.5rem;
+  background: var(--brand-charcoal);
+  border: 1px solid var(--silver-grey);
+  border-radius: 6px;
+  color: var(--off-white);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterGroup select:hover {
+  border-color: var(--violet-purple);
+}
+
+.filterGroup select:focus {
+  outline: none;
+  border-color: var(--violet-purple);
+  box-shadow: 0 0 0 3px rgba(178, 77, 216, 0.1);
+}
+
+/* Custom Date Range */
+.customDateRange {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: var(--brand-charcoal);
+  border-radius: 6px;
+  animation: fadeIn 0.3s ease;
+}
+
+.dateInputGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dateInputGroup label {
+  font-size: 12px;
+  color: var(--silver-grey);
+}
+
+.dateInputGroup input[type="date"] {
+  padding: 0.5rem;
+  background: var(--brand-gray);
+  border: 1px solid var(--silver-grey);
+  border-radius: 6px;
+  color: var(--off-white);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.dateInputGroup input[type="date"]:focus {
+  outline: none;
+  border-color: var(--violet-purple);
+  box-shadow: 0 0 0 3px rgba(178, 77, 216, 0.1);
+}
+
+/* Tag Filter */
+.tagFilter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tagFilter label {
+  font-size: 12px;
+  color: var(--silver-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagChip {
+  padding: 0.25rem 0.75rem;
+  background: var(--brand-charcoal);
+  border: 1px solid var(--silver-grey);
+  border-radius: 16px;
+  color: var(--silver-grey);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tagChip:hover {
+  background: var(--brand-gray-dark);
+  color: var(--off-white);
+  border-color: var(--violet-purple);
+}
+
+.tagChip.active {
+  background: var(--violet-purple);
+  color: var(--off-white);
+  border-color: var(--violet-purple);
+}
+
+.tagChip:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(178, 77, 216, 0.1);
+}
+
+/* Search Results Info */
+.searchResultsInfo {
+  padding: 0.75rem;
+  background: var(--brand-gray);
+  border-radius: 6px;
+  text-align: center;
+  color: var(--silver-grey);
+  font-size: 13px;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .advancedFilters,
+  .customDateRange {
+    animation: none;
+  }
+}
+
+/* Dark mode color scheme for date inputs */
+@media (prefers-color-scheme: dark) {
+  .dateInputGroup input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}

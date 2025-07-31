@@ -1,0 +1,140 @@
+/* Shared Animation Keyframes Module */
+
+/* Basic Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Desktop-specific smooth animations */
+@keyframes smoothPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gentleShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+/* Spinning Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Export animation classes */
+.fadeIn {
+  animation: fadeIn 0.3s ease;
+}
+
+.slideDown {
+  animation: slideDown 0.3s ease;
+}
+
+.slideUp {
+  animation: slideUp 0.3s ease;
+}
+
+.smoothPulse {
+  animation: smoothPulse 2s ease-in-out infinite;
+}
+
+.gentleShake {
+  animation: gentleShake 0.5s ease-in-out;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.scaleIn {
+  animation: scaleIn 0.3s ease;
+}
+
+/* Animation Utilities */
+.animationDelayShort {
+  animation-delay: 0.1s;
+}
+
+.animationDelayMedium {
+  animation-delay: 0.2s;
+}
+
+.animationDelayLong {
+  animation-delay: 0.3s;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .fadeIn,
+  .slideDown,
+  .slideUp,
+  .smoothPulse,
+  .gentleShake,
+  .spin,
+  .pulse,
+  .scaleIn {
+    animation: none;
+  }
+}

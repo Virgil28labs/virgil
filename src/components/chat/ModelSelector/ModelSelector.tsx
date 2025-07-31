@@ -1,6 +1,6 @@
-import { memo, useState, useCallback, useEffect } from 'react';
-import type { ModelOption } from '../../types/chat.types';
-import './ui-controls.css';
+import { memo, useState, useCallback, useEffect, useRef } from 'react';
+import type { ModelOption } from '../../../types/chat.types';
+import styles from './ModelSelector.module.css';
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -14,6 +14,7 @@ const ModelSelector = memo(function ModelSelector({
   onModelChange,
 }: ModelSelectorProps) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Get current model info
   const getCurrentModel = useCallback(() => {
@@ -31,7 +32,7 @@ const ModelSelector = memo(function ModelSelector({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showDropdown && !(event.target as Element)?.closest('.model-selector')) {
+      if (showDropdown && !containerRef.current?.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     };
@@ -59,9 +60,9 @@ const ModelSelector = memo(function ModelSelector({
   };
 
   return (
-    <div className="model-selector">
+    <div className={styles.container} ref={containerRef}>
       <button
-        className="model-dropdown-btn compact"
+        className={`${styles.button} ${styles.buttonCompact}`}
         onClick={() => setShowDropdown(!showDropdown)}
         aria-expanded={showDropdown}
         aria-haspopup="listbox"
@@ -71,11 +72,11 @@ const ModelSelector = memo(function ModelSelector({
       </button>
 
       {showDropdown && (
-        <div className="model-dropdown" role="listbox">
+        <div className={styles.dropdown} role="listbox">
           {models.map(model => (
             <div
               key={model.id}
-              className={`model-option ${selectedModel === model.id ? 'selected' : ''}`}
+              className={`${styles.option} ${selectedModel === model.id ? styles.optionSelected : ''}`}
               onClick={() => handleModelChange(model.id)}
               data-keyboard-nav
               tabIndex={0}
@@ -88,8 +89,8 @@ const ModelSelector = memo(function ModelSelector({
                 }
               }}
             >
-              <div className="model-name">{model.name}</div>
-              <div className="model-description">{model.description}</div>
+              <div className={styles.name}>{model.name}</div>
+              <div className={styles.description}>{model.description}</div>
             </div>
           ))}
         </div>

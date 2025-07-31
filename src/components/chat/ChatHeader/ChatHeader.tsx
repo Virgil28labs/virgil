@@ -1,12 +1,12 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
-import type { ModelOption } from '../../types/chat.types';
-import type { DashboardContext } from '../../services/DashboardContextService';
-import type { StoredConversation, MarkedMemory } from '../../services/SupabaseMemoryService';
-import { StatusPills } from './StatusPills';
-import { WindowControls } from './WindowControls';
-import { ModelSelector } from './ModelSelector';
-import { ProfileDropdown } from './ProfileDropdown';
-import './chat-interface.css';
+import type { ModelOption } from '../../../types/chat.types';
+import type { DashboardContext } from '../../../services/DashboardContextService';
+import type { StoredConversation, MarkedMemory } from '../../../services/SupabaseMemoryService';
+import { StatusPills } from '../StatusPills/StatusPills';
+import { WindowControls } from '../WindowControls/WindowControls';
+import { ModelSelector } from '../ModelSelector/ModelSelector';
+import { ProfileDropdown } from '../ProfileDropdown/ProfileDropdown';
+import styles from './ChatHeader.module.css';
 
 interface ChatHeaderProps {
   // Window state
@@ -97,11 +97,11 @@ const ChatHeader = memo(function ChatHeader({
   }, [onMinimize]);
 
   return (
-    <div className="chatbot-header">
-      <div className="header-left">
+    <div className={styles.header}>
+      <div className={styles.headerLeft}>
         {/* Virgil Logo/Name */}
         <div
-          className="assistant-name clickable-logo"
+          className={styles.assistantName}
           onClick={handleLogoClick}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
@@ -110,35 +110,34 @@ const ChatHeader = memo(function ChatHeader({
           role="button"
           tabIndex={0}
           aria-label="Close chat or view system prompt"
-          style={{ cursor: 'pointer', userSelect: 'none' }}
         >
           Virgil
           {showTooltip && dashboardContext && (
-            <div className="tooltip enhanced-context-tooltip">
-              <div className="tooltip-content">
-                <div className="tooltip-header">
+            <div className={styles.enhancedTooltip}>
+              <div className={styles.tooltipContent}>
+                <div className={styles.tooltipHeader}>
                   <strong>🧠 Virgil's Context Awareness</strong>
-                  <span className="last-updated">Updated: {dashboardContext.currentTime}</span>
+                  <span className={styles.lastUpdated}>Updated: {dashboardContext.currentTime}</span>
                 </div>
                 
                 {/* Time & Location Row */}
-                <div className="context-row">
-                  <div className="context-section">
-                    <span className="context-icon">⏰</span>
-                    <div className="context-details">
-                      <div className="context-label">Time</div>
-                      <div className="context-value">{dashboardContext.currentTime}</div>
-                      <div className="context-meta">{dashboardContext.timeOfDay} • {dashboardContext.dayOfWeek}</div>
+                <div className={styles.contextRow}>
+                  <div className={styles.contextSection}>
+                    <span className={styles.contextIcon}>⏰</span>
+                    <div className={styles.contextDetails}>
+                      <div className={styles.contextLabel}>Time</div>
+                      <div className={styles.contextValue}>{dashboardContext.currentTime}</div>
+                      <div className={styles.contextMeta}>{dashboardContext.timeOfDay} • {dashboardContext.dayOfWeek}</div>
                     </div>
                   </div>
                   
                   {dashboardContext.location.city && (
-                    <div className="context-section">
-                      <span className="context-icon">📍</span>
-                      <div className="context-details">
-                        <div className="context-label">Location</div>
-                        <div className="context-value">{dashboardContext.location.city}</div>
-                        <div className="context-meta">
+                    <div className={styles.contextSection}>
+                      <span className={styles.contextIcon}>📍</span>
+                      <div className={styles.contextDetails}>
+                        <div className={styles.contextLabel}>Location</div>
+                        <div className={styles.contextValue}>{dashboardContext.location.city}</div>
+                        <div className={styles.contextMeta}>
                           {dashboardContext.location.region || dashboardContext.location.country || 
                            (dashboardContext.location.hasGPS ? 'GPS' : 'IP-based')}
                         </div>
@@ -149,32 +148,32 @@ const ChatHeader = memo(function ChatHeader({
                 
                 {/* Weather & User Row */}
                 {(dashboardContext.weather.hasData || dashboardContext.user.name) && (
-                  <div className="context-row">
+                  <div className={styles.contextRow}>
                     {dashboardContext.weather.hasData && (
-                      <div className="context-section">
-                        <span className="context-icon">🌤️</span>
-                        <div className="context-details">
-                          <div className="context-label">Weather</div>
-                          <div className="context-value">
+                      <div className={styles.contextSection}>
+                        <span className={styles.contextIcon}>🌤️</span>
+                        <div className={styles.contextDetails}>
+                          <div className={styles.contextLabel}>Weather</div>
+                          <div className={styles.contextValue}>
                             {dashboardContext.weather.temperature}°{dashboardContext.weather.unit === 'fahrenheit' ? 'F' : 'C'}
                           </div>
-                          <div className="context-meta">{dashboardContext.weather.description}</div>
+                          <div className={styles.contextMeta}>{dashboardContext.weather.description}</div>
                         </div>
                       </div>
                     )}
                     
                     {dashboardContext.user.isAuthenticated && (
-                      <div className="context-section">
-                        <span className="context-icon">👤</span>
-                        <div className="context-details">
-                          <div className="context-label">User</div>
-                          <div className="context-value">
+                      <div className={styles.contextSection}>
+                        <span className={styles.contextIcon}>👤</span>
+                        <div className={styles.contextDetails}>
+                          <div className={styles.contextLabel}>User</div>
+                          <div className={styles.contextValue}>
                             {dashboardContext.user.profile?.nickname || 
                              dashboardContext.user.profile?.fullName || 
                              dashboardContext.user.name || 
                              'User'}
                           </div>
-                          <div className="context-meta">
+                          <div className={styles.contextMeta}>
                             Session: {Math.floor(dashboardContext.activity.timeSpentInSession / 60000)}m
                           </div>
                         </div>
@@ -185,25 +184,25 @@ const ChatHeader = memo(function ChatHeader({
                 
                 {/* Device & Apps Row */}
                 {(dashboardContext.device.hasData || (dashboardContext.apps && Object.keys(dashboardContext.apps.apps).length > 0)) && (
-                  <div className="context-row">
+                  <div className={styles.contextRow}>
                     {dashboardContext.device.hasData && (
-                      <div className="context-section">
-                        <span className="context-icon">💻</span>
-                        <div className="context-details">
-                          <div className="context-label">Device</div>
-                          <div className="context-value">{dashboardContext.device.browser || 'Browser'}</div>
-                          <div className="context-meta">{dashboardContext.device.os || dashboardContext.environment.deviceType}</div>
+                      <div className={styles.contextSection}>
+                        <span className={styles.contextIcon}>💻</span>
+                        <div className={styles.contextDetails}>
+                          <div className={styles.contextLabel}>Device</div>
+                          <div className={styles.contextValue}>{dashboardContext.device.browser || 'Browser'}</div>
+                          <div className={styles.contextMeta}>{dashboardContext.device.os || dashboardContext.environment.deviceType}</div>
                         </div>
                       </div>
                     )}
                     
                     {dashboardContext.apps && Object.keys(dashboardContext.apps.apps).length > 0 && (
-                      <div className="context-section">
-                        <span className="context-icon">📱</span>
-                        <div className="context-details">
-                          <div className="context-label">Active Apps</div>
-                          <div className="context-value">{dashboardContext.apps.activeApps.length} active</div>
-                          <div className="context-meta">
+                      <div className={styles.contextSection}>
+                        <span className={styles.contextIcon}>📱</span>
+                        <div className={styles.contextDetails}>
+                          <div className={styles.contextLabel}>Active Apps</div>
+                          <div className={styles.contextValue}>{dashboardContext.apps.activeApps.length} active</div>
+                          <div className={styles.contextMeta}>
                             {dashboardContext.apps.activeApps.slice(0, 3).join(', ')}
                             {dashboardContext.apps.activeApps.length > 3 && '...'}
                           </div>
@@ -215,12 +214,12 @@ const ChatHeader = memo(function ChatHeader({
                 
                 {/* Activity if present */}
                 {dashboardContext.activity.recentActions.length > 0 && (
-                  <div className="context-row">
-                    <div className="context-section full-width">
-                      <span className="context-icon">🎯</span>
-                      <div className="context-details">
-                        <div className="context-label">Recent Activity</div>
-                        <div className="context-value">
+                  <div className={styles.contextRow}>
+                    <div className={styles.contextSectionFull}>
+                      <span className={styles.contextIcon}>🎯</span>
+                      <div className={styles.contextDetails}>
+                        <div className={styles.contextLabel}>Recent Activity</div>
+                        <div className={styles.contextValue}>
                           {dashboardContext.activity.recentActions[dashboardContext.activity.recentActions.length - 1]}
                         </div>
                       </div>
@@ -229,7 +228,7 @@ const ChatHeader = memo(function ChatHeader({
                 )}
                 
                 {systemPromptInfo.hasCustomPrompt && (
-                  <div className="custom-prompt-indicator">
+                  <div className={styles.customPromptIndicator}>
                     ✏️ Custom prompt active
                   </div>
                 )}
@@ -239,12 +238,12 @@ const ChatHeader = memo(function ChatHeader({
           
           {/* Fallback for when no context is available */}
           {showTooltip && !dashboardContext && (
-            <div className="tooltip">
-              <div className="tooltip-content">
+            <div className={styles.tooltip}>
+              <div className={styles.tooltipContent}>
                 <strong>System Prompt:</strong>
                 <p>{systemPromptInfo.prompt}</p>
                 {systemPromptInfo.hasCustomPrompt && (
-                  <small style={{ color: 'var(--color-active)', marginTop: '8px', display: 'block' }}>
+                  <small style={{ color: 'var(--amber-orange)', marginTop: '8px', display: 'block' }}>
                     ✏️ Custom prompt active
                   </small>
                 )}
@@ -282,7 +281,7 @@ const ChatHeader = memo(function ChatHeader({
 
         {/* New Chat Button */}
         <button
-          className="status-pill new-chat-pill"
+          className={styles.newChatButton}
           onClick={onNewChat}
           title={messageCount > 0 ? 'Start a new conversation (current one will be saved to memory)' : 'Start a new conversation'}
         >
@@ -291,7 +290,7 @@ const ChatHeader = memo(function ChatHeader({
       </div>
 
       {/* Window Controls */}
-      <div className="header-right">
+      <div className={styles.headerRight}>
         <WindowControls
           windowSize={windowSize}
           onSizeToggle={onSizeToggle}

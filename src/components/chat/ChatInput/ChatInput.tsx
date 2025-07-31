@@ -1,6 +1,6 @@
 import React, { memo, useRef, useEffect, useCallback } from 'react';
-import type { DashboardContext } from '../../services/DashboardContextService';
-import './chat-interface.css';
+import type { DashboardContext } from '../../../services/DashboardContextService';
+import styles from './ChatInput.module.css';
 
 interface ChatInputProps {
   input: string;
@@ -80,12 +80,12 @@ const ChatInput = memo(function ChatInput({
   const quickActions = generateQuickActions();
 
   const renderQuickActions = () => (
-    <div className="quick-actions">
-      <div className="quick-title">Quick help:</div>
+    <div className={styles.quickActions}>
+      <div className={styles.quickTitle}>Quick help:</div>
       {quickActions.map((action, index) => (
         <button
           key={index}
-          className="quick-btn"
+          className={styles.quickButton}
           onClick={() => onQuickAction(action)}
           data-keyboard-nav
           aria-label={`Quick action: ${action}`}
@@ -102,8 +102,8 @@ const ChatInput = memo(function ChatInput({
       {showQuickActions && renderQuickActions()}
 
       {/* Input Form */}
-      <form onSubmit={onSubmit} className="input-area" role="form">
-        <div className="input-wrapper">
+      <form onSubmit={onSubmit} className={styles.inputArea} role="form">
+        <div className={styles.inputWrapper}>
           <label htmlFor="chat-input" className="sr-only">Type your message to Virgil</label>
           <input
             ref={activeRef}
@@ -114,7 +114,7 @@ const ChatInput = memo(function ChatInput({
             onKeyDown={onKeyDown}
             placeholder="Type your message..."
             disabled={isTyping}
-            className="msg-input"
+            className={styles.messageInput}
             aria-label="Type your message to Virgil"
             aria-describedby={error ? 'chat-error' : undefined}
             autoComplete="off"
@@ -122,7 +122,7 @@ const ChatInput = memo(function ChatInput({
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="send-btn"
+            className={styles.sendButton}
             title="Send message"
             aria-label={isTyping ? 'Sending message' : 'Send message'}
           >

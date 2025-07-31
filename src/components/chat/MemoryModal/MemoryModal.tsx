@@ -1,16 +1,16 @@
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import type { StoredConversation, MarkedMemory } from '../../services/SupabaseMemoryService';
-import { SupabaseMemoryService } from '../../services/SupabaseMemoryService';
-import { vectorMemoryService } from '../../services/VectorMemoryService';
-import { ConversationView } from './ConversationView';
-import { AdvancedMemorySearch } from './AdvancedMemorySearch';
-import { RecentMessagesTab } from './RecentMessagesTab';
-import type { ChatMessage } from '../../types/chat.types';
-import { dashboardContextService } from '../../services/DashboardContextService';
-import { timeService } from '../../services/TimeService';
-import { logger } from '../../lib/logger';
-import './memory-modal-modern.css';
+import type { StoredConversation, MarkedMemory } from '../../../services/SupabaseMemoryService';
+import { SupabaseMemoryService } from '../../../services/SupabaseMemoryService';
+import { vectorMemoryService } from '../../../services/VectorMemoryService';
+import { ConversationView } from '../ConversationView/ConversationView';
+import { AdvancedMemorySearch } from '../AdvancedMemorySearch/AdvancedMemorySearch';
+import { RecentMessagesTab } from '../RecentMessagesTab/RecentMessagesTab';
+import type { ChatMessage } from '../../../types/chat.types';
+import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
+import { logger } from '../../../lib/logger';
+import styles from './MemoryModal.module.css';
 
 interface MemoryModalProps {
   isOpen: boolean;
@@ -244,8 +244,8 @@ const MemoryModal = memo(function MemoryModal({
   // Show conversation detail if a conversation is selected
   if (selectedConversation) {
     return ReactDOM.createPortal(
-      <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
-        <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modalBackdrop} onClick={handleBackdropClick}>
+        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <ConversationView
             conversation={selectedConversation}
             onBack={handleBackToList}
@@ -258,12 +258,12 @@ const MemoryModal = memo(function MemoryModal({
   }
 
   return ReactDOM.createPortal(
-    <div className="memory-modal-backdrop" onClick={handleBackdropClick}>
-      <div className="memory-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="memory-modal-header">
+    <div className={styles.modalBackdrop} onClick={handleBackdropClick}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
           <h3>Memory & Conversations</h3>
           <button
-            className="close-btn"
+            className={styles.closeButton}
             onClick={onClose}
             title="Close memory viewer"
             aria-label="Close memory viewer"
@@ -272,7 +272,7 @@ const MemoryModal = memo(function MemoryModal({
           </button>
         </div>
 
-        <div className="memory-modal-content">
+        <div className={styles.modalContent}>
           <AdvancedMemorySearch
             memories={markedMemories}
             conversations={recentConversations}
@@ -281,65 +281,65 @@ const MemoryModal = memo(function MemoryModal({
             onToggleExpanded={toggleAdvancedSearch}
           />
 
-          <div className="memory-tabs">
-            <div className="memory-tabs-header">
+          <div className={styles.tabs}>
+            <div className={styles.tabsHeader}>
               <button
-                className={`memory-tab-btn ${activeTab === 'memories' ? 'active' : ''}`}
+                className={`${styles.tabButton} ${activeTab === 'memories' ? styles.active : ''}`}
                 onClick={() => setActiveTab('memories')}
               >
                 Marked Memories ({markedMemories.length})
               </button>
               <button
-                className={`memory-tab-btn ${activeTab === 'recent' ? 'active' : ''}`}
+                className={`${styles.tabButton} ${activeTab === 'recent' ? styles.active : ''}`}
                 onClick={() => setActiveTab('recent')}
               >
                 Recent Messages
               </button>
               <button
-                className={`memory-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+                className={`${styles.tabButton} ${activeTab === 'history' ? styles.active : ''}`}
                 onClick={() => setActiveTab('history')}
               >
                 Full Chat History
               </button>
               <button
-                className={`memory-tab-btn ${activeTab === 'summaries' ? 'active' : ''}`}
+                className={`${styles.tabButton} ${activeTab === 'summaries' ? styles.active : ''}`}
                 onClick={() => setActiveTab('summaries')}
               >
                 Daily Summaries ({dailySummaries.length})
               </button>
               <button
-                className={`memory-tab-btn ${activeTab === 'insights' ? 'active' : ''}`}
+                className={`${styles.tabButton} ${activeTab === 'insights' ? styles.active : ''}`}
                 onClick={() => setActiveTab('insights')}
               >
                 Insights
               </button>
             </div>
 
-            <div className="memory-tabs-content">
+            <div className={styles.tabsContent}>
               {activeTab === 'memories' && (
-                <div className="memory-tab-panel">
-                  <div className="memory-list">
+                <div className={styles.tabPanel}>
+                  <div className={styles.memoryList}>
                     {categorizedMemories.size === 0 ? (
-                      <div className="memory-empty">
+                      <div className={styles.memoryEmpty}>
                         {filteredResults.memories.length !== markedMemories.length
                           ? 'No memories found with current search criteria'
                           : 'No marked memories yet. Mark important messages to remember them.'}
                       </div>
                     ) : (
                       Array.from(categorizedMemories.entries()).map(([category, memories]) => (
-                        <div key={category} className="memory-category">
-                          <h4 className="category-header">{category} ({memories.length})</h4>
-                          <div className="category-memories">
+                        <div key={category} className={styles.memoryCategory}>
+                          <h4 className={styles.categoryHeader}>{category} ({memories.length})</h4>
+                          <div className={styles.categoryMemories}>
                             {memories.map(memory => (
-                              <div key={memory.id} className="memory-item">
-                                <div className="memory-content">{memory.content}</div>
-                                <div className="memory-meta">
-                                  <span className="memory-context">{memory.context}</span>
-                                  <span className="memory-time">
+                              <div key={memory.id} className={styles.memoryItem}>
+                                <div className={styles.memoryContent}>{memory.content}</div>
+                                <div className={styles.memoryMeta}>
+                                  <span className={styles.memoryContext}>{memory.context}</span>
+                                  <span className={styles.memoryTime}>
                                     {SupabaseMemoryService.timeAgo(memory.timestamp)}
                                   </span>
                                   <button
-                                    className="memory-delete"
+                                    className={styles.memoryDelete}
                                     onClick={() => handleDeleteMemory(memory.id)}
                                     title="Forget this memory"
                                     aria-label="Delete this memory"
@@ -359,7 +359,7 @@ const MemoryModal = memo(function MemoryModal({
               )}
 
               {activeTab === 'recent' && (
-                <div className="memory-tab-panel">
+                <div className={styles.tabPanel}>
                   <RecentMessagesTab
                     onMarkAsImportant={handleMarkAsImportantFromDetail}
                   />
@@ -367,16 +367,16 @@ const MemoryModal = memo(function MemoryModal({
               )}
 
               {activeTab === 'history' && (
-                <div className="memory-tab-panel">
-                  <div className="chat-history-info">
+                <div className={styles.tabPanel}>
+                  <div className={styles.chatHistoryInfo}>
                     <h4>Your Complete Chat History</h4>
-                    <p className="history-description">
+                    <p className={styles.historyDescription}>
                       All your conversations are saved in one continuous thread
                     </p>
                   </div>
-                  <div className="conversation-list">
+                  <div className={styles.conversationList}>
                     {filteredResults.conversations.length === 0 ? (
-                      <div className="memory-empty">
+                      <div className={styles.memoryEmpty}>
                         {filteredResults.conversations.length !== recentConversations.length
                           ? 'No conversations found with current search criteria'
                           : 'No conversations yet.'}
@@ -385,7 +385,7 @@ const MemoryModal = memo(function MemoryModal({
                       filteredResults.conversations.map(conv => (
                         <div
                           key={conv.id}
-                          className="conversation-item clickable"
+                          className={`${styles.conversationItem} clickable`}
                           onClick={() => handleConversationClick(conv)}
                           role="button"
                           tabIndex={0}
@@ -396,24 +396,24 @@ const MemoryModal = memo(function MemoryModal({
                             }
                           }}
                         >
-                          <div className="conversation-stats-card">
-                            <div className="stat-row">
-                              <span className="stat-label">Total Messages:</span>
-                              <span className="stat-value">{conv.messageCount}</span>
+                          <div className={styles.conversationStatsCard}>
+                            <div className={styles.statRow}>
+                              <span className={styles.statLabel}>Total Messages:</span>
+                              <span className={styles.statValue}>{conv.messageCount}</span>
                             </div>
-                            <div className="stat-row">
-                              <span className="stat-label">Started:</span>
-                              <span className="stat-value">
+                            <div className={styles.statRow}>
+                              <span className={styles.statLabel}>Started:</span>
+                              <span className={styles.statValue}>
                                 {timeService.formatDateToLocal(timeService.fromTimestamp(conv.timestamp))}
                               </span>
                             </div>
-                            <div className="stat-row">
-                              <span className="stat-label">Status:</span>
-                              <span className="stat-value sync-status">✅ Synced across all devices</span>
+                            <div className={styles.statRow}>
+                              <span className={styles.statLabel}>Status:</span>
+                              <span className={`${styles.statValue} ${styles.syncStatus}`}>✅ Synced across all devices</span>
                             </div>
                           </div>
-                          <div className="conversation-action">
-                            <span className="view-all-btn">View All Messages →</span>
+                          <div className={styles.conversationAction}>
+                            <span className={styles.viewAllButton}>View All Messages →</span>
                           </div>
                         </div>
                       ))
@@ -423,39 +423,39 @@ const MemoryModal = memo(function MemoryModal({
               )}
 
               {activeTab === 'summaries' && (
-                <div className="memory-tab-panel">
-                  <div className="summary-header" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p style={{ margin: 0, color: 'var(--text-gray)' }}>
+                <div className={styles.tabPanel}>
+                  <div className={styles.summaryHeader}>
+                    <p>
                       Daily summaries capture your conversations and key information
                     </p>
                     <button
-                      className="memory-action-btn summary-generate-btn"
+                      className={`${styles.actionButton} ${styles.summaryGenerateButton}`}
                       onClick={handleGenerateDailySummary}
                       disabled={isLoading}
                     >
                       {isLoading ? 'Generating...' : 'Generate Today\'s Summary'}
                     </button>
                   </div>
-                  <div className="memory-list">
+                  <div className={styles.memoryList}>
                     {dailySummaries.length === 0 ? (
-                      <div className="memory-empty">
+                      <div className={styles.memoryEmpty}>
                         No daily summaries yet. Click the button above to generate one!
                       </div>
                     ) : (
                       dailySummaries
                         .sort((a, b) => b.timestamp - a.timestamp)
                         .map(summary => (
-                          <div key={summary.id} className="memory-item summary-item">
-                            <div className="memory-content summary-content">
+                          <div key={summary.id} className={`${styles.memoryItem} ${styles.summaryItem}`}>
+                            <div className={`${styles.memoryContent} ${styles.summaryContent}`}>
                               {summary.content.split('\n').map((line, idx) => (
-                                <div key={idx} className={line.startsWith('Conversation') ? 'summary-section' : ''}>
+                                <div key={idx} className={line.startsWith('Conversation') ? styles.summarySection : ''}>
                                   {line}
                                 </div>
                               ))}
                             </div>
-                            <div className="memory-meta">
-                              <span className="memory-context">{summary.context}</span>
-                              <span className="memory-time">
+                            <div className={styles.memoryMeta}>
+                              <span className={styles.memoryContext}>{summary.context}</span>
+                              <span className={styles.memoryTime}>
                                 {SupabaseMemoryService.timeAgo(summary.timestamp)}
                               </span>
                             </div>
@@ -467,39 +467,39 @@ const MemoryModal = memo(function MemoryModal({
               )}
 
               {activeTab === 'insights' && (
-                <div className="memory-tab-panel">
-                  <div className="insights-container">
+                <div className={styles.tabPanel}>
+                  <div className={styles.insightsContainer}>
                     <h4>Your Conversation Patterns</h4>
                     
                     {patternInsights.peakHours && patternInsights.peakHours.length > 0 && (
-                      <div className="insight-section">
+                      <div className={styles.insightSection}>
                         <h5>🕐 Most Active Hours</h5>
                         <p>You typically chat during: {patternInsights.peakHours.join(', ')}</p>
                       </div>
                     )}
                     
                     {patternInsights.frequentTopics && patternInsights.frequentTopics.length > 0 && (
-                      <div className="insight-section">
+                      <div className={styles.insightSection}>
                         <h5>💬 Frequent Topics</h5>
-                        <div className="topic-list">
+                        <div className={styles.topicList}>
                           {patternInsights.frequentTopics.map((topic, idx) => (
-                            <span key={idx} className="topic-tag">{topic}</span>
+                            <span key={idx} className={styles.topicTag}>{topic}</span>
                           ))}
                         </div>
                       </div>
                     )}
                     
                     {patternInsights.preferences && patternInsights.preferences.length > 0 && (
-                      <div className="insight-section">
+                      <div className={styles.insightSection}>
                         <h5>⭐ Learned Preferences</h5>
                         <p>{patternInsights.preferences.join(', ')}</p>
                       </div>
                     )}
                     
                     {!patternInsights.peakHours && !patternInsights.frequentTopics && !patternInsights.preferences && (
-                      <div className="memory-empty">
+                      <div className={styles.memoryEmpty}>
                         <p>No patterns detected yet. Keep chatting and I'll learn your preferences over time!</p>
-                        <p className="insight-note">Pattern analysis runs weekly on Sundays.</p>
+                        <p className={styles.insightNote}>Pattern analysis runs weekly on Sundays.</p>
                       </div>
                     )}
                   </div>
@@ -508,9 +508,9 @@ const MemoryModal = memo(function MemoryModal({
             </div>
           </div>
 
-          <div className="memory-modal-actions">
+          <div className={styles.modalActions}>
             <button
-              className="memory-action-btn export"
+              className={styles.actionButtonExport}
               onClick={handleExportData}
               disabled={isLoading}
             >
@@ -518,7 +518,7 @@ const MemoryModal = memo(function MemoryModal({
             </button>
 
             <button
-              className="memory-action-btn clear"
+              className={styles.actionButtonClear}
               onClick={handleClearAllData}
               disabled={isLoading}
             >

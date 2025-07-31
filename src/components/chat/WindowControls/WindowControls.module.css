@@ -1,0 +1,67 @@
+/**
+ * Window Controls Component Styles
+ * 
+ * Window management buttons (minimize, resize)
+ * Using icon button pattern from shared styles
+ */
+
+/* Container */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Base button style for window controls */
+.button {
+  background: none;
+  border: none;
+  color: var(--silver-grey);
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 1;
+  visibility: visible;
+}
+
+.button:hover {
+  background: var(--off-white);
+  color: var(--deep-plum);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+}
+
+/* Minimize button */
+.minimizeButton {
+  composes: button;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* Size toggle button */
+.sizeToggleButton {
+  composes: button;
+  font-size: 0.8rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .controls {
+    gap: 0.2rem;
+  }
+  
+  .button {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+}

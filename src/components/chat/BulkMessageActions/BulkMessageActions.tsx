@@ -1,9 +1,9 @@
 import { memo, useCallback, useState } from 'react';
-import type { ChatMessage } from '../../types/chat.types';
-import { toastService } from '../../services/ToastService';
-import { dashboardContextService } from '../../services/DashboardContextService';
-import { timeService } from '../../services/TimeService';
-import './chat-interface.css';
+import type { ChatMessage } from '../../../types/chat.types';
+import { toastService } from '../../../services/ToastService';
+import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
+import styles from './BulkMessageActions.module.css';
 
 interface BulkMessageActionsProps {
   messages: ChatMessage[];
@@ -120,14 +120,14 @@ const BulkMessageActions = memo(function BulkMessageActions({
   }
 
   return (
-    <div className="bulk-message-actions" role="toolbar" aria-label="Bulk message actions">
-      <div className="bulk-actions-header">
-        <div className="selection-info">
-          <span className="selection-count">
+    <div className={styles.bulkMessageActions} role="toolbar" aria-label="Bulk message actions">
+      <div className={styles.bulkActionsHeader}>
+        <div className={styles.selectionInfo}>
+          <span className={styles.selectionCount}>
             {selectedMessages.length} message{selectedMessages.length !== 1 ? 's' : ''} selected
           </span>
           <button
-            className="select-all-btn"
+            className={styles.selectAllButton}
             onClick={handleSelectAll}
             aria-label={selectedMessages.length === messages.length ? 'Deselect all' : 'Select all'}
           >
@@ -135,7 +135,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
           </button>
         </div>
         <button
-          className="close-bulk-actions"
+          className={styles.closeBulkActions}
           onClick={onClose}
           aria-label="Close bulk actions"
         >
@@ -143,9 +143,9 @@ const BulkMessageActions = memo(function BulkMessageActions({
         </button>
       </div>
 
-      <div className="bulk-actions-buttons">
+      <div className={styles.bulkActionsButtons}>
         <button
-          className="bulk-action-btn copy-btn"
+          className={styles.copyButton}
           onClick={handleCopySelected}
           title="Copy selected messages"
           aria-label="Copy selected messages to clipboard"
@@ -154,7 +154,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
         </button>
 
         <button
-          className="bulk-action-btn share-btn"
+          className={styles.shareButton}
           onClick={handleShareSelected}
           title="Share selected messages"
           aria-label="Share selected messages"
@@ -163,7 +163,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
         </button>
 
         <button
-          className="bulk-action-btn export-btn"
+          className={styles.exportButton}
           onClick={handleExportSelected}
           disabled={isExporting}
           title="Export selected messages"
@@ -173,7 +173,7 @@ const BulkMessageActions = memo(function BulkMessageActions({
         </button>
 
         <button
-          className="bulk-action-btn important-btn"
+          className={styles.importantButton}
           onClick={handleMarkAllAsImportant}
           title="Mark all selected as important"
           aria-label="Mark all selected messages as important"

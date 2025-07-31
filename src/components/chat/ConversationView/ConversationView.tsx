@@ -1,11 +1,11 @@
 import { memo, useCallback } from 'react';
-import type { StoredConversation } from '../../services/SupabaseMemoryService';
-import type { ChatMessage } from '../../types/chat.types';
-import { useUserProfile } from '../../hooks/useUserProfile';
-import { dashboardContextService } from '../../services/DashboardContextService';
-import { timeService } from '../../services/TimeService';
-import { Message } from './Message';
-import './memory-modal-modern.css';
+import type { StoredConversation } from '../../../services/SupabaseMemoryService';
+import type { ChatMessage } from '../../../types/chat.types';
+import { useUserProfile } from '../../../hooks/useUserProfile';
+import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
+import { Message } from '../Message/Message';
+import styles from './ConversationView.module.css';
 
 interface ConversationViewProps {
   conversation: StoredConversation;
@@ -44,29 +44,29 @@ const ConversationView = memo(function ConversationView({
   }, [conversation]);
 
   return (
-    <div className="conversation-detail">
+    <div className={styles.conversationDetail}>
       {/* Header */}
-      <div className="conversation-detail-header">
+      <div className={styles.conversationDetailHeader}>
         <button
-          className="back-button"
+          className={styles.backButton}
           onClick={onBack}
           aria-label="Back to conversations list"
         >
           ← Back
         </button>
-        <div className="conversation-info">
+        <div className={styles.conversationInfo}>
           <h3>Conversation History</h3>
-          <div className="conversation-stats">
-            <span className="stat-item">
+          <div className={styles.conversationStats}>
+            <span className={styles.statItem}>
               <span role="img" aria-label="messages">💬</span> {conversation.messageCount} messages
             </span>
-            <span className="stat-item">
+            <span className={styles.statItem}>
               <span role="img" aria-label="time">🕐</span> {timeService.formatDateTimeToLocal(timeService.fromTimestamp(conversation.timestamp))}
             </span>
           </div>
         </div>
         <button
-          className="export-button"
+          className={styles.exportButton}
           onClick={handleExportConversation}
           title="Download conversation"
           aria-label="Download conversation"
@@ -76,7 +76,7 @@ const ConversationView = memo(function ConversationView({
       </div>
 
       {/* Messages */}
-      <div className="conversation-messages">
+      <div className={styles.conversationMessages}>
         {conversation.messages.map((message) => (
           <Message
             key={message.id}

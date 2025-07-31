@@ -1,10 +1,10 @@
 import { memo, useCallback, useState } from 'react';
-import type { ChatMessage } from '../../types/chat.types';
-import { FormattedText } from '../FormattedText';
-import { toastService } from '../../services/ToastService';
-import { dashboardContextService } from '../../services/DashboardContextService';
-import { timeService } from '../../services/TimeService';
-import './message-components.css';
+import type { ChatMessage } from '../../../types/chat.types';
+import { FormattedText } from '../../FormattedText';
+import { toastService } from '../../../services/ToastService';
+import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
+import styles from './Message.module.css';
 
 interface MessageProps {
   message: ChatMessage;
@@ -108,8 +108,8 @@ const Message = memo(function Message({
 
   // Different class names based on variant
   const messageClass = variant === 'chat'
-    ? `message ${message.role === 'user' ? 'user-msg' : 'assistant-msg'}`
-    : `conversation-message ${message.role === 'user' ? 'user' : 'assistant'}`;
+    ? message.role === 'user' ? styles.userMsg : styles.assistantMsg
+    : `${styles.conversationMessage} ${message.role === 'user' ? styles.user : styles.assistant}`;
 
   const renderChatVariant = () => (
     <div
@@ -119,17 +119,17 @@ const Message = memo(function Message({
       aria-label={`${message.role === 'user' ? 'Your message' : 'Virgil\'s response'}`}
     >
       {message.role === 'assistant' && (
-        <div className="msg-avatar" aria-hidden="true">
-          <span className="chatbot-avatar-v">V</span>
+        <div className={styles.msgAvatar} aria-hidden="true">
+          <span className={styles.chatbotAvatarV}>V</span>
         </div>
       )}
-      <div className="msg-content" role="text">
+      <div className={styles.msgContent} role="text">
         <FormattedText content={message.content} />
         {message.role === 'assistant' && message.confidence !== undefined && (
           <span 
-            className={`confidence-indicator confidence-${
-              message.confidence >= 0.8 ? 'high' : 
-                message.confidence >= 0.7 ? 'medium' : 'low'
+            className={`${styles.confidenceIndicator} ${
+              message.confidence >= 0.8 ? styles.confidenceHigh : 
+                message.confidence >= 0.7 ? styles.confidenceMedium : styles.confidenceLow
             }`}
             title={`Confidence: ${Math.round(message.confidence * 100)}%`}
             aria-label={`Confidence: ${Math.round(message.confidence * 100)}%`}
@@ -139,7 +139,7 @@ const Message = memo(function Message({
           </span>
         )}
         <button
-          className="remember-btn"
+          className={styles.rememberBtn}
           onClick={() => onMarkAsImportant(message)}
           title="Remember this message"
           aria-label="Mark this message as important"
@@ -152,10 +152,10 @@ const Message = memo(function Message({
 
   const renderConversationVariant = () => (
     <div className={messageClass}>
-      <div className="message-meta">
-        <span className="message-role">{message.role === 'user' ? userNickname : 'Virgil'}</span>
+      <div className={styles.messageMeta}>
+        <span className={styles.messageRole}>{message.role === 'user' ? userNickname : 'Virgil'}</span>
         {message.timestamp && (
-          <span className="message-timestamp">
+          <span className={styles.messageTimestamp}>
             {new Intl.DateTimeFormat('en-US', {
               hour: '2-digit',
               minute: '2-digit',
@@ -165,9 +165,9 @@ const Message = memo(function Message({
         )}
         {message.role === 'assistant' && message.confidence !== undefined && (
           <span 
-            className={`confidence-indicator confidence-${
-              message.confidence >= 0.8 ? 'high' : 
-                message.confidence >= 0.7 ? 'medium' : 'low'
+            className={`${styles.confidenceIndicator} ${
+              message.confidence >= 0.8 ? styles.confidenceHigh : 
+                message.confidence >= 0.7 ? styles.confidenceMedium : styles.confidenceLow
             }`}
             title={`Confidence: ${Math.round(message.confidence * 100)}%`}
             aria-label={`Confidence: ${Math.round(message.confidence * 100)}%`}
@@ -177,14 +177,14 @@ const Message = memo(function Message({
           </span>
         )}
       </div>
-      <div className="message-content">
+      <div className={styles.messageContent}>
         <FormattedText content={message.content} />
       </div>
-      <div className="message-actions">
+      <div className={styles.messageActions}>
         {/* Primary actions - always visible */}
-        <div className="primary-actions">
+        <div className={styles.primaryActions}>
           <button
-            className={'message-action-btn copy-action'}
+            className={`${styles.messageActionButton} ${styles.copyAction}`}
             onClick={handleCopyMessage}
             title={copiedMessageId === message.id ? 'Copied!' : 'Copy message'}
             aria-label={copiedMessageId === message.id ? 'Copied!' : 'Copy message'}
@@ -192,7 +192,7 @@ const Message = memo(function Message({
             {copiedMessageId === message.id ? '✓' : '📋'}
           </button>
           <button
-            className="message-action-btn important-action"
+            className={`${styles.messageActionButton} ${styles.importantAction}`}
             onClick={() => onMarkAsImportant(message)}
             title="Mark as important"
             aria-label="Mark as important"
@@ -203,9 +203,9 @@ const Message = memo(function Message({
 
         {/* Extended actions */}
         {(showExtendedActions || isExpanded) && (
-          <div className="extended-actions">
+          <div className={`${styles.extendedActions} ${isExpanded ? styles.expanded : ''}`}>
             <button
-              className="message-action-btn share-action"
+              className={`${styles.messageActionButton} ${styles.shareAction}`}
               onClick={handleShareMessage}
               title="Share message"
               aria-label="Share message"
@@ -213,7 +213,7 @@ const Message = memo(function Message({
               📤
             </button>
             <button
-              className="message-action-btn quote-action"
+              className={`${styles.messageActionButton} ${styles.quoteAction}`}
               onClick={handleQuoteMessage}
               title="Quote message"
               aria-label="Quote message"
@@ -221,7 +221,7 @@ const Message = memo(function Message({
               💬
             </button>
             <button
-              className="message-action-btn export-action"
+              className={`${styles.messageActionButton} ${styles.exportAction}`}
               onClick={handleExportMessage}
               title="Export message"
               aria-label="Export message"
@@ -234,7 +234,7 @@ const Message = memo(function Message({
         {/* More actions button for mobile/compact mode */}
         {!showExtendedActions && (
           <button
-            className="message-action-btn more-actions"
+            className={`${styles.messageActionButton} ${styles.moreActions}`}
             onClick={toggleExpanded}
             title={isExpanded ? 'Hide actions' : 'More actions'}
             aria-label={isExpanded ? 'Hide actions' : 'More actions'}

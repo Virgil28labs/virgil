@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import './ui-controls.css';
+import styles from './WindowControls.module.css';
 
 interface WindowControlsProps {
   windowSize: 'normal' | 'large' | 'fullscreen';
@@ -13,9 +13,9 @@ const WindowControls = memo(function WindowControls({
   onMinimize,
 }: WindowControlsProps) {
   return (
-    <div className="window-controls">
+    <div className={styles.controls}>
       <button
-        className="minimize-btn"
+        className={styles.minimizeButton}
         onClick={onMinimize}
         title="Close to floating bubble"
         aria-label="Close to floating bubble"
@@ -23,7 +23,7 @@ const WindowControls = memo(function WindowControls({
         —
       </button>
       <button
-        className="size-toggle-btn"
+        className={styles.sizeToggleButton}
         onClick={onSizeToggle}
         title={`Current: ${windowSize} - Click to toggle`}
         aria-label={`Toggle window size (current: ${windowSize})`}

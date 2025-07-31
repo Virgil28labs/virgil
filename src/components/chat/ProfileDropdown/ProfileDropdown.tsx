@@ -1,5 +1,5 @@
-import { memo, useState, useCallback, useEffect } from 'react';
-import './chat-interface.css';
+import { memo, useState, useCallback, useEffect, useRef } from 'react';
+import styles from './ProfileDropdown.module.css';
 
 interface ProfileDropdownProps {
   customSystemPrompt: string;
@@ -19,6 +19,7 @@ const ProfileDropdown = memo(function ProfileDropdown({
   messageCount,
 }: ProfileDropdownProps) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Handle save with dropdown close
   const handleSave = useCallback(() => {
@@ -49,7 +50,7 @@ const ProfileDropdown = memo(function ProfileDropdown({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showDropdown && !(event.target as Element)?.closest('.profile-selector')) {
+      if (showDropdown && !containerRef.current?.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     };
@@ -59,9 +60,9 @@ const ProfileDropdown = memo(function ProfileDropdown({
   }, [showDropdown]);
 
   return (
-    <div className="profile-selector">
+    <div className={styles.container} ref={containerRef}>
       <button
-        className="status-pill edit-pill"
+        className={styles.triggerButton}
         onClick={() => setShowDropdown(!showDropdown)}
         title="System Prompt Editor"
         aria-expanded={showDropdown}
@@ -71,59 +72,59 @@ const ProfileDropdown = memo(function ProfileDropdown({
       </button>
 
       {showDropdown && (
-        <div className="profile-dropdown" role="menu">
-          <div className="profile-section">
-            <div className="section-title">System Prompt Editor</div>
+        <div className={styles.dropdown} role="menu">
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>System Prompt Editor</div>
             <textarea
               value={customSystemPrompt}
               onChange={(e) => onSystemPromptChange(e.target.value)}
               placeholder="Enter custom system prompt for Virgil..."
-              className="chatbot-prompt-textarea"
+              className={styles.promptTextarea}
               rows={6}
             />
 
-            <div className="chatbot-prompt-actions">
+            <div className={styles.promptActions}>
               <button
-                className="chatbot-prompt-btn save"
+                className={styles.saveButton}
                 onClick={handleSave}
               >
                 💾 Save
               </button>
               <button
-                className="chatbot-prompt-btn reset"
+                className={styles.resetButton}
                 onClick={handleReset}
               >
                 🔄 Default
               </button>
             </div>
 
-            <div className="chatbot-prompt-info">
-              <small>
+            <div className={styles.promptInfo}>
+              <small className={styles.promptInfoText}>
                 Length: {customSystemPrompt.length} characters
                 {customSystemPrompt && (
-                  <span className="prompt-active"> • Custom prompt active</span>
+                  <span className={styles.promptActive}> • Custom prompt active</span>
                 )}
               </small>
             </div>
           </div>
 
-          <div className="profile-section">
-            <div className="section-title">Chat Actions</div>
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Chat Actions</div>
             <button
-              className="profile-action"
+              className={styles.profileAction}
               onClick={handleClear}
               role="menuitem"
             >
-              <span className="action-icon">🗑️</span>
+              <span className={styles.actionIcon}>🗑️</span>
               Clear Chat History
             </button>
             <button
-              className="profile-action"
+              className={styles.profileAction}
               onClick={handleExport}
               disabled={messageCount === 0}
               role="menuitem"
             >
-              <span className="action-icon">💾</span>
+              <span className={styles.actionIcon}>💾</span>
               Export Chat Messages
             </button>
           </div>

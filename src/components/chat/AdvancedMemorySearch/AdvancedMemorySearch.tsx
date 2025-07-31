@@ -1,8 +1,8 @@
 import { memo, useState, useCallback, useMemo, useEffect } from 'react';
-import type { MarkedMemory, StoredConversation } from '../../services/SupabaseMemoryService';
-import { dashboardContextService } from '../../services/DashboardContextService';
-import { timeService } from '../../services/TimeService';
-import './memory-modal-modern.css';
+import type { MarkedMemory, StoredConversation } from '../../../services/SupabaseMemoryService';
+import { dashboardContextService } from '../../../services/DashboardContextService';
+import { timeService } from '../../../services/TimeService';
+import styles from './AdvancedMemorySearch.module.css';
 
 interface SearchFilters {
   query: string;
@@ -210,18 +210,18 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
   }, [filters]);
 
   return (
-    <div className="advanced-memory-search">
-      <div className="search-header">
-        <div className="search-input-container">
+    <div className={styles.advancedMemorySearch}>
+      <div className={styles.searchHeader}>
+        <div className={styles.searchInputContainer}>
           <input
             type="text"
             placeholder="Search memories and conversations..."
             value={filters.query}
             onChange={(e) => updateFilters({ query: e.target.value })}
-            className="search-input"
+            className={styles.searchInput}
           />
           <button
-            className="advanced-toggle"
+            className={styles.advancedToggle}
             onClick={onToggleExpanded}
             aria-label={isExpanded ? 'Hide advanced filters' : 'Show advanced filters'}
             aria-expanded={isExpanded}
@@ -231,16 +231,16 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
         </div>
 
         {hasActiveFilters && (
-          <button className="clear-filters" onClick={clearFilters}>
+          <button className={styles.clearFilters} onClick={clearFilters}>
             Clear Filters
           </button>
         )}
       </div>
 
       {isExpanded && (
-        <div className="advanced-filters">
-          <div className="filter-row">
-            <div className="filter-group">
+        <div className={styles.advancedFilters}>
+          <div className={styles.filterRow}>
+            <div className={styles.filterGroup}>
               <label>Date Range</label>
               <select
                 value={filters.dateRange}
@@ -254,7 +254,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
               </select>
             </div>
 
-            <div className="filter-group">
+            <div className={styles.filterGroup}>
               <label>Content Type</label>
               <select
                 value={filters.contentType}
@@ -266,7 +266,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
               </select>
             </div>
 
-            <div className="filter-group">
+            <div className={styles.filterGroup}>
               <label>Sort By</label>
               <select
                 value={filters.sortBy}
@@ -281,8 +281,8 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           </div>
 
           {filters.dateRange === 'custom' && (
-            <div className="custom-date-range">
-              <div className="date-input-group">
+            <div className={styles.customDateRange}>
+              <div className={styles.dateInputGroup}>
                 <label>From</label>
                 <input
                   type="date"
@@ -290,7 +290,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
                   onChange={(e) => updateFilters({ customStartDate: e.target.value })}
                 />
               </div>
-              <div className="date-input-group">
+              <div className={styles.dateInputGroup}>
                 <label>To</label>
                 <input
                   type="date"
@@ -302,13 +302,13 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
           )}
 
           {availableTags.length > 0 && (
-            <div className="tag-filter">
+            <div className={styles.tagFilter}>
               <label>Tags</label>
-              <div className="tag-list">
+              <div className={styles.tagList}>
                 {availableTags.map(tag => (
                   <button
                     key={tag}
-                    className={`tag-chip ${filters.tags.includes(tag) ? 'active' : ''}`}
+                    className={`${styles.tagChip} ${filters.tags.includes(tag) ? styles.active : ''}`}
                     onClick={() => handleTagToggle(tag)}
                   >
                     #{tag}
@@ -320,7 +320,7 @@ const AdvancedMemorySearch = memo(function AdvancedMemorySearch({
         </div>
       )}
 
-      <div className="search-results-info">
+      <div className={styles.searchResultsInfo}>
         {filteredResults.memories.length + filteredResults.conversations.length} result(s) found
         {hasActiveFilters && ' with current filters'}
       </div>

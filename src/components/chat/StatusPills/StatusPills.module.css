@@ -1,0 +1,124 @@
+/**
+ * Status Pills Component Styles
+ * 
+ * Displays status indicators as compact pills
+ */
+
+/* Status Cluster Container */
+.cluster {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Base Status Pill */
+.pill {
+  width: 54px;
+  height: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: transparent;
+  white-space: nowrap;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+/* Memory Pill */
+.memoryPill {
+  composes: pill;
+  background: color-mix(in srgb, var(--violet-purple) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--violet-purple) 25%, transparent);
+  color: color-mix(in srgb, var(--violet-purple) 90%, var(--deep-plum));
+}
+
+.memoryPill:hover {
+  background: color-mix(in srgb, var(--violet-purple) 20%, transparent);
+  border-color: color-mix(in srgb, var(--violet-purple) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* Context Pill */
+.contextPill {
+  composes: pill;
+  background: color-mix(in srgb, var(--context-green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--context-green) 25%, transparent);
+  color: color-mix(in srgb, var(--context-green) 90%, var(--deep-plum));
+}
+
+.contextPill:hover {
+  background: color-mix(in srgb, var(--context-green) 20%, transparent);
+  border-color: color-mix(in srgb, var(--context-green) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* Sync Status Pills */
+.syncStatus {
+  composes: pill;
+  width: auto;
+  min-width: 30px;
+  padding: 0 8px;
+  cursor: default;
+}
+
+.syncConnected {
+  composes: syncStatus;
+  background: color-mix(in srgb, var(--success-green, #4caf50) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success-green, #4caf50) 25%, transparent);
+  color: var(--success-green, #4caf50);
+}
+
+.syncDisconnected {
+  composes: syncStatus;
+  background: color-mix(in srgb, var(--warning-orange, #ff9800) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning-orange, #ff9800) 25%, transparent);
+  color: var(--warning-orange, #ff9800);
+}
+
+/* New Chat Pill */
+.newChatPill {
+  composes: pill;
+  background: color-mix(in srgb, var(--soft-pink) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--soft-pink) 25%, transparent);
+  color: color-mix(in srgb, var(--soft-pink) 90%, var(--deep-plum));
+}
+
+.newChatPill:hover {
+  background: color-mix(in srgb, var(--soft-pink) 20%, transparent);
+  border-color: color-mix(in srgb, var(--soft-pink) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* Edit Pill */
+.editPill {
+  composes: pill;
+  background: color-mix(in srgb, var(--lavender) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--lavender) 25%, transparent);
+  color: color-mix(in srgb, var(--lavender) 90%, var(--deep-plum));
+}
+
+.editPill:hover {
+  background: color-mix(in srgb, var(--lavender) 20%, transparent);
+  border-color: color-mix(in srgb, var(--lavender) 40%, transparent);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-sm);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .cluster {
+    gap: 4px;
+  }
+}

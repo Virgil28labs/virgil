@@ -1,0 +1,135 @@
+/**
+ * Shared Dropdown Styles
+ * 
+ * Reusable dropdown patterns for menus, selects, and popovers
+ * Import in components: import dropdownStyles from '@/styles/shared/Dropdown.module.css'
+ */
+
+/* Container for relative positioning */
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Menu Base */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  background: var(--off-white);
+  border: 1px solid var(--silver-grey);
+  border-radius: 8px;
+  box-shadow: var(--elevation-md);
+  margin-top: 2px;
+  z-index: 1050;
+  overflow: hidden;
+  animation: slideDown var(--transition-fast) ease-out;
+}
+
+/* Dropdown Positions */
+.dropdownLeft {
+  left: 0;
+}
+
+.dropdownRight {
+  right: 0;
+}
+
+.dropdownCenter {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Dropdown Sizes */
+.dropdownSmall {
+  min-width: 120px;
+}
+
+.dropdownMedium {
+  min-width: 200px;
+}
+
+.dropdownLarge {
+  min-width: 300px;
+}
+
+/* Dropdown Item/Option */
+.option {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.option:hover {
+  background: color-mix(in srgb, var(--silver-grey) 5%, var(--off-white));
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: -2px;
+}
+
+.optionSelected {
+  background: color-mix(in srgb, var(--violet-purple) 8%, var(--off-white));
+  border-left: 2px solid var(--violet-purple);
+  padding-left: calc(0.75rem - 2px);
+}
+
+/* Compact variant for small dropdowns */
+.optionCompact {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Dropdown Section Header */
+.sectionHeader {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--silver-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Dropdown Divider */
+.divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 0.25rem 0;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .dropdown {
+    min-width: 110px;
+  }
+  
+  .option {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .dropdownSmall {
+    min-width: 100px;
+  }
+}
