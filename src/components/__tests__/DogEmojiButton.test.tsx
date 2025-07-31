@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DogEmojiButton } from './DogEmojiButton';
+import { DogEmojiButton } from '../DogEmojiButton';
 
 // Mock the DogGallery component since it's lazily loaded
-jest.mock('./dog/DogGallery', () => ({
+jest.mock('../dog/DogGallery', () => ({
   DogGallery: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     if (!isOpen) return null;
     return (

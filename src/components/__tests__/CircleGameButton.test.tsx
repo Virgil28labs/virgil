@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CircleGameButton } from './CircleGameButton';
+import { CircleGameButton } from '../CircleGameButton';
 
 // Mock the DrawPerfectCircle component since it's lazily loaded
-jest.mock('./circle/DrawPerfectCircle', () => ({
+jest.mock('../circle/DrawPerfectCircle', () => ({
   DrawPerfectCircle: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     if (!isOpen) return null;
     return (

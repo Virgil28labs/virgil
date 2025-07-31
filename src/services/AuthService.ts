@@ -5,6 +5,7 @@
 
 import { supabase } from '../lib/supabase';
 import type { User } from '../types/auth.types';
+import type { Session } from '@supabase/supabase-js';
 import { AuthError, ValidationError } from '../lib/errors';
 import { isValidEmail, sanitizeInput, validatePassword } from '../lib/utils/validation';
 import { AUTH_CONFIG, AUTH_MESSAGES } from '../constants/auth.constants';
@@ -22,11 +23,11 @@ interface SignUpData extends LoginCredentials {
 
 interface AuthResponse {
   user: User | null;
-  session: any;
+  session: Session | null;
 }
 
 export class AuthService {
-  private sessionCache: { data: any; timestamp: number } | null = null;
+  private sessionCache: { data: Session | null; timestamp: number } | null = null;
 
   /**
    * Login with email and password
@@ -180,7 +181,7 @@ export class AuthService {
   async getCurrentUser(): Promise<User | null> {
     try {
       // Check cache first
-      if (this.sessionCache && this.isCacheValid()) {
+      if (this.sessionCache && this.isCacheValid() && this.sessionCache.data) {
         return this.sessionCache.data.user;
       }
 
@@ -205,7 +206,7 @@ export class AuthService {
   /**
    * Get current session (with caching)
    */
-  async getSession(): Promise<any> {
+  async getSession(): Promise<Session | null> {
     try {
       // Check cache first
       if (this.sessionCache && this.isCacheValid()) {
@@ -231,7 +232,7 @@ export class AuthService {
   /**
    * Refresh the current session
    */
-  async refreshSession(): Promise<any> {
+  async refreshSession(): Promise<Session | null> {
     try {
       const { data: { session }, error } = await supabase.auth.refreshSession();
       
@@ -261,7 +262,7 @@ export class AuthService {
   /**
    * Map Supabase errors to user-friendly messages
    */
-  private mapSupabaseError(error: any): string {
+  private mapSupabaseError(error: { message?: string; code?: string }): string {
     const message = error.message?.toLowerCase() || '';
     
     if (message.includes('invalid login credentials')) {
@@ -287,7 +288,7 @@ export class AuthService {
   /**
    * Cache session data
    */
-  private cacheSession(session: any): void {
+  private cacheSession(session: Session | null): void {
     if (session) {
       this.sessionCache = {
         data: session,

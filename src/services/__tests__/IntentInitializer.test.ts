@@ -5,7 +5,7 @@
  * AI-powered confidence scoring for dashboard adapters.
  */
 
-import { IntentInitializer, intentInitializer } from '../IntentInitializer';
+import { IntentInitializer } from '../IntentInitializer';
 import { vectorMemoryService } from '../VectorMemoryService';
 import { vectorService } from '../vectorService';
 import { logger } from '../../lib/logger';

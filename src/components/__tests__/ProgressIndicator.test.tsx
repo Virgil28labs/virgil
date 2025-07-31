@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ProgressIndicator } from './ProgressIndicator';
+import { ProgressIndicator } from '../ProgressIndicator';
 
 describe('ProgressIndicator', () => {
   it('renders with default props', () => {

@@ -162,29 +162,116 @@ const mockLocalStorage = {
 Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
 describe('Dashboard', () => {
+  const mockUser = {
+    id: '1',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: { name: 'Test User' },
+    aud: 'authenticated',
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
+    role: 'authenticated',
+    last_sign_in_at: '2024-01-01T00:00:00.000Z',
+    confirmation_sent_at: null,
+    confirmed_at: '2024-01-01T00:00:00.000Z',
+    email_confirmed_at: '2024-01-01T00:00:00.000Z',
+    phone: null,
+    phone_confirmed_at: null,
+    recovery_sent_at: null,
+    new_email: null,
+    invited_at: null,
+    factors: null,
+    identities: [],
+    is_anonymous: false,
+  };
+
   const defaultAuthData = {
-    user: { id: '1', email: 'test@example.com', name: 'Test User' },
+    user: mockUser,
     loading: false,
     signOut: jest.fn(),
+    refreshUser: jest.fn(),
   };
 
   const defaultLocationData = {
-    address: '123 Test St, Test City, CA',
-    ipLocation: { city: 'Test City', region: 'CA', country: 'US' },
-    coordinates: { latitude: 37.7749, longitude: -122.4194 },
+    address: { 
+      street: 'Test St',
+      house_number: '123',
+      city: 'Test City',
+      postcode: '12345',
+      country: 'US',
+      formatted: '123 Test St, Test City, CA',
+    },
+    ipLocation: { 
+      ip: '127.0.0.1',
+      city: 'Test City', 
+      region: 'CA', 
+      country: 'US', 
+    },
+    coordinates: { 
+      latitude: 37.7749, 
+      longitude: -122.4194,
+      accuracy: 10,
+      timestamp: Date.now(),
+    },
     loading: false,
+    error: null,
+    permissionStatus: 'granted' as const,
+    lastUpdated: Date.now(),
+    initialized: true,
+    fetchLocationData: jest.fn(),
+    requestLocationPermission: jest.fn(),
+    clearError: jest.fn(),
+    hasLocation: true,
+    hasGPSLocation: true,
+    hasIpLocation: true,
   };
 
   const defaultDeviceInfo = {
     deviceInfo: {
+      location: 'Test City, CA',
+      ip: '127.0.0.1',
+      device: 'Desktop',
       os: 'Windows 10',
       browser: 'Chrome',
-      deviceType: 'desktop',
+      screen: '1920x1080',
+      pixelRatio: 1,
+      colorScheme: 'light' as const,
+      windowSize: '1920x1080',
+      cpu: 8,
+      memory: '8 GB',
+      online: true,
+      networkType: '4g',
+      downlink: '10 Mbps',
+      rtt: '50ms',
+      batteryLevel: null,
+      batteryCharging: null,
+      localTime: '12:00 PM',
+      timezone: 'America/Los_Angeles',
+      language: 'en-US',
+      tabVisible: true,
+      sessionDuration: 0,
+      cookiesEnabled: true,
+      doNotTrack: null,
+      storageQuota: '10 GB',
     },
+    permissions: {
+      geolocation: 'granted' as const,
+      camera: 'prompt' as const,
+      microphone: 'prompt' as const,
+      notifications: 'prompt' as const,
+      'clipboard-read': 'prompt' as const,
+      clipboard: 'prompt' as const,
+    },
+    requestPermission: jest.fn(),
   };
 
   const defaultKeyboardNav = {
     containerRef: { current: null },
+    focusFirst: jest.fn(),
+    focusLast: jest.fn(),
+    focusNext: jest.fn(),
+    focusPrevious: jest.fn(),
+    focusElement: jest.fn(),
   };
 
   beforeEach(() => {
@@ -246,7 +333,7 @@ describe('Dashboard', () => {
       mockUseLocation.mockReturnValue({
         ...defaultLocationData,
         loading: true,
-        address: undefined,
+        address: null,
       });
       
       renderDashboard();
@@ -416,9 +503,10 @@ describe('Dashboard', () => {
   describe('Responsive Behavior', () => {
     it('adapts to mobile device', () => {
       mockUseDeviceInfo.mockReturnValue({
+        ...defaultDeviceInfo,
         deviceInfo: {
           ...defaultDeviceInfo.deviceInfo,
-          deviceType: 'mobile',
+          device: 'mobile',
         },
       });
       
@@ -431,9 +519,10 @@ describe('Dashboard', () => {
 
     it('handles missing location data gracefully', () => {
       mockUseLocation.mockReturnValue({
-        address: undefined,
-        ipLocation: undefined,
-        coordinates: undefined,
+        ...defaultLocationData,
+        address: null,
+        ipLocation: null,
+        coordinates: null,
         loading: false,
       });
       
@@ -476,8 +565,10 @@ describe('Dashboard', () => {
 
     it('handles escape key correctly', () => {
       let escapeHandler: () => void;
-      mockUseKeyboardNavigation.mockImplementation(({ onEscape }) => {
-        escapeHandler = onEscape!;
+      mockUseKeyboardNavigation.mockImplementation((options) => {
+        if (options && 'onEscape' in options) {
+          escapeHandler = options.onEscape!;
+        }
         return defaultKeyboardNav;
       });
       

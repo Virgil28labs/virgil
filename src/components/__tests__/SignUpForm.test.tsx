@@ -1,15 +1,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SignUpForm } from './SignUpForm';
-import { authService } from '../services/AuthService';
-import { AuthError, ValidationError } from '../lib/errors';
-import { assertElement } from '../test-utils/domHelpers';
+import { SignUpForm } from '../SignUpForm';
+import { authService } from '../../services/AuthService';
+import { AuthError, ValidationError } from '../../lib/errors';
+import { assertElement } from '../../test-utils/domHelpers';
 
 // Mock AuthService
-jest.mock('../services/AuthService');
+jest.mock('../../services/AuthService');
 
 // Mock useFocusManagement hook
-jest.mock('../hooks/useFocusManagement', () => ({
+jest.mock('../../hooks/useFocusManagement', () => ({
   useFocusManagement: () => ({
     containerRef: { current: null },
   }),

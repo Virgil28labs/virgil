@@ -5,11 +5,11 @@
  * memory integration, and user interactions. Critical chat interface component.
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VirgilChatbot } from '../VirgilChatbot';
 import { AllTheProviders } from '../../test-utils/AllTheProviders';
+import type { ChatContextValue } from '../chat/chatTypes';
 
 // Mock chat context and services
 jest.mock('../chat/useChatContext', () => ({
@@ -67,9 +67,10 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
         disabled={disabled}
         placeholder={isStreaming ? 'Virgil is typing...' : 'Type a message...'}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && e.target.value) {
-            onSend(e.target.value);
-            e.target.value = '';
+          const target = e.target as HTMLInputElement;
+          if (e.key === 'Enter' && target.value) {
+            onSend(target.value);
+            target.value = '';
           }
         }}
       />
@@ -77,7 +78,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
         data-testid="send-button"
         disabled={disabled}
         onClick={() => {
-          const input = document.querySelector('[data-testid="message-input"]');
+          const input = document.querySelector('[data-testid="message-input"]') as HTMLInputElement;
           if (input && input.value) {
             onSend(input.value);
             input.value = '';
@@ -116,7 +117,7 @@ import { useChatContext } from '../chat/useChatContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useMemoryService } from '../../hooks/useMemoryService';
 import { chatService } from '../../services/ChatService';
-import { llmService } from '../../services/llm/LLMService';
+import { llmService } from '../../services/llm';
 import { errorHandlerService } from '../../services/ErrorHandlerService';
 
 const mockUseChatContext = useChatContext as jest.MockedFunction<typeof useChatContext>;
@@ -124,27 +125,81 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseMemoryService = useMemoryService as jest.MockedFunction<typeof useMemoryService>;
 
 describe('VirgilChatbot', () => {
-  const defaultChatState = {
-    messages: [],
-    isStreaming: false,
-    error: null,
+  const defaultChatState: ChatContextValue = {
+    state: {
+      isOpen: true,
+      windowSize: 'normal',
+      messages: [],
+      input: '',
+      isTyping: false,
+      error: null,
+      selectedModel: 'claude-3-sonnet',
+      customSystemPrompt: '',
+      lastConversation: null,
+      markedMemories: [],
+      showMemoryIndicator: false,
+      memoryContext: '',
+      showMemoryModal: false,
+      recentConversations: [],
+      dashboardContext: null,
+      contextualSuggestions: [],
+      shouldAutoScroll: true,
+    },
     dispatch: jest.fn(),
+    setOpen: jest.fn(),
+    setWindowSize: jest.fn(),
     addMessage: jest.fn(),
-    updateMessage: jest.fn(),
-    setStreaming: jest.fn(),
+    setInput: jest.fn(),
+    setTyping: jest.fn(),
     setError: jest.fn(),
     clearMessages: jest.fn(),
+    newChat: jest.fn(),
+  };
+
+  const mockUser = {
+    id: '1',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
+    role: 'authenticated',
+    last_sign_in_at: '2024-01-01T00:00:00.000Z',
+    confirmation_sent_at: null,
+    confirmed_at: '2024-01-01T00:00:00.000Z',
+    email_confirmed_at: '2024-01-01T00:00:00.000Z',
+    phone: null,
+    phone_confirmed_at: null,
+    recovery_sent_at: null,
+    new_email: null,
+    invited_at: null,
+    factors: null,
+    identities: [],
+    is_anonymous: false,
   };
 
   const defaultAuthState = {
-    user: { id: '1', email: 'test@example.com' },
+    user: mockUser,
     loading: false,
+    signOut: jest.fn(),
+    refreshUser: jest.fn(),
   };
 
   const defaultMemoryService = {
-    saveConversation: jest.fn(),
-    searchMemories: jest.fn(),
-    forgetMemory: jest.fn(),
+    memoryService: {
+      saveConversation: jest.fn(),
+      searchMemories: jest.fn(),
+      getMarkedMemories: jest.fn(),
+      markMemory: jest.fn(),
+      unmarkMemory: jest.fn(),
+      forgetMemory: jest.fn(),
+      getRecentConversations: jest.fn(),
+      getConversation: jest.fn(),
+      deleteConversation: jest.fn(),
+      clearAllMemories: jest.fn(),
+    },
+    isSupabaseEnabled: true,
   };
 
   beforeEach(() => {
@@ -160,8 +215,8 @@ describe('VirgilChatbot', () => {
       message: { id: '1', role: 'assistant', content: 'Test response' },
     });
     
-    (chatService.clearHistory as jest.Mock).mockResolvedValue({ success: true });
-    (chatService.exportChat as jest.Mock).mockResolvedValue({ success: true });
+    // chatService doesn't have clearHistory or exportChat methods
+    // These are handled differently in the actual implementation
   });
 
   const renderChatbot = () => {

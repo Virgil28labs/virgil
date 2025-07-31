@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import {
   LazyRaccoonMascot,
   LazyVirgilChatbot,
-} from './LazyComponents';
-import { lazyWeatherService, lazyLocationService } from '../lib/lazyServices';
+} from '../LazyComponents';
+import { lazyWeatherService, lazyLocationService } from '../../lib/lazyServices';
 
 // Mock React.lazy to return resolved promises with proper component structure
 jest.mock('react', () => ({

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { LoadingFallback } from './LoadingFallback';
+import { LoadingFallback } from '../LoadingFallback';
 
 describe('LoadingFallback', () => {
   it('renders with default props', () => {

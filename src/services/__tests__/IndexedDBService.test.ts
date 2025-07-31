@@ -5,7 +5,7 @@
  * for all IndexedDB operations with retry logic and error handling.
  */
 
-import { IndexedDBService, indexedDBService } from '../IndexedDBService';
+import { IndexedDBService } from '../IndexedDBService';
 import { logger } from '../../lib/logger';
 
 // Mock dependencies
@@ -125,9 +125,9 @@ class MockIDBObjectStore {
     return request;
   }
   
-  index(name: string) {
+  index(_name: string) {
     return {
-      getAll: (query?: any) => {
+      getAll: (_query?: any) => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.result = Array.from(this.data.values());
@@ -151,7 +151,7 @@ class MockIDBDatabase {
     this.name = name;
     this.version = version;
     this.objectStoreNames = {
-      contains: (storeName: string) => true,
+      contains: (_storeName: string) => true,
     };
   }
   
@@ -159,7 +159,7 @@ class MockIDBDatabase {
     return new MockIDBTransaction(storeNames, mode);
   }
   
-  createObjectStore(name: string, options?: any) {
+  createObjectStore(name: string, _options?: any) {
     const store = new MockIDBObjectStore(name);
     return {
       ...store,
@@ -193,7 +193,7 @@ const mockIndexedDB = {
     return request;
   }),
   
-  deleteDatabase: jest.fn((name: string) => {
+  deleteDatabase: jest.fn((_name: string) => {
     const request = new MockIDBRequest();
     setTimeout(() => {
       if (request.onsuccess) request.onsuccess({ target: request });
@@ -237,7 +237,6 @@ describe('IndexedDBService', () => {
       const instance2 = IndexedDBService.getInstance();
       
       expect(instance1).toBe(instance2);
-      // Note: indexedDBService from import has pre-registered configs
       expect(instance1).toBeInstanceOf(IndexedDBService);
     });
   });
@@ -530,7 +529,7 @@ describe('IndexedDBService', () => {
     });
 
     it('executes transaction across multiple stores', async () => {
-      const operation = jest.fn(async (transaction) => {
+      const operation = jest.fn(async (_transaction) => {
         // Mock transaction operation
         return 'transaction result';
       });
@@ -589,7 +588,7 @@ describe('IndexedDBService', () => {
     it('fails after maximum retries', async () => {
       const originalGet = MockIDBObjectStore.prototype.get;
       
-      MockIDBObjectStore.prototype.get = function(key: string) {
+      MockIDBObjectStore.prototype.get = function(_key: string) {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Persistent failure');
@@ -877,7 +876,7 @@ describe('IndexedDBService', () => {
       
       // All operations should complete (success may vary based on timing)
       expect(results).toHaveLength(5);
-      expect(results.every(r => r.hasOwnProperty('success'))).toBe(true);
+      expect(results.every(r => Object.prototype.hasOwnProperty.call(r, 'success'))).toBe(true);
     });
   });
 });

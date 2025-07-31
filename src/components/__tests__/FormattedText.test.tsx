@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { FormattedText } from './FormattedText';
+import { FormattedText } from '../FormattedText';
 
 describe('FormattedText', () => {
   it('renders basic text', () => {

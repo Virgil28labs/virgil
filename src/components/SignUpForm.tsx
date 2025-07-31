@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { useAuthForm } from '../hooks/useAuthForm';
 import { AUTH_CONFIG } from '../constants/auth.constants';
 
