@@ -105,7 +105,7 @@ describe('lazyImport', () => {
       const importError = new Error('Module load failed');
       const mockImportFn = jest.fn().mockRejectedValue(importError);
 
-      const _LazyComponent = lazyImport(mockImportFn, 'TestComponent');
+      lazyImport(mockImportFn, 'TestComponent');
       
       const factory = mockLazy.mock.calls[0][0];
       

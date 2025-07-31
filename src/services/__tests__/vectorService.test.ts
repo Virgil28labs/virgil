@@ -49,7 +49,9 @@ describe('vectorService', () => {
     access_token: 'test-token',
     refresh_token: 'refresh-token',
     user: { id: 'user-id' },
-  };
+    expires_in: 3600,
+    token_type: 'bearer',
+  } as any;
 
   const mockVectorResults: VectorSearchResult[] = [
     {
@@ -83,7 +85,7 @@ describe('vectorService', () => {
     (vectorService as any).lastRequestTime = 0;
     
     // Default to successful auth
-    mockSupabase.auth.getSession.mockResolvedValue({
+    (mockSupabase.auth.getSession as jest.MockedFunction<typeof mockSupabase.auth.getSession>).mockResolvedValue({
       data: { session: mockSession },
       error: null,
     });
@@ -117,7 +119,7 @@ describe('vectorService', () => {
     });
 
     it('throws error when no session available', async () => {
-      mockSupabase.auth.getSession.mockResolvedValue({
+      (mockSupabase.auth.getSession as jest.MockedFunction<typeof mockSupabase.auth.getSession>).mockResolvedValue({
         data: { session: null },
         error: null,
       });
@@ -126,9 +128,9 @@ describe('vectorService', () => {
     }, 15000);
 
     it('throws error when session error occurs', async () => {
-      mockSupabase.auth.getSession.mockResolvedValue({
+      (mockSupabase.auth.getSession as jest.MockedFunction<typeof mockSupabase.auth.getSession>).mockResolvedValue({
         data: { session: null },
-        error: new Error('Session error'),
+        error: new Error('Session error') as any,
       });
 
       await expect(vectorService.store('test')).rejects.toThrow('No active session');

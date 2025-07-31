@@ -54,9 +54,11 @@ describe('NotesAdapter', () => {
       tags: ['work' as TagType],
       actionType: 'task' as ActionType,
       tasks: [
-        { id: 'task-1', text: 'Implement authentication', completed: false },
-        { id: 'task-2', text: 'Design user dashboard', completed: true },
+        { text: 'Implement authentication', completed: false, extracted: false },
+        { text: 'Design user dashboard', completed: true, extracted: false },
       ],
+      aiProcessed: false,
+      isEdited: false,
     },
     {
       id: 'note-2',
@@ -65,8 +67,10 @@ describe('NotesAdapter', () => {
       tags: ['people' as TagType, 'work' as TagType],
       actionType: 'note' as ActionType,
       tasks: [
-        { id: 'task-3', text: 'Follow up with John', completed: false },
+        { text: 'Follow up with John', completed: false, extracted: false },
       ],
+      aiProcessed: false,
+      isEdited: false,
     },
     {
       id: 'note-3',
@@ -75,6 +79,8 @@ describe('NotesAdapter', () => {
       tags: ['growth' as TagType, 'health' as TagType],
       actionType: 'reflect' as ActionType,
       tasks: [],
+      aiProcessed: false,
+      isEdited: false,
     },
     {
       id: 'note-4',
@@ -83,9 +89,11 @@ describe('NotesAdapter', () => {
       tags: ['money' as TagType],
       actionType: 'goal' as ActionType,
       tasks: [
-        { id: 'task-4', text: 'Set up expense tracking', completed: false },
-        { id: 'task-5', text: 'Review monthly budget', completed: false },
+        { text: 'Set up expense tracking', completed: false, extracted: false },
+        { text: 'Review monthly budget', completed: false, extracted: false },
       ],
+      aiProcessed: false,
+      isEdited: false,
     },
     {
       id: 'note-5',
@@ -94,6 +102,8 @@ describe('NotesAdapter', () => {
       tags: [],
       actionType: undefined,
       tasks: [],
+      aiProcessed: false,
+      isEdited: false,
     },
   ];
 
@@ -412,6 +422,8 @@ describe('NotesAdapter', () => {
         tags: ['work'],
         actionType: 'note',
         tasks: [],
+        aiProcessed: false,
+        isEdited: false,
       };
       
       mockNotesStorage.getAllEntries.mockResolvedValue([longContentEntry]);
@@ -457,9 +469,11 @@ describe('NotesAdapter', () => {
         id: `note-${i}`,
         content: `Note content ${i} with some text about work and life`,
         timestamp: new Date(baseTime.getTime() - i * 60000),
-        tags: i % 3 === 0 ? ['work'] : i % 3 === 1 ? ['life'] : [],
+        tags: i % 3 === 0 ? ['work' as TagType] : i % 3 === 1 ? ['life' as TagType] : [],
         actionType: i % 2 === 0 ? 'note' as ActionType : 'task' as ActionType,
-        tasks: i % 5 === 0 ? [{ id: `task-${i}`, text: `Task ${i}`, completed: false }] : [],
+        tasks: i % 5 === 0 ? [{ text: `Task ${i}`, completed: false, extracted: false }] : [],
+        aiProcessed: false,
+        isEdited: false,
       }));
       
       mockNotesStorage.getAllEntries.mockResolvedValue(largeEntries);
@@ -482,11 +496,12 @@ describe('NotesAdapter', () => {
         tags: ['work'],
         actionType: 'task',
         tasks: Array.from({ length: 20 }, (_, i) => ({
-          id: `subtask-${i}`,
           text: `Subtask ${i}`,
           completed: i % 2 === 0,
           extracted: false,
         })),
+        aiProcessed: false,
+        isEdited: false,
       };
       
       mockNotesStorage.getAllEntries.mockResolvedValue([noteWithManyTasks]);

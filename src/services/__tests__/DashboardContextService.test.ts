@@ -531,7 +531,7 @@ describe('DashboardContextService', () => {
       (dashboardAppService.getAllAppData as jest.Mock).mockReturnValue({
         apps: new Map([['weather', { temperature: 75 }], ['calendar', { events: [] }]]),
         activeApps: [],
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       });
       
       // Create new service to trigger initialization
@@ -551,7 +551,7 @@ describe('DashboardContextService', () => {
       (dashboardAppService.getAllAppData as jest.Mock).mockReturnValue({
         apps: new Map([['notes', { count: 5 }]]),
         activeApps: [],
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
       });
       updateCallback();
       

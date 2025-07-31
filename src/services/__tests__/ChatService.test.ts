@@ -108,7 +108,7 @@ describe('ChatService', () => {
       const originalEnv = import.meta.env.VITE_LLM_API_URL;
       Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
         value: 'http://env-api.com',
-        configurable: true
+        configurable: true,
       });
       
       const envService = new ChatService();
@@ -116,7 +116,7 @@ describe('ChatService', () => {
       
       Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
         value: originalEnv,
-        configurable: true
+        configurable: true,
       });
     });
 
@@ -124,7 +124,7 @@ describe('ChatService', () => {
       const originalEnv = import.meta.env.VITE_LLM_API_URL;
       Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
         value: undefined,
-        configurable: true
+        configurable: true,
       });
       
       const defaultService = new ChatService();
@@ -132,7 +132,7 @@ describe('ChatService', () => {
       
       Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
         value: originalEnv,
-        configurable: true
+        configurable: true,
       });
     });
   });

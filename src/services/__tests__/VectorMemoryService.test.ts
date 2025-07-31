@@ -122,13 +122,13 @@ describe('VectorMemoryService', () => {
         email: 'test@example.com',
         name: 'Test User',
         memberSince: '2024-01-01',
-        preferences: {}
+        preferences: {},
       },
       environment: {
         deviceType: 'desktop',
         isOnline: true,
         prefersDarkMode: false,
-        language: 'en-US'
+        language: 'en-US',
       },
       location: {
         coordinates: { latitude: 37.7749, longitude: -122.4194, accuracy: 10 },
@@ -140,7 +140,7 @@ describe('VectorMemoryService', () => {
         ipAddress: '192.168.1.1',
         isp: 'Test ISP',
         postal: '94102',
-        address: '123 Market St'
+        address: '123 Market St',
       },
       weather: {
         temperature: 65,
@@ -150,13 +150,13 @@ describe('VectorMemoryService', () => {
         windSpeed: 10,
         feelsLike: 63,
         unit: 'fahrenheit',
-        hasData: true
+        hasData: true,
       },
       activity: {
         activeComponents: ['VirgilChatbot'],
         recentActions: ['send_message'],
         timeSpentInSession: 30000,
-        lastInteraction: Date.now()
+        lastInteraction: Date.now(),
       },
       currentTime: '12:00 PM',
       currentDate: 'January 20, 2024',
@@ -166,8 +166,8 @@ describe('VectorMemoryService', () => {
         hasData: true,
         browser: 'Chrome',
         os: 'macOS',
-        screen: '1920x1080'
-      }
+        screen: '1920x1080',
+      },
     });
     
     mockDynamicContextBuilder.createContextSummary.mockReturnValue('Test context summary');
@@ -447,13 +447,13 @@ describe('VectorMemoryService', () => {
           email: '',
           name: '',
           memberSince: '',
-          preferences: {}
+          preferences: {},
         },
         environment: {
           deviceType: 'desktop',
           isOnline: false,
           prefersDarkMode: false,
-          language: 'en-US'
+          language: 'en-US',
         },
         location: {
           coordinates: { latitude: 0, longitude: 0, accuracy: 0 },
@@ -465,20 +465,20 @@ describe('VectorMemoryService', () => {
           ipAddress: '',
           isp: '',
           postal: '',
-          address: ''
+          address: '',
         },
         weather: { hasData: false, unit: 'fahrenheit' },
         activity: {
           activeComponents: [],
           recentActions: [],
           timeSpentInSession: 0,
-          lastInteraction: 0
+          lastInteraction: 0,
         },
         currentTime: '',
         currentDate: '',
         dayOfWeek: '',
         timeOfDay: 'morning',
-        device: { hasData: false, browser: '', os: '', screen: '' }
+        device: { hasData: false, browser: '', os: '', screen: '' },
       });
       
       const message: ChatMessage = {
@@ -930,8 +930,8 @@ describe('VectorMemoryService', () => {
     });
 
     it('handles unauthenticated user', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
-        data: { user: null },
+      (mockSupabase.auth.getUser as jest.MockedFunction<typeof mockSupabase.auth.getUser>).mockResolvedValue({
+        data: { user: null as any },
         error: null,
       });
 
