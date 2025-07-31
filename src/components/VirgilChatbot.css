@@ -1,5 +1,13 @@
 /* Virgil Chatbot Styles */
 
+/* Z-Index Hierarchy:
+ * 10   - Remember button (.remember-btn in chat-interface.css)
+ * 100  - Chat header (ensures dropdowns appear above messages)
+ * 1001 - Chat container and bubble
+ * 1002 - Tooltips
+ * 1050 - Dropdowns (model and profile)
+ */
+
 /* Floating bubble */
 .virgil-chatbot-bubble {
   position: fixed;
@@ -14,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1001;
+  z-index: 1001; /* Above page content */
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -79,7 +87,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  z-index: 1001;
+  z-index: 1001; /* Same as bubble */
   overflow: visible;
   animation: slideUp 0.3s ease-out;
   transition: all 0.3s ease;
@@ -305,150 +313,8 @@
   box-shadow: 0 2px 4px rgba(52, 152, 219, 0.15);
 }
 
-/* Model Selector */
-.model-selector {
-  position: relative;
-}
+/* Model Selector - Styles moved to ui-controls.css */
 
-.model-dropdown-btn {
-  background: var(--brand-light-gray);
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.9rem;
-  color: var(--brand-medium-gray);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-}
-
-.model-dropdown-btn.compact {
-  height: 20px;
-  width: 54px;
-  padding: 0;
-  font-size: 10px;
-  font-weight: 600;
-  border-radius: 12px;
-  gap: 0.15rem;
-  background: rgba(108, 117, 125, 0.12);
-  border: 1px solid rgba(108, 117, 125, 0.25);
-  color: rgba(108, 117, 125, 0.9);
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: 0.3px;
-  justify-content: center;
-  /* Match status pill styling */
-  flex-shrink: 0;
-}
-
-.profile-dropdown-btn.compact {
-  height: 20px;
-  padding: 0 0.5rem;
-  font-size: 0.8rem;
-  border-radius: 12px;
-  gap: 0.25rem;
-  /* Match status pill height */
-}
-
-.model-dropdown-btn:hover {
-  background: var(--color-surface);
-  border-color: var(--brand-light-purple);
-}
-
-.model-dropdown-btn.compact:hover {
-  background: rgba(108, 117, 125, 0.2);
-  border-color: rgba(108, 117, 125, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.15);
-}
-
-.dropdown-arrow {
-  font-size: 0.7rem;
-  transition: transform 0.2s ease;
-}
-
-.model-dropdown-btn:hover .dropdown-arrow {
-  transform: rotate(180deg);
-}
-
-.model-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 120px;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 2px;
-  z-index: 1050;
-  overflow: hidden;
-  animation: slideDown 0.15s ease-out;
-  /* Compact mini-list design */
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.model-option {
-  padding: 0.4rem 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-  border-bottom: 1px solid var(--off-white);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.model-option:last-child {
-  border-bottom: none;
-}
-
-.model-option:hover {
-  background: var(--color-surface);
-}
-
-.model-option.selected {
-  background: rgba(108, 59, 170, 0.08);
-  border-left: 2px solid var(--brand-accent-purple);
-}
-
-.model-name {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 0.75rem;
-  color: var(--brand-dark-purple);
-  line-height: 1.1;
-}
-
-.model-description {
-  font-size: 0.65rem;
-  color: var(--brand-medium-gray);
-  line-height: 1.2;
-  max-width: 100px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 /* Window Controls Container */
 .window-controls {
@@ -545,16 +411,7 @@
   animation: fadeIn 0.3s ease-out;
 } */
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* fadeIn animation - Using the one defined in chat-interface.css */
 
 /* .user-msg {
   flex-direction: row-reverse;
@@ -820,262 +677,11 @@
   /* Push controls to right side while maintaining stable left alignment */
 }
 
-.profile-selector {
-  position: relative;
-}
+/* Profile Dropdown - Styles moved to chat-interface.css */
 
-.profile-dropdown-btn {
-  background: none;
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
-  padding: 0.4rem 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
-}
+/* Profile sections - Styles moved to chat-interface.css */
 
-.profile-dropdown-btn:hover {
-  background: var(--color-surface);
-  border-color: var(--brand-light-purple);
-}
-
-.user-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--brand-accent-purple);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 600;
-  overflow: hidden;
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  margin-top: 0.5rem;
-  z-index: 1050;
-  min-width: 280px;
-  max-width: min(400px, calc(100vw - 2rem));
-  overflow: hidden;
-  animation: slideDown 0.2s ease-out;
-}
-
-.profile-section {
-  padding: 1.25rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.profile-section:last-child {
-  border-bottom: none;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0;
-}
-
-.profile-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--brand-accent-purple);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  overflow: hidden;
-}
-
-.profile-info {
-  flex: 1;
-}
-
-.profile-name {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--brand-dark-purple);
-  margin: 0;
-  line-height: 1.2;
-}
-
-.profile-email {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  color: var(--brand-medium-gray);
-  margin: 0;
-  line-height: 1.2;
-  margin-top: 0.25rem;
-}
-
-.section-title {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--brand-dark-purple);
-  margin: 0 0 0.75rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.profile-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding: 0.25rem 0;
-}
-
-.profile-item:last-child {
-  margin-bottom: 0;
-}
-
-.item-icon {
-  font-size: 1rem;
-  width: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.item-text {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  color: var(--brand-medium-gray);
-  line-height: 1.3;
-  flex: 1;
-}
-
-.profile-action {
-  background: none;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  margin-bottom: 0.5rem;
-  transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  color: var(--brand-medium-gray);
-}
-
-.profile-action:last-child {
-  margin-bottom: 0;
-}
-
-.profile-action:hover {
-  background: var(--color-surface);
-  border-color: var(--brand-light-purple);
-  color: var(--brand-dark-purple);
-}
-
-.action-icon {
-  font-size: 0.9rem;
-  width: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Chatbot System Prompt Editor Styles */
-.chatbot-prompt-textarea {
-  width: 100%;
-  background: var(--color-chat-bg);
-  border: 1px solid rgba(108, 59, 170, 0.2);
-  border-radius: 6px;
-  color: var(--brand-dark-purple);
-  padding: 10px;
-  font-size: 12px;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  line-height: 1.3;
-  resize: vertical;
-  min-height: 100px;
-  transition: border-color 0.2s ease;
-  margin-bottom: 10px;
-}
-
-.chatbot-prompt-textarea:focus {
-  outline: none;
-  border-color: var(--brand-accent-purple);
-  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.1);
-}
-
-.chatbot-prompt-textarea::placeholder {
-  color: var(--brand-light-purple);
-  font-style: italic;
-}
-
-.chatbot-prompt-actions {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.chatbot-prompt-btn {
-  background: var(--brand-accent-purple);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  flex: 1;
-}
-
-.chatbot-prompt-btn:hover {
-  background: var(--brand-light-purple);
-  transform: translateY(-1px);
-}
-
-.chatbot-prompt-btn.save {
-  background: var(--brand-accent-purple);
-}
-
-.chatbot-prompt-btn.reset {
-  background: var(--color-primary);
-}
-
-.chatbot-prompt-btn.reset:hover {
-  background: var(--color-primary-hover);
-}
-
-.chatbot-prompt-info {
-  padding-top: 8px;
-  border-top: 1px solid var(--color-border);
-}
-
-.chatbot-prompt-info small {
-  color: var(--brand-medium-gray);
-  font-size: 10px;
-  line-height: 1.2;
-}
-
-.prompt-active {
-  color: var(--color-active);
-  font-weight: 600;
-}
+/* Chatbot System Prompt Editor - Styles moved to chat-interface.css */
 
 
 /* Recent Messages Tab Styles */
@@ -1258,23 +864,13 @@
 
 /* GPU acceleration for smooth animations */
 @supports (will-change: transform) {
-  .chatbot-open,
-  .chatbot-close,
   .model-selector,
   .profile-selector,
-  .model-option,
-  .model-dropdown {
+  .model-option {
     will-change: transform;
   }
 }
 
-/* Force hardware acceleration on animated elements */
-.chatbot-modal,
-.profile-dropdown {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
 
 /* Enhanced hover states for desktop */
 @media (hover: hover) {
