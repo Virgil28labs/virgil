@@ -34,7 +34,6 @@ export function setupTimeTest(initialDate?: Date | string): TimeTestContext {
 
     advanceTime: (ms: number) => {
       timeService.advanceTime(ms);
-      jest.advanceTimersByTime(ms);
     },
 
     setTime: (date: Date | string) => {
@@ -43,12 +42,10 @@ export function setupTimeTest(initialDate?: Date | string): TimeTestContext {
 
     freezeTime: () => {
       timeService.freezeTime();
-      jest.useFakeTimers();
     },
 
     unfreezeTime: () => {
       timeService.unfreezeTime();
-      jest.useRealTimers();
     },
 
     expectTimeAgo: (date: Date, expected: string) => {
@@ -61,7 +58,6 @@ export function setupTimeTest(initialDate?: Date | string): TimeTestContext {
 
     cleanup: () => {
       timeService.destroy();
-      jest.useRealTimers();
     },
   };
 }

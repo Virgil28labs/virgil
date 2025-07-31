@@ -108,7 +108,12 @@ export class TimeService {
    * @returns Formatted date string
    */
   formatDate(date?: Date): string {
-    return this.dateFormatter.format(date || new Date());
+    const dateObj = date || new Date();
+    // Handle invalid dates gracefully
+    if (!this.isValidDate(dateObj)) {
+      return 'Invalid Date';
+    }
+    return this.dateFormatter.format(dateObj);
   }
 
   /**
@@ -606,6 +611,10 @@ export class TimeService {
    * @returns Date object or null if invalid
    */
   parseDate(dateString: string): Date | null {
+    // Handle null/undefined inputs
+    if (dateString == null || dateString === '') {
+      return null;
+    }
     const date = new Date(dateString);
     return this.isValidDate(date) ? date : null;
   }

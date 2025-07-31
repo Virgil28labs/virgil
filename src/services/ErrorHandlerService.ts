@@ -66,11 +66,17 @@ class ErrorHandlerService {
     );
 
     // Log the error
-    logger.error(error.message, error, {
-      component: info?.component || 'Unknown',
-      action: info?.action || 'error',
-      metadata: info?.metadata,
-    });
+    try {
+      logger.error(error.message, error, {
+        component: info?.component || 'Unknown',
+        action: info?.action || 'error',
+        metadata: info?.metadata,
+      });
+    } catch (logError) {
+      // Failsafe: if logging fails, at least show console error
+      console.error('Logger failed:', logError);
+      console.error('Original error:', error);
+    }
 
     // Check if we're getting too many errors
     if (this.errorQueue.length >= this.ERROR_THRESHOLD) {
@@ -98,7 +104,7 @@ class ErrorHandlerService {
    * Show appropriate user notification based on error type
    */
   private showUserNotification(error: Error) {
-    const message = error.message.toLowerCase();
+    const message = (error.message || String(error)).toLowerCase();
 
     if (message.includes('network') || message.includes('fetch')) {
       toastService.error('Network error. Please check your connection.');

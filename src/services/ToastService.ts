@@ -24,7 +24,14 @@ class ToastService {
    * Emit a toast event to all subscribers
    */
   private emit(toast: Omit<Toast, 'id'>): void {
-    this.listeners.forEach(listener => listener(toast));
+    this.listeners.forEach(listener => {
+      try {
+        listener(toast);
+      } catch (error) {
+        // Silently ignore listener errors to prevent cascade failures
+        console.error('Toast listener error:', error);
+      }
+    });
   }
 
   /**
