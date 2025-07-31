@@ -150,7 +150,7 @@ describe('CameraAdapter', () => {
     });
 
     it('sets timestamp when data is loaded', async () => {
-      const adapter = new CameraAdapter();
+      new CameraAdapter(); // adapter instance created to trigger initialization
       await new Promise(resolve => setTimeout(resolve, 10));
       
       expect(mockTimeService.getTimestamp).toHaveBeenCalled();
@@ -654,7 +654,7 @@ describe('CameraAdapter', () => {
 
   describe('Time Service Integration', () => {
     it('uses timeService for all timestamp operations', async () => {
-      const adapter = new CameraAdapter();
+      new CameraAdapter();
       await new Promise(resolve => setTimeout(resolve, 10));
       
       expect(mockTimeService.getTimestamp).toHaveBeenCalled();
@@ -666,7 +666,7 @@ describe('CameraAdapter', () => {
     it('converts timestamps to dates correctly', async () => {
       const adapter = new CameraAdapter();
       await new Promise(resolve => setTimeout(resolve, 10));
-      const contextData = adapter.getContextData();
+      adapter.getContextData();
       
       // Should call fromTimestamp for oldest and newest photos
       expect(mockTimeService.fromTimestamp).toHaveBeenCalledWith(1642672800000);

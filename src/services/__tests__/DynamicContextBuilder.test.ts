@@ -57,21 +57,12 @@ describe('DynamicContextBuilder', () => {
       email: 'test@example.com',
       name: 'Test User',
       memberSince: '2024-01-01',
-      profile: {
-        firstName: 'Test',
-        lastName: 'User',
-        birthday: '1990-01-15',
-        phoneNumber: '+1234567890',
-        gender: 'other',
-        maritalStatus: 'single',
-      },
+      preferences: {},
     },
     environment: {
-      timeOfDay: 'afternoon',
-      date: 'January 15, 2025',
-      season: 'winter',
       deviceType: 'desktop',
       isOnline: true,
+      prefersDarkMode: false,
       language: 'en-US',
     },
     location: {
@@ -101,20 +92,11 @@ describe('DynamicContextBuilder', () => {
       hasData: true,
     },
     activity: {
-      currentTime: '12:00 PM',
-      currentDate: 'January 15, 2025',
-      timeSinceLastActivity: 30000,
-      lastComponent: 'Dashboard',
-      visitCount: 5,
-      isNewSession: false,
-      browser: 'Chrome',
-      os: 'macOS',
-      screenResolution: '1920x1080',
-      cpu: '8-core',
-      memory: '16GB',
-      networkSpeed: 'fast',
+      activeComponents: ['Dashboard'],
+      recentActions: ['view_dashboard'],
+      timeSpentInSession: 30000,
+      lastInteraction: Date.now(),
     },
-    suggestions: [],
     currentTime: '12:00 PM',
     currentDate: 'January 15, 2025',
     dayOfWeek: 'Wednesday',
@@ -123,10 +105,7 @@ describe('DynamicContextBuilder', () => {
       hasData: true,
       browser: 'Chrome',
       os: 'macOS',
-      screenResolution: '1920x1080',
-      cpu: '8-core',
-      memory: '16GB',
-      networkSpeed: 'fast',
+      screen: '1920x1080',
     },
   };
 
@@ -361,6 +340,16 @@ describe('DynamicContextBuilder', () => {
         appName: 'notes',
         displayName: 'Notes',
         getConfidence: jest.fn(),
+        getContextData: jest.fn(() => ({
+          appName: 'notes',
+          displayName: 'Notes',
+          isActive: true,
+          lastUsed: Date.now(),
+          data: {},
+          summary: '5 notes saved',
+          capabilities: ['create', 'read'],
+        })),
+        getKeywords: jest.fn(() => ['note', 'notes']),
       };
       
       mockDashboardAppService.getAppsWithConfidence.mockResolvedValue([
@@ -385,8 +374,22 @@ describe('DynamicContextBuilder', () => {
   describe('Context Suggestions', () => {
     it('includes suggestions in enhanced prompt', async () => {
       const mockSuggestions: ContextualSuggestion[] = [
-        { text: 'Good afternoon!', reason: 'time-based greeting' },
-        { text: 'Ready for lunch?', reason: 'meal time suggestion' },
+        { 
+          id: 'greeting-1',
+          type: 'information',
+          priority: 'medium',
+          content: 'Good afternoon!',
+          reasoning: 'time-based greeting',
+          triggers: ['greeting', 'hello'],
+        },
+        { 
+          id: 'meal-1',
+          type: 'recommendation',
+          priority: 'low',
+          content: 'Ready for lunch?',
+          reasoning: 'meal time suggestion',
+          triggers: ['lunch', 'meal'],
+        },
       ];
       
       const originalPrompt = 'Hello';

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { DogGalleryContent } from './DogGalleryContent';
-import { useDogGallery } from './hooks/useDogGallery';
-import type { DogImage, DogGalleryContextType } from '../../types';
+import { DogGalleryContent } from '../DogGalleryContent';
+import { useDogGallery } from '../hooks/useDogGallery';
+import type { DogImage, DogGalleryContextType } from '../../../types/dog.types';
 
 // Mock the components
 interface FetchControlsProps {

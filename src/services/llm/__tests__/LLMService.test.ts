@@ -6,7 +6,7 @@
  */
 
 import { LLMService } from '../LLMService';
-import { logger } from '../../../lib/logger';
+import type { LLMMessage } from '../../../types/llm.types';
 
 // Mock dependencies
 const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
@@ -20,8 +20,6 @@ jest.mock('../../../lib/logger', () => ({
     debug: jest.fn(),
   },
 }));
-
-const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('LLMService', () => {
   let llmService: LLMService;
@@ -66,7 +64,7 @@ describe('LLMService', () => {
         messages: [{ role: 'user', content: 'Hello' }],
       });
 
-      expect(response.choices[0].message.content).toBe('Test response');
+      expect(response.content).toBe('Test response');
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/llm/complete'),
         expect.objectContaining({
@@ -79,7 +77,7 @@ describe('LLMService', () => {
     });
 
     it('includes all messages in request', async () => {
-      const messages = [
+      const messages: LLMMessage[] = [
         { role: 'user', content: 'Hello' },
         { role: 'assistant', content: 'Hi there!' },
         { role: 'user', content: 'How are you?' },
@@ -87,7 +85,7 @@ describe('LLMService', () => {
 
       await llmService.complete({ messages });
 
-      const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const requestBody = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
       expect(requestBody.messages).toHaveLength(3);
       expect(requestBody.messages).toEqual(messages);
     });
@@ -100,7 +98,7 @@ describe('LLMService', () => {
         systemPrompt,
       });
 
-      const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const requestBody = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
       expect(requestBody.messages[0]).toEqual({
         role: 'system',
         content: systemPrompt,
@@ -113,7 +111,7 @@ describe('LLMService', () => {
         model: 'gpt-4',
       });
 
-      const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const requestBody = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
       expect(requestBody.model).toBe('gpt-4');
     });
 
@@ -123,7 +121,7 @@ describe('LLMService', () => {
         temperature: 0.9,
       });
 
-      const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const requestBody = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
       expect(requestBody.temperature).toBe(0.9);
     });
 
@@ -133,7 +131,7 @@ describe('LLMService', () => {
         maxTokens: 1000,
       });
 
-      const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const requestBody = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
       expect(requestBody.maxTokens).toBe(1000);
     });
   });

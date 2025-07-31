@@ -211,7 +211,7 @@ describe('ErrorHandlerService', () => {
 
   describe('Function Wrapping', () => {
     it('wraps sync functions correctly', () => {
-      const testFn = jest.fn(() => 'success');
+      const testFn = jest.fn((..._args: any[]) => 'success');
       const info = { component: 'TestComponent', action: 'testAction' };
       
       const wrappedFn = errorHandlerService.wrapFunction(testFn, info);
@@ -238,7 +238,7 @@ describe('ErrorHandlerService', () => {
     });
 
     it('wraps async functions correctly', async () => {
-      const testFn = jest.fn(async () => 'async success');
+      const testFn = jest.fn(async (..._args: any[]) => 'async success');
       const info = { component: 'TestComponent', action: 'asyncAction' };
       
       const wrappedFn = errorHandlerService.wrapFunction(testFn, info);
@@ -362,7 +362,7 @@ describe('ErrorHandlerService', () => {
       const handler = jest.fn();
       window.addEventListener = jest.fn((event, callback) => {
         if (event === 'unhandledrejection') {
-          handler.mockImplementation(callback);
+          handler.mockImplementation(callback as (...args: any[]) => any);
         }
       });
 
@@ -392,7 +392,7 @@ describe('ErrorHandlerService', () => {
       const handler = jest.fn();
       window.addEventListener = jest.fn((event, callback) => {
         if (event === 'error') {
-          handler.mockImplementation(callback);
+          handler.mockImplementation(callback as (...args: any[]) => any);
         }
       });
 

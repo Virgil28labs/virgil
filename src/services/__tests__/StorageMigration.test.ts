@@ -6,7 +6,7 @@
  */
 
 import { StorageMigration } from '../StorageMigration';
-import { StorageService, STORAGE_KEYS } from '../StorageService';
+import { StorageService } from '../StorageService';
 import { logger } from '../../lib/logger';
 
 // Mock dependencies

@@ -735,7 +735,7 @@ describe('CircleGameAdapter', () => {
 
   describe('Time Handling', () => {
     it('uses timeService for timestamp operations', () => {
-      const adapter = new CircleGameAdapter();
+      new CircleGameAdapter();
       
       expect(mockTimeService.getTimestamp).toHaveBeenCalled();
     });

@@ -181,7 +181,7 @@ describe('StreakAdapterRefactored', () => {
     });
 
     it('sets timestamp when data is loaded', () => {
-      const adapter = new StreakAdapterRefactored();
+      new StreakAdapterRefactored();
       
       expect(mockTimeService.getTimestamp).toHaveBeenCalled();
     });
@@ -249,8 +249,7 @@ describe('StreakAdapterRefactored', () => {
 
     it('calculates recent activity correctly', () => {
       // Mock recent dates for activity calculation
-      mockTimeService.formatDateToLocal.mockImplementation((date: Date) => {
-        const dayOffset = Math.floor((date.getTime() - new Date('2024-01-20').getTime()) / (24 * 60 * 60 * 1000));
+      mockTimeService.formatDateToLocal.mockImplementation((_date: Date) => {
         return new Date('2024-01-20').toISOString().split('T')[0];
       });
       
@@ -674,7 +673,7 @@ describe('StreakAdapterRefactored', () => {
     });
 
     it('calculates relative time for perfect days correctly', async () => {
-      mockTimeService.getTimeAgo = jest.fn(() => '3 days ago');
+      mockTimeService.getTimeAgo = jest.fn((_date: Date) => '3 days ago');
       
       const response = await adapter.getResponse('perfect days');
       

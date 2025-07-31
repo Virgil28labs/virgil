@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DrawPerfectCircle } from './DrawPerfectCircle';
+import { DrawPerfectCircle } from '../DrawPerfectCircle';
 
 // Mock localStorage
 const mockLocalStorage = {

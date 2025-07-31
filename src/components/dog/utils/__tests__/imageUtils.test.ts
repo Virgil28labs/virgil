@@ -1,5 +1,5 @@
 import type React from 'react';
-import { stopEvent, downloadImage, copyImageToClipboard } from './imageUtils';
+import { stopEvent, downloadImage, copyImageToClipboard } from '../imageUtils';
 
 describe('imageUtils', () => {
   describe('stopEvent', () => {

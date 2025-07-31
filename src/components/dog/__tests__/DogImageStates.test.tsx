@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DogImageStates, DogImageSkeleton, DogImageError } from './DogImageStates';
+import { DogImageStates, DogImageSkeleton, DogImageError } from '../DogImageStates';
 
 const defaultProps = {
   loading: false,

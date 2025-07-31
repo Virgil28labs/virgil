@@ -138,6 +138,7 @@ describe('ConfidenceService', () => {
 
       // Setup default mocks
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'test query',
         normalized: 'test query',
         corrections: [],
         expansions: [],
@@ -234,6 +235,7 @@ describe('ConfidenceService', () => {
       } as AppDataAdapter;
 
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'basic query',
         normalized: 'basic query',
         corrections: [],
         expansions: [],
@@ -279,8 +281,9 @@ describe('ConfidenceService', () => {
 
     it('includes preprocessing info in logs when available', async () => {
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'tast query',
         normalized: 'test query',
-        corrections: [{ original: 'tast', corrected: 'test' }],
+        corrections: [{ original: 'tast', corrected: 'test', distance: 1 }],
         expansions: ['examination', 'trial'],
       });
       
@@ -332,6 +335,7 @@ describe('ConfidenceService', () => {
       getAppData = () => adapter.getContextData();
       
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'test query',
         normalized: 'test query',
         corrections: [],
         expansions: [],
@@ -379,6 +383,7 @@ describe('ConfidenceService', () => {
       // Fill cache with many entries to trigger cleanup
       for (let i = 0; i < 150; i++) {
         mockQueryPreprocessor.preprocess.mockReturnValue({
+          original: `query${i}`,
           normalized: `query${i}`,
           corrections: [],
           expansions: [],
@@ -391,6 +396,7 @@ describe('ConfidenceService', () => {
       
       // Add one more query to trigger cleanup when cache is full
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'cleanup-trigger',
         normalized: 'cleanup-trigger',
         corrections: [],
         expansions: [],
@@ -399,6 +405,7 @@ describe('ConfidenceService', () => {
       
       // Early queries should have been cleaned up when cache size limit was hit
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'query0',
         normalized: 'query0',
         corrections: [],
         expansions: [],
@@ -411,6 +418,7 @@ describe('ConfidenceService', () => {
       // Create many unique queries to test cache size management
       for (let i = 0; i < 150; i++) {
         mockQueryPreprocessor.preprocess.mockReturnValue({
+          original: `query ${i}`,
           normalized: `query ${i}`,
           corrections: [],
           expansions: [],
@@ -584,6 +592,7 @@ describe('ConfidenceService', () => {
       getAppData = () => adapter.getContextData();
       
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: 'test query',
         normalized: 'test query',
         corrections: [],
         expansions: [],
@@ -632,6 +641,7 @@ describe('ConfidenceService', () => {
 
     it('handles empty query strings', async () => {
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: '',
         normalized: '',
         corrections: [],
         expansions: [],
@@ -678,6 +688,7 @@ describe('ConfidenceService', () => {
       const longQuery = 'a'.repeat(1000);
       
       mockQueryPreprocessor.preprocess.mockReturnValue({
+        original: longQuery,
         normalized: longQuery,
         corrections: [],
         expansions: [],
@@ -708,6 +719,7 @@ describe('ConfidenceService', () => {
       const getAppData = () => adapter.getContextData();
       
       mockQueryPreprocessor.preprocess.mockImplementation((query: string) => ({
+        original: query,
         normalized: query,
         corrections: [],
         expansions: [],
@@ -745,6 +757,7 @@ describe('ConfidenceService', () => {
       // Generate many queries over time
       for (let i = 0; i < 200; i++) {
         mockQueryPreprocessor.preprocess.mockReturnValue({
+          original: `query ${i}`,
           normalized: `query ${i}`,
           corrections: [],
           expansions: [],

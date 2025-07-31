@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { DogGrid } from './DogGrid';
-import type { DogImage } from './hooks/useDogApi';
+import { DogGrid } from '../DogGrid';
+import type { DogImage } from '../hooks/useDogApi';
 
 // Mock DogCard component
-jest.mock('./DogCard', () => ({
+jest.mock('../DogCard', () => ({
   DogCard: jest.fn(({ dog, index, isFavorited, onImageClick, onFavoriteToggle }) => (
     <div data-testid={`dog-card-${dog.id}`}>
       <span>Dog: {dog.breed}</span>
@@ -15,7 +15,7 @@ jest.mock('./DogCard', () => ({
   )),
 }));
 
-import { DogCard } from './DogCard';
+import { DogCard } from '../DogCard';
 
 describe('DogGrid', () => {
   const mockDogs: DogImage[] = [

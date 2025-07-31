@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ImageModal } from './ImageModal';
-import { downloadImage, copyImageToClipboard } from './utils/imageUtils';
-import type { DogImage } from './hooks/useDogApi';
-import { logger } from '../../lib/logger';
+import { ImageModal } from '../ImageModal';
+import { downloadImage, copyImageToClipboard } from '../utils/imageUtils';
+import type { DogImage } from '../hooks/useDogApi';
+import { logger } from '../../../lib/logger';
 
 // Mock imageUtils
-jest.mock('./utils/imageUtils', () => ({
+jest.mock('../utils/imageUtils', () => ({
   stopEvent: jest.fn((e: Event) => {
     e.stopPropagation();
     e.preventDefault();

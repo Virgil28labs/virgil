@@ -28,7 +28,7 @@ jest.mock('../../TimeService', () => ({
       const parsed = new Date(date);
       return isNaN(parsed.getTime()) ? null : parsed;
     }),
-    formatDate: jest.fn((date: Date) => 'January 20, 2024'),
+    formatDate: jest.fn((_date: Date) => 'January 20, 2024'),
     getTimeAgo: jest.fn(() => '2 hours ago'),
   },
 }));

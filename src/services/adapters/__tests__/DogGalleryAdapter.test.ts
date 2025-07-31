@@ -6,7 +6,6 @@
  */
 
 import { DogGalleryAdapter } from '../DogGalleryAdapter';
-import { timeService } from '../../TimeService';
 import { logger } from '../../../lib/logger';
 
 // Mock dependencies
@@ -23,7 +22,7 @@ jest.mock('../../TimeService', () => ({
   timeService: {
     getTimestamp: jest.fn(() => 1703020800000), // Dec 20, 2023
     getCurrentDateTime: jest.fn(() => new Date('2023-12-20T00:00:00Z')),
-    formatDateToLocal: jest.fn((date: Date) => 'December 20, 2023'),
+    formatDateToLocal: jest.fn((_date: Date) => 'December 20, 2023'),
     fromTimestamp: jest.fn((timestamp: number) => new Date(timestamp)),
   },
 }));

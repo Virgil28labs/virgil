@@ -282,7 +282,7 @@ describe('LLM Service Index', () => {
 
       try {
         await complete({ messages: [] });
-        fail('Should have thrown error');
+        throw new Error('Should have thrown error');
       } catch (error) {
         expect(error).toBe(networkError);
         expect((error as Error).name).toBe('NetworkError');

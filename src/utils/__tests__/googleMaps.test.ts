@@ -362,7 +362,7 @@ describe('googleMaps', () => {
     });
 
     it('returns true when Street View is available', async () => {
-      mockStreetViewService.getPanorama.mockImplementation((request, callback) => {
+      mockStreetViewService.getPanorama.mockImplementation((_request, callback) => {
         callback({}, mockGoogle.maps.StreetViewStatus.OK);
       });
       
@@ -379,7 +379,7 @@ describe('googleMaps', () => {
     });
 
     it('returns false when Street View is not available', async () => {
-      mockStreetViewService.getPanorama.mockImplementation((request, callback) => {
+      mockStreetViewService.getPanorama.mockImplementation((_request, callback) => {
         callback({}, mockGoogle.maps.StreetViewStatus.ZERO_RESULTS);
       });
       

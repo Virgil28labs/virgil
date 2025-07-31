@@ -50,7 +50,7 @@ describe('lazyImport', () => {
         default: MockComponent,
       });
 
-      const LazyComponent = lazyImport(mockImportFn);
+      lazyImport(mockImportFn);
       
       expect(React.lazy).toHaveBeenCalled();
       
@@ -68,7 +68,7 @@ describe('lazyImport', () => {
         otherExport: () => 'other',
       });
 
-      const LazyComponent = lazyImport(mockImportFn, 'NamedComponent');
+      lazyImport(mockImportFn, 'NamedComponent');
       
       const factory = mockLazy.mock.calls[0][0];
       const result = await factory();
@@ -82,7 +82,7 @@ describe('lazyImport', () => {
         SecondComponent: MockNamedComponent,
       });
 
-      const LazyComponent = lazyImport(mockImportFn);
+      lazyImport(mockImportFn);
       
       const factory = mockLazy.mock.calls[0][0];
       const result = await factory();
@@ -93,7 +93,7 @@ describe('lazyImport', () => {
     it('throws error when no valid export found', async () => {
       const mockImportFn = jest.fn().mockResolvedValue({});
 
-      const LazyComponent = lazyImport(mockImportFn);
+      lazyImport(mockImportFn);
       
       const factory = mockLazy.mock.calls[0][0];
       
@@ -105,7 +105,7 @@ describe('lazyImport', () => {
       const importError = new Error('Module load failed');
       const mockImportFn = jest.fn().mockRejectedValue(importError);
 
-      const LazyComponent = lazyImport(mockImportFn, 'TestComponent');
+      const _LazyComponent = lazyImport(mockImportFn, 'TestComponent');
       
       const factory = mockLazy.mock.calls[0][0];
       
@@ -175,14 +175,15 @@ describe('lazyImport', () => {
       mockLazy.mockImplementation((factory) => ({
         _factory: factory,
         _payload: mockPayload,
+        _result: null,
         $$typeof: Symbol.for('react.lazy'),
-      }));
+      }) as any);
 
       const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
-      const { Component, preload } = lazyWithPreload(mockImportFn);
+      const { preload } = lazyWithPreload(mockImportFn);
 
       preload();
 
@@ -196,7 +197,7 @@ describe('lazyImport', () => {
         default: MockComponent,
       });
 
-      const LazyComponent = lazyImport(mockImportFn, undefined);
+      lazyImport(mockImportFn, undefined);
       
       const factory = mockLazy.mock.calls[0][0];
       const result = await factory();
@@ -209,7 +210,7 @@ describe('lazyImport', () => {
         default: MockComponent,
       });
 
-      const LazyComponent = lazyImport(mockImportFn, '');
+      lazyImport(mockImportFn, '');
       
       const factory = mockLazy.mock.calls[0][0];
       const result = await factory();
@@ -255,7 +256,7 @@ describe('lazyImport', () => {
       const mockImportFn = jest.fn().mockResolvedValue(complexModule);
 
       // Test with default export (should use default)
-      const LazyComponent = lazyImport(mockImportFn);
+      lazyImport(mockImportFn);
       
       const factory = mockLazy.mock.calls[0][0];
       const result = await factory();

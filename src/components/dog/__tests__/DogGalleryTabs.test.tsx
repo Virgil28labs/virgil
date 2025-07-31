@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DogGalleryTabs } from './DogGalleryTabs';
+import { DogGalleryTabs } from '../DogGalleryTabs';
 
 const defaultProps = {
   activeTab: 'fetch' as const,

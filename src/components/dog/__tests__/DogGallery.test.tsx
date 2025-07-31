@@ -1,16 +1,16 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DogGallery } from './DogGallery';
-import { useDogApi } from './hooks/useDogApi';
-import { useDogFavorites } from './hooks/useDogFavorites';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
-import type { Shortcut } from '../../hooks/useKeyboardShortcuts';
-import type { DogImage } from './hooks/useDogApi';
+import { DogGallery } from '../DogGallery';
+import { useDogApi } from '../hooks/useDogApi';
+import { useDogFavorites } from '../hooks/useDogFavorites';
+import { useKeyboardShortcuts } from '../../../hooks/useKeyboardShortcuts';
+import type { Shortcut } from '../../../hooks/useKeyboardShortcuts';
+import type { DogImage } from '../hooks/useDogApi';
 
 // Mock hooks
-jest.mock('./hooks/useDogApi');
-jest.mock('./hooks/useDogFavorites');
-jest.mock('../../hooks/useKeyboardShortcuts');
+jest.mock('../hooks/useDogApi');
+jest.mock('../hooks/useDogFavorites');
+jest.mock('../../../hooks/useKeyboardShortcuts');
 
 // Mock components
 jest.mock('./FetchControls', () => ({

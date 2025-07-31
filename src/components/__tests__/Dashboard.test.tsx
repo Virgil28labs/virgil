@@ -172,15 +172,15 @@ describe('Dashboard', () => {
     updated_at: '2024-01-01T00:00:00.000Z',
     role: 'authenticated',
     last_sign_in_at: '2024-01-01T00:00:00.000Z',
-    confirmation_sent_at: null,
+    confirmation_sent_at: undefined,
     confirmed_at: '2024-01-01T00:00:00.000Z',
     email_confirmed_at: '2024-01-01T00:00:00.000Z',
-    phone: null,
-    phone_confirmed_at: null,
-    recovery_sent_at: null,
-    new_email: null,
-    invited_at: null,
-    factors: null,
+    phone: undefined,
+    phone_confirmed_at: undefined,
+    recovery_sent_at: undefined,
+    new_email: undefined,
+    invited_at: undefined,
+    factors: undefined,
     identities: [],
     is_anonymous: false,
   };
@@ -188,8 +188,8 @@ describe('Dashboard', () => {
   const defaultAuthData = {
     user: mockUser,
     loading: false,
-    signOut: jest.fn(),
-    refreshUser: jest.fn(),
+    signOut: jest.fn().mockResolvedValue({ error: undefined }),
+    refreshUser: jest.fn().mockResolvedValue(undefined),
   };
 
   const defaultLocationData = {

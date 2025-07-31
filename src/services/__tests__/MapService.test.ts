@@ -6,7 +6,7 @@
  */
 
 import type { DirectionsRequestConfig } from '../MapService';
-import { MapService, DirectionsResult } from '../MapService';
+import { MapService } from '../MapService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 import { createLocationMarker } from '../../utils/googleMaps';
@@ -149,7 +149,7 @@ describe('MapService', () => {
         },
       ];
 
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback({ routes: mockRoutes }, 'OK');
       });
 
@@ -178,7 +178,7 @@ describe('MapService', () => {
     });
 
     it('uses custom travel mode', async () => {
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback({ routes: [] }, 'OK');
       });
 
@@ -200,7 +200,7 @@ describe('MapService', () => {
 
     it('uses custom departure time', async () => {
       const customTime = new Date('2024-02-01T15:30:00');
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback({ routes: [] }, 'OK');
       });
 
@@ -223,7 +223,7 @@ describe('MapService', () => {
     });
 
     it('uses current time when departureTime is "now"', async () => {
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback({ routes: [] }, 'OK');
       });
 
@@ -247,7 +247,7 @@ describe('MapService', () => {
     });
 
     it('disables route alternatives when specified', async () => {
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback({ routes: [] }, 'OK');
       });
 
@@ -268,7 +268,7 @@ describe('MapService', () => {
     });
 
     it('handles directions service errors', async () => {
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback(null, 'NOT_FOUND');
       });
 
@@ -324,7 +324,7 @@ describe('MapService', () => {
         },
       ];
 
-      mockGeocoder.geocode.mockImplementation((request, callback) => {
+      mockGeocoder.geocode.mockImplementation((_request, callback) => {
         callback(mockResults, 'OK');
       });
 
@@ -339,7 +339,7 @@ describe('MapService', () => {
     });
 
     it('returns empty string when no results', async () => {
-      mockGeocoder.geocode.mockImplementation((request, callback) => {
+      mockGeocoder.geocode.mockImplementation((_request, callback) => {
         callback([], 'OK');
       });
 
@@ -350,7 +350,7 @@ describe('MapService', () => {
     });
 
     it('handles geocoding errors', async () => {
-      mockGeocoder.geocode.mockImplementation((request, callback) => {
+      mockGeocoder.geocode.mockImplementation((_request, callback) => {
         callback(null, 'ZERO_RESULTS');
       });
 
@@ -455,7 +455,7 @@ describe('MapService', () => {
           east: -122.3,
           west: -122.5,
         },
-      } as google.maps.DirectionsRoute;
+      } as unknown as google.maps.DirectionsRoute;
 
       mapService.fitRouteBounds(route);
 
@@ -478,7 +478,7 @@ describe('MapService', () => {
           east: -122.3,
           west: -122.5,
         },
-      } as google.maps.DirectionsRoute;
+      } as unknown as google.maps.DirectionsRoute;
 
       const customPadding = {
         top: 200,
@@ -508,7 +508,7 @@ describe('MapService', () => {
           east: -122.3,
           west: -122.5,
         },
-      } as google.maps.DirectionsRoute;
+      } as unknown as google.maps.DirectionsRoute;
 
       mapService.panToRouteBounds(route);
 
@@ -531,7 +531,7 @@ describe('MapService', () => {
           east: -122.3,
           west: -122.5,
         },
-      } as google.maps.DirectionsRoute;
+      } as unknown as google.maps.DirectionsRoute;
 
       const customPadding = {
         top: 200,
@@ -566,17 +566,15 @@ describe('MapService', () => {
   });
 
   describe('Edge Cases and Error Handling', () => {
-    let mapService: MapService;
-
     beforeEach(() => {
-      mapService = MapService.getInstance(mockMap);
+      MapService.getInstance(mockMap);
     });
 
     it('handles promise rejection in directions service', async () => {
       // Ensure service is initialized
       const freshMapService = MapService.getInstance(mockMap);
       
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, _callback) => {
         // Simulate an internal error in the directions service
         throw new Error('Internal service error');
       });
@@ -593,7 +591,7 @@ describe('MapService', () => {
       // Ensure service is initialized
       const freshMapService = MapService.getInstance(mockMap);
       
-      mockGeocoder.geocode.mockImplementation((request, callback) => {
+      mockGeocoder.geocode.mockImplementation((_request, _callback) => {
         // Simulate an internal error in the geocoder
         throw new Error('Geocoder service error');
       });
@@ -620,7 +618,7 @@ describe('MapService', () => {
       // Ensure service is initialized
       const freshMapService = MapService.getInstance(mockMap);
       
-      mockGeocoder.geocode.mockImplementation((request, callback) => {
+      mockGeocoder.geocode.mockImplementation((_request, callback) => {
         callback([{ malformed: 'result' }], 'OK');
       });
 
@@ -634,7 +632,7 @@ describe('MapService', () => {
       // Ensure service is initialized
       const freshMapService = MapService.getInstance(mockMap);
       
-      mockDirectionsService.route.mockImplementation((request, callback) => {
+      mockDirectionsService.route.mockImplementation((_request, callback) => {
         callback(null, 'OK');
       });
 

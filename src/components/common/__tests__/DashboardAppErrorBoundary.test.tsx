@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DashboardAppErrorBoundary } from './DashboardAppErrorBoundary';
-import { toastService } from '../../services/ToastService';
+import { DashboardAppErrorBoundary } from '../DashboardAppErrorBoundary';
+import { toastService } from '../../../services/ToastService';
 
 // Mock dependencies
-jest.mock('../../services/ToastService');
-jest.mock('../../lib/logger');
+jest.mock('../../../services/ToastService');
+jest.mock('../../../lib/logger');
 
 // Component that throws an error
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {

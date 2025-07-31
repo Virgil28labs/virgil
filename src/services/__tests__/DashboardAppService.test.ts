@@ -40,7 +40,7 @@ jest.mock('../../lib/logger', () => ({
 }));
 
 // Mock adapter implementations
-class MockAdapter implements AppDataAdapter {
+class MockAdapter implements AppDataAdapter<any> {
   constructor(
     public readonly appName: string,
     public readonly displayName: string,
@@ -75,6 +75,11 @@ class MockAdapter implements AppDataAdapter {
 
   async getResponse(query: string): Promise<string> {
     return `${this.displayName} response to: ${query}`;
+  }
+
+  subscribe(_callback: (data: any) => void): () => void {
+    // Mock subscription - return an unsubscribe function
+    return () => {};
   }
 
   async search(_query: string): Promise<any[]> {
@@ -501,9 +506,9 @@ describe('DashboardAppService', () => {
       
       service.registerAdapter(adapter);
       
-      // const context = service.getDetailedContext(['notes']);
-      // 
-      // expect(context).toContain('NOTES APP:');
+      const context = service.getDetailedContext(['notes']);
+      
+      expect(context).toContain('NOTES APP:');
       expect(context).toContain('Status: Active');
       expect(context).toContain('5 notes available');
       expect(context).toContain('Can help with: create, read, search');
@@ -934,7 +939,7 @@ describe('DashboardAppService', () => {
       
       // Test all functionality
       const appData = service.getAppData('notes');
-      expect(appData?.data.totalNotes).toBe(42);
+      expect((appData?.data as any).totalNotes).toBe(42);
       expect(appData?.capabilities).toContain('search');
       
       const allData = service.getAllAppData();

@@ -7,7 +7,6 @@
 
 import { RhythmMachineAdapter } from '../RhythmMachineAdapter';
 import { timeService } from '../../TimeService';
-import type { AppContextData } from '../../DashboardAppService';
 
 // Mock dependencies
 jest.mock('../../TimeService', () => ({
@@ -25,7 +24,7 @@ jest.mock('../../TimeService', () => ({
     getYear: jest.fn(() => 2025),
     parseDate: jest.fn((dateStr: string) => new Date(dateStr)),
     toISOString: jest.fn(() => '2025-01-15T12:00:00.000Z'),
-    getTimeAgo: jest.fn((date: Date) => '5 minutes ago'),
+    getTimeAgo: jest.fn((_date: Date) => '5 minutes ago'),
   },
 }));
 

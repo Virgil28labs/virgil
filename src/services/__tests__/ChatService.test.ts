@@ -52,7 +52,7 @@ const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
 import { logger } from '../../lib/logger';
-import { dashboardAppService, CONFIDENCE_THRESHOLDS } from '../DashboardAppService';
+import { dashboardAppService } from '../DashboardAppService';
 import { dedupeFetch } from '../../lib/requestDeduplication';
 
 describe('ChatService', () => {
@@ -106,22 +106,34 @@ describe('ChatService', () => {
 
     it('uses environment variable when no URL provided', () => {
       const originalEnv = import.meta.env.VITE_LLM_API_URL;
-      import.meta.env.VITE_LLM_API_URL = 'http://env-api.com';
+      Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
+        value: 'http://env-api.com',
+        configurable: true
+      });
       
       const envService = new ChatService();
       expect(envService).toBeDefined();
       
-      import.meta.env.VITE_LLM_API_URL = originalEnv;
+      Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
+        value: originalEnv,
+        configurable: true
+      });
     });
 
     it('uses default URL when environment variable not set', () => {
       const originalEnv = import.meta.env.VITE_LLM_API_URL;
-      delete import.meta.env.VITE_LLM_API_URL;
+      Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
+        value: undefined,
+        configurable: true
+      });
       
       const defaultService = new ChatService();
       expect(defaultService).toBeDefined();
       
-      import.meta.env.VITE_LLM_API_URL = originalEnv;
+      Object.defineProperty(import.meta.env, 'VITE_LLM_API_URL', {
+        value: originalEnv,
+        configurable: true
+      });
     });
   });
 

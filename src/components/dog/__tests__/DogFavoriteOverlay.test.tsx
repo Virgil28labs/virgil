@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DogFavoriteOverlay } from './DogFavoriteOverlay';
+import { DogFavoriteOverlay } from '../DogFavoriteOverlay';
 
 const defaultProps = {
   isFavorited: false,

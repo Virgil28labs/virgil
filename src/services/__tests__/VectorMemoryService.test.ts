@@ -5,7 +5,7 @@
  * Critical for intelligent context and conversation understanding.
  */
 
-import { VectorMemoryService, vectorMemoryService, VectorMemory } from '../VectorMemoryService';
+import { VectorMemoryService } from '../VectorMemoryService';
 import { SupabaseMemoryService } from '../SupabaseMemoryService';
 import { vectorService } from '../vectorService';
 import { timeService } from '../TimeService';
@@ -66,10 +66,11 @@ jest.mock('../../lib/logger', () => ({
   },
 }));
 
+const mockGetUser = jest.fn();
 jest.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
-      getUser: jest.fn(),
+      getUser: mockGetUser,
     },
     from: jest.fn(),
   },
@@ -94,7 +95,6 @@ describe('VectorMemoryService', () => {
   const mockDynamicContextBuilder = DynamicContextBuilder as jest.Mocked<typeof DynamicContextBuilder>;
   const mockLogger = logger as jest.Mocked<typeof logger>;
   const mockSupabase = supabase as jest.Mocked<typeof supabase>;
-  const mockSupabaseMemoryService = SupabaseMemoryService as jest.MockedClass<typeof SupabaseMemoryService>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -105,28 +105,75 @@ describe('VectorMemoryService', () => {
     // Mock time service
     mockTimeService.getTimestamp.mockReturnValue(1705748400000); // January 20, 2024
     mockTimeService.getCurrentDateTime.mockReturnValue(new Date(1705748400000));
-    mockTimeService.toISOString.mockImplementation((date) => date.toISOString());
+    mockTimeService.toISOString.mockImplementation((date?) => date ? date.toISOString() : new Date().toISOString());
     mockTimeService.formatDateToLocal.mockImplementation((date) => date.toLocaleDateString());
     mockTimeService.formatTimeToLocal.mockImplementation((date) => date.toLocaleTimeString());
     
     // Mock vector service as healthy by default
     mockVectorService.isHealthy.mockResolvedValue(true);
-    mockVectorService.store.mockResolvedValue(undefined);
+    mockVectorService.store.mockResolvedValue('mock-id');
     mockVectorService.search.mockResolvedValue([]);
     mockVectorService.getCount.mockResolvedValue(0);
     
     // Mock dashboard context
     mockDashboardContextService.getContext.mockReturnValue({
-      currentApp: 'test-app',
-      isActive: true,
-      data: {},
-      lastUsed: 1705748400000,
+      user: { 
+        isAuthenticated: true, 
+        email: 'test@example.com',
+        name: 'Test User',
+        memberSince: '2024-01-01',
+        preferences: {}
+      },
+      environment: {
+        deviceType: 'desktop',
+        isOnline: true,
+        prefersDarkMode: false,
+        language: 'en-US'
+      },
+      location: {
+        coordinates: { latitude: 37.7749, longitude: -122.4194, accuracy: 10 },
+        city: 'San Francisco',
+        region: 'California', 
+        country: 'US',
+        timezone: 'America/Los_Angeles',
+        hasGPS: true,
+        ipAddress: '192.168.1.1',
+        isp: 'Test ISP',
+        postal: '94102',
+        address: '123 Market St'
+      },
+      weather: {
+        temperature: 65,
+        condition: 'sunny',
+        description: 'Clear sky',
+        humidity: 60,
+        windSpeed: 10,
+        feelsLike: 63,
+        unit: 'fahrenheit',
+        hasData: true
+      },
+      activity: {
+        activeComponents: ['VirgilChatbot'],
+        recentActions: ['send_message'],
+        timeSpentInSession: 30000,
+        lastInteraction: Date.now()
+      },
+      currentTime: '12:00 PM',
+      currentDate: 'January 20, 2024',
+      dayOfWeek: 'Saturday',
+      timeOfDay: 'afternoon',
+      device: {
+        hasData: true,
+        browser: 'Chrome',
+        os: 'macOS',
+        screen: '1920x1080'
+      }
     });
     
     mockDynamicContextBuilder.createContextSummary.mockReturnValue('Test context summary');
     
     // Mock Supabase
-    mockSupabase.auth.getUser.mockResolvedValue({
+    mockGetUser.mockResolvedValue({
       data: { user: { id: 'test-user-id' } },
       error: null,
     });
@@ -394,7 +441,45 @@ describe('VectorMemoryService', () => {
       // Clear mock calls after health setup
       mockVectorService.store.mockClear();
       
-      mockDashboardContextService.getContext.mockReturnValue(null);
+      mockDashboardContextService.getContext.mockReturnValue({
+        user: { 
+          isAuthenticated: false, 
+          email: '',
+          name: '',
+          memberSince: '',
+          preferences: {}
+        },
+        environment: {
+          deviceType: 'desktop',
+          isOnline: false,
+          prefersDarkMode: false,
+          language: 'en-US'
+        },
+        location: {
+          coordinates: { latitude: 0, longitude: 0, accuracy: 0 },
+          city: '',
+          region: '', 
+          country: '',
+          timezone: '',
+          hasGPS: false,
+          ipAddress: '',
+          isp: '',
+          postal: '',
+          address: ''
+        },
+        weather: { hasData: false, unit: 'fahrenheit' },
+        activity: {
+          activeComponents: [],
+          recentActions: [],
+          timeSpentInSession: 0,
+          lastInteraction: 0
+        },
+        currentTime: '',
+        currentDate: '',
+        dayOfWeek: '',
+        timeOfDay: 'morning',
+        device: { hasData: false, browser: '', os: '', screen: '' }
+      });
       
       const message: ChatMessage = {
         id: 'test-msg',
@@ -747,7 +832,7 @@ describe('VectorMemoryService', () => {
       mockTimeService.getCurrentDateTime.mockReturnValue(mockDate);
       mockTimeService.startOfDay.mockReturnValue(new Date('2024-01-20T00:00:00Z'));
       mockTimeService.endOfDay.mockReturnValue(new Date('2024-01-20T23:59:59Z'));
-      mockTimeService.toISOString.mockImplementation((date) => date.toISOString());
+      mockTimeService.toISOString.mockImplementation((date?) => date ? date.toISOString() : new Date().toISOString());
       mockTimeService.formatDateToLocal.mockReturnValue('January 20, 2024');
       mockTimeService.parseDate.mockImplementation((timestamp) => 
         typeof timestamp === 'string' ? new Date(timestamp) : new Date(timestamp),

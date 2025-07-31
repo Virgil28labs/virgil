@@ -67,7 +67,7 @@ describe('IntentInitializer', () => {
     
     // Default mock implementations
     mockVectorMemoryService.waitForHealthCheck.mockResolvedValue(true);
-    mockVectorService.store.mockResolvedValue();
+    mockVectorService.store.mockResolvedValue('stored-id');
     (timeService.getTimestamp as jest.Mock).mockReturnValue(Date.now());
     
     // Reset initialization state
@@ -195,8 +195,8 @@ describe('IntentInitializer', () => {
     it('handles individual intent storage failures', async () => {
       mockVectorService.store
         .mockRejectedValueOnce(new Error('Store failed'))
-        .mockResolvedValueOnce()
-        .mockResolvedValueOnce();
+        .mockResolvedValueOnce('stored-id-1')
+        .mockResolvedValueOnce('stored-id-2');
       
       await initializer.initializeIntents();
       
@@ -421,14 +421,14 @@ describe('IntentInitializer', () => {
     it('handles concurrent lazy loads', async () => {
       // Create a delayed store implementation to test concurrent behavior
       let resolveStore: any;
-      const storePromise = new Promise(resolve => { resolveStore = resolve; });
+      const storePromise = new Promise<string>(resolve => { resolveStore = resolve; });
       mockVectorService.store.mockReturnValueOnce(storePromise);
       
       // Start multiple concurrent loads
       const promises = Array(3).fill(null).map(() => initializer.ensureIntentLoaded('dogGallery'));
       
       // Resolve the store operation
-      resolveStore();
+      resolveStore('stored-id');
       
       await Promise.all(promises);
       

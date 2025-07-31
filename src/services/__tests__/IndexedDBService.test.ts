@@ -17,6 +17,7 @@ class MockIDBRequest {
   error: any;
   onsuccess: any;
   onerror: any;
+  onupgradeneeded: any;
   
   constructor(result?: any, error?: any) {
     this.result = result;
@@ -40,10 +41,8 @@ class MockIDBTransaction {
 
 class MockIDBObjectStore {
   private data: Map<string, any> = new Map();
-  private name: string;
   
   constructor(name: string) {
-    this.name = name;
     // Get or create global data store
     const globalStore = (global as any).__mockIDBStores || {};
     if (!globalStore[name]) {
@@ -578,7 +577,7 @@ describe('IndexedDBService', () => {
       const result = await service.get('RetryTestDB', 'items', 'retry-test');
       
       expect(result.success).toBe(true);
-      expect(result.data?.data).toBe('success after retry');
+      expect((result.data as any)?.data).toBe('success after retry');
       expect(attempts).toBe(2);
       
       // Restore original method

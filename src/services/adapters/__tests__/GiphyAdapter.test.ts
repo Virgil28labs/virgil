@@ -7,19 +7,12 @@
 
 import { GiphyAdapter } from '../GiphyAdapter';
 import { timeService } from '../../TimeService';
-import { logger } from '../../ErrorHandlerService';
 
 // Mock dependencies
 jest.mock('../../TimeService', () => ({
   timeService: {
     getTimestamp: jest.fn(),
     toISOString: jest.fn(),
-  },
-}));
-
-jest.mock('../../ErrorHandlerService', () => ({
-  logger: {
-    error: jest.fn(),
   },
 }));
 
@@ -53,7 +46,6 @@ Object.defineProperty(window, 'addEventListener', {
 describe('GiphyAdapter', () => {
   let adapter: GiphyAdapter;
   const mockTimeService = timeService as jest.Mocked<typeof timeService>;
-  const mockLogger = logger as jest.Mocked<typeof logger>;
 
   const sampleGifs = [
     {

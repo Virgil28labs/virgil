@@ -10,7 +10,7 @@ import { toastService } from '../ToastService';
 import { dashboardContextService } from '../DashboardContextService';
 import { logger } from '../../lib/logger';
 import type { ChatMessage } from '../../types/chat.types';
-import type { StoredConversation, MarkedMemory } from '../MemoryService';
+import type { MarkedMemory } from '../MemoryService';
 
 // Mock dependencies
 jest.mock('../ToastService', () => ({
@@ -53,7 +53,7 @@ jest.mock('../TimeService', () => ({
     getMonth: jest.fn(() => 'January'),
     getYear: jest.fn(() => 2025),
     toISOString: jest.fn(() => '2025-01-15T12:00:00.000Z'),
-    getTimeAgo: jest.fn((date: Date) => '5 minutes ago'),
+    getTimeAgo: jest.fn((_date: Date) => '5 minutes ago'),
   },
 }));
 
@@ -63,6 +63,7 @@ class MockIDBRequest {
   error: any;
   onsuccess: any;
   onerror: any;
+  onupgradeneeded: any;
   
   constructor(result?: any, error?: any) {
     this.result = result;
@@ -78,10 +79,7 @@ class MockIDBTransaction {
 
 class MockIDBObjectStore {
   private data: Map<string, any> = new Map();
-  private name: string;
-  
   constructor(name: string) {
-    this.name = name;
     // Get or create data store
     const globalStore = (global as any).__mockDBStores || {};
     if (!globalStore[name]) {
@@ -145,7 +143,7 @@ class MockIDBObjectStore {
     return request;
   }
   
-  openCursor(range?: any, direction?: string) {
+  openCursor(_range?: any, direction?: string) {
     const request = new MockIDBRequest();
     setTimeout(() => {
       const values = Array.from(this.data.values());
@@ -160,7 +158,7 @@ class MockIDBObjectStore {
         continue: () => {
           index++;
           if (index < values.length) {
-            cursor.value = values[index];
+            cursor!.value = values[index];
             request.result = cursor;
             if (request.onsuccess) request.onsuccess();
           } else {
@@ -176,7 +174,7 @@ class MockIDBObjectStore {
     return request;
   }
   
-  index(indexName: string) {
+  index(_indexName: string) {
     return this; // Simplified - just return self for index operations
   }
 }
@@ -186,11 +184,11 @@ class MockIDBDatabase {
     contains: (name: string) => ['conversations', 'memories'].includes(name),
   };
   
-  transaction(storeNames: string[], mode: string) {
+  transaction(_storeNames: string[], _mode: string) {
     return new MockIDBTransaction();
   }
   
-  createObjectStore(name: string, options: any) {
+  createObjectStore(_name: string, _options: any) {
     return {
       createIndex: jest.fn(),
     };
@@ -198,7 +196,7 @@ class MockIDBDatabase {
 }
 
 const mockIndexedDB = {
-  open: jest.fn((name: string, version?: number) => {
+  open: jest.fn((_name: string, _version?: number) => {
     const request = new MockIDBRequest();
     
     setTimeout(() => {
@@ -229,15 +227,17 @@ describe('MemoryService', () => {
 
   // Sample data
   const sampleMessage: ChatMessage = {
+    id: 'msg-1',
     role: 'user',
     content: 'Hello, Virgil!',
-    timestamp: Date.now(),
+    timestamp: new Date().toISOString(),
   };
 
   const sampleAssistantMessage: ChatMessage = {
+    id: 'msg-2',
     role: 'assistant',
     content: 'Hello! How can I help you today?',
-    timestamp: Date.now() + 1000,
+    timestamp: new Date(Date.now() + 1000).toISOString(),
   };
 
   const sampleMemory: Omit<MarkedMemory, 'id'> = {
@@ -273,7 +273,7 @@ describe('MemoryService', () => {
 
     it('handles initialization errors', async () => {
       const originalOpen = mockIndexedDB.open;
-      mockIndexedDB.open = jest.fn(() => {
+      mockIndexedDB.open = jest.fn((_name: string, _version?: number) => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Failed to open DB');
@@ -319,9 +319,9 @@ describe('MemoryService', () => {
 
     it('maintains message order', async () => {
       const messages = [
-        { ...sampleMessage, content: 'First', timestamp: 1000 },
-        { ...sampleMessage, content: 'Second', timestamp: 2000 },
-        { ...sampleMessage, content: 'Third', timestamp: 3000 },
+        { ...sampleMessage, content: 'First', timestamp: new Date(1000).toISOString() },
+        { ...sampleMessage, content: 'Second', timestamp: new Date(2000).toISOString() },
+        { ...sampleMessage, content: 'Third', timestamp: new Date(3000).toISOString() },
       ];
 
       for (const msg of messages) {
@@ -363,7 +363,7 @@ describe('MemoryService', () => {
         await memoryService.saveConversation([{
           ...sampleMessage,
           content: `Message ${i}`,
-          timestamp: Date.now() + i,
+          timestamp: new Date(Date.now() + i).toISOString(),
         }]);
       }
 
@@ -425,7 +425,7 @@ describe('MemoryService', () => {
         await memoryService.saveConversation([{
           ...sampleMessage,
           content: `Message ${i}`,
-          timestamp: Date.now() + i,
+          timestamp: new Date(Date.now() + i).toISOString(),
         }]);
       }
       
@@ -578,7 +578,7 @@ describe('MemoryService', () => {
       const messages = Array.from({ length: 10 }, (_, i) => ({
         ...sampleMessage,
         content: `Message ${i}`,
-        timestamp: Date.now() + i,
+        timestamp: new Date(Date.now() + i).toISOString(),
       }));
 
       // Save all at once
@@ -609,7 +609,7 @@ describe('MemoryService', () => {
       const largeMessageSet = Array.from({ length: 100 }, (_, i) => ({
         ...sampleMessage,
         content: `Message ${i}`,
-        timestamp: Date.now() + i,
+        timestamp: new Date(Date.now() + i).toISOString(),
       }));
       
       await memoryService.saveConversation(largeMessageSet);

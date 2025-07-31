@@ -6,7 +6,6 @@
  */
 
 import { NasaApodAdapter } from '../NasaApodAdapter';
-import { timeService } from '../../TimeService';
 import { logger } from '../../../lib/logger';
 
 // Mock dependencies
@@ -28,9 +27,9 @@ jest.mock('../../TimeService', () => ({
       const parsed = new Date(dateStr);
       return isNaN(parsed.getTime()) ? null : parsed;
     }),
-    formatDateToLocal: jest.fn((date: Date) => 'December 20, 2023'),
+    formatDateToLocal: jest.fn((_date: Date) => 'December 20, 2023'),
     fromTimestamp: jest.fn((timestamp: number) => new Date(timestamp)),
-    formatDate: jest.fn((date: Date) => 'December 20, 2023'),
+    formatDate: jest.fn((_date: Date) => 'December 20, 2023'),
     getTimeAgo: jest.fn((date: Date) => {
       const now = 1703020800000;
       const diff = now - date.getTime();
@@ -461,7 +460,7 @@ describe('NasaApodAdapter', () => {
 
     it('handles missing copyright fields', () => {
       const dataWithoutCopyright = mockStoredApods.map(item => {
-        const { copyright, ...rest } = item;
+        const { copyright: _copyright, ...rest } = item;
         return rest;
       });
       

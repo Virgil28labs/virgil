@@ -6,7 +6,6 @@
  */
 
 import { NotesAdapter } from '../NotesAdapter';
-import { timeService } from '../../TimeService';
 import { logger } from '../../../lib/logger';
 import { notesStorage } from '../../../components/notes/storage';
 import type { Entry, TagType, ActionType } from '../../../components/notes/types';
@@ -486,6 +485,7 @@ describe('NotesAdapter', () => {
           id: `subtask-${i}`,
           text: `Subtask ${i}`,
           completed: i % 2 === 0,
+          extracted: false,
         })),
       };
       
@@ -507,6 +507,8 @@ describe('NotesAdapter', () => {
         tags: ['life'],
         actionType: 'note',
         tasks: [],
+        aiProcessed: true,
+        isEdited: false,
       };
       
       mockNotesStorage.getAllEntries.mockResolvedValue([specialCharEntry]);
@@ -527,6 +529,8 @@ describe('NotesAdapter', () => {
         tags: ['work'],
         actionType: 'note',
         tasks: [],
+        aiProcessed: true,
+        isEdited: false,
       };
       
       mockNotesStorage.getAllEntries.mockResolvedValue([longContentEntry]);
@@ -549,6 +553,8 @@ describe('NotesAdapter', () => {
           tags: [],
           actionType: 'note',
           tasks: [],
+          aiProcessed: true,
+          isEdited: false,
         },
         {
           id: 'tag-match',
@@ -557,6 +563,8 @@ describe('NotesAdapter', () => {
           tags: ['work'],
           actionType: 'note',
           tasks: [],
+          aiProcessed: true,
+          isEdited: false,
         },
         {
           id: 'action-match',
@@ -565,6 +573,8 @@ describe('NotesAdapter', () => {
           tags: [],
           actionType: 'work' as any, // Using work as action type for test
           tasks: [],
+          aiProcessed: false,
+          isEdited: false,
         },
       ];
       

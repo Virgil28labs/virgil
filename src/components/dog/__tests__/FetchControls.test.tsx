@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FetchControls } from './FetchControls';
+import { FetchControls } from '../FetchControls';
 
 describe('FetchControls', () => {
   const mockBreeds = ['akita', 'beagle', 'corgi', 'dalmatian'];

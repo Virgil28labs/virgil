@@ -126,8 +126,6 @@ describe('RateLimiter', () => {
     });
 
     it('implements sliding window correctly', () => {
-      const initialTime = mockTimeService.getTimestamp();
-      
       // Make 2 requests at start
       expect(rateLimiter.checkLimit()).toBe(true); // t=0
       expect(rateLimiter.checkLimit()).toBe(true); // t=0
