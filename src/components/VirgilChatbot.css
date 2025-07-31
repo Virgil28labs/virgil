@@ -1,7 +1,7 @@
 /* Virgil Chatbot Styles */
 
 /* Z-Index Hierarchy:
- * 10   - Remember button (.remember-btn in chat-interface.css)
+ * 10   - Remember button
  * 100  - Chat header (ensures dropdowns appear above messages)
  * 1001 - Chat container and bubble
  * 1002 - Tooltips
@@ -313,8 +313,6 @@
   box-shadow: 0 2px 4px rgba(52, 152, 219, 0.15);
 }
 
-/* Model Selector - Styles moved to ui-controls.css */
-
 
 /* Window Controls Container */
 .window-controls {
@@ -401,75 +399,6 @@
   line-height: 1.5;
   border: 1px solid rgba(108, 59, 170, 0.08);
 }
-
-/* Messages - Styles moved to chat-interface.css used by ChatMessages component */
-/* .message {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-  animation: fadeIn 0.3s ease-out;
-} */
-
-/* fadeIn animation - Using the one defined in chat-interface.css */
-
-/* .user-msg {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-}
-
-.assistant-msg {
-  flex-direction: row;
-} */
-
-/* Avatar styles moved to chat-interface.css */
-/* .msg-avatar {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand-accent-purple);
-  border-radius: 50%;
-  margin-top: 0.125rem;
-}
-
-.chatbot-avatar-v {
-  color: white !important;
-  font-weight: 700 !important;
-  font-family: 'Montserrat', sans-serif !important;
-  font-size: 1rem !important;
-  text-transform: uppercase !important;
-} */
-
-/* Message content styles moved to chat-interface.css */
-/* .msg-content {
-  background: var(--color-chat-bg);
-  color: var(--brand-dark-purple);
-  padding: 0.75rem 1rem;
-  border-radius: 18px;
-  line-height: 1.5;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.875rem;
-  border: 1px solid rgba(108, 59, 170, 0.08);
-  max-width: calc(100% - 48px);
-  word-wrap: break-word;
-  position: relative;
-}
-
-.user-msg .msg-content {
-  background: var(--brand-accent-purple);
-  color: white;
-  border: none;
-  border-bottom-right-radius: 4px;
-}
-
-.assistant-msg .msg-content {
-  border-bottom-left-radius: 4px;
-} */
-
-/* Remember button styles moved to chat-interface.css to avoid duplication */
 
 /* Typing indicator */
 .typing-dots {
@@ -676,13 +605,6 @@
   margin-left: auto;
   /* Push controls to right side while maintaining stable left alignment */
 }
-
-/* Profile Dropdown - Styles moved to chat-interface.css */
-
-/* Profile sections - Styles moved to chat-interface.css */
-
-/* Chatbot System Prompt Editor - Styles moved to chat-interface.css */
-
 
 /* Recent Messages Tab Styles */
 .recent-messages-tab {

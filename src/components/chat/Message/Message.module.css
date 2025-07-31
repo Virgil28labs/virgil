@@ -218,7 +218,7 @@
   word-wrap: break-word;
 }
 
-/* Chat View Styles (from chat-interface.css) */
+/* Message Container Styles */
 .message {
   display: flex;
   align-items: flex-start;
