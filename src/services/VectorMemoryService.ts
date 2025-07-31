@@ -8,6 +8,15 @@ import { dashboardContextService } from './DashboardContextService';
 import { DynamicContextBuilder } from './DynamicContextBuilder';
 import { logger } from '../lib/logger';
 import { supabase } from '../lib/supabase';
+import { 
+  MIN_MESSAGE_LENGTH as MIN_MSG_LENGTH,
+  CONTEXT_SEARCH_LIMIT as CONTEXT_LIMIT,
+  VECTOR_CONFIDENCE_CACHE_TTL,
+  VECTOR_CONFIDENCE_CACHE_MAX_SIZE,
+  THREAD_GAP_THRESHOLD,
+  MAX_CONTENT_PREVIEW_LENGTH,
+  HOURLY_CHECK_INTERVAL,
+} from '../constants/timing';
 
 export interface VectorMemory {
   id: string;
@@ -22,10 +31,10 @@ export class VectorMemoryService extends SupabaseMemoryService {
   private static instance: VectorMemoryService;
   private isVectorServiceHealthy = false;
   private healthCheckPromise: Promise<void>;
-  private readonly MIN_MESSAGE_LENGTH = 50; // Minimum chars to store as vector
-  private readonly CONTEXT_SEARCH_LIMIT = 5; // Number of memories to retrieve for context
-  private readonly CONFIDENCE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  private readonly CONFIDENCE_CACHE_MAX_SIZE = 1000; // Max entries to prevent memory growth
+  private readonly MIN_MESSAGE_LENGTH = MIN_MSG_LENGTH;
+  private readonly CONTEXT_SEARCH_LIMIT = CONTEXT_LIMIT;
+  private readonly CONFIDENCE_CACHE_TTL = VECTOR_CONFIDENCE_CACHE_TTL;
+  private readonly CONFIDENCE_CACHE_MAX_SIZE = VECTOR_CONFIDENCE_CACHE_MAX_SIZE;
   private confidenceCache = new Map<string, { confidence: number; timestamp: number }>();
   private lastSummaryDate: string | null = null;
 
@@ -288,7 +297,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
     ).length;
 
     // Save if message has high information density
-    return indicatorCount >= 2 || message.content.length > 200;
+    return indicatorCount >= 2 || message.content.length > (MAX_CONTENT_PREVIEW_LENGTH * 2);
   }
 
   /**
@@ -373,7 +382,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
         const parsedDate = timeService.parseDate(msg.timestamp || timeService.toISOString(timeService.getCurrentDateTime()));
         const msgTime = parsedDate ? parsedDate.valueOf() : timeService.getTimestamp();
         
-        if (lastTimestamp && (msgTime - lastTimestamp) > 30 * 60 * 1000) {
+        if (lastTimestamp && (msgTime - lastTimestamp) > THREAD_GAP_THRESHOLD) {
           // New thread if gap > 30 minutes
           if (currentThread.length > 0) {
             threads.push(currentThread);
@@ -493,14 +502,14 @@ export class VectorMemoryService extends SupabaseMemoryService {
       
       // Look for preferences stated
       const preferenceMatch = msg.content.match(/i (prefer|like|want|need|always|never) (.+)/i);
-      if (preferenceMatch && preferenceMatch[0].length < 100) {
+      if (preferenceMatch && preferenceMatch[0].length < MAX_CONTENT_PREVIEW_LENGTH) {
         keyInfo.push(`Preference: ${preferenceMatch[0]}`);
       }
       
       // Look for important facts or data
       if (msg.content.includes('remember') || msg.content.includes('important')) {
-        const shortened = msg.content.length > 100 
-          ? msg.content.substring(0, 97) + '...' 
+        const shortened = msg.content.length > MAX_CONTENT_PREVIEW_LENGTH 
+          ? msg.content.substring(0, MAX_CONTENT_PREVIEW_LENGTH - 3) + '...' 
           : msg.content;
         keyInfo.push(`Important: ${shortened}`);
       }
@@ -620,7 +629,7 @@ export class VectorMemoryService extends SupabaseMemoryService {
           });
         }
       }
-    }, 60 * 60 * 1000); // Check every hour
+    }, HOURLY_CHECK_INTERVAL); // Check every hour
   }
 
   /**

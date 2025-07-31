@@ -8,6 +8,10 @@ const BULLET_LIST_PATTERN = /^[\s]*[-•*]\s+(.+)/gm;
 const NUMBERED_LIST_PATTERN = /^[\s]*\d+\.\s+(.+)/gm;
 const COMBINED_INLINE_PATTERN = /((?:\*\*)?(?:Command|Cmd|Ctrl|Alt|Shift|Option)\s*(?:\(([⌘⌥⇧⌃])\))?\s*\+\s*\w+(?:\*\*)?)|(`[^`]+`)|(\*\*[^*]+\*\*)/gi;
 
+// Cache for formatted results to improve performance
+const formattedCache = new WeakMap<object, React.ReactNode[]>();
+const cacheKey = Symbol('textFormatterCache');
+
 /**
  * Intelligent text formatter that converts plain text to beautifully formatted JSX
  * using shadcn/ui components for consistent, readable output
@@ -17,11 +21,26 @@ export function formatText(text: string): React.ReactNode[] {
     return [text];
   }
 
+  // Fast path for plain text without formatting
+  if (!text.includes('\n') && !text.match(/[*`]|(?:Command|Cmd|Ctrl|Alt|Shift|Option)|^[⚠💡📝🔥✅❌🚨💭]/u)) {
+    return [text];
+  }
+
+  // Check cache for previously formatted content
+  const textObj = { [cacheKey]: text };
+  const cached = formattedCache.get(textObj);
+  if (cached) {
+    return cached;
+  }
+
   const elements: React.ReactNode[] = [];
   let elementKey = 0;
 
+  // Pre-process to group numbered lists that span multiple "paragraphs"
+  const processedText = groupNumberedLists(text);
+  
   // Split text by paragraphs for better structure
-  const paragraphs = text.split(/\n\s*\n/);
+  const paragraphs = processedText.split(/\n\s*\n/);
 
   paragraphs.forEach((paragraph, paragraphIndex) => {
     if (paragraph.trim() === '') return;
@@ -33,11 +52,26 @@ export function formatText(text: string): React.ReactNode[] {
 
     // Add paragraph break (except for last paragraph)
     if (paragraphIndex < paragraphs.length - 1) {
-      elements.push(<div key={`break-${elementKey++}`} className="h-3" />);
+      elements.push(<div key={`break-${elementKey++}`} className="h-2" />);
     }
   });
 
-  return elements.length > 0 ? elements : [text];
+  const result = elements.length > 0 ? elements : [text];
+  
+  // Cache the result for future use
+  formattedCache.set(textObj, result);
+  
+  return result;
+}
+
+/**
+ * Groups numbered list items that are separated by blank lines
+ * to prevent them from being split into separate <ol> elements
+ */
+function groupNumberedLists(text: string): string {
+  // Replace single blank lines between numbered items with single newlines
+  // This regex looks for patterns like "1. item\n\n2. item" and converts to "1. item\n2. item"
+  return text.replace(/(\d+\.\s+.+)(\n\s*\n)(?=\d+\.\s+)/g, '$1\n');
 }
 
 function formatParagraph(paragraph: string, startKey: number): React.ReactNode[] {
@@ -54,7 +88,7 @@ function formatParagraph(paragraph: string, startKey: number): React.ReactNode[]
   if (importantMatch) {
     const [, emoji, content] = importantMatch;
     elements.push(
-      <Alert key={keyCounter++} variant="info" className="my-2">
+      <Alert key={keyCounter++} variant="info" className="mb-2">
         <AlertDescription>
           <span className="mr-2">{emoji}</span>
           {formatInlineElements(content)}
@@ -65,15 +99,20 @@ function formatParagraph(paragraph: string, startKey: number): React.ReactNode[]
   }
 
   // Check if paragraph contains numbered list items
-  const numberedMatches = Array.from(paragraph.matchAll(NUMBERED_LIST_PATTERN));
-  if (numberedMatches.length > 0) {
-    const listItems = numberedMatches.map((match, index) => (
-      <li key={`numbered-${keyCounter + index}`} className="mb-2 leading-relaxed">
+  const numberedMatches = paragraph.matchAll(NUMBERED_LIST_PATTERN);
+  const numberedItems = [];
+  for (const match of numberedMatches) {
+    numberedItems.push(match);
+  }
+  
+  if (numberedItems.length > 0) {
+    const listItems = numberedItems.map((match, index) => (
+      <li key={`numbered-${keyCounter + index}`} className="leading-relaxed">
         {formatInlineElements(match[1])}
       </li>
     ));
     elements.push(
-      <ol key={keyCounter++} className="list-decimal list-outside my-3 space-y-2 pl-6">
+      <ol key={keyCounter++} className="list-decimal list-outside mb-2 space-y-1 pl-6">
         {listItems}
       </ol>,
     );
@@ -81,15 +120,20 @@ function formatParagraph(paragraph: string, startKey: number): React.ReactNode[]
   }
 
   // Check if paragraph contains bullet list items
-  const bulletMatches = Array.from(paragraph.matchAll(BULLET_LIST_PATTERN));
-  if (bulletMatches.length > 0) {
-    const listItems = bulletMatches.map((match, index) => (
-      <li key={`bullet-${keyCounter + index}`} className="mb-2 leading-relaxed">
+  const bulletMatches = paragraph.matchAll(BULLET_LIST_PATTERN);
+  const bulletItems = [];
+  for (const match of bulletMatches) {
+    bulletItems.push(match);
+  }
+  
+  if (bulletItems.length > 0) {
+    const listItems = bulletItems.map((match, index) => (
+      <li key={`bullet-${keyCounter + index}`} className="leading-relaxed">
         {formatInlineElements(match[1])}
       </li>
     ));
     elements.push(
-      <ul key={keyCounter++} className="list-disc list-outside my-3 space-y-2 pl-6">
+      <ul key={keyCounter++} className="list-disc list-outside mb-2 space-y-1 pl-6">
         {listItems}
       </ul>,
     );
@@ -98,11 +142,21 @@ function formatParagraph(paragraph: string, startKey: number): React.ReactNode[]
 
   // Process inline formatting for regular paragraphs
   const formattedContent = formatInlineElements(paragraph);
-  elements.push(
-    <div key={keyCounter++} className="leading-relaxed">
-      {formattedContent}
-    </div>,
-  );
+  
+  // If content is just plain text, return it without wrapper
+  if (formattedContent.length === 1 && typeof formattedContent[0] === 'string') {
+    elements.push(
+      <p key={keyCounter++} className="mb-2 leading-relaxed">
+        {formattedContent[0]}
+      </p>,
+    );
+  } else {
+    elements.push(
+      <div key={keyCounter++} className="mb-2 leading-relaxed">
+        {formattedContent}
+      </div>,
+    );
+  }
 
   return elements;
 }

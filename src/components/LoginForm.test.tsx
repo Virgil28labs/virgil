@@ -1,10 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LoginForm } from './LoginForm';
-import { supabase } from '../lib/supabase';
+import { authService } from '../services/AuthService';
+import { AUTH_CONFIG } from '../constants/auth.constants';
+import { AuthError, ValidationError } from '../lib/errors';
 
-// Mock supabase
-jest.mock('../lib/supabase');
+// Mock AuthService
+jest.mock('../services/AuthService');
 
 // Mock useFocusManagement hook
 jest.mock('../hooks/useFocusManagement', () => ({
@@ -31,7 +33,7 @@ describe('LoginForm', () => {
   });
 
   it('loads saved email from localStorage', () => {
-    localStorage.setItem('virgil_email', 'saved@example.com');
+    localStorage.setItem(AUTH_CONFIG.EMAIL_STORAGE_KEY, 'saved@example.com');
 
     render(<LoginForm />);
 
@@ -55,6 +57,11 @@ describe('LoginForm', () => {
 
   it('validates empty fields when bypassing HTML validation', async () => {
     const { container } = render(<LoginForm />);
+    
+    // Mock validation error from AuthService
+    (authService.login as jest.Mock).mockRejectedValueOnce(
+      new ValidationError('Please fill in all fields'),
+    );
 
     // Bypass HTML5 validation by calling submit directly
     const form = container.querySelector('form');
@@ -67,26 +74,12 @@ describe('LoginForm', () => {
     await waitFor(() => {
       expect(screen.getByText('Please fill in all fields')).toBeInTheDocument();
     });
-
-    expect(supabase.auth.signInWithPassword).not.toHaveBeenCalled();
   });
 
   it('handles successful login', async () => {
     const user = userEvent.setup();
-    const mockUser = {
-      id: 'test-id',
-      email: 'test@example.com',
-    };
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-      data: { user: mockUser },
-      error: null,
-    });
-
-    (supabase.auth.getSession as jest.Mock).mockResolvedValue({
-      data: { session: { user: mockUser } },
-      error: null,
-    });
+    // AuthService mock already returns success by default
 
     render(<LoginForm onSuccess={mockOnSuccess} />);
 
@@ -99,24 +92,23 @@ describe('LoginForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+      expect(authService.login).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123',
       });
     });
 
     expect(screen.getByText('Login successful!')).toBeInTheDocument();
-    expect(localStorage.getItem('virgil_email')).toBe('test@example.com');
+    expect(localStorage.getItem(AUTH_CONFIG.EMAIL_STORAGE_KEY)).toBe('test@example.com');
     expect(mockOnSuccess).toHaveBeenCalled();
   });
 
   it('handles login error', async () => {
     const user = userEvent.setup();
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-      data: null,
-      error: { message: 'Invalid credentials' },
-    });
+    (authService.login as jest.Mock).mockRejectedValueOnce(
+      new AuthError('Invalid credentials'),
+    );
 
     render(<LoginForm />);
 
@@ -139,7 +131,9 @@ describe('LoginForm', () => {
   it('handles network error', async () => {
     const user = userEvent.setup();
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(new Error('Network error'));
+    (authService.login as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error. Please try again.'),
+    );
 
     render(<LoginForm />);
 
@@ -159,8 +153,8 @@ describe('LoginForm', () => {
   it('disables form during submission', async () => {
     const user = userEvent.setup();
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 100)),
+    (authService.login as jest.Mock).mockImplementation(
+      () => new Promise(resolve => setTimeout(() => resolve({ user: {}, session: {} }), 100)),
     );
 
     render(<LoginForm />);
@@ -183,13 +177,10 @@ describe('LoginForm', () => {
     });
   });
 
-  it('trims and lowercases email', async () => {
+  it('passes raw email to AuthService which handles lowercasing', async () => {
     const user = userEvent.setup();
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-      data: { user: { email: 'test@example.com' } },
-      error: null,
-    });
+    // AuthService mock already returns success by default
 
     render(<LoginForm />);
 
@@ -197,30 +188,28 @@ describe('LoginForm', () => {
     const passwordInput = screen.getByLabelText('Password:');
     const submitButton = screen.getByRole('button', { name: 'Login' });
 
-    await user.type(emailInput, '  TEST@EXAMPLE.COM  ');
+    await user.type(emailInput, 'TEST@EXAMPLE.COM');
     await user.type(passwordInput, 'password123');
     await user.click(submitButton);
 
+    // useAuthForm passes raw input to AuthService (HTML input trims spaces automatically)
     await waitFor(() => {
-      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
-        email: 'test@example.com',
+      expect(authService.login).toHaveBeenCalledWith({
+        email: 'TEST@EXAMPLE.COM',
         password: 'password123',
       });
+    });
+
+    // AuthService handles the lowercasing internally, and the lowercased email is saved
+    await waitFor(() => {
+      expect(localStorage.getItem(AUTH_CONFIG.EMAIL_STORAGE_KEY)).toBe('test@example.com');
     });
   });
 
   it('clears password but keeps email after successful login', async () => {
     const user = userEvent.setup();
 
-    (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-      data: { user: { email: 'test@example.com' } },
-      error: null,
-    });
-
-    (supabase.auth.getSession as jest.Mock).mockResolvedValue({
-      data: { session: {} },
-      error: null,
-    });
+    // AuthService mock already returns success by default
 
     render(<LoginForm />);
 

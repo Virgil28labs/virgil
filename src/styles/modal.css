@@ -121,16 +121,7 @@
   position: relative;
 }
 
-/* Specialized Modal Content Variants */
-.modal-content-dark {
-  background: var(--brand-dark-purple);
-  max-height: 80vh;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
+/* Modal Content Padding Variant */
 .modal-content-padded {
   padding: 1.5rem;
 }
@@ -177,36 +168,10 @@
 
 /* Specific Modal Style Modifiers */
 
-/* Notes Modal */
-.notes-modal .modal-content {
-  background: var(--brand-dark-purple);
-  max-height: 80vh;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
+/* Notes Modal - Keep only unique styling in notes.css */
 
 /* Delete Confirmation Modal */
 .delete-confirm-modal .modal-panel {
   max-width: 400px;
 }
 
-/* Maps Modal */
-.maps-modal .modal-content {
-  padding: 0;
-  overflow: hidden;
-}
-
-/* Gallery Modals */
-.gallery-modal .modal-content {
-  background: transparent;
-  padding: 0;
-}
-
-/* Chat Modal */
-.chat-modal .modal-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}

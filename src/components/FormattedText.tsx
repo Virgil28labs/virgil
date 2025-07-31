@@ -16,7 +16,7 @@ export const FormattedText = React.memo(function FormattedText({ content }: Form
   }, [content]);
 
   return (
-    <div className="space-y-2">
+    <div>
       {formattedElements.map((element, index) => (
         <React.Fragment key={index}>
           {element}

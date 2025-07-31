@@ -1,85 +1,24 @@
-import type { FormEvent, ChangeEvent } from 'react';
-import { useState, memo } from 'react';
-import { supabase } from '../lib/supabase';
+import React, { memo } from 'react';
+import { useAuthForm } from '../hooks/useAuthForm';
+import { AUTH_CONFIG } from '../constants/auth.constants';
 
 interface SignUpFormProps {
   onSuccess?: () => void;
 }
 
-interface FormData {
-  name: string;
-  email: string;
-  password: string;
-}
-
+/**
+ * Sign up form component with proper validation
+ * Uses centralized auth logic from useAuthForm hook
+ */
 export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProps) {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>('');
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-
-    // Basic validation
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      setMessage('Please fill in all fields');
-      setLoading(false);
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setMessage('Please enter a valid email address');
-      setLoading(false);
-      return;
-    }
-
-    // Password validation
-    if (formData.password.length < 6) {
-      setMessage('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name.trim(),
-          },
-        },
-      });
-
-      if (error) {
-        setMessage(error.message);
-      } else {
-        setMessage('Sign up successful! Please check your email to confirm your account.');
-        setFormData({ name: '', email: '', password: '' });
-        if (onSuccess) onSuccess();
-      }
-    } catch {
-      setMessage('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    formData,
+    loading,
+    message,
+    isSuccess,
+    handleSubmit,
+    handleInputChange,
+  } = useAuthForm('signup', onSuccess);
 
   return (
     <div className="signup-form" role="form" aria-labelledby="signup-title">
@@ -125,15 +64,15 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            placeholder="Enter a password (min 6 characters)"
+            placeholder={`Enter a password (min ${AUTH_CONFIG.MIN_PASSWORD_LENGTH} characters)`}
             disabled={loading}
             required
-            minLength={6}
+            minLength={AUTH_CONFIG.MIN_PASSWORD_LENGTH}
             aria-describedby="password-help"
             autoComplete="new-password"
           />
           <div id="password-help" className="sr-only">
-            Password must be at least 6 characters long
+            Password must be at least {AUTH_CONFIG.MIN_PASSWORD_LENGTH} characters long
           </div>
         </div>
 
@@ -145,12 +84,12 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
       {message && (
         <div
           id="signup-message"
-          className={`message ${message.includes('successful') ? 'success' : 'error'}`}
+          className={`message ${isSuccess ? 'success' : 'error'}`}
           role="alert"
           aria-live="polite"
         >
           <span aria-hidden="true">
-            {message.includes('successful') ? '✅ ' : '❌ '}
+            {isSuccess ? '✅ ' : '❌ '}
           </span>
           {message}
         </div>

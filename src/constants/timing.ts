@@ -55,6 +55,18 @@ export const RACCOON_UPDATE_INTERVAL = 5 * MS_PER_SECOND; // 5s - UI detection
 // Memory service timings
 export const MEMORY_CONTEXT_CACHE_DURATION = 30 * MS_PER_SECOND; // 30s
 export const CONFIDENCE_CACHE_TTL = MS_PER_MINUTE; // 60s
+export const RECENT_USE_THRESHOLD = 5 * MS_PER_MINUTE; // 5m - for context scoring
+export const CONFIDENCE_CACHE_MAX_SIZE = 100; // Max cache entries
+export const MAX_QUERY_LOG_LENGTH = 50; // Max chars for query logging
+
+// Vector memory service timings
+export const MIN_MESSAGE_LENGTH = 50; // Minimum chars to store as vector
+export const CONTEXT_SEARCH_LIMIT = 5; // Number of memories to retrieve for context
+export const VECTOR_CONFIDENCE_CACHE_TTL = 5 * MS_PER_MINUTE; // 5m
+export const VECTOR_CONFIDENCE_CACHE_MAX_SIZE = 1000; // Max entries to prevent memory growth
+export const THREAD_GAP_THRESHOLD = 30 * MS_PER_MINUTE; // 30m - for conversation threading
+export const MAX_CONTENT_PREVIEW_LENGTH = 100; // Max chars for content preview
+export const HOURLY_CHECK_INTERVAL = MS_PER_HOUR; // 1h - for scheduled tasks
 
 // Error handling
 export const ERROR_WINDOW_DURATION = MS_PER_MINUTE; // 1m - for rate limiting errors

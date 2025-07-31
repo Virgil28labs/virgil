@@ -1,8 +1,9 @@
+const { jwtVerify } = require('jose');
 const logger = require('../lib/logger');
 
 /**
  * Middleware to authenticate requests using Supabase JWT tokens
- * Decodes and validates the JWT to extract user information
+ * Properly verifies JWT signature in production
  * Works with the service key to bypass RLS on the backend
  */
 const supabaseAuth = async (req, res, next) => {
@@ -17,17 +18,40 @@ const supabaseAuth = async (req, res, next) => {
 
     const token = authHeader.replace('Bearer ', '');
 
-    // For development, we'll decode without verification since we're using symmetric keys
-    // In production, you should verify against the JWT secret
     try {
-      // Decode the JWT to get the payload
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      let payload;
 
-      // Check if token is expired
-      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-        return res.status(401).json({
-          error: 'Token expired',
+      // Proper JWT verification for production
+      if (process.env.NODE_ENV === 'production') {
+        // Verify the token with the JWT secret
+        const jwtSecret = process.env.SUPABASE_JWT_SECRET;
+        if (!jwtSecret) {
+          logger.error('SUPABASE_JWT_SECRET not configured');
+          return res.status(500).json({
+            error: 'Server configuration error',
+          });
+        }
+
+        // Convert the secret to a Uint8Array for jose
+        const encoder = new TextEncoder();
+        const secret = encoder.encode(jwtSecret);
+        // Verify the token with jose
+        const { payload: verifiedPayload } = await jwtVerify(token, secret, {
+          algorithms: ['HS256'],
+          issuer: process.env.SUPABASE_URL?.replace('/rest/v1', ''),
         });
+        payload = verifiedPayload;
+      } else {
+        // Development mode - decode without verification but log warning
+        logger.warn('JWT verification bypassed in development mode');
+        payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+
+        // Still check expiration in dev
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+          return res.status(401).json({
+            error: 'Token expired',
+          });
+        }
       }
 
       // Extract user ID from the 'sub' claim
@@ -46,10 +70,20 @@ const supabaseAuth = async (req, res, next) => {
       };
 
       next();
-    } catch (decodeError) {
-      logger.error('JWT decode error:', decodeError);
+    } catch (verifyError) {
+      if (verifyError.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          error: 'Token expired',
+        });
+      } else if (verifyError.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+          error: 'Invalid token',
+        });
+      }
+
+      logger.error('JWT verification error:', verifyError);
       return res.status(401).json({
-        error: 'Invalid token format',
+        error: 'Authentication failed',
       });
     }
   } catch (error) {

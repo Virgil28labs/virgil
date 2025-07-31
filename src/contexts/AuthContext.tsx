@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useEffect, useState, useMemo } from 'react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { AuthContextValue } from '../types/auth.types';
+import { authService } from '../services/AuthService';
+import { supabase } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { AuthContext } from './AuthContextInstance';
 
@@ -21,15 +22,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     // Get initial session with error handling
-    const getSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const session = await authService.getSession();
         setUser(session?.user ?? null);
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           logger.error('Auth session error', error as Error, {
             component: 'AuthContext',
-            action: 'authStateChange',
+            action: 'initializeAuth',
           });
         }
         setUser(null);
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
 
-    getSession();
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -53,8 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async (): Promise<{ error?: Error }> => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await authService.signOut();
       return {};
     } catch (error) {
       logger.error('Sign out error', error as Error, {
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const refreshUser = async (): Promise<void> => {
     try {
-      const { data: { user: refreshedUser } } = await supabase.auth.getUser();
+      const refreshedUser = await authService.getCurrentUser();
       setUser(refreshedUser);
     } catch (error) {
       logger.error('Error refreshing user', error as Error, {
@@ -77,12 +77,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const value: AuthContextValue = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo<AuthContextValue>(() => ({
     user,
     loading,
     signOut,
     refreshUser,
-  };
+  }), [user, loading]);
 
   return (
     <AuthContext.Provider value={value}>

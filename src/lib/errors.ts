@@ -19,6 +19,7 @@ export class ValidationError extends AppError {
   constructor(message: string, details?: unknown) {
     super(message, 'VALIDATION_ERROR', 400, details);
     this.name = 'ValidationError';
+    Object.setPrototypeOf(this, ValidationError.prototype);
   }
 }
 
@@ -26,6 +27,7 @@ export class NetworkError extends AppError {
   constructor(message: string, details?: unknown) {
     super(message, 'NETWORK_ERROR', 503, details);
     this.name = 'NetworkError';
+    Object.setPrototypeOf(this, NetworkError.prototype);
   }
 }
 
@@ -33,6 +35,7 @@ export class AuthError extends AppError {
   constructor(message: string, details?: unknown) {
     super(message, 'AUTH_ERROR', 401, details);
     this.name = 'AuthError';
+    Object.setPrototypeOf(this, AuthError.prototype);
   }
 }
 
@@ -40,6 +43,7 @@ export class NotFoundError extends AppError {
   constructor(message: string, details?: unknown) {
     super(message, 'NOT_FOUND', 404, details);
     this.name = 'NotFoundError';
+    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
 
@@ -47,6 +51,7 @@ export class RateLimitError extends AppError {
   constructor(message: string, details?: unknown) {
     super(message, 'RATE_LIMIT', 429, details);
     this.name = 'RateLimitError';
+    Object.setPrototypeOf(this, RateLimitError.prototype);
   }
 }
 

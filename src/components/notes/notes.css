@@ -3,16 +3,11 @@
    Modern, clean note-taking interface
    ======================================== */
 
-/* Notes App Container */
+/* Notes Modal Specific Styling */
 .notes-modal .modal-content {
   background: var(--deep-plum);
-  max-height: 80vh;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
   border: 1px solid rgba(179, 179, 179, 0.15);
   box-shadow: 0 20px 40px rgba(57, 41, 62, 0.1);
-  flex: 1;
 }
 
 .notes-container {
@@ -515,10 +510,7 @@
   transform: scale(1.1);
 }
 
-/* Delete Confirmation Modal */
-.delete-confirm-modal .modal-panel {
-  max-width: 400px;
-}
+/* Delete Confirmation Modal styling is in modal.css */
 
 .delete-confirm-content {
   padding: 1.5rem;

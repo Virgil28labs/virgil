@@ -11,7 +11,12 @@ import { vectorMemoryService } from './VectorMemoryService';
 import { queryPreprocessor } from './QueryPreprocessor';
 import { intentInitializer } from './IntentInitializer';
 import type { AppDataAdapter, AppContextData } from './DashboardAppService';
-import { CONFIDENCE_CACHE_TTL } from '../constants/timing';
+import { 
+  CONFIDENCE_CACHE_TTL,
+  RECENT_USE_THRESHOLD,
+  CONFIDENCE_CACHE_MAX_SIZE,
+  MAX_QUERY_LOG_LENGTH,
+} from '../constants/timing';
 
 export interface ConfidenceScore {
   adapter: AppDataAdapter;
@@ -64,7 +69,7 @@ export class ConfidenceService {
   // Cache configuration
   private cache: Map<string, CacheEntry> = new Map();
   private readonly CACHE_TTL = CONFIDENCE_CACHE_TTL;
-  private readonly MAX_CACHE_SIZE = 100;
+  private readonly MAX_CACHE_SIZE = CONFIDENCE_CACHE_MAX_SIZE;
   
   // Default weights for hybrid scoring
   private defaultWeights: ConfidenceWeights = {
@@ -269,8 +274,7 @@ export class ConfidenceService {
     }
     
     // Recently used apps get a boost
-    const fiveMinutesAgo = timeService.getTimestamp() - 5 * 60 * 1000;
-    if (appData.lastUsed > fiveMinutesAgo) {
+    if (this.isRecentlyUsed(appData.lastUsed)) {
       score += 0.5;
     }
     
@@ -322,8 +326,7 @@ export class ConfidenceService {
       parts.push('app is currently active');
     }
     
-    const fiveMinutesAgo = timeService.getTimestamp() - 5 * 60 * 1000;
-    if (metadata.lastUsed && metadata.lastUsed > fiveMinutesAgo) {
+    if (metadata.lastUsed && this.isRecentlyUsed(metadata.lastUsed)) {
       parts.push('recently used');
     }
     
@@ -392,7 +395,7 @@ export class ConfidenceService {
     const topMatches = scores.slice(0, 3);
     
     const metadata: Record<string, unknown> = {
-      query: query.substring(0, 50),
+      query: query.substring(0, MAX_QUERY_LOG_LENGTH),
       matchCount: scores.filter(s => s.totalScore > this.THRESHOLDS.LOW).length,
       topMatches: topMatches.map(s => ({
         app: s.adapter.appName,
@@ -424,6 +427,13 @@ export class ConfidenceService {
     if (score >= this.THRESHOLDS.MEDIUM) return 'MEDIUM';
     if (score >= this.THRESHOLDS.LOW) return 'LOW';
     return 'BELOW_THRESHOLD';
+  }
+  
+  /**
+   * Check if a timestamp is within the recent use threshold
+   */
+  private isRecentlyUsed(timestamp: number): boolean {
+    return timestamp > timeService.getTimestamp() - RECENT_USE_THRESHOLD;
   }
 }
 

@@ -1,7 +1,9 @@
 /**
  * Authentication and User Types
- * Based on Supabase Auth types and extended for Virgil app
+ * Extends Supabase Auth types for Virgil app
  */
+
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export interface UserAddress {
   street: string;
@@ -11,7 +13,8 @@ export interface UserAddress {
   country: string;
 }
 
-export interface UserMetadata {
+// Extend Supabase's UserMetadata with our app-specific fields
+export interface AppUserMetadata {
   name?: string;
   nickname?: string;
   fullName?: string;
@@ -24,21 +27,9 @@ export interface UserMetadata {
   avatarUrl?: string;
 }
 
-export interface AppMetadata {
-  provider?: string;
-  providers?: string[];
-}
-
-export interface User {
-  id: string;
-  email?: string;
-  user_metadata: UserMetadata;
-  created_at: string;
-  updated_at?: string;
-  email_confirmed_at?: string;
-  last_sign_in_at?: string;
-  app_metadata?: AppMetadata;
-}
+// For now, we'll use Supabase User directly
+// In the future, we can extend it if needed
+export type User = SupabaseUser;
 
 export interface AuthContextValue {
   user: User | null;

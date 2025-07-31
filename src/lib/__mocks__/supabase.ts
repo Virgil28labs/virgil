@@ -4,6 +4,15 @@ export const supabase = {
       data: { session: null },
       error: null,
     }),
+    getUser: jest.fn().mockResolvedValue({
+      data: { 
+        user: {
+          id: 'test-user-id',
+          email: 'test@example.com',
+        },
+      },
+      error: null,
+    }),
     signInWithPassword: jest.fn().mockResolvedValue({
       data: {
         user: {
@@ -23,10 +32,23 @@ export const supabase = {
           id: 'test-user-id',
           email: 'test@example.com',
         },
+        session: {
+          access_token: 'test-token',
+          refresh_token: 'test-refresh',
+        },
       },
       error: null,
     }),
     signOut: jest.fn().mockResolvedValue({ error: null }),
+    refreshSession: jest.fn().mockResolvedValue({
+      data: { 
+        session: {
+          access_token: 'test-token',
+          refresh_token: 'test-refresh',
+        },
+      },
+      error: null,
+    }),
     onAuthStateChange: jest.fn(() => {
       // Return a mock subscription
       return {
