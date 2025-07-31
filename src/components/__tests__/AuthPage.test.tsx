@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AuthPage } from './AuthPage';
+import { AuthPage } from '../AuthPage';
 
 // Mock the child components
-jest.mock('./SignUpForm', () => ({
+jest.mock('../SignUpForm', () => ({
   SignUpForm: () => <div data-testid="signup-form">Sign Up Form</div>,
 }));
 
-jest.mock('./LoginForm', () => ({
+jest.mock('../LoginForm', () => ({
   LoginForm: () => <div data-testid="login-form">Login Form</div>,
 }));
 
