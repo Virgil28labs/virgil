@@ -112,21 +112,21 @@ describe('DepartureTimeSelector', () => {
     it('should show clock icon', () => {
       render(<DepartureTimeSelector {...defaultProps} />);
 
-      const clockIcon = screen.getByRole('button').querySelector('svg');
+      const clockIcon = screen.getByRole('button')?.querySelector('svg');
       expect(clockIcon).toBeInTheDocument();
     });
 
     it('should show chevron icon when not compact', () => {
       render(<DepartureTimeSelector {...defaultProps} />);
 
-      const chevron = screen.getByRole('button').querySelector('.chevron');
+      const chevron = screen.getByRole('button')?.querySelector('.chevron');
       expect(chevron).toBeInTheDocument();
     });
 
     it('should not show chevron icon when compact', () => {
       render(<DepartureTimeSelector {...defaultProps} isCompact />);
 
-      const chevron = screen.getByRole('button').querySelector('.chevron');
+      const chevron = screen.getByRole('button')?.querySelector('.chevron');
       expect(chevron).not.toBeInTheDocument();
     });
   });
@@ -186,7 +186,7 @@ describe('DepartureTimeSelector', () => {
       const dropdownOption = leaveNowOptions.find(option => 
         option.closest('.departure-time-dropdown'),
       );
-      await user.click(dropdownOption!);
+      await user.click(dropdownOption);
 
       expect(mockOnTimeChange).toHaveBeenCalledWith('now');
     });
@@ -411,8 +411,8 @@ describe('DepartureTimeSelector', () => {
       expect(screen.getByText('In 15 minutes')).toBeInTheDocument();
 
       // Click inside dropdown
-      const dropdown = container.querySelector('.departure-time-dropdown');
-      fireEvent.mouseDown(dropdown!);
+      const dropdown = container?.querySelector('.departure-time-dropdown');
+      fireEvent.mouseDown(dropdown);
 
       expect(screen.getByText('In 15 minutes')).toBeInTheDocument();
     });

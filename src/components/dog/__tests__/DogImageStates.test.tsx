@@ -14,7 +14,7 @@ describe('DogImageStates', () => {
       render(<DogImageStates {...defaultProps} loading />);
 
       expect(screen.getByText('Fetching adorable doggos...')).toBeInTheDocument();
-      expect(document.querySelector('.doggo-loading-spinner')).toBeInTheDocument();
+      expect(document?.querySelector('.doggo-loading-spinner')).toBeInTheDocument();
     });
 
     it('shows loading state regardless of other props when loading is true', () => {
@@ -84,7 +84,7 @@ describe('DogImageStates', () => {
         />,
       );
 
-      expect(screen.getByText('Your Doggo Sanctuary is empty!')).toBeInTheDocument();
+      expect(screen.getByText('Your Doggo Sanctuary is empty')).toBeInTheDocument();
       expect(screen.getByText('Start by fetching some adorable friends')).toBeInTheDocument();
     });
 
@@ -164,7 +164,7 @@ describe('DogImageSkeleton', () => {
   it('renders skeleton loading element', () => {
     const { container } = render(<DogImageSkeleton />);
 
-    expect(container.querySelector('.doggo-image-skeleton')).toBeInTheDocument();
+    expect(container?.querySelector('.doggo-image-skeleton')).toBeInTheDocument();
   });
 });
 

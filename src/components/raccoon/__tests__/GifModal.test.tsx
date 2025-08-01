@@ -94,7 +94,7 @@ describe('GifModal', () => {
       render(<GifModal {...defaultProps} show />);
       
       // Should have modal overlay
-      const modal = document.querySelector('[style*="fixed"]');
+      const modal = document?.querySelector('[style*="fixed"]');
       expect(modal).toBeInTheDocument();
       expect(modal).toHaveStyle({
         position: 'fixed',
@@ -110,7 +110,7 @@ describe('GifModal', () => {
     it('renders gif container with correct styles', () => {
       render(<GifModal {...defaultProps} show />);
       
-      const container = document.querySelector('[style*="relative"]');
+      const container = document?.querySelector('[style*="relative"]');
       expect(container).toHaveStyle({
         position: 'relative',
         maxWidth: '90%',
@@ -171,8 +171,8 @@ describe('GifModal', () => {
       
       render(<GifModal {...defaultProps} show onClose={onClose} />);
       
-      const overlay = document.querySelector('[style*="fixed"]');
-      await user.click(overlay!);
+      const overlay = document?.querySelector('[style*="fixed"]');
+      await user.click(overlay);
       
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -183,8 +183,8 @@ describe('GifModal', () => {
       
       render(<GifModal {...defaultProps} show onClose={onClose} />);
       
-      const gifContainer = document.querySelector('[style*="relative"]');
-      await user.click(gifContainer!);
+      const gifContainer = document?.querySelector('[style*="relative"]');
+      await user.click(gifContainer);
       
       expect(onClose).not.toHaveBeenCalled();
     });
@@ -207,7 +207,7 @@ describe('GifModal', () => {
       const onClose = jest.fn();
       render(<GifModal {...defaultProps} show onClose={onClose} />);
       
-      const gifContainer = document.querySelector('[style*="relative"]');
+      const gifContainer = document?.querySelector('[style*="relative"]');
       const event = new MouseEvent('click', { bubbles: true });
       const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
       
@@ -332,7 +332,7 @@ describe('GifModal', () => {
 
     it('handles missing onClose prop gracefully', () => {
       expect(() => 
-        render(<GifModal show onClose={undefined as any} />),
+        render(<GifModal show onClose={undefined as unknown} />),
       ).not.toThrow();
     });
   });
@@ -341,14 +341,14 @@ describe('GifModal', () => {
     it('maintains modal overlay on top of content', () => {
       render(<GifModal {...defaultProps} show />);
       
-      const overlay = document.querySelector('[style*="fixed"]');
+      const overlay = document?.querySelector('[style*="fixed"]');
       expect(overlay).toHaveStyle({ zIndex: '1000' });
     });
 
     it('centers content in viewport', () => {
       render(<GifModal {...defaultProps} show />);
       
-      const overlay = document.querySelector('[style*="fixed"]');
+      const overlay = document?.querySelector('[style*="fixed"]');
       expect(overlay).toHaveStyle({
         display: 'flex',
         alignItems: 'center',
@@ -359,7 +359,7 @@ describe('GifModal', () => {
     it('applies backdrop blur effect', () => {
       render(<GifModal {...defaultProps} show />);
       
-      const overlay = document.querySelector('[style*="fixed"]');
+      const overlay = document?.querySelector('[style*="fixed"]');
       expect(overlay).toHaveStyle({
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
       });

@@ -11,7 +11,7 @@ import { CameraEmojiButton } from '../CameraEmojiButton';
 
 // Mock the EmojiButton component
 jest.mock('../../common/EmojiButton', () => ({
-  EmojiButton: ({ emoji, ariaLabel, GalleryComponent, title, className, ...props }: any) => {
+  EmojiButton: ({ emoji, ariaLabel, GalleryComponent, title, className, ...props }: unknown) => {
     const { hoverScale: _hoverScale, hoverColor: _hoverColor, position: _position, ...cleanProps } = props;
     return (
       <div data-testid="emoji-button" className={className} {...cleanProps}>
@@ -32,7 +32,7 @@ jest.mock('../../common/EmojiButton', () => ({
 
 // Mock the CameraApp component
 jest.mock('../CameraApp', () => ({
-  CameraApp: ({ isOpen, onClose }: any) => (
+  CameraApp: ({ isOpen, onClose }: unknown) => (
     <div data-testid="camera-app">
       <span>Camera App Open: {isOpen.toString()}</span>
       <button onClick={onClose}>Close Camera</button>
@@ -42,7 +42,7 @@ jest.mock('../CameraApp', () => ({
 
 // Mock the DashboardAppErrorBoundary
 jest.mock('../../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: any) => (
+  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>

@@ -48,7 +48,7 @@ const mockPermission = {
 
 Object.defineProperty(navigator, 'permissions', {
   value: {
-    query: jest.fn().mockResolvedValue(mockPermission),
+    query: jest.fn<any, any>().mockResolvedValue(mockPermission),
   },
   configurable: true,
 });

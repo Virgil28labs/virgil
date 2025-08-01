@@ -150,8 +150,8 @@ describe('RouteInputBar', () => {
     it('should render location dots for visual indicators', () => {
       const { container } = render(<RouteInputBar {...defaultProps} />);
 
-      const originDot = container.querySelector('.location-dot.origin');
-      const destinationDot = container.querySelector('.location-dot.destination');
+      const originDot = container?.querySelector('.location-dot.origin');
+      const destinationDot = container?.querySelector('.location-dot.destination');
       
       expect(originDot).toBeInTheDocument();
       expect(destinationDot).toBeInTheDocument();
@@ -160,7 +160,7 @@ describe('RouteInputBar', () => {
     it('should render connection line', () => {
       const { container } = render(<RouteInputBar {...defaultProps} />);
 
-      const connectionLine = container.querySelector('.route-connection-line');
+      const connectionLine = container?.querySelector('.route-connection-line');
       expect(connectionLine).toBeInTheDocument();
     });
   });

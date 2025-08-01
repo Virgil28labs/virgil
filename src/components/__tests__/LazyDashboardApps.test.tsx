@@ -397,7 +397,7 @@ describe('LazyDashboardApps', () => {
 
       // Should not throw
       expect(() => {
-        const app = mockAppWithoutPayload as any;
+        const app = mockAppWithoutPayload as unknown;
         if (app && '_payload' in app && typeof app._payload === 'function') {
           app._payload();
         }

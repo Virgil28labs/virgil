@@ -15,7 +15,7 @@ import type { SavedPhoto } from '../../../../types/camera.types';
 // Mock dependencies
 jest.mock('../../utils/photoStorage', () => ({
   PhotoStorage: {
-    initialize: jest.fn().mockResolvedValue(undefined),
+    initialize: jest.fn<any, any>().mockResolvedValue(undefined),
     getAllPhotos: jest.fn(),
     getFavoritePhotos: jest.fn(),
     savePhoto: jest.fn(),
@@ -38,8 +38,8 @@ jest.mock('../../utils/cameraUtils', () => ({
     getImageDimensions: jest.fn(),
     calculateDataUrlSize: jest.fn(),
     generatePhotoName: jest.fn().mockReturnValue('photo-name.jpg'),
-    downloadPhoto: jest.fn().mockResolvedValue(undefined),
-    sharePhoto: jest.fn().mockResolvedValue(undefined),
+    downloadPhoto: jest.fn<any, any>().mockResolvedValue(undefined),
+    sharePhoto: jest.fn<any, any>().mockResolvedValue(undefined),
   },
 }));
 
@@ -764,7 +764,7 @@ describe('usePhotos', () => {
 
       const { result } = renderHook(() => usePhotos());
 
-      let info: any = null;
+      let info: unknown = null;
       await act(async () => {
         info = await result.current.getStorageInfo();
       });
@@ -778,7 +778,7 @@ describe('usePhotos', () => {
 
       const { result } = renderHook(() => usePhotos());
 
-      let info: any = null;
+      let info: unknown = null;
       await act(async () => {
         info = await result.current.getStorageInfo();
       });

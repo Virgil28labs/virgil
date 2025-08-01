@@ -24,7 +24,7 @@ const mockUseTimezones = useTimezones as jest.MockedFunction<typeof useTimezones
 
 // Mock components
 jest.mock('../TimezoneModal', () => ({
-  TimezoneModal: ({ isOpen, onClose, className }: any) => (
+  TimezoneModal: ({ isOpen, onClose, className }: unknown) => (
     isOpen ? (
       <div data-testid="timezone-modal" className={className}>
         <button onClick={onClose}>Close Modal</button>
@@ -34,7 +34,7 @@ jest.mock('../TimezoneModal', () => ({
 }));
 
 jest.mock('../TimezoneHoverPanel', () => ({
-  PositionedTimezoneHoverPanel: ({ isVisible, triggerRef, className }: any) => (
+  PositionedTimezoneHoverPanel: ({ isVisible, triggerRef, className }: unknown) => (
     isVisible ? (
       <div data-testid="timezone-hover-panel" className={className}>
         <span data-testid="trigger-ref-exists">{!!triggerRef?.current}</span>
@@ -77,7 +77,7 @@ describe('TimezoneWidget', () => {
         <TimezoneWidget {...defaultProps} className="custom-widget" />,
       );
 
-      expect(container.querySelector('.timezone-widget-trigger')).toHaveClass('custom-widget');
+      expect(container?.querySelector('.timezone-widget-trigger')).toHaveClass('custom-widget');
     });
 
     it('should apply disabled class when disabled', () => {
@@ -85,7 +85,7 @@ describe('TimezoneWidget', () => {
         <TimezoneWidget {...defaultProps} disabled />,
       );
 
-      expect(container.querySelector('.timezone-widget-trigger')).toHaveClass('disabled');
+      expect(container?.querySelector('.timezone-widget-trigger')).toHaveClass('disabled');
     });
 
     it('should have proper aria attributes', () => {
@@ -100,10 +100,10 @@ describe('TimezoneWidget', () => {
 
     it('should update aria-label based on selected timezones', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
-          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
+          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -195,10 +195,10 @@ describe('TimezoneWidget', () => {
       jest.useFakeTimers();
       // Mock multiple selected timezones to enable hover panel
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
-          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
+          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -217,7 +217,7 @@ describe('TimezoneWidget', () => {
     it('should show hover panel on mouse enter after delay', async () => {
       render(<TimezoneWidget {...defaultProps} hoverDelay={100} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
       fireEvent.mouseEnter(container);
 
       // Should not show immediately
@@ -272,9 +272,9 @@ describe('TimezoneWidget', () => {
 
     it('should not show hover panel with only one timezone', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -409,10 +409,10 @@ describe('TimezoneWidget', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
-          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
+          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -493,10 +493,10 @@ describe('TimezoneWidget', () => {
 
     it('should handle rapid mouse enter/leave', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
-          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
+          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -538,10 +538,10 @@ describe('TimezoneWidget', () => {
 
     it('should use default hover delay when not specified', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
         timezonesWithTime: [
-          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
-          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
+          { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as unknown, isValid: true },
+          { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as unknown, isValid: true },
         ],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),

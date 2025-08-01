@@ -173,7 +173,7 @@ describe('FetchControls', () => {
     it('should have proper form structure', () => {
       render(<FetchControls {...defaultProps} />);
 
-      const controls = document.querySelector('.doggo-fetch-controls');
+      const controls = document?.querySelector('.doggo-fetch-controls');
       expect(controls).toBeInTheDocument();
 
       const controlGroups = document.querySelectorAll('.doggo-control-group');

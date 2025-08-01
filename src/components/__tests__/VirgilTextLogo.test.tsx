@@ -189,7 +189,7 @@ describe('VirgilTextLogo', () => {
     });
 
     it('should handle null onClick gracefully', () => {
-      render(<VirgilTextLogo onClick={null as any} />);
+      render(<VirgilTextLogo onClick={null as unknown} />);
       
       const logo = screen.getByText('Virgil');
       expect(logo.tagName).toBe('DIV');

@@ -79,7 +79,7 @@ test.describe('Integration Workflows', () => {
       
       // Close and recreate browser context
       await context.close();
-      const newContext = await page.context().browser()!.newContext();
+      const newContext = await page.context().browser()?.newContext();
       const newPage = await newContext.newPage();
       const newHelpers = new TestHelpers(newPage);
       
@@ -393,7 +393,7 @@ test.describe('Integration Workflows', () => {
       await page.goto(URLs.chat);
       await helpers.mockApiResponse(/\/chat/, {
         ...ApiResponses.chatResponse,
-        message: { ...ApiResponses.chatResponse.message, content: 'Chat is working fine!' }
+        message: { ...ApiResponses.chatResponse.message, content: 'Chat is working fine' }
       });
       
       await helpers.typeWithDelay(Selectors.chat.messageInput, 'How are you?');

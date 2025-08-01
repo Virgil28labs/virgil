@@ -53,7 +53,7 @@ const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Mock Modal component
 jest.mock('../../common/Modal', () => ({
-  Modal: ({ children, isOpen, onClose, title, className, size }: any) => (
+  Modal: ({ children, isOpen, onClose, title, className, size }: unknown) => (
     isOpen ? (
       <div data-testid="modal" className={className} data-size={size}>
         <div data-testid="modal-title">{title}</div>
@@ -66,7 +66,7 @@ jest.mock('../../common/Modal', () => ({
 
 // Mock child components
 jest.mock('../RouteInputBar', () => ({
-  RouteInputBar: ({ currentLocation, currentAddress, onRouteRequest, onClearRoute, hasRoute }: any) => (
+  RouteInputBar: ({ currentLocation, currentAddress, onRouteRequest, onClearRoute, hasRoute }: unknown) => (
     <div data-testid="route-input-bar">
       <span data-testid="current-location">{JSON.stringify(currentLocation)}</span>
       <span data-testid="current-address">{currentAddress}</span>
@@ -78,7 +78,7 @@ jest.mock('../RouteInputBar', () => ({
 }));
 
 jest.mock('../RouteInfoBar', () => ({
-  RouteInfoBar: ({ route, alternativeRoutes, selectedRouteIndex, isExpanded, onRouteSelect, onToggleExpand, onClose }: any) => (
+  RouteInfoBar: ({ route, alternativeRoutes, selectedRouteIndex, isExpanded, onRouteSelect, onToggleExpand, onClose }: unknown) => (
     <div data-testid="route-info-bar">
       <span data-testid="has-route">{!!route}</span>
       <span data-testid="alternatives-count">{alternativeRoutes.length}</span>
@@ -92,7 +92,7 @@ jest.mock('../RouteInfoBar', () => ({
 }));
 
 jest.mock('../TrafficIndicator', () => ({
-  TrafficIndicator: ({ map, isTrafficEnabled, onToggleTraffic }: any) => (
+  TrafficIndicator: ({ map, isTrafficEnabled, onToggleTraffic }: unknown) => (
     <div data-testid="traffic-indicator">
       <span data-testid="has-map">{!!map}</span>
       <span data-testid="traffic-enabled">{isTrafficEnabled.toString()}</span>
@@ -200,7 +200,7 @@ describe('GoogleMapsModal', () => {
 
     // Mock implementations
     mockGetGoogleMapsApiKey.mockReturnValue('test-api-key');
-    mockCreateLocationMarker.mockResolvedValue(mockMarker as any);
+    mockCreateLocationMarker.mockResolvedValue(mockMarker as unknown);
     mockUseRouteState.mockReturnValue(mockRouteState);
     mockTimeService.getCurrentDateTime.mockReturnValue(new Date('2024-01-15T14:30:00'));
   });
@@ -229,7 +229,7 @@ describe('GoogleMapsModal', () => {
       render(<GoogleMapsModal {...defaultProps} />);
 
       expect(screen.getByText('Loading map...')).toBeInTheDocument();
-      expect(screen.getByTestId('modal').querySelector('.maps-spinner')).toBeInTheDocument();
+      expect(screen.getByTestId('modal')?.querySelector('.maps-spinner')).toBeInTheDocument();
     });
 
     it('should show error state when API key missing', async () => {
@@ -329,7 +329,7 @@ describe('GoogleMapsModal', () => {
         formatted_address: '456 Market St, San Francisco, CA',
       }];
 
-      mockGeocoder.geocode.mockImplementation((_request: any, callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: unknown, callback: unknown) => {
         setTimeout(() => callback(mockGeocoderResult, 'OK'), 100);
       });
 
@@ -357,7 +357,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle geocoding timeout gracefully', async () => {
-      mockGeocoder.geocode.mockImplementation((_request: any, _callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: unknown, _callback: unknown) => {
         // Don't call callback to simulate timeout
       });
 
@@ -373,7 +373,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle geocoding errors gracefully', async () => {
-      mockGeocoder.geocode.mockImplementation((_request: any, callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: unknown, callback: unknown) => {
         setTimeout(() => callback(null, 'ERROR'), 100);
       });
 
@@ -406,7 +406,7 @@ describe('GoogleMapsModal', () => {
     };
 
     beforeEach(() => {
-      mockDirectionsService.route.mockImplementation((_request: any, callback: any) => {
+      mockDirectionsService.route.mockImplementation((_request: unknown, callback: unknown) => {
         setTimeout(() => callback(mockDirectionsResult, 'OK'), 100);
       });
     });
@@ -479,7 +479,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle route calculation errors', async () => {
-      mockDirectionsService.route.mockImplementation((_request: any, callback: any) => {
+      mockDirectionsService.route.mockImplementation((_request: unknown, callback: unknown) => {
         setTimeout(() => callback(null, 'NOT_FOUND'), 100);
       });
 
@@ -524,8 +524,8 @@ describe('GoogleMapsModal', () => {
     beforeEach(() => {
       mockUseRouteState.mockReturnValue({
         ...mockRouteState,
-        currentRoute: { bounds: { extend: jest.fn() } } as any,
-        alternativeRoutes: [{ bounds: { extend: jest.fn() } }] as any,
+        currentRoute: { bounds: { extend: jest.fn() } } as unknown,
+        alternativeRoutes: [{ bounds: { extend: jest.fn() } }] as unknown,
         routeInfoVisible: true,
       });
     });
@@ -648,7 +648,7 @@ describe('GoogleMapsModal', () => {
       // Mock route state with active route
       mockUseRouteState.mockReturnValue({
         ...mockRouteState,
-        currentRoute: { bounds: { extend: jest.fn() } } as any,
+        currentRoute: { bounds: { extend: jest.fn() } } as unknown,
         routeInfoVisible: true,
       });
 
@@ -693,7 +693,7 @@ describe('GoogleMapsModal', () => {
   describe('error handling', () => {
     it('should handle missing Google Maps gracefully', async () => {
       // Remove Google Maps from global
-      delete (window as any).google;
+      delete (window as unknown).google;
 
       render(<GoogleMapsModal {...defaultProps} />);
 

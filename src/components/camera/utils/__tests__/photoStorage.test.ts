@@ -117,8 +117,8 @@ describe('PhotoStorage', () => {
     jest.clearAllMocks();
     
     // Reset PhotoStorage state
-    (PhotoStorage as any).db = null;
-    (PhotoStorage as any).initPromise = null;
+    (PhotoStorage as unknown).db = null;
+    (PhotoStorage as unknown).initPromise = null;
 
     // Setup mocks
     mockCameraUtils.generatePhotoId.mockReturnValue('photo-123');
@@ -139,7 +139,7 @@ describe('PhotoStorage', () => {
     global.indexedDB = {
       open: jest.fn(() => mockOpenRequest),
       deleteDatabase: jest.fn(),
-    } as any;
+    } as unknown;
 
     // Mock localStorage
     global.localStorage = {
@@ -149,7 +149,7 @@ describe('PhotoStorage', () => {
       clear: jest.fn(),
       length: 0,
       key: jest.fn(),
-    } as any;
+    } as unknown;
   });
 
   afterEach(() => {
@@ -161,12 +161,12 @@ describe('PhotoStorage', () => {
       const initPromise = PhotoStorage.initialize();
       
       // Simulate successful DB open
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       
       await initPromise;
       
       expect(global.indexedDB.open).toHaveBeenCalledWith('VirgilCameraDB', 1);
-      expect((PhotoStorage as any).db).toBe(mockDB);
+      expect((PhotoStorage as unknown).db).toBe(mockDB);
     });
 
     it('should handle database initialization errors', async () => {
@@ -201,8 +201,8 @@ describe('PhotoStorage', () => {
         createObjectStore: jest.fn().mockReturnValue(mockObjectStore),
       };
       
-      (upgradeRequest as any).onupgradeneeded({ target: { result: mockUpgradeDB } });
-      upgradeRequest.success(mockDB as any);
+      (upgradeRequest as unknown).onupgradeneeded({ target: { result: mockUpgradeDB } });
+      upgradeRequest.success(mockDB as unknown);
       
       await initPromise;
       
@@ -223,7 +223,7 @@ describe('PhotoStorage', () => {
       mockObjectStore.add.mockReturnValue(addRequest);
 
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       
       await initPromise;
       
@@ -241,7 +241,7 @@ describe('PhotoStorage', () => {
   describe('savePhoto', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -322,7 +322,7 @@ describe('PhotoStorage', () => {
   describe('getAllPhotos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -368,7 +368,7 @@ describe('PhotoStorage', () => {
   describe('getFavoritePhotos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -396,7 +396,7 @@ describe('PhotoStorage', () => {
   describe('updatePhoto', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -444,7 +444,7 @@ describe('PhotoStorage', () => {
   describe('deletePhoto', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -480,7 +480,7 @@ describe('PhotoStorage', () => {
   describe('deletePhotos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -509,7 +509,7 @@ describe('PhotoStorage', () => {
   describe('toggleFavorite', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -540,7 +540,7 @@ describe('PhotoStorage', () => {
   describe('getStorageInfo', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -573,7 +573,7 @@ describe('PhotoStorage', () => {
   describe('clearAllPhotos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -613,7 +613,7 @@ describe('PhotoStorage', () => {
   describe('importPhotos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -703,7 +703,7 @@ describe('PhotoStorage', () => {
   describe('cleanup old photos', () => {
     beforeEach(async () => {
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       await initPromise;
     });
 
@@ -721,19 +721,19 @@ describe('PhotoStorage', () => {
       mockObjectStore.getAll.mockReturnValue(getAllRequest);
       
       // Mock for cleanup
-      jest.spyOn(PhotoStorage as any, 'deletePhotos').mockResolvedValue(1);
+      jest.spyOn(PhotoStorage as unknown, 'deletePhotos').mockResolvedValue(1);
       mockTimeService.getTimestamp.mockReturnValue(now);
 
       // Trigger cleanup through initialize
       const initPromise = PhotoStorage.initialize();
-      mockOpenRequest.success(mockDB as any);
+      mockOpenRequest.success(mockDB as unknown);
       
       // Simulate finding photos for cleanup
       getAllRequest.success(photos);
       
       await initPromise;
       
-      expect((PhotoStorage as any).deletePhotos).toHaveBeenCalledWith(['old-1']);
+      expect((PhotoStorage as unknown).deletePhotos).toHaveBeenCalledWith(['old-1']);
     });
   });
 });

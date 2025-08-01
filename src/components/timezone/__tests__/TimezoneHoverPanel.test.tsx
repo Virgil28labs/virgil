@@ -39,7 +39,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: -5 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T12:00:00-05:00')),
-      } as any,
+      } as unknown,
       isValid: true,
     },
     {
@@ -53,7 +53,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: 0 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T17:00:00Z')),
-      } as any,
+      } as unknown,
       isValid: true,
     },
     {
@@ -67,7 +67,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: 9 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-02T02:00:00+09:00')),
-      } as any,
+      } as unknown,
       isValid: true,
     },
   ];
@@ -202,7 +202,7 @@ describe('TimezoneHoverPanel', () => {
         <PositionedTimezoneHoverPanel {...defaultProps} className="custom-panel" />,
       );
       
-      expect(container.querySelector('.timezone-hover-panel')).toHaveClass('custom-panel');
+      expect(container?.querySelector('.timezone-hover-panel')).toHaveClass('custom-panel');
     });
   });
 
@@ -244,7 +244,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      const wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      const wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '134px', // bottom (130) + 4
         left: '250px', // left (200) + width/2 (50)
@@ -272,7 +272,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      const wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      const wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '144px', // datetime bottom (140) + 4
         left: '250px', // datetime left (220) + width/2 (30)
@@ -289,7 +289,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      expect(container.querySelector('.timezone-hover-panel-wrapper')).not.toBeInTheDocument();
+      expect(container?.querySelector('.timezone-hover-panel-wrapper')).not.toBeInTheDocument();
     });
 
     it('should handle missing triggerRef', () => {
@@ -300,7 +300,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      const wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      const wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '0px',
         left: '0px',
@@ -318,7 +318,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      const wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      const wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '0px',
         left: '0px',
@@ -335,7 +335,7 @@ describe('TimezoneHoverPanel', () => {
       );
       
       // Initial position should be set
-      let wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      let wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '134px', // initial bottom (130) + 4
         left: '250px', // initial left (200) + width/2 (50)
@@ -363,7 +363,7 @@ describe('TimezoneHoverPanel', () => {
         />,
       );
       
-      wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '234px', // new bottom (230) + 4
         left: '450px', // new left (400) + width/2 (50)
@@ -381,7 +381,7 @@ describe('TimezoneHoverPanel', () => {
       );
       
       // Should not be visible
-      expect(container.querySelector('.timezone-hover-panel-wrapper')).not.toBeInTheDocument();
+      expect(container?.querySelector('.timezone-hover-panel-wrapper')).not.toBeInTheDocument();
       
       // Make visible
       rerender(
@@ -393,7 +393,7 @@ describe('TimezoneHoverPanel', () => {
       );
       
       // Should now be positioned correctly
-      const wrapper = container.querySelector('.timezone-hover-panel-wrapper');
+      const wrapper = container?.querySelector('.timezone-hover-panel-wrapper');
       expect(wrapper).toHaveStyle({
         top: '134px',
         left: '250px',
@@ -437,7 +437,7 @@ describe('TimezoneHoverPanel', () => {
             isValid: true,
             diff: jest.fn().mockReturnValue({ hours: -5 }),
             toJSDate: jest.fn().mockReturnValue(new Date()),
-          } as any,
+          } as unknown,
           isValid: true,
         },
         {
@@ -451,7 +451,7 @@ describe('TimezoneHoverPanel', () => {
             isValid: true,
             diff: jest.fn().mockReturnValue({ hours: -5 }),
             toJSDate: jest.fn().mockReturnValue(new Date()),
-          } as any,
+          } as unknown,
           isValid: true,
         },
       ];

@@ -477,7 +477,7 @@ test.describe('Dashboard Functionality', () => {
       
       // Test data update announcement
       await page.evaluate(() => {
-        const liveRegion = document.querySelector('[aria-live]');
+        const liveRegion = document?.querySelector('[aria-live]');
         if (liveRegion) {
           liveRegion.textContent = 'Weather data updated';
         }
@@ -505,7 +505,7 @@ test.describe('Dashboard Functionality', () => {
       // Mock many app cards
       await page.evaluate(() => {
         // Simulate large number of apps
-        const grid = document.querySelector('[data-testid="app-grid"]');
+        const grid = document?.querySelector('[data-testid="app-grid"]');
         if (grid) {
           for (let i = 0; i < 50; i++) {
             const card = document.createElement('div');

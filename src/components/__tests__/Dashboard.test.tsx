@@ -199,8 +199,8 @@ describe('Dashboard', () => {
   const defaultAuthData = {
     user: mockUser,
     loading: false,
-    signOut: jest.fn().mockResolvedValue({ error: undefined }),
-    refreshUser: jest.fn().mockResolvedValue(undefined),
+    signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
+    refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
   };
 
   const defaultLocationData = {
@@ -357,7 +357,7 @@ describe('Dashboard', () => {
 
   describe('User Interactions', () => {
     it('handles sign out correctly', async () => {
-      const mockSignOut = jest.fn().mockResolvedValue({ error: null });
+      const mockSignOut = jest.fn<any, any>().mockResolvedValue({ error: null });
       mockUseAuth.mockReturnValue({
         ...defaultAuthData,
         signOut: mockSignOut,
@@ -373,7 +373,7 @@ describe('Dashboard', () => {
 
     it('handles sign out error', async () => {
       const mockError = new Error('Sign out failed');
-      const mockSignOut = jest.fn().mockResolvedValue({ error: mockError });
+      const mockSignOut = jest.fn<any, any>().mockResolvedValue({ error: mockError });
       mockUseAuth.mockReturnValue({
         ...defaultAuthData,
         signOut: mockSignOut,

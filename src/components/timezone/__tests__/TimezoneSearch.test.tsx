@@ -86,7 +86,7 @@ describe('TimezoneSearch', () => {
     it('should render with custom className', () => {
       const { container } = render(<TimezoneSearch {...defaultProps} className="custom-search" />);
 
-      expect(container.querySelector('.timezone-search')).toHaveClass('custom-search');
+      expect(container?.querySelector('.timezone-search')).toHaveClass('custom-search');
     });
 
     it('should render search icon', () => {
@@ -351,7 +351,7 @@ describe('TimezoneSearch', () => {
       const input = screen.getByRole('combobox');
       await userEvent.type(input, 'test');
 
-      const option = screen.getByText('Los Angeles').closest('li')!;
+      const option = screen.getByText('Los Angeles').closest('li');
       fireEvent.mouseEnter(option);
 
       expect(option).toHaveClass('selected');

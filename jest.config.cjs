@@ -2,7 +2,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/server'],
   testMatch: [
     '**/__tests__/**/*.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
@@ -38,8 +38,11 @@ module.exports = {
     '!src/vite-env.d.ts',
     '!src/__tests__/**',
     '!src/**/*.test.{ts,tsx}',
-    '!src/**/*.spec.{ts,tsx}'
+    '!src/**/*.spec.{ts,tsx}',
+    '!src/test-utils/**',
+    '!src/**/__mocks__/**'
   ],
+  coverageProvider: 'v8',
   coverageThreshold: {
     global: {
       branches: 70,
@@ -48,10 +51,21 @@ module.exports = {
       statements: 80
     }
   },
-  coverageReporters: ['text', 'lcov', 'html'],
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testTimeout: 10000,
   transformIgnorePatterns: [
-    'node_modules/(?!(isows|@supabase|superjson|ws|@xenova)/)'
+    'node_modules/(?!(isows|@supabase|superjson|ws|@xenova|jose)/)'
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/coverage/'
+  ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/test-utils/',
+    '/__mocks__/',
+    '/dist/'
+  ]
 };

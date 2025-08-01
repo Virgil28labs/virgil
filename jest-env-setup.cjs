@@ -8,3 +8,16 @@ process.env.VITE_API_URL = 'http://localhost:5002';
 process.env.VITE_DEFAULT_MODEL = 'gpt-4o-mini';
 process.env.VITE_CACHE_TTL = '3600';
 process.env.VITE_ENABLE_CACHE = 'true';
+
+// Polyfill setImmediate for Jest environment (Node.js compatibility)
+if (typeof global.setImmediate === 'undefined') {
+  global.setImmediate = (callback, ...args) => {
+    return setTimeout(callback, 0, ...args);
+  };
+}
+
+if (typeof global.clearImmediate === 'undefined') {
+  global.clearImmediate = (id) => {
+    clearTimeout(id);
+  };
+}

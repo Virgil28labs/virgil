@@ -55,7 +55,7 @@ describe('App Component', () => {
 
   it('renders without crashing', () => {
     render(<App />);
-    expect(document.querySelector('.app')).toBeInTheDocument();
+    expect(document?.querySelector('.app')).toBeInTheDocument();
   });
 
   it('includes skip link for accessibility', () => {
@@ -90,7 +90,7 @@ describe('App Component', () => {
     });
 
     render(<App />);
-    expect(document.querySelector('.loading-screen')).toBeInTheDocument();
+    expect(document?.querySelector('.loading-screen')).toBeInTheDocument();
   });
 
   it('renders chatbot for authenticated users', async () => {
@@ -114,12 +114,12 @@ describe('App Component', () => {
     render(<App />);
 
     // App should render successfully
-    expect(document.querySelector('.app')).toBeInTheDocument();
+    expect(document?.querySelector('.app')).toBeInTheDocument();
   });
 
   it('renders toast container', () => {
     const { container } = render(<App />);
     // App structure should be present
-    expect(container.querySelector('.app')).toBeInTheDocument();
+    expect(container?.querySelector('.app')).toBeInTheDocument();
   });
 });

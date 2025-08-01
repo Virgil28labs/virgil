@@ -118,7 +118,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
     _dashboardContext, 
     _shouldFocus, 
     externalInputRef, 
-  }: any) => {
+  }: unknown) => {
     // Suppress unused variable warnings for mock parameters
     void _dashboardContext;
     void _shouldFocus;
@@ -180,7 +180,7 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
     onClearMessages,
     onExportMessages,
     _createSystemPrompt,
-  }: any) => {
+  }: unknown) => {
     // Suppress unused variable warnings for mock parameters
     void _showMemoryIndicator;
     void _markedMemories;
@@ -201,7 +201,7 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
         <button data-testid="minimize-button" onClick={onMinimize}>Minimize</button>
         <button data-testid="size-toggle" onClick={onSizeToggle}>{windowSize}</button>
         <select data-testid="model-select" value={selectedModel} onChange={(e) => onModelChange(e.target.value)}>
-          {models?.map((model: any) => (
+          {models?.map((model: unknown) => (
             <option key={model.id} value={model.id}>{model.name}</option>
           ))}
         </select>
@@ -221,7 +221,7 @@ jest.mock('../chat/MemoryModal/MemoryModal', () => ({
     _onConversationsUpdate,
     _onMemoryContextUpdate,
     _onMemoryIndicatorUpdate,
-  }: any) => {
+  }: unknown) => {
     // Suppress unused variable warnings for mock parameters
     void _markedMemories;
     void _recentConversations;
@@ -316,14 +316,14 @@ describe('VirgilChatbot', () => {
   const defaultAuthState = {
     user: mockUser,
     loading: false,
-    signOut: jest.fn().mockResolvedValue({ error: undefined }),
-    refreshUser: jest.fn().mockResolvedValue(undefined),
+    signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
+    refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
   };
 
   const defaultMemoryService = {
-    initializeMemory: jest.fn().mockResolvedValue(undefined),
-    markAsImportant: jest.fn().mockResolvedValue(undefined),
-    loadRecentMessages: jest.fn().mockResolvedValue(undefined),
+    initializeMemory: jest.fn<any, any>().mockResolvedValue(undefined),
+    markAsImportant: jest.fn<any, any>().mockResolvedValue(undefined),
+    loadRecentMessages: jest.fn<any, any>().mockResolvedValue(undefined),
     isRealtimeConnected: true,
   };
 
@@ -371,7 +371,7 @@ describe('VirgilChatbot', () => {
     it('displays existing messages', () => {
       const messages: ChatMessage[] = [
         { id: '1', role: 'user' as const, content: 'Hello', timestamp: '2024-01-01T00:00:00.000Z' },
-        { id: '2', role: 'assistant' as const, content: 'Hi there!', timestamp: '2024-01-01T00:00:00.000Z' },
+        { id: '2', role: 'assistant' as const, content: 'Hi there', timestamp: '2024-01-01T00:00:00.000Z' },
       ];
       
       mockUseChatContext.mockReturnValue({
@@ -674,8 +674,8 @@ describe('VirgilChatbot', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: false,
-        signOut: jest.fn().mockResolvedValue({ error: undefined }),
-        refreshUser: jest.fn().mockResolvedValue(undefined),
+        signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
+        refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
       });
       
       renderChatbot();
@@ -689,8 +689,8 @@ describe('VirgilChatbot', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: true,
-        signOut: jest.fn().mockResolvedValue({ error: undefined }),
-        refreshUser: jest.fn().mockResolvedValue(undefined),
+        signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
+        refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
       });
       
       renderChatbot();

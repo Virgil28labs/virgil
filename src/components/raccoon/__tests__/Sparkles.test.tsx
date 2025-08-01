@@ -27,7 +27,7 @@ jest.mock('../raccoonStyles', () => ({
       pointerEvents: 'none',
       zIndex: 10,
     },
-    sparklePosition: (pos: any) => ({
+    sparklePosition: (pos: unknown) => ({
       position: 'absolute',
       left: `${pos.x}px`,
       top: `${pos.y}px`,
@@ -44,7 +44,7 @@ describe('Sparkles', () => {
       render(<Sparkles show />);
       
       // Should render sparkle container
-      const container = document.querySelector('[style*="absolute"]');
+      const container = document?.querySelector('[style*="absolute"]');
       expect(container).toBeInTheDocument();
       
       // Should render all sparkle emojis
@@ -105,7 +105,7 @@ describe('Sparkles', () => {
     it('applies sparkle container styles', () => {
       render(<Sparkles show />);
       
-      const container = document.querySelector('[style*="absolute"]');
+      const container = document?.querySelector('[style*="absolute"]');
       expect(container).toHaveStyle({
         position: 'absolute',
         pointerEvents: 'none',
@@ -199,7 +199,7 @@ describe('Sparkles', () => {
 
     it('handles undefined show prop gracefully', () => {
       // TypeScript would catch this, but test runtime behavior
-      expect(() => render(<Sparkles show={undefined as any} />)).not.toThrow();
+      expect(() => render(<Sparkles show={undefined as unknown} />)).not.toThrow();
     });
   });
 });

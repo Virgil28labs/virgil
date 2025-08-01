@@ -789,7 +789,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatTime(mockDateTimeWithFormat as any);
+      const formatted = result.current.formatTime(mockDateTimeWithFormat as unknown);
       expect(formatted).toBe('12:00');
       expect(mockDateTimeWithFormat.toFormat).toHaveBeenCalledWith('HH:mm');
     });
@@ -805,7 +805,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT as any, mockDT as any);
+      const formatted = result.current.formatRelativeTime(mockDT as unknown, mockDT as unknown);
       expect(formatted).toBe('Same time');
       expect(mockDT.diff).toHaveBeenCalledWith(mockDT, 'hours');
     });
@@ -823,7 +823,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as any, mockDT2 as any);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
       expect(formatted).toBe('3h ahead');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -841,7 +841,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as any, mockDT2 as any);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
       expect(formatted).toBe('3h behind');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -859,7 +859,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as any, mockDT2 as any);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
       expect(formatted).toBe('0h ahead'); // Should floor to 0
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -877,7 +877,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as any, mockDT2 as any);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
       expect(formatted).toBe('12h ahead');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });

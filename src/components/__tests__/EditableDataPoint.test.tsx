@@ -78,7 +78,7 @@ describe('EditableDataPoint', () => {
     it('should apply custom className', () => {
       render(<EditableDataPoint {...defaultProps} className="custom-class" />);
 
-      expect(document.querySelector('.data-point')).toHaveClass('custom-class');
+      expect(document?.querySelector('.data-point')).toHaveClass('custom-class');
     });
   });
 
@@ -364,8 +364,8 @@ describe('EditableDataPoint', () => {
     it('should apply correct CSS classes', () => {
       render(<EditableDataPoint {...defaultProps} />);
 
-      expect(document.querySelector('.data-point')).toBeInTheDocument();
-      expect(document.querySelector('.editable')).toBeInTheDocument();
+      expect(document?.querySelector('.data-point')).toBeInTheDocument();
+      expect(document?.querySelector('.editable')).toBeInTheDocument();
       expect(screen.getByText('👤')).toHaveClass('data-icon');
       expect(screen.getByText('Name')).toHaveClass('data-label');
       expect(screen.getByText('John Doe')).toHaveClass('data-value');

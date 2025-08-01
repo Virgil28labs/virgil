@@ -257,7 +257,7 @@ describe('ToastNotification', () => {
       render(<ToastNotification toast={baseToast} onDismiss={mockOnDismiss} />);
       
       const alert = screen.getByRole('alert');
-      const progressBar = alert.querySelector('[style*="toast-progress"]');
+      const progressBar = alert?.querySelector('[style*="toast-progress"]');
       expect(progressBar).toBeInTheDocument();
     });
 
@@ -266,7 +266,7 @@ describe('ToastNotification', () => {
       render(<ToastNotification toast={persistentToast} onDismiss={mockOnDismiss} />);
       
       const alert = screen.getByRole('alert');
-      const progressBar = alert.querySelector('[style*="toast-progress"]');
+      const progressBar = alert?.querySelector('[style*="toast-progress"]');
       expect(progressBar).not.toBeInTheDocument();
     });
 
@@ -275,7 +275,7 @@ describe('ToastNotification', () => {
       render(<ToastNotification toast={noDurationToast} onDismiss={mockOnDismiss} />);
       
       const alert = screen.getByRole('alert');
-      const progressBar = alert.querySelector('[style*="toast-progress"]');
+      const progressBar = alert?.querySelector('[style*="toast-progress"]');
       expect(progressBar).not.toBeInTheDocument();
     });
   });
@@ -397,7 +397,7 @@ describe('ToastContainer', () => {
     });
 
     it('should apply custom positioning', () => {
-      const positions: Array<{ position: Parameters<typeof ToastContainer>[0]['position'], styles: any }> = [
+      const positions: Array<{ position: Parameters<typeof ToastContainer>[0]['position'], styles: unknown }> = [
         { position: 'top-left', styles: { top: '20px', left: '20px' } },
         { position: 'bottom-right', styles: { bottom: '20px', right: '20px' } },
         { position: 'bottom-left', styles: { bottom: '20px', left: '20px' } },

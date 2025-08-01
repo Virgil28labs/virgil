@@ -17,7 +17,7 @@ import { RouteInfoBar } from '../RouteInfoBar';
 
 // Mock DepartureTimeSelector
 jest.mock('../DepartureTimeSelector', () => ({
-  DepartureTimeSelector: ({ selectedTime, onTimeChange, isCompact }: any) => (
+  DepartureTimeSelector: ({ selectedTime, onTimeChange, isCompact }: unknown) => (
     <div data-testid="departure-time-selector">
       <span data-testid="selected-time">{selectedTime.toString()}</span>
       <span data-testid="is-compact">{isCompact.toString()}</span>
@@ -67,7 +67,7 @@ describe('RouteInfoBar', () => {
     overview_polyline: '',
     warnings: [],
     waypoint_order: [],
-    bounds: { extend: jest.fn() } as any,
+    bounds: { extend: jest.fn() } as unknown,
   });
 
   const defaultProps = {
@@ -107,14 +107,14 @@ describe('RouteInfoBar', () => {
     it('should render in expanded state by default', () => {
       const { container } = render(<RouteInfoBar {...defaultProps} />);
 
-      expect(container.querySelector('.route-info-bar')).toHaveClass('expanded');
+      expect(container?.querySelector('.route-info-bar')).toHaveClass('expanded');
       expect(screen.getByText('Light traffic')).toBeInTheDocument();
     });
 
     it('should render in collapsed state when specified', () => {
       const { container } = render(<RouteInfoBar {...defaultProps} isExpanded={false} />);
 
-      expect(container.querySelector('.route-info-bar')).toHaveClass('collapsed');
+      expect(container?.querySelector('.route-info-bar')).toHaveClass('collapsed');
       expect(screen.queryByText('Light traffic')).not.toBeInTheDocument();
     });
 
@@ -135,7 +135,7 @@ describe('RouteInfoBar', () => {
     it('should render traffic light icon', () => {
       const { container } = render(<RouteInfoBar {...defaultProps} />);
 
-      const trafficIcon = container.querySelector('.traffic-icon svg');
+      const trafficIcon = container?.querySelector('.traffic-icon svg');
       expect(trafficIcon).toBeInTheDocument();
       
       // Should have 3 traffic light rectangles
@@ -169,7 +169,7 @@ describe('RouteInfoBar', () => {
 
     it('should show fallback when duration is missing', () => {
       const route = createMockRoute('US-101 N', 1800);
-      route.legs[0].duration = undefined as any;
+      route.legs[0].duration = undefined as unknown;
       route.legs[0].duration_in_traffic = undefined;
       render(<RouteInfoBar {...defaultProps} route={route} />);
 
@@ -331,7 +331,7 @@ describe('RouteInfoBar', () => {
       );
 
       const routeButton = screen.getByText('I-280 S').closest('button');
-      await user.click(routeButton!);
+      await user.click(routeButton);
 
       expect(mockOnRouteSelect).toHaveBeenCalledWith(1);
     });
@@ -483,7 +483,7 @@ describe('RouteInfoBar', () => {
   describe('edge cases', () => {
     it('should handle missing distance gracefully', () => {
       const route = createMockRoute();
-      route.legs[0].distance = undefined as any;
+      route.legs[0].distance = undefined as unknown;
       render(<RouteInfoBar {...defaultProps} route={route} />);
 
       expect(screen.getByText('--')).toBeInTheDocument();
@@ -518,7 +518,7 @@ describe('RouteInfoBar', () => {
       const route = createMockRoute('US-101 N', 1800, 2000); // Light traffic
       const { container } = render(<RouteInfoBar {...defaultProps} route={route} />);
 
-      const trafficIcon = container.querySelector('.traffic-icon.light');
+      const trafficIcon = container?.querySelector('.traffic-icon.light');
       expect(trafficIcon).toBeInTheDocument();
     });
 
@@ -526,7 +526,7 @@ describe('RouteInfoBar', () => {
       const route = createMockRoute('US-101 N', 1800, 2400); // Moderate traffic
       const { container } = render(<RouteInfoBar {...defaultProps} route={route} />);
 
-      const trafficIcon = container.querySelector('.traffic-icon.moderate');
+      const trafficIcon = container?.querySelector('.traffic-icon.moderate');
       expect(trafficIcon).toBeInTheDocument();
     });
 
@@ -534,7 +534,7 @@ describe('RouteInfoBar', () => {
       const route = createMockRoute('US-101 N', 1800, 3000); // Heavy traffic
       const { container } = render(<RouteInfoBar {...defaultProps} route={route} />);
 
-      const trafficIcon = container.querySelector('.traffic-icon.heavy');
+      const trafficIcon = container?.querySelector('.traffic-icon.heavy');
       expect(trafficIcon).toBeInTheDocument();
     });
   });

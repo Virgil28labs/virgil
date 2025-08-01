@@ -77,7 +77,7 @@ describe('TrafficIndicator', () => {
       render(<TrafficIndicator {...defaultProps} />);
 
       // Check for disabled icon (with X pattern)
-      const svg = screen.getByRole('button').querySelector('svg');
+      const svg = screen.getByRole('button')?.querySelector('svg');
       expect(svg).toBeInTheDocument();
       
       // Should have the X pattern paths
@@ -89,7 +89,7 @@ describe('TrafficIndicator', () => {
       render(<TrafficIndicator {...defaultProps} isTrafficEnabled />);
 
       // Check for enabled icon (with pulse circle)
-      const svg = screen.getByRole('button').querySelector('svg');
+      const svg = screen.getByRole('button')?.querySelector('svg');
       expect(svg).toBeInTheDocument();
       
       const circle = svg?.querySelector('.traffic-pulse');
@@ -104,14 +104,14 @@ describe('TrafficIndicator', () => {
         jest.runOnlyPendingTimers();
       });
 
-      const statusDot = screen.getByRole('button').querySelector('.traffic-status-dot');
+      const statusDot = screen.getByRole('button')?.querySelector('.traffic-status-dot');
       expect(statusDot).toBeInTheDocument();
     });
 
     it('should not show status dot when traffic is disabled', () => {
       render(<TrafficIndicator {...defaultProps} />);
 
-      const statusDot = screen.getByRole('button').querySelector('.traffic-status-dot');
+      const statusDot = screen.getByRole('button')?.querySelector('.traffic-status-dot');
       expect(statusDot).not.toBeInTheDocument();
     });
   });

@@ -452,7 +452,7 @@ describe('WeatherForecast', () => {
           ...mockForecastData.forecasts[0],
           condition: {
             main: 'Unknown',
-          } as any,
+          } as unknown,
         }],
       };
       

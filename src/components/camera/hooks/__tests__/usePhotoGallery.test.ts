@@ -91,7 +91,7 @@ describe('usePhotoGallery', () => {
     mockUsePhotosReturn.getPhotoById.mockImplementation(id => 
       mockPhotos.find(photo => photo.id === id),
     );
-    mockUsePhotosReturn.searchPhotos.mockReturnValue([mockPhoto1] as any); // Return filtered results synchronously
+    mockUsePhotosReturn.searchPhotos.mockReturnValue([mockPhoto1] as unknown); // Return filtered results synchronously
     mockUsePhotosReturn.sortPhotos.mockImplementation((photos) => photos);
     mockUsePhotosReturn.loadPhotos.mockResolvedValue(undefined);
     mockUsePhotosReturn.savePhoto.mockResolvedValue(mockPhoto1);
@@ -100,7 +100,7 @@ describe('usePhotoGallery', () => {
     mockUsePhotosReturn.toggleFavorite.mockResolvedValue(true);
     mockUsePhotosReturn.clearError.mockImplementation(() => {});
     
-    mockUsePhotos.mockReturnValue(mockUsePhotosReturn as any);
+    mockUsePhotos.mockReturnValue(mockUsePhotosReturn as unknown);
     mockTimeService.getTimestamp.mockReturnValue(Date.now());
   });
 
@@ -765,7 +765,7 @@ describe('usePhotoGallery', () => {
         photos: newPhotos,
         favorites: newFavorites,
         loading: true,
-      } as any);
+      } as unknown);
 
       rerender();
 

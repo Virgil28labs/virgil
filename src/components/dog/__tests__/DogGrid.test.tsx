@@ -39,7 +39,7 @@ describe('DogGrid', () => {
     it('should render a grid container', () => {
       render(<DogGrid {...defaultProps} />);
 
-      const grid = document.querySelector('.doggo-grid');
+      const grid = document?.querySelector('.doggo-grid');
       expect(grid).toBeInTheDocument();
     });
 
@@ -87,7 +87,7 @@ describe('DogGrid', () => {
     it('should render empty grid when no dogs', () => {
       render(<DogGrid {...defaultProps} dogs={[]} />);
 
-      const grid = document.querySelector('.doggo-grid');
+      const grid = document?.querySelector('.doggo-grid');
       expect(grid).toBeInTheDocument();
       expect(grid?.children).toHaveLength(0);
     });

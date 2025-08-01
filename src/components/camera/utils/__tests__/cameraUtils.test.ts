@@ -6,7 +6,7 @@ import { logger } from '../../../../lib/logger';
 // Mock dependencies
 jest.mock('../../../../services/TimeService', () => ({
   timeService: {
-    formatDateToLocal: jest.fn((date: Date, options: any) => {
+    formatDateToLocal: jest.fn((date: Date, options: unknown) => {
       return new Intl.DateTimeFormat('en-US', options).format(date);
     }),
     fromTimestamp: jest.fn((timestamp: number) => new Date(timestamp)),
@@ -111,8 +111,8 @@ describe('CameraUtils', () => {
   });
 
   describe('compressImage', () => {
-    let mockCanvas: any;
-    let mockContext: any;
+    let mockCanvas: unknown;
+    let mockContext: unknown;
 
     beforeEach(() => {
       mockContext = {
@@ -139,10 +139,10 @@ describe('CameraUtils', () => {
         src: '',
         width: 1920,
         height: 1080,
-        onload: null as any,
+        onload: null as unknown,
       };
 
-      (global as any).Image = jest.fn().mockImplementation(() => {
+      (global as unknown).Image = jest.fn().mockImplementation(() => {
         Promise.resolve().then(() => {
           if (mockImage.onload) mockImage.onload();
         });
@@ -163,10 +163,10 @@ describe('CameraUtils', () => {
         src: '',
         width: 1920,
         height: 1080,
-        onload: null as any,
+        onload: null as unknown,
       };
 
-      (global as any).Image = jest.fn().mockImplementation(() => {
+      (global as unknown).Image = jest.fn().mockImplementation(() => {
         Promise.resolve().then(() => {
           if (mockImage.onload) mockImage.onload();
         });
@@ -182,8 +182,8 @@ describe('CameraUtils', () => {
   });
 
   describe('downloadPhoto', () => {
-    let mockAnchor: any;
-    let originalDocument: any;
+    let mockAnchor: unknown;
+    let originalDocument: unknown;
 
     beforeEach(() => {
       mockAnchor = {
@@ -203,13 +203,13 @@ describe('CameraUtils', () => {
         return originalDocument.createElement(tagName);
       });
       
-      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn() as any);
-      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn() as any);
+      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn() as unknown);
+      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn() as unknown);
 
       global.URL = {
         createObjectURL: jest.fn(() => 'blob:mock-url'),
         revokeObjectURL: jest.fn(),
-      } as any;
+      } as unknown;
     });
 
     afterEach(() => {
@@ -280,7 +280,7 @@ describe('CameraUtils', () => {
     });
 
     it('should handle undefined input', () => {
-      expect(CameraUtils.formatFileSize(undefined as any)).toBe('NaN undefined');
+      expect(CameraUtils.formatFileSize(undefined as unknown)).toBe('NaN undefined');
     });
 
     it('should handle negative values', () => {
@@ -298,8 +298,8 @@ describe('CameraUtils', () => {
         height: 0,
         naturalWidth: 0,
         naturalHeight: 0,
-        onload: null as any,
-        onerror: null as any,
+        onload: null as unknown,
+        onerror: null as unknown,
       };
 
       global.Image = jest.fn().mockImplementation(() => {
@@ -311,7 +311,7 @@ describe('CameraUtils', () => {
           if (mockImage.onload) mockImage.onload();
         }, 0);
         return mockImage;
-      }) as any;
+      }) as unknown;
 
       const dataUrl = 'data:image/jpeg;base64,test';
       const dimensions = await CameraUtils.getImageDimensions(dataUrl);
@@ -322,8 +322,8 @@ describe('CameraUtils', () => {
     it('should handle dimension retrieval errors', async () => {
       const mockImage = {
         src: '',
-        onload: null as any,
-        onerror: null as any,
+        onload: null as unknown,
+        onerror: null as unknown,
       };
 
       global.Image = jest.fn().mockImplementation(() => {
@@ -331,7 +331,7 @@ describe('CameraUtils', () => {
           if (mockImage.onerror) mockImage.onerror(new Error('Failed to load'));
         }, 0);
         return mockImage;
-      }) as any;
+      }) as unknown;
 
       await expect(CameraUtils.getImageDimensions('invalid'))
         .rejects.toThrow('Failed to load');

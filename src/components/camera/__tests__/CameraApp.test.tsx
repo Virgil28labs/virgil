@@ -23,7 +23,7 @@ jest.mock('../../../hooks/useToast', () => ({
 }));
 
 jest.mock('../PhotoGallery', () => ({
-  PhotoGallery: ({ onPhotoSelect, onError }: any) => (
+  PhotoGallery: ({ onPhotoSelect, onError }: unknown) => (
     <div data-testid="photo-gallery">
       <button onClick={() => onPhotoSelect(mockPhoto1)}>Select Photo 1</button>
       <button onClick={() => onPhotoSelect(mockPhoto2)}>Select Photo 2</button>
@@ -33,7 +33,7 @@ jest.mock('../PhotoGallery', () => ({
 }));
 
 jest.mock('../PhotoModal', () => ({
-  PhotoModal: ({ photo, isOpen, onClose, onNext, onPrevious, onFavoriteToggle, onDelete, onShare }: any) => (
+  PhotoModal: ({ photo, isOpen, onClose, onNext, onPrevious, onFavoriteToggle, onDelete, onShare }: unknown) => (
     isOpen ? (
       <div data-testid="photo-modal">
         <div>Photo: {photo?.name}</div>
@@ -126,7 +126,7 @@ const mockInfo = jest.fn();
 describe('CameraApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn as any);
+    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn as unknown);
     mockUseToast.mockReturnValue({
       toasts: [],
       addToast: mockAddToast,
@@ -136,7 +136,7 @@ describe('CameraApp', () => {
       error: mockError,
       warning: mockWarning,
       info: mockInfo,
-    } as any);
+    } as unknown);
   });
 
   const renderCameraApp = (props = {}) => {
@@ -178,7 +178,7 @@ describe('CameraApp', () => {
       mockUsePhotoGallery.mockReturnValue({
         ...mockPhotoGalleryReturn,
         galleryState: favoritesGalleryState,
-      } as any);
+      } as unknown);
       renderCameraApp();
 
       expect(screen.getByText('1 favorite')).toBeInTheDocument();

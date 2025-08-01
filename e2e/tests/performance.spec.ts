@@ -129,7 +129,7 @@ test.describe('Performance Testing', () => {
       // Measure Core Web Vitals
       const webVitals = await page.evaluate(() => {
         return new Promise((resolve) => {
-          const vitals: any = {};
+          const vitals: unknown = {};
           
           // Largest Contentful Paint
           new PerformanceObserver((list) => {
@@ -148,8 +148,8 @@ test.describe('Performance Testing', () => {
           let clsValue = 0;
           new PerformanceObserver((list) => {
             for (const entry of list.getEntries()) {
-              if (!(entry as any).hadRecentInput) {
-                clsValue += (entry as any).value;
+              if (!(entry as unknown).hadRecentInput) {
+                clsValue += (entry as unknown).value;
               }
             }
             vitals.cls = clsValue;
@@ -176,7 +176,7 @@ test.describe('Performance Testing', () => {
       await page.waitForTimeout(100);
       
       const fidMeasurement = await page.evaluate(() => {
-        return (window as any).fidValue || 0;
+        return (window as unknown).fidValue || 0;
       });
       
       if (fidMeasurement > 0) {
@@ -189,13 +189,13 @@ test.describe('Performance Testing', () => {
       
       // Monitor layout shifts
       await page.evaluate(() => {
-        (window as any).layoutShifts = [];
+        (window as unknown).layoutShifts = [];
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            (window as any).layoutShifts.push({
-              value: (entry as any).value,
-              hadRecentInput: (entry as any).hadRecentInput,
-              sources: (entry as any).sources?.map((source: any) => ({
+            (window as unknown).layoutShifts.push({
+              value: (entry as unknown).value,
+              hadRecentInput: (entry as unknown).hadRecentInput,
+              sources: (entry as unknown).sources?.map((source: unknown) => ({
                 node: source.node?.tagName,
                 currentRect: source.currentRect,
                 previousRect: source.previousRect,
@@ -210,12 +210,12 @@ test.describe('Performance Testing', () => {
       // Wait for potential layout shifts to occur
       await page.waitForTimeout(3000);
       
-      const layoutShifts = await page.evaluate(() => (window as any).layoutShifts || []);
+      const layoutShifts = await page.evaluate(() => (window as unknown).layoutShifts || []);
       
       // Calculate total CLS
       const totalCLS = layoutShifts
-        .filter((shift: any) => !shift.hadRecentInput)
-        .reduce((sum: number, shift: any) => sum + shift.value, 0);
+        .filter((shift: unknown) => shift.hadRecentInput)
+        .reduce((sum: number, shift: unknown) => sum + shift.value, 0);
       
       expect(totalCLS).toBeLessThan(0.1);
       
@@ -233,10 +233,10 @@ test.describe('Performance Testing', () => {
       
       // Get initial memory usage
       const initialMemory = await page.evaluate(() => {
-        return (performance as any).memory ? {
-          usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
-          totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
-          jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+        return (performance as unknown).memory ? {
+          usedJSHeapSize: (performance as unknown).memory.usedJSHeapSize,
+          totalJSHeapSize: (performance as unknown).memory.totalJSHeapSize,
+          jsHeapSizeLimit: (performance as unknown).memory.jsHeapSizeLimit,
         } : null;
       });
       
@@ -249,9 +249,9 @@ test.describe('Performance Testing', () => {
         await page.waitForTimeout(1000);
         
         const afterInteractionMemory = await page.evaluate(() => {
-          return (performance as any).memory ? {
-            usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
-            totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+          return (performance as unknown).memory ? {
+            usedJSHeapSize: (performance as unknown).memory.usedJSHeapSize,
+            totalJSHeapSize: (performance as unknown).memory.totalJSHeapSize,
           } : null;
         });
         
@@ -269,7 +269,7 @@ test.describe('Performance Testing', () => {
       
       const getMemoryUsage = async () => {
         return await page.evaluate(() => {
-          return (performance as any).memory?.usedJSHeapSize || 0;
+          return (performance as unknown).memory?.usedJSHeapSize || 0;
         });
       };
       
@@ -291,8 +291,8 @@ test.describe('Performance Testing', () => {
       
       // Force garbage collection
       await page.evaluate(() => {
-        if ((window as any).gc) {
-          (window as any).gc();
+        if ((window as unknown).gc) {
+          (window as unknown).gc();
         }
       });
       
@@ -310,7 +310,7 @@ test.describe('Performance Testing', () => {
 
   test.describe('Network Performance', () => {
     test('should minimize network requests', async ({ page }) => {
-      const networkRequests: any[] = [];
+      const networkRequests: unknown[] = [];
       
       page.on('request', (request) => {
         networkRequests.push({
@@ -325,7 +325,7 @@ test.describe('Performance Testing', () => {
       
       // Filter out hot reload and dev server requests
       const productionRequests = networkRequests.filter(req => 
-        !req.url.includes('vite') && 
+        req.url.includes('vite') && 
         !req.url.includes('/@') &&
         !req.url.includes('node_modules')
       );
@@ -343,7 +343,7 @@ test.describe('Performance Testing', () => {
     });
 
     test('should have efficient bundle loading', async ({ page }) => {
-      const resourceSizes: any[] = [];
+      const resourceSizes: unknown[] = [];
       
       page.on('response', async (response) => {
         if (response.request().resourceType() === 'script') {
@@ -376,7 +376,7 @@ test.describe('Performance Testing', () => {
     });
 
     test('should load critical resources first', async ({ page }) => {
-      const requestTimes: any[] = [];
+      const requestTimes: unknown[] = [];
       const startTime = Date.now();
       
       page.on('response', (response) => {
@@ -441,7 +441,7 @@ test.describe('Performance Testing', () => {
           };
           
           // Trigger animation
-          const widget = document.querySelector('[data-testid="weather-widget"]') as HTMLElement;
+          const widget = document?.querySelector('[data-testid="weather-widget"]') as HTMLElement;
           if (widget) {
             widget.style.transition = 'transform 1s ease';
             widget.style.transform = 'scale(1.1)';
@@ -489,7 +489,7 @@ test.describe('Performance Testing', () => {
           };
           
           scrollContainer.addEventListener('scroll', () => {
-            if (!isScrolling) {
+            if (isScrolling) {
               isScrolling = true;
               requestAnimationFrame(measureScrollFrame);
             }

@@ -255,9 +255,9 @@ describe('PhotoGalleryTabs', () => {
       const cameraTab = screen.getByRole('button', { name: /switch to camera tab/i });
       
       // Should contain icon, label, and no count
-      expect(cameraTab.querySelector('.tab-icon')).toHaveTextContent('📸');
-      expect(cameraTab.querySelector('.tab-label')).toHaveTextContent('Camera');
-      expect(cameraTab.querySelector('.tab-count')).toBeNull();
+      expect(cameraTab?.querySelector('.tab-icon')).toHaveTextContent('📸');
+      expect(cameraTab?.querySelector('.tab-label')).toHaveTextContent('Camera');
+      expect(cameraTab?.querySelector('.tab-count')).toBeNull();
     });
 
     it('should show count elements for tabs with counts', () => {
@@ -266,8 +266,8 @@ describe('PhotoGalleryTabs', () => {
       const galleryTab = screen.getByRole('button', { name: /switch to gallery tab/i });
       const favoritesTab = screen.getByRole('button', { name: /switch to favorites tab/i });
 
-      expect(galleryTab.querySelector('.tab-count')).toHaveTextContent('5');
-      expect(favoritesTab.querySelector('.tab-count')).toHaveTextContent('2');
+      expect(galleryTab?.querySelector('.tab-count')).toHaveTextContent('5');
+      expect(favoritesTab?.querySelector('.tab-count')).toHaveTextContent('2');
     });
   });
 
@@ -305,7 +305,7 @@ describe('PhotoGalleryTabs', () => {
       const { container } = render(
         <PhotoGalleryTabs
           activeTab="camera"
-          onTabChange={undefined as any}
+          onTabChange={undefined as unknown}
           photoCount={5}
           favoriteCount={2}
         />,

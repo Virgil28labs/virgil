@@ -154,7 +154,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={jest.fn()} />);
 
       expect(screen.getByText('Fetching adorable doggos...')).toBeInTheDocument();
-      expect(document.querySelector('.doggo-loading-spinner')).toBeInTheDocument();
+      expect(document?.querySelector('.doggo-loading-spinner')).toBeInTheDocument();
     });
 
     it('should show error state', () => {
@@ -192,7 +192,7 @@ describe('DogGallery', () => {
 
       await user.click(screen.getByRole('tab', { name: /Favorites/i }));
 
-      expect(screen.getByText('Your Doggo Sanctuary is empty!')).toBeInTheDocument();
+      expect(screen.getByText('Your Doggo Sanctuary is empty')).toBeInTheDocument();
       expect(screen.getByText('Start by fetching some adorable friends')).toBeInTheDocument();
       expect(screen.getByText('Go Fetch →')).toBeInTheDocument();
     });
@@ -204,8 +204,8 @@ describe('DogGallery', () => {
       const onClose = jest.fn();
       render(<DogGallery isOpen onClose={onClose} />);
 
-      const backdrop = document.querySelector('.doggo-sanctuary-backdrop');
-      if (!backdrop) throw new Error('Backdrop not found');
+      const backdrop = document?.querySelector('.doggo-sanctuary-backdrop');
+      if (backdrop) throw new Error('Backdrop not found');
       await user.click(backdrop);
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -216,8 +216,8 @@ describe('DogGallery', () => {
       const onClose = jest.fn();
       render(<DogGallery isOpen onClose={onClose} />);
 
-      const panel = document.querySelector('.doggo-sanctuary-panel');
-      if (!panel) throw new Error('Panel not found');
+      const panel = document?.querySelector('.doggo-sanctuary-panel');
+      if (panel) throw new Error('Panel not found');
       await user.click(panel);
 
       expect(onClose).not.toHaveBeenCalled();
