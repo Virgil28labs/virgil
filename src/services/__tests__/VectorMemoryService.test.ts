@@ -66,13 +66,10 @@ jest.mock('../../lib/logger', () => ({
   },
 }));
 
-// Create mock functions before using them in jest.mock
-const mockGetUser = jest.fn();
-
 jest.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
-      getUser: mockGetUser,
+      getUser: jest.fn(),
     },
     from: jest.fn(),
   },
@@ -175,7 +172,7 @@ describe('VectorMemoryService', () => {
     mockDynamicContextBuilder.createContextSummary.mockReturnValue('Test context summary');
     
     // Mock Supabase
-    mockGetUser.mockResolvedValue({
+    (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
       data: { user: { id: 'test-user-id' } },
       error: null,
     });
@@ -442,6 +439,9 @@ describe('VectorMemoryService', () => {
       
       // Clear mock calls after health setup
       mockVectorService.store.mockClear();
+      
+      // Mock createContextSummary to return empty string for this test (missing context)
+      mockDynamicContextBuilder.createContextSummary.mockReturnValue('');
       
       mockDashboardContextService.getContext.mockReturnValue({
         user: { 
@@ -932,7 +932,7 @@ describe('VectorMemoryService', () => {
     });
 
     it('handles unauthenticated user', async () => {
-      mockGetUser.mockResolvedValue({
+      (mockSupabase.auth.getUser as jest.Mock).mockResolvedValue({
         data: { user: null },
         error: null,
       });

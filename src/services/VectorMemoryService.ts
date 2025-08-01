@@ -313,7 +313,9 @@ export class VectorMemoryService extends SupabaseMemoryService {
 
     if (dashboardContext) {
       const contextSummary = DynamicContextBuilder.createContextSummary(dashboardContext);
-      context += `, ${contextSummary}`;
+      if (contextSummary && contextSummary.trim().length > 0) {
+        context += `, ${contextSummary}`;
+      }
     }
 
     return context;

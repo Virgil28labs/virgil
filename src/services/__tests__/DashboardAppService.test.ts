@@ -229,10 +229,15 @@ describe('DashboardAppService', () => {
 
     it('invalidates cache when adapter updates', () => {
       const mockAdapter = new TestMockAdapter('notes', 'Notes App');
-      // Set up subscription mock
+      // Set up subscription mock with callback storage
+      interface MockAdapterWithCallback extends TestMockAdapter {
+        updateCallback?: () => void;
+      }
+      const mockAdapterWithCallback = mockAdapter as MockAdapterWithCallback;
+      
       mockAdapter.subscribe = jest.fn((callback: () => void) => {
         // Store callback to simulate real-time updates
-        (mockAdapter as any).updateCallback = callback;
+        mockAdapterWithCallback.updateCallback = callback;
         return () => {}; // Return unsubscribe function
       });
       
@@ -242,9 +247,9 @@ describe('DashboardAppService', () => {
       // const data1 = service.getAppData('notes');
       service.getAppData('notes'); // cache data
       
-      // Simulate adapter update
-      if ((mockAdapter as any).updateCallback) {
-        (mockAdapter as any).updateCallback();
+      // Simulate adapter update using typed callback
+      if (mockAdapterWithCallback.updateCallback) {
+        mockAdapterWithCallback.updateCallback();
       }
       
       // Should get fresh data

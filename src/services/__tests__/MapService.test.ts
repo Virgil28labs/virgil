@@ -54,7 +54,7 @@ const mockTrafficLayer = {
 };
 
 // Mock Google Maps classes
-(global as any).google = {
+(global as unknown as { google: MockGoogleMaps }).google = {
   maps: {
     DirectionsService: jest.fn(() => mockDirectionsService),
     Geocoder: jest.fn(() => mockGeocoder),

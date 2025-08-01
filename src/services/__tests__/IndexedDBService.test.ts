@@ -73,16 +73,22 @@ class MockIDBTransaction {
   }
 }
 
+// Extend global interface for mock IDB stores
+interface MockGlobal {
+  __mockIDBStores?: Record<string, Map<string, unknown>>;
+}
+
 class MockIDBObjectStore {
   private data: Map<string, unknown> = new Map();
   
   constructor(name: string) {
     // Get or create global data store
-    const globalStore = (global as any).__mockIDBStores || {};
+    const mockGlobal = global as unknown as MockGlobal;
+    const globalStore = mockGlobal.__mockIDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as any).__mockIDBStores = globalStore;
+    mockGlobal.__mockIDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -107,7 +113,7 @@ class MockIDBObjectStore {
   add(value: unknown) {
     const request = new MockIDBRequest();
     setTimeout(() => {
-      const key = (value as any).id || Math.random().toString();
+      const key = (value as Record<string, unknown>)?.id as string || Math.random().toString();
       if (this.data.has(key)) {
         request.error = new Error('Key already exists');
         if (request.onerror) request.onerror(createMockEvent(request));
@@ -280,7 +286,7 @@ describe('IndexedDBService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (global as any).__mockIDBStores = {};
+    (global as unknown as MockGlobal).__mockIDBStores = {};
     
     // Reset singleton instance
     (IndexedDBService as unknown as MockIndexedDBServicePrivate).instance = undefined;

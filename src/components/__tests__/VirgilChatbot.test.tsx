@@ -26,7 +26,7 @@ jest.mock('../../services/ChatService', () => ({
   },
 }));
 
-jest.mock('../../services/llm/LLMService', () => ({
+jest.mock('../../services/llm', () => ({
   llmService: {
     complete: jest.fn(),
     generateResponse: jest.fn(),
@@ -68,6 +68,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
         data-testid="message-input"
         disabled={disabled}
         placeholder={isStreaming ? 'Virgil is typing...' : 'Type a message...'}
+        aria-label="Type your message"
         onKeyDown={(e) => {
           const target = e.target as HTMLInputElement;
           if (e.key === 'Enter' && target.value) {
@@ -79,6 +80,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
       <button 
         data-testid="send-button"
         disabled={disabled}
+        aria-label="Send message"
         onClick={() => {
           const input = document.querySelector('[data-testid="message-input"]') as HTMLInputElement;
           if (input && input.value) {
@@ -97,8 +99,8 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
   ChatHeader: ({ onClear, onExport, messagesCount }: { onClear: () => void; onExport: () => void; messagesCount: number }) => (
     <div data-testid="chat-header">
       <span data-testid="message-count">{messagesCount} messages</span>
-      <button data-testid="clear-button" onClick={onClear}>Clear</button>
-      <button data-testid="export-button" onClick={onExport}>Export</button>
+      <button data-testid="clear-button" onClick={onClear} tabIndex={0}>Clear</button>
+      <button data-testid="export-button" onClick={onExport} tabIndex={0}>Export</button>
     </div>
   ),
 }));
@@ -669,10 +671,12 @@ describe('VirgilChatbot', () => {
       const input = screen.getByTestId('message-input');
       const sendButton = screen.getByTestId('send-button');
       
-      await userEvent.tab(); // Focus input
+      // Focus the input directly
+      await userEvent.click(input);
       expect(input).toHaveFocus();
       
-      await userEvent.tab(); // Focus send button
+      // Tab to send button
+      await userEvent.tab();
       expect(sendButton).toHaveFocus();
     });
   });

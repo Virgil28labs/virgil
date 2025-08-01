@@ -145,11 +145,17 @@ export const Dashboard = memo(function Dashboard() {
   }, [deviceInfo]);
 
   return (
-    <div ref={containerRef as React.RefObject<HTMLDivElement>} className="dashboard" role="main" aria-label="Dashboard">
+    <div 
+      ref={containerRef as React.RefObject<HTMLDivElement>} 
+      className={`dashboard ${deviceInfo?.device === 'mobile' ? 'mobile-layout' : ''}`}
+      role="main" 
+      aria-label="Dashboard main content"
+      data-testid="dashboard-container"
+    >
       {/* Fixed positioned elements */}
       <VirgilTextLogo onClick={handleShowProfileViewer} />
       <DateTime />
-      <SectionErrorBoundary sectionName="Weather" fallback={null}>
+      <SectionErrorBoundary sectionName="Weather" fallback={null} data-testid="section-error-boundary">
         <Weather />
       </SectionErrorBoundary>
 
@@ -164,13 +170,21 @@ export const Dashboard = memo(function Dashboard() {
       >
         <div className="power-icon" aria-hidden="true" />
         <span className="sr-only">{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
+        {isSigningOut ? 'Signing out...' : 'Sign Out'}
       </button>
 
       {/* Main content */}
-      <div id="main-content" className="dashboard-content">
+      <div id="main-content" className="dashboard-content" aria-label="User profile and settings">
         <div className="user-info">
           <p className="user-name">{user?.user_metadata?.name || 'Anonymous User'}</p>
-          <p className="user-email">{user?.email}</p>
+          <button 
+            className="user-email" 
+            onClick={handleShowProfileViewer}
+            tabIndex={0}
+            aria-label="View user profile"
+          >
+            {user?.email}
+          </button>
         </div>
 
         <div className="location-info">
@@ -196,7 +210,9 @@ export const Dashboard = memo(function Dashboard() {
                 <Skeleton className="w-48 h-4" />
               )
             ) : locationLoading ? (
-              <Skeleton className="w-48 h-4" />
+              <div data-testid="location-loading">
+                <Skeleton className="w-48 h-4" />
+              </div>
             ) : ipLocation?.city ? (
               <p
                 className="street-address clickable"
@@ -241,8 +257,14 @@ export const Dashboard = memo(function Dashboard() {
                 title="Click to toggle unit"
               >
                 Elevation: {elevationUnit === 'meters'
-                  ? `${Math.round(coordinates.elevation)}m`
-                  : `${Math.round(coordinates.elevation * 3.28084)}ft`}
+                  ? `${Math.round(coordinates.elevation)}`
+                  : `${Math.round(coordinates.elevation * 3.28084)}`}
+                <button 
+                  onClick={toggleElevationUnit}
+                  style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  {elevationUnit === 'meters' ? 'm' : 'ft'}
+                </button>
               </p>
             ) : coordinates && !locationLoading ? (
               <p className="elevation" style={{ opacity: 0.6 }}>
@@ -255,41 +277,44 @@ export const Dashboard = memo(function Dashboard() {
         </div>
       </div>
 
-      {/* Raccoon Mascot */}
-      <SectionErrorBoundary sectionName="Mascot" fallback={null}>
-        <Suspense fallback={<LoadingFallback message="Loading mascot..." size="small" />}>
-          <LazyRaccoonMascot />
-        </Suspense>
-      </SectionErrorBoundary>
-      {/* Dog Emoji Button */}
-      <DogEmojiButton />
+      {/* Dashboard Applications */}
+      <div aria-label="Dashboard applications">
+        {/* Raccoon Mascot */}
+        <SectionErrorBoundary sectionName="Mascot" fallback={null} data-testid="section-error-boundary">
+          <Suspense fallback={<div data-testid="loading-fallback"><LoadingFallback message="Loading mascot..." size="small" /></div>}>
+            <LazyRaccoonMascot />
+          </Suspense>
+        </SectionErrorBoundary>
+        {/* Dog Emoji Button */}
+        <DogEmojiButton />
 
-      {/* Giphy Emoji Button */}
-      <GiphyEmojiButton />
+        {/* Giphy Emoji Button */}
+        <GiphyEmojiButton />
 
-      {/* NASA APOD Button */}
-      <NasaApodButton />
+        {/* NASA APOD Button */}
+        <NasaApodButton />
 
-      {/* Rhythm Machine Button */}
-      <RhythmMachineButton />
+        {/* Rhythm Machine Button */}
+        <RhythmMachineButton />
 
-      {/* Circle Game Button */}
-      <CircleGameButton />
+        {/* Circle Game Button */}
+        <CircleGameButton />
 
-      {/* Streak Tracker Button */}
-      <StreakTrackerButton />
+        {/* Streak Tracker Button */}
+        <StreakTrackerButton />
 
-      {/* Camera Button */}
-      <CameraEmojiButton />
+        {/* Camera Button */}
+        <CameraEmojiButton />
 
-      {/* Pomodoro Timer Button */}
-      <PomodoroEmojiButton />
+        {/* Pomodoro Timer Button */}
+        <PomodoroEmojiButton />
 
-      {/* Notes Button */}
-      <NotesEmojiButton />
+        {/* Notes Button */}
+        <NotesEmojiButton />
 
-      {/* Vector Test Button */}
-      <VectorMemoryButton />
+        {/* Vector Test Button */}
+        <VectorMemoryButton />
+      </div>
 
       {/* User Profile Viewer */}
       <UserProfileViewer
@@ -298,7 +323,7 @@ export const Dashboard = memo(function Dashboard() {
       />
 
       {/* Google Maps Modal */}
-      <SectionErrorBoundary sectionName="Maps">
+      <SectionErrorBoundary sectionName="Maps" data-testid="section-error-boundary">
         <GoogleMapsModal
           isOpen={showMapsModal}
           onClose={handleHideMapsModal}

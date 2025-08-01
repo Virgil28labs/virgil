@@ -81,15 +81,27 @@ class MockIDBTransaction {
   }
 }
 
+// Interface for objects with timestamp (used in memory entries)
+interface TimestampedEntry {
+  timestamp?: number;
+  [key: string]: unknown;
+}
+
+// Extend global interface for mock DB stores
+interface MockMemoryGlobal {
+  __mockDBStores?: Record<string, Map<string, unknown>>;
+}
+
 class MockIDBObjectStore {
   private data: Map<string, unknown> = new Map();
   constructor(name: string) {
     // Get or create data store
-    const globalStore = (global as any).__mockDBStores || {};
+    const mockGlobal = global as unknown as MockMemoryGlobal;
+    const globalStore = mockGlobal.__mockDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as any).__mockDBStores = globalStore;
+    mockGlobal.__mockDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -152,8 +164,11 @@ class MockIDBObjectStore {
     setTimeout(() => {
       const values = Array.from(this.data.values());
       // Sort by timestamp if direction is 'prev'
-      if (direction === 'prev' && values.length > 0 && (values[0] as any).timestamp) {
-        values.sort((a: any, b: any) => b.timestamp - a.timestamp);
+      const typedValues = values as TimestampedEntry[];
+      if (direction === 'prev' && typedValues.length > 0 && typedValues[0].timestamp) {
+        typedValues.sort((a: TimestampedEntry, b: TimestampedEntry) => 
+          (b.timestamp || 0) - (a.timestamp || 0),
+        );
       }
       
       let index = 0;
@@ -254,7 +269,7 @@ describe('MemoryService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     // Clear mock data stores
-    (global as any).__mockDBStores = {};
+    (global as unknown as MockMemoryGlobal).__mockDBStores = {};
     mockDashboardContextService.getTimestamp.mockReturnValue(Date.now());
     
     memoryService = new MemoryService();

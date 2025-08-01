@@ -27,7 +27,7 @@ jest.mock('react', () => ({
 }));
 
 // Mock the service imports
-jest.mock('../lib/weatherService', () => ({
+jest.mock('../../lib/weatherService', () => ({
   weatherService: {
     getWeatherByCoordinates: jest.fn(),
     formatTemperature: jest.fn(),
@@ -35,7 +35,7 @@ jest.mock('../lib/weatherService', () => ({
   },
 }));
 
-jest.mock('../lib/locationService', () => ({
+jest.mock('../../lib/locationService', () => ({
   locationService: {
     getIpLocation: jest.fn(),
     getAddressFromCoordinates: jest.fn(),

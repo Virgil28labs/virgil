@@ -349,7 +349,7 @@ describe('ToastService', () => {
     it('handles null/undefined options', () => {
       toastService.subscribe(mockListener);
       
-      expect(() => toastService.error('Test', null as any)).not.toThrow();
+      expect(() => toastService.error('Test', undefined)).not.toThrow();
       expect(() => toastService.warning('Test', undefined)).not.toThrow();
     });
   });

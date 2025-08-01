@@ -209,29 +209,39 @@ function VirgilChatbotInner() {
         createSystemPrompt={createSystemPromptSync}
       />
 
-      <ChatMessages
-        messages={state.messages}
-        error={state.error}
-        onErrorDismiss={handleErrorDismiss}
-        onMarkAsImportant={markAsImportant}
-        user={user}
-        lastConversation={state.lastConversation}
-        isTyping={state.isTyping}
-      />
+      <div aria-label="Chat conversation" role="log" aria-live="polite">
+        <ChatMessages
+          messages={state.messages}
+          error={state.error}
+          onErrorDismiss={handleErrorDismiss}
+          onMarkAsImportant={markAsImportant}
+          user={user}
+          lastConversation={state.lastConversation}
+          isTyping={state.isTyping}
+        />
+        {/* Screen reader announcements for new messages */}
+        {state.messages.length > 0 && state.messages[state.messages.length - 1]?.role === 'assistant' && (
+          <div className="sr-only" aria-live="polite">
+            New message from assistant
+          </div>
+        )}
+      </div>
 
-      <ChatInput
-        input={state.input}
-        onInputChange={setInput}
-        onSubmit={handleSubmit}
-        onKeyDown={handleKeyDown}
-        isTyping={state.isTyping}
-        error={state.error}
-        onQuickAction={handleQuickAction}
-        showQuickActions={state.messages.length === 0}
-        dashboardContext={state.dashboardContext}
-        shouldFocus={state.isOpen}
-        externalInputRef={inputRef}
-      />
+      <div role="region" aria-label="Message input">
+        <ChatInput
+          input={state.input}
+          onInputChange={setInput}
+          onSubmit={handleSubmit}
+          onKeyDown={handleKeyDown}
+          isTyping={state.isTyping}
+          error={state.error}
+          onQuickAction={handleQuickAction}
+          showQuickActions={state.messages.length === 0}
+          dashboardContext={state.dashboardContext}
+          shouldFocus={state.isOpen}
+          externalInputRef={inputRef}
+        />
+      </div>
 
       <MemoryModal
         isOpen={state.showMemoryModal}

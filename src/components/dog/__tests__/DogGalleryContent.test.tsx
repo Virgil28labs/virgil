@@ -10,7 +10,7 @@ interface FetchControlsProps {
   onCountChange: (count: number) => void;
 }
 
-jest.mock('./FetchControls', () => ({
+jest.mock('../FetchControls', () => ({
   FetchControls: ({ onFetch, onBreedChange, onCountChange }: FetchControlsProps) => (
     <div data-testid="fetch-controls">
       <button onClick={onFetch}>Fetch</button>
@@ -26,7 +26,7 @@ interface DogGridProps {
   onFavoriteToggle: (dog: DogImage) => void;
 }
 
-jest.mock('./DogGrid', () => ({
+jest.mock('../DogGrid', () => ({
   DogGrid: ({ dogs, onImageClick, onFavoriteToggle }: DogGridProps) => (
     <div data-testid="dog-grid">
       {dogs.map((dog: DogImage) => (
@@ -47,7 +47,7 @@ interface DogImageStatesProps {
   onSwitchToFetch?: () => void;
 }
 
-jest.mock('./DogImageStates', () => ({
+jest.mock('../DogImageStates', () => ({
   DogImageStates: ({ loading, error, dogsCount, activeTab, onSwitchToFetch }: DogImageStatesProps) => (
     <div data-testid="dog-image-states">
       <div data-testid="loading">{loading.toString()}</div>
@@ -59,7 +59,7 @@ jest.mock('./DogImageStates', () => ({
   ),
 }));
 
-jest.mock('./hooks/useDogGallery', () => ({
+jest.mock('../hooks/useDogGallery', () => ({
   useDogGallery: jest.fn(),
 }));
 

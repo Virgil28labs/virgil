@@ -214,11 +214,15 @@ afterEach(() => {
   localStorageMock.clear.mockClear();
 });
 
-// Suppress specific React 18 warnings in tests
+// Suppress specific React 18 warnings and expected test errors
 const originalConsoleError = console.error;
 beforeEach(() => {
   console.error = (...args) => {
     if (typeof args[0] === 'string' && args[0].includes('ReactDOM.createRoot')) {
+      return;
+    }
+    // Suppress expected CircleGameAdapter error during testing
+    if (typeof args[0] === 'string' && args[0].includes('[circleAdapter:loadData] Failed to fetch circle game data') && args[0].includes('invalid-json')) {
       return;
     }
     originalConsoleError.call(console, ...args);

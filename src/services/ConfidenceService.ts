@@ -7,7 +7,6 @@
 
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
-import { vectorMemoryService } from './VectorMemoryService';
 import { queryPreprocessor } from './QueryPreprocessor';
 import { intentInitializer } from './IntentInitializer';
 import type { AppDataAdapter, AppContextData } from './DashboardAppService';
@@ -235,6 +234,8 @@ export class ConfidenceService {
       intent: adapter.appName,
     }));
     
+    // Use dynamic import to avoid circular dependency
+    const { vectorMemoryService } = await import('./VectorMemoryService');
     return vectorMemoryService.getSemanticConfidenceBatch(batchQueries);
   }
   

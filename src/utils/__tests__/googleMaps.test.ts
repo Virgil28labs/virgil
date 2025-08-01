@@ -10,6 +10,19 @@ import type { MockGoogleMapsModule } from '../../test-utils/mockTypes';
 import type { LoadGoogleMapsOptions } from '../googleMaps';
 import type * as GoogleMapsModule from '../googleMaps';
 
+// Extend global interfaces for Google Maps testing
+interface GoogleMapsGlobal {
+  google?: typeof google;
+}
+
+interface ImportMetaGlobal {
+  import?: {
+    meta?: {
+      env?: Record<string, string>;
+    };
+  };
+}
+
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
   logger: {
@@ -91,7 +104,7 @@ describe('googleMaps', () => {
     });
     
     // Reset global google object
-    delete (global as any).google;
+    delete (global as unknown as GoogleMapsGlobal).google;
     
     // Re-import the module to reset module-level state
     const googleMapsModule = await import('../googleMaps');
@@ -116,7 +129,7 @@ describe('googleMaps', () => {
       const loadPromise = loadGoogleMaps(defaultOptions);
       
       // Simulate Google Maps being available after script load
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       
       // Trigger script onload
       setTimeout(() => {
@@ -143,7 +156,7 @@ describe('googleMaps', () => {
       // Check the script src was set correctly before resolving
       expect(mockScript.src).toContain('libraries=places%2Cgeometry%2Cmarker');
       
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       setTimeout(() => {
         if (mockScript.onload) mockScript.onload();
       }, 0);
@@ -164,7 +177,7 @@ describe('googleMaps', () => {
       expect(mockScript.src).toContain('language=es');
       expect(mockScript.src).toContain('region=ES');
       
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       setTimeout(() => {
         if (mockScript.onload) mockScript.onload();
       }, 0);
@@ -173,7 +186,7 @@ describe('googleMaps', () => {
     });
 
     it('returns existing Google object if already loaded', async () => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       
       const result = await loadGoogleMaps(defaultOptions);
       
@@ -195,7 +208,7 @@ describe('googleMaps', () => {
       expect(firstLoad === secondLoad).toBe(true);
       
       // Complete the load
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       setTimeout(() => {
         if (mockScript.onload) mockScript.onload();
       }, 0);
@@ -246,7 +259,7 @@ describe('googleMaps', () => {
     it('uses default libraries when none specified', async () => {
       const loadPromise = loadGoogleMaps(defaultOptions);
       
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       setTimeout(() => {
         if (mockScript.onload) mockScript.onload();
       }, 0);
@@ -264,7 +277,7 @@ describe('googleMaps', () => {
     const mockAdvancedMarker = { position: mockPosition };
 
     beforeEach(() => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       
       mockGoogle.maps.importLibrary.mockResolvedValue({
         AdvancedMarkerElement: jest.fn().mockReturnValue(mockAdvancedMarker),
@@ -308,7 +321,7 @@ describe('googleMaps', () => {
     };
 
     beforeEach(() => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       mockGoogle.maps.InfoWindow.mockReturnValue(mockInfoWindow);
     });
 
@@ -371,7 +384,7 @@ describe('googleMaps', () => {
     };
 
     beforeEach(() => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       mockGoogle.maps.StreetViewService.mockReturnValue(mockStreetViewService);
     });
 
@@ -406,8 +419,11 @@ describe('googleMaps', () => {
   describe('getGoogleMapsApiKey', () => {
     it('returns API key from environment variables', () => {
       // Temporarily set up import.meta.env for this test
-      const originalEnv = (globalThis as any).import.meta.env;
-      (globalThis as any).import.meta.env = {
+      const globalThis_ = globalThis as unknown as ImportMetaGlobal;
+      const originalEnv = globalThis_.import?.meta?.env;
+      if (!globalThis_.import) globalThis_.import = {};
+      if (!globalThis_.import.meta) globalThis_.import.meta = {};
+      globalThis_.import.meta.env = {
         ...originalEnv,
         VITE_GOOGLE_MAPS_API_KEY: 'test-google-maps-key',
       };
@@ -418,7 +434,9 @@ describe('googleMaps', () => {
       expect(apiKey).toBe('test-google-maps-key');
       
       // Restore original env
-      (globalThis as any).import.meta.env = originalEnv;
+      if (globalThis_.import?.meta) {
+        globalThis_.import.meta.env = originalEnv;
+      }
     });
 
     it('returns null when API key is not set', () => {
@@ -439,7 +457,7 @@ describe('googleMaps', () => {
 
   describe('Edge Cases and Error Handling', () => {
     it('handles undefined position in createLocationMarker', async () => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       
       const mockMap = {} as google.maps.Map;
       const undefinedPosition = undefined as unknown as google.maps.LatLngLiteral;
@@ -453,7 +471,7 @@ describe('googleMaps', () => {
     });
 
     it('handles empty content in createInfoWindow', () => {
-      (global as any).google = mockGoogle;
+      (global as unknown as GoogleMapsGlobal).google = mockGoogle as unknown as typeof google;
       
       const mockMarker = { addListener: jest.fn() } as unknown as google.maps.marker.AdvancedMarkerElement;
       const mockMap = {} as google.maps.Map;

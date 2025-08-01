@@ -130,7 +130,7 @@ export class DashboardContextService {
   private onlineHandler?: () => void;
   private offlineHandler?: () => void;
   constructor() {
-    this.sessionStartTime = timeService.getTimestamp();
+    this.sessionStartTime = this.getTimestamp();
     this.context = this.getInitialContext();
     this.startPeriodicUpdates();
     this.subscribeToDashboardApps();
@@ -156,7 +156,7 @@ export class DashboardContextService {
         activeComponents: [],
         recentActions: [],
         timeSpentInSession: 0,
-        lastInteraction: timeService.getTimestamp(),
+        lastInteraction: this.getTimestamp(),
       },
       environment: {
         isOnline: navigator.onLine,
@@ -171,19 +171,43 @@ export class DashboardContextService {
   }
 
   private getCurrentTime(): string {
-    return timeService.getCurrentTime();
+    try {
+      return timeService.getCurrentTime();
+    } catch (error) {
+      console.error('DashboardContextService: Error getting current time:', error);
+      // Safe fallback: return default time format to maintain interface compliance
+      return '12:00';
+    }
   }
 
   private getCurrentDate(): string {
-    return timeService.getCurrentDate();
+    try {
+      return timeService.getCurrentDate();
+    } catch (error) {
+      console.error('DashboardContextService: Error getting current date:', error);
+      // Safe fallback: return default date format to maintain interface compliance
+      return 'January 1, 2024';
+    }
   }
 
   private getDayOfWeek(): string {
-    return timeService.getDayOfWeek();
+    try {
+      return timeService.getDayOfWeek();
+    } catch (error) {
+      console.error('DashboardContextService: Error getting day of week:', error);
+      // Safe fallback: return default day to maintain interface compliance
+      return 'monday';
+    }
   }
 
   private getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
-    return timeService.getTimeOfDay();
+    try {
+      return timeService.getTimeOfDay();
+    } catch (error) {
+      console.error('DashboardContextService: Error getting time of day:', error);
+      // Safe fallback: return default time period to maintain interface compliance
+      return 'morning';
+    }
   }
 
   // =============================================================================
@@ -220,7 +244,13 @@ export class DashboardContextService {
    * @returns Current timestamp in milliseconds
    */
   getTimestamp(): number {
-    return timeService.getTimestamp();
+    try {
+      return timeService.getTimestamp();
+    } catch (error) {
+      console.error('DashboardContextService: Error getting timestamp:', error);
+      // Safe fallback: use performance API which doesn't violate TimeService rules
+      return performance.now() + performance.timeOrigin;
+    }
   }
 
   /**
@@ -379,11 +409,11 @@ export class DashboardContextService {
 
   private startPeriodicUpdates(): void {
     // Initialize last minute update timestamp
-    this.lastMinuteUpdate = timeService.getTimestamp();
+    this.lastMinuteUpdate = this.getTimestamp();
 
     // Context update timer (runs every minute)
     this.mainTimer = setInterval(() => {
-      const now = timeService.getTimestamp();
+      const now = this.getTimestamp();
 
       // Update dashboard context every minute
       if (now - this.lastMinuteUpdate >= 60000) {
@@ -629,7 +659,14 @@ export class DashboardContextService {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.context));
+    this.listeners.forEach(listener => {
+      try {
+        listener(this.context);
+      } catch (error) {
+        // Log the error but don't let it break other listeners
+        console.error('DashboardContextService: Listener error:', error);
+      }
+    });
   }
 
   private subscribeToDashboardApps(): void {

@@ -28,17 +28,22 @@ jest.mock('../../hooks/useKeyboardNavigation', () => ({
   useKeyboardNavigation: jest.fn(),
 }));
 
-jest.mock('../services/DashboardAppService', () => ({
+jest.mock('../../services/DashboardAppService', () => ({
   dashboardAppService: {
-    registerApp: jest.fn(),
+    registerAdapter: jest.fn(),
+    unregisterAdapter: jest.fn(),
     subscribe: jest.fn(() => jest.fn()),
+    getAppData: jest.fn(() => ({ apps: new Map(), activeApps: [], lastUpdated: Date.now() })),
   },
 }));
 
-jest.mock('../services/DashboardContextService', () => ({
+jest.mock('../../services/DashboardContextService', () => ({
   dashboardContextService: {
     subscribe: jest.fn(() => jest.fn()),
     getContext: jest.fn(() => ({})),
+    updateDeviceContext: jest.fn(),
+    updateLocationContext: jest.fn(),
+    updateWeatherContext: jest.fn(),
   },
 }));
 
@@ -104,15 +109,15 @@ jest.mock('../StreakTrackerButton', () => ({
   StreakTrackerButton: () => <button data-testid="streak-button">📈</button>,
 }));
 
-jest.mock('./camera/CameraEmojiButton', () => ({
+jest.mock('../camera/CameraEmojiButton', () => ({
   CameraEmojiButton: () => <button data-testid="camera-button">📷</button>,
 }));
 
-jest.mock('./pomodoro/PomodoroEmojiButton', () => ({
+jest.mock('../pomodoro/PomodoroEmojiButton', () => ({
   PomodoroEmojiButton: () => <button data-testid="pomodoro-button">🍅</button>,
 }));
 
-jest.mock('./notes/NotesEmojiButton', () => ({
+jest.mock('../notes/NotesEmojiButton', () => ({
   NotesEmojiButton: () => <button data-testid="notes-button">📝</button>,
 }));
 
@@ -120,7 +125,7 @@ jest.mock('../VectorMemoryButton', () => ({
   VectorMemoryButton: () => <button data-testid="memory-button">🧠</button>,
 }));
 
-jest.mock('./maps/GoogleMapsModal', () => ({
+jest.mock('../maps/GoogleMapsModal', () => ({
   GoogleMapsModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => 
     isOpen ? (
       <div data-testid="maps-modal">
@@ -130,7 +135,7 @@ jest.mock('./maps/GoogleMapsModal', () => ({
     ) : null,
 }));
 
-jest.mock('./location/IPHoverCard', () => ({
+jest.mock('../location/IPHoverCard', () => ({
   PositionedIPHoverCard: ({ show, onClose }: { show: boolean; onClose: () => void }) =>
     show ? (
       <div data-testid="ip-hover-card">
@@ -629,7 +634,7 @@ describe('Dashboard', () => {
       renderDashboard();
       
       // Should register all adapters with dashboard app service
-      expect(require('../services/DashboardAppService').dashboardAppService.registerApp)
+      expect(require('../../services/DashboardAppService').dashboardAppService.registerAdapter)
         .toHaveBeenCalledTimes(10); // All the adapters
     });
 

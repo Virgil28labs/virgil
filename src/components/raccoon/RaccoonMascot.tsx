@@ -713,6 +713,7 @@ const RaccoonMascot = memo(function RaccoonMascot() {
     <>
       <style>{RACCOON_ANIMATIONS}</style>
       <div
+        data-testid="raccoon-mascot"
         style={{
           ...styles.mainContainer(isPickedUp),
           left: position.x,

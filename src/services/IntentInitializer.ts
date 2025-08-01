@@ -5,7 +5,6 @@
  * semantic confidence scoring instead of just keyword matching.
  */
 
-import { vectorMemoryService } from './VectorMemoryService';
 import { vectorService } from './vectorService';
 import { logger } from '../lib/logger';
 import { timeService } from './TimeService';
@@ -70,7 +69,8 @@ export class IntentInitializer {
    * Perform the actual initialization
    */
   private async performInitialization(): Promise<void> {
-    // Wait for vector service health check
+    // Wait for vector service health check - use dynamic import to avoid circular dependency
+    const { vectorMemoryService } = await import('./VectorMemoryService');
     const isHealthy = await vectorMemoryService.waitForHealthCheck();
     if (!isHealthy) {
       return;

@@ -16,7 +16,7 @@ jest.mock('../utils/imageUtils', () => ({
 }));
 
 // Mock logger
-jest.mock('../../lib/logger', () => ({
+jest.mock('../../../lib/logger', () => ({
   logger: {
     error: jest.fn(),
     warn: jest.fn(),

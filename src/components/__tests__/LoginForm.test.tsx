@@ -9,7 +9,7 @@ import { AuthError, ValidationError } from '../../lib/errors';
 jest.mock('../../services/AuthService');
 
 // Mock useFocusManagement hook
-jest.mock('../hooks/useFocusManagement', () => ({
+jest.mock('../../hooks/useFocusManagement', () => ({
   useFocusManagement: () => ({
     containerRef: { current: null },
   }),

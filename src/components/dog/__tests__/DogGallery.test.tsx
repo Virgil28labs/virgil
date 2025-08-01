@@ -13,7 +13,7 @@ jest.mock('../hooks/useDogFavorites');
 jest.mock('../../../hooks/useKeyboardShortcuts');
 
 // Mock components
-jest.mock('./FetchControls', () => ({
+jest.mock('../FetchControls', () => ({
   FetchControls: jest.fn(({ onFetch, onBreedChange, onCountChange }) => (
     <div data-testid="fetch-controls">
       <button onClick={onFetch}>Fetch</button>
@@ -23,7 +23,7 @@ jest.mock('./FetchControls', () => ({
   )),
 }));
 
-jest.mock('./DogGrid', () => ({
+jest.mock('../DogGrid', () => ({
   DogGrid: jest.fn(({ dogs, onImageClick, onFavoriteToggle }) => (
     <div data-testid="dog-grid">
       {dogs.map((dog: DogImage, _index: number) => (
@@ -36,7 +36,7 @@ jest.mock('./DogGrid', () => ({
   )),
 }));
 
-jest.mock('./ImageModal', () => ({
+jest.mock('../ImageModal', () => ({
   ImageModal: jest.fn(({ currentIndex, onClose, onNavigate }) =>
     currentIndex !== null ? (
       <div data-testid="image-modal">
