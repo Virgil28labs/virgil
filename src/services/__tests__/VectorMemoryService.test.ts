@@ -16,11 +16,6 @@ import { supabase } from '../../lib/supabase';
 import type { ChatMessage } from '../../types/chat.types';
 import type { VectorSearchResult } from '../vectorService';
 import type { MarkedMemory } from '../SupabaseMemoryService';
-import type { 
-  MockSupabaseClient, 
-  MockApiResponse, 
-  MockedClass,
-} from '../../test-utils/mockTypes';
 
 // Mock all dependencies
 jest.mock('../SupabaseMemoryService');
@@ -937,7 +932,7 @@ describe('VectorMemoryService', () => {
     });
 
     it('handles unauthenticated user', async () => {
-      (mockSupabase.auth.getUser as jest.MockedFunction<typeof mockSupabase.auth.getUser>).mockResolvedValue({
+      mockGetUser.mockResolvedValue({
         data: { user: null },
         error: null,
       });

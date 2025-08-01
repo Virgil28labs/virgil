@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import type { ComponentType } from 'react';
 import { lazyImport, preloadComponent, lazyWithPreload } from '../lazyImport';
 import { logger } from '../../lib/logger';
 
@@ -40,7 +41,7 @@ describe('lazyImport', () => {
         _payload: factory,
         $$typeof: Symbol.for('react.lazy'),
       };
-      return lazyComponent as React.LazyExoticComponent<React.ComponentType>;
+      return lazyComponent as unknown as React.LazyExoticComponent<ComponentType<unknown>>;
     });
   });
 
@@ -132,7 +133,7 @@ describe('lazyImport', () => {
       const mockPayload = jest.fn();
       const mockLazyComponent = {
         _payload: mockPayload,
-      } as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
+      } as unknown as React.LazyExoticComponent<ComponentType<unknown>> & { _payload?: unknown };
 
       preloadComponent(mockLazyComponent);
 
@@ -140,7 +141,7 @@ describe('lazyImport', () => {
     });
 
     it('handles lazy component without _payload', () => {
-      const mockLazyComponent = {} as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
+      const mockLazyComponent = {} as unknown as React.LazyExoticComponent<ComponentType<unknown>> & { _payload?: unknown };
 
       expect(() => preloadComponent(mockLazyComponent)).not.toThrow();
     });
@@ -148,7 +149,7 @@ describe('lazyImport', () => {
     it('handles lazy component with non-function _payload', () => {
       const mockLazyComponent = {
         _payload: 'not a function',
-      } as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
+      } as unknown as React.LazyExoticComponent<ComponentType<unknown>> & { _payload?: unknown };
 
       expect(() => preloadComponent(mockLazyComponent)).not.toThrow();
     });
@@ -177,7 +178,7 @@ describe('lazyImport', () => {
         _payload: mockPayload,
         _result: null,
         $$typeof: Symbol.for('react.lazy'),
-      }) as React.LazyExoticComponent<React.ComponentType> & { _payload?: () => void });
+      }) as unknown as React.LazyExoticComponent<ComponentType<unknown>> & { _payload?: () => void });
 
       const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,

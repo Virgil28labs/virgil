@@ -122,7 +122,7 @@ describe('IntentInitializer', () => {
       expect(privateInit.initializationPromise).toBeDefined();
       
       // Resolve the health check
-      resolveHealthCheck(true);
+      if (resolveHealthCheck) resolveHealthCheck(true);
       
       await Promise.all([promise1, promise2]);
       expect(mockVectorMemoryService.waitForHealthCheck).toHaveBeenCalledTimes(1);
@@ -431,7 +431,7 @@ describe('IntentInitializer', () => {
       const promises = Array(3).fill(null).map(() => initializer.ensureIntentLoaded('dogGallery'));
       
       // Resolve the store operation
-      resolveStore('stored-id');
+      if (resolveStore) resolveStore('stored-id');
       
       await Promise.all(promises);
       

@@ -7,7 +7,7 @@
 
 import { RateLimiter } from '../rateLimit';
 import { timeService } from '../../../TimeService';
-import type { MockGlobal } from '../../../../test-utils/mockTypes';
+// MockGlobal type import removed - not used
 
 // Mock the TimeService
 jest.mock('../../../TimeService', () => ({
@@ -32,7 +32,7 @@ describe('RateLimiter', () => {
     mockTimeService.fromTimestamp.mockImplementation((timestamp: number) => new Date(timestamp));
     
     // Helper to advance time in tests
-    (global as MockGlobal).advanceTime = (ms: number) => {
+    (global as any).advanceTime = (ms: number) => {
       currentTime += ms;
     };
     
@@ -44,7 +44,7 @@ describe('RateLimiter', () => {
   });
 
   afterEach(() => {
-    delete (global as MockGlobal).advanceTime;
+    delete (global as any).advanceTime;
   });
 
   describe('Constructor and Configuration', () => {
@@ -117,7 +117,7 @@ describe('RateLimiter', () => {
       expect(rateLimiter.checkLimit()).toBe(false);
       
       // Advance time by more than window
-      (global as MockGlobal).advanceTime(61000); // 61 seconds
+      (global as any).advanceTime(61000); // 61 seconds
       
       // Should allow new requests
       expect(rateLimiter.checkLimit()).toBe(true);
@@ -132,7 +132,7 @@ describe('RateLimiter', () => {
       expect(rateLimiter.checkLimit()).toBe(true); // t=0
       
       // Advance 30 seconds
-      (global as MockGlobal).advanceTime(30000);
+      (global as any).advanceTime(30000);
       
       // Make 1 more request (total 3, should be allowed)
       expect(rateLimiter.checkLimit()).toBe(true); // t=30s
@@ -142,7 +142,7 @@ describe('RateLimiter', () => {
       
       // Advance another 31 seconds (total 61s from start)
       // The first 2 requests should now be outside the window
-      (global as MockGlobal).advanceTime(31000);
+      (global as any).advanceTime(31000);
       
       // Should allow 2 new requests (3rd request from t=30s still in window)
       expect(rateLimiter.checkLimit()).toBe(true);
@@ -188,11 +188,11 @@ describe('RateLimiter', () => {
       expect(rateLimiter.getRemainingRequests()).toBe(0);
       
       // Advance time partially
-      (global as MockGlobal).advanceTime(30000);
+      (global as any).advanceTime(30000);
       expect(rateLimiter.getRemainingRequests()).toBe(0); // All still in window
       
       // Advance past window
-      (global as MockGlobal).advanceTime(31000);
+      (global as any).advanceTime(31000);
       expect(rateLimiter.getRemainingRequests()).toBe(3); // All expired
     });
 
@@ -212,7 +212,7 @@ describe('RateLimiter', () => {
       
       rateLimiter.checkLimit(); // t=0
       
-      (global as MockGlobal).advanceTime(30000);
+      (global as any).advanceTime(30000);
       rateLimiter.checkLimit(); // t=30s
       
       const resetTime = rateLimiter.getResetTime();
@@ -226,7 +226,7 @@ describe('RateLimiter', () => {
       
       rateLimiter.checkLimit(); // t=0 (oldest)
       
-      (global as MockGlobal).advanceTime(30000);
+      (global as any).advanceTime(30000);
       rateLimiter.checkLimit(); // t=30s
       
       // Reset time should be based on oldest (t=0)
@@ -234,7 +234,7 @@ describe('RateLimiter', () => {
       expect(resetTime).toEqual(new Date(startTime + 60000));
       
       // Advance past first request's window
-      (global as MockGlobal).advanceTime(31000); // Now at t=61s
+      (global as any).advanceTime(31000); // Now at t=61s
       
       // Call getStats to trigger cleanup of expired requests
       rateLimiter.getStats();
@@ -251,7 +251,7 @@ describe('RateLimiter', () => {
       expect(rateLimiter.getResetTime()).not.toBeNull();
       
       // Advance past window
-      (global as MockGlobal).advanceTime(61000);
+      (global as any).advanceTime(61000);
       
       // Trigger cleanup by calling getStats first
       rateLimiter.getStats();
@@ -289,10 +289,10 @@ describe('RateLimiter', () => {
       // Make requests at different times  
       rateLimiter.checkLimit(); // t=0
       
-      (global as MockGlobal).advanceTime(30000);
+      (global as any).advanceTime(30000);
       rateLimiter.checkLimit(); // t=30s
       
-      (global as MockGlobal).advanceTime(31000); // t=61s, first request should expire
+      (global as any).advanceTime(31000); // t=61s, first request should expire
       
       const stats = rateLimiter.getStats();
       
@@ -365,7 +365,7 @@ describe('RateLimiter', () => {
       expect(shortLimiter.checkLimit()).toBe(false);
       
       // Advance past short window
-      (global as MockGlobal).advanceTime(101);
+      (global as any).advanceTime(101);
       
       expect(shortLimiter.checkLimit()).toBe(true);
     });
@@ -381,7 +381,7 @@ describe('RateLimiter', () => {
       expect(longLimiter.checkLimit()).toBe(false);
       
       // Even after an hour, should still be blocked
-      (global as MockGlobal).advanceTime(60 * 60 * 1000);
+      (global as any).advanceTime(60 * 60 * 1000);
       expect(longLimiter.checkLimit()).toBe(false);
     });
 
@@ -395,7 +395,7 @@ describe('RateLimiter', () => {
       expect(singleLimiter.checkLimit()).toBe(false);
       expect(singleLimiter.checkLimit()).toBe(false);
       
-      (global as MockGlobal).advanceTime(1001);
+      (global as any).advanceTime(1001);
       expect(singleLimiter.checkLimit()).toBe(true);
     });
 
@@ -415,7 +415,7 @@ describe('RateLimiter', () => {
       rateLimiter.checkLimit();
       
       // Simulate time going backwards (shouldn't happen in practice)
-      (global as MockGlobal).advanceTime(-30000);
+      (global as any).advanceTime(-30000);
       
       // Should still work correctly
       expect(rateLimiter.checkLimit()).toBe(true);
@@ -431,7 +431,7 @@ describe('RateLimiter', () => {
       // Make requests over time, ensuring we don't exceed rate
       for (let i = 0; i < 50; i++) {
         // Every 2 seconds, should allow 2 requests (10 requests per 10 seconds = 1 per second)
-        (global as MockGlobal).advanceTime(2000);
+        (global as any).advanceTime(2000);
         
         expect(limiter.checkLimit()).toBe(true);
         
@@ -471,7 +471,7 @@ describe('RateLimiter', () => {
       // Make many requests over time
       for (let i = 0; i < 100; i++) {
         limiter.checkLimit();
-        (global as MockGlobal).advanceTime(1000); // Advance 1 second each time
+        (global as any).advanceTime(1000); // Advance 1 second each time
       }
       
       // After 60+ seconds, early requests should be cleaned up
@@ -488,7 +488,7 @@ describe('RateLimiter', () => {
       }
       
       // Advance past window
-      (global as MockGlobal).advanceTime(61000);
+      (global as any).advanceTime(61000);
       
       // Accessing stats should trigger cleanup
       const stats = limiter.getStats();

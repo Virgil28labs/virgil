@@ -16,14 +16,14 @@ jest.mock('../StorageService', () => ({
     set: jest.fn(),
   },
   STORAGE_KEYS: {
-    SELECTED_MODEL: 'selectedModel',
-    CUSTOM_SYSTEM_PROMPT: 'customSystemPrompt',
-    WINDOW_SIZE: 'windowSize',
+    SELECTED_MODEL: 'virgil-selected-model',
+    CUSTOM_SYSTEM_PROMPT: 'virgil-custom-system-prompt',
+    WINDOW_SIZE: 'virgil-window-size',
     ELEVATION_UNIT: 'elevationUnit',
     WEATHER_UNIT: 'weatherUnit',
-    LAST_DESTINATION: 'lastDestination',
-    USER_EMAIL: 'userEmail',
-    PERFECT_CIRCLE_BEST: 'perfectCircleBest',
+    LAST_DESTINATION: 'virgil_last_destination',
+    USER_EMAIL: 'virgil_email',
+    PERFECT_CIRCLE_BEST: 'perfectCircleBestScore',
     PERFECT_CIRCLE_ATTEMPTS: 'perfectCircleAttempts',
     RHYTHM_VOLUME: 'rhythmVolume',
     WEATHER_LAST_UPDATED: 'weatherLastUpdated',
@@ -38,34 +38,32 @@ jest.mock('../../lib/logger', () => ({
   },
 }));
 
-// Mock localStorage
-const mockLocalStorage = (() => {
-  let store: Record<string, string> = {};
+// Mock localStorage with proper store management
+let mockStore: Record<string, string> = {};
 
-  return {
-    getItem: jest.fn((key: string) => store[key] || null),
-    setItem: jest.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: jest.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-    key: jest.fn((index: number) => {
-      const keys = Object.keys(store);
-      return keys[index] || null;
-    }),
-    get length() {
-      return Object.keys(store).length;
-    },
-    _getStore: () => store,
-    _setStore: (newStore: Record<string, string>) => {
-      store = newStore;
-    },
-  };
-})();
+const mockLocalStorage = {
+  getItem: jest.fn((key: string) => mockStore[key] || null),
+  setItem: jest.fn((key: string, value: string) => {
+    mockStore[key] = value;
+  }),
+  removeItem: jest.fn((key: string) => {
+    delete mockStore[key];
+  }),
+  clear: jest.fn(() => {
+    mockStore = {};
+  }),
+  key: jest.fn((index: number) => {
+    const keys = Object.keys(mockStore);
+    return keys[index] || null;
+  }),
+  get length() {
+    return Object.keys(mockStore).length;
+  },
+  _getStore: () => mockStore,
+  _setStore: (newStore: Record<string, string>) => {
+    mockStore = { ...newStore };
+  },
+};
 
 // @ts-ignore
 global.localStorage = mockLocalStorage;
@@ -73,14 +71,49 @@ global.localStorage = mockLocalStorage;
 describe('StorageMigration', () => {
   const mockStorageService = StorageService as jest.Mocked<typeof StorageService>;
   const mockLogger = logger as jest.Mocked<typeof logger>;
+  
+  // Override the global localStorage mock with our functional version
+  beforeAll(() => {
+    // @ts-ignore - Override the global mock from jest.setup.ts
+    global.localStorage = mockLocalStorage;
+    // Also assign to window.localStorage if it exists
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.localStorage = mockLocalStorage;
+    }
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockLocalStorage.clear();
-    mockLocalStorage._setStore({});
+    mockStore = {};
     
-    // Reset clear mock to avoid interference between tests
-    mockLocalStorage.clear.mockClear();
+    // Restore mock implementations that were cleared by jest.clearAllMocks()
+    mockLocalStorage.getItem.mockImplementation((key: string) => mockStore[key] || null);
+    mockLocalStorage.setItem.mockImplementation((key: string, value: string) => {
+      mockStore[key] = value;
+    });
+    mockLocalStorage.removeItem.mockImplementation((key: string) => {
+      delete mockStore[key];
+    });
+    mockLocalStorage.clear.mockImplementation(() => {
+      mockStore = {};
+    });
+    mockLocalStorage.key.mockImplementation((index: number) => {
+      const keys = Object.keys(mockStore);
+      return keys[index] || null;
+    });
+    
+    // Ensure global.localStorage delegates to our mock
+    // @ts-ignore
+    global.localStorage.getItem = mockLocalStorage.getItem;
+    // @ts-ignore
+    global.localStorage.setItem = mockLocalStorage.setItem;
+    // @ts-ignore
+    global.localStorage.removeItem = mockLocalStorage.removeItem;
+    // @ts-ignore
+    global.localStorage.clear = mockLocalStorage.clear;
+    // @ts-ignore
+    global.localStorage.key = mockLocalStorage.key;
   });
 
   describe('runMigrations', () => {
@@ -136,32 +169,41 @@ describe('StorageMigration', () => {
     it('migrates plain string to JSON format', async () => {
       mockStorageService.get.mockReturnValue('0.0.0');
       mockLocalStorage._setStore({
-        selectedModel: 'gpt-4',
+        'virgil-selected-model': 'gpt-4',
       });
+      
+      // Force override the global localStorage right before calling the migration
+      const originalLocalStorage = global.localStorage;
+      // @ts-ignore
+      global.localStorage = mockLocalStorage;
 
       const results = await StorageMigration.runMigrations();
+      
+      // Restore original localStorage
+      // @ts-ignore
+      global.localStorage = originalLocalStorage;
 
       // Find the specific result for selectedModel
-      const selectedModelResult = results.find(r => r.key === 'selectedModel');
+      const selectedModelResult = results.find(r => r.key === 'virgil-selected-model');
       expect(selectedModelResult).toEqual({
-        key: 'selectedModel',
+        key: 'virgil-selected-model',
         success: true,
         oldValue: 'gpt-4',
         newValue: '"gpt-4"',
       });
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('selectedModel', '"gpt-4"');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('virgil-selected-model', '"gpt-4"');
     });
 
     it('leaves already JSON values unchanged', async () => {
       mockStorageService.get.mockReturnValue('0.0.0');
       mockLocalStorage._setStore({
-        selectedModel: '"gpt-4"',
+        'virgil-selected-model': '"gpt-4"',
       });
 
       await StorageMigration.runMigrations();
 
       // Should not call setItem for already JSON values
-      expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith('selectedModel', expect.any(String));
+      expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith('virgil-selected-model', expect.any(String));
     });
 
     it('handles null values gracefully', async () => {
@@ -170,9 +212,9 @@ describe('StorageMigration', () => {
 
       const results = await StorageMigration.runMigrations();
 
-      const selectedModelResult = results.find(r => r.key === 'selectedModel');
+      const selectedModelResult = results.find(r => r.key === 'virgil-selected-model');
       expect(selectedModelResult).toEqual({
-        key: 'selectedModel',
+        key: 'virgil-selected-model',
         success: true,
         oldValue: null,
         newValue: null,
@@ -185,7 +227,7 @@ describe('StorageMigration', () => {
       // Mock localStorage.getItem to throw
       const originalGetItem = mockLocalStorage.getItem;
       mockLocalStorage.getItem.mockImplementation((key) => {
-        if (key === 'selectedModel') {
+        if (key === 'virgil-selected-model') {
           throw new Error('localStorage error');
         }
         return originalGetItem(key);
@@ -193,9 +235,9 @@ describe('StorageMigration', () => {
 
       const results = await StorageMigration.runMigrations();
 
-      const selectedModelResult = results.find(r => r.key === 'selectedModel');
+      const selectedModelResult = results.find(r => r.key === 'virgil-selected-model');
       expect(selectedModelResult).toEqual({
-        key: 'selectedModel',
+        key: 'virgil-selected-model',
         success: false,
         oldValue: null,
         newValue: null,
@@ -211,19 +253,19 @@ describe('StorageMigration', () => {
     it('migrates plain number string to JSON format', async () => {
       mockStorageService.get.mockReturnValue('0.0.0');
       mockLocalStorage._setStore({
-        perfectCircleBest: '42.5',
+        perfectCircleBestScore: '42.5',
       });
 
       const results = await StorageMigration.runMigrations();
 
-      const numberResult = results.find(r => r.key === 'perfectCircleBest');
+      const numberResult = results.find(r => r.key === 'perfectCircleBestScore');
       expect(numberResult).toEqual({
-        key: 'perfectCircleBest',
+        key: 'perfectCircleBestScore',
         success: true,
         oldValue: '42.5',
         newValue: '42.5',
       });
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('perfectCircleBest', '42.5');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('perfectCircleBestScore', '42.5');
     });
 
     it('migrates integer string to JSON format', async () => {

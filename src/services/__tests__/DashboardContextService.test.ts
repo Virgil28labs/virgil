@@ -546,15 +546,22 @@ describe('DashboardContextService', () => {
       expect(service.getTimestamp()).toBe(1705780800000); // PST timezone
     });
 
-    it('updates time context periodically', async () => {
-      // Advance time to trigger update
+    it('updates time context periodically', () => {
+      jest.useFakeTimers();
+      
+      // Create a new service instance with fake timers active
+      const testService = new DashboardContextService();
+      
+      // Advance both mock time and Jest timers
       timeContext.advanceTime(60000); // 1 minute
+      jest.advanceTimersByTime(60000); // Advance setInterval timer
       
-      // Wait for periodic update to process
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      const context = service.getContext();
+      const context = testService.getContext();
       expect(context.currentTime).toBe('12:01');
+      
+      // Clean up
+      testService.cleanup();
+      jest.useRealTimers();
     });
   });
 

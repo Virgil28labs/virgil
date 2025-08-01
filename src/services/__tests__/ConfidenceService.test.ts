@@ -5,7 +5,7 @@
  * and explanation generation. Critical for AI-powered intent classification.
  */
 
-import { ConfidenceService, confidenceService } from '../ConfidenceService';
+import { ConfidenceService, confidenceService, type ConfidenceScore } from '../ConfidenceService';
 import { timeService } from '../TimeService';
 import { vectorMemoryService } from '../VectorMemoryService';
 import { queryPreprocessor } from '../QueryPreprocessor';
@@ -56,16 +56,16 @@ class MockAdapter implements AppDataAdapter {
     return {
       appName: this.appName,
       displayName: this.displayName,
-      isActive: this.mockData.isActive || false,
-      lastUsed: this.mockData.lastUsed || 0,
-      data: this.mockData.data || {},
-      summary: this.mockData.summary || `${this.displayName} summary`,
-      capabilities: this.mockData.capabilities || ['basic'],
+      isActive: (this.mockData.isActive as boolean | undefined) ?? false,
+      lastUsed: (this.mockData.lastUsed as number | undefined) ?? 0,
+      data: (this.mockData.data as object | undefined) ?? {},
+      summary: (this.mockData.summary as string | undefined) ?? `${this.displayName} summary`,
+      capabilities: (this.mockData.capabilities as string[] | undefined) ?? ['basic'],
     };
   }
 
   getKeywords(): string[] {
-    return this.mockData.keywords || [this.appName];
+    return (this.mockData.keywords as string[] | undefined) ?? [this.appName];
   }
 
   async getConfidence(query: string): Promise<number> {
@@ -434,7 +434,7 @@ describe('ConfidenceService', () => {
 
   describe('Confidence Explanation', () => {
     let adapter: MockAdapter;
-    let score: unknown;
+    let score: ConfidenceScore;
 
     beforeEach(() => {
       adapter = new MockAdapter('notes', 'Notes App');

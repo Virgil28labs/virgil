@@ -29,10 +29,14 @@ global.fetch = mockFetch;
 // Mock URL methods
 const mockCreateObjectURL = jest.fn();
 const mockRevokeObjectURL = jest.fn();
-global.URL = {
-  createObjectURL: mockCreateObjectURL,
-  revokeObjectURL: mockRevokeObjectURL,
-} as unknown as URL;
+Object.defineProperty(global.URL, 'createObjectURL', {
+  value: mockCreateObjectURL,
+  writable: true,
+});
+Object.defineProperty(global.URL, 'revokeObjectURL', {
+  value: mockRevokeObjectURL,
+  writable: true,
+});
 
 // Mock document methods
 const mockLink = {

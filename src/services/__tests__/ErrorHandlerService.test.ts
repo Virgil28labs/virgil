@@ -7,7 +7,7 @@
 
 import { errorHandlerService, handleError, wrapFunction, createSafeAsync } from '../ErrorHandlerService';
 import { setupTimeTest } from '../../test-utils/timeTestUtils';
-import type { MockLogger, MockErrorHandlerServicePrivate } from '../../test-utils/mockTypes';
+import type { MockErrorHandlerServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
@@ -459,8 +459,8 @@ describe('ErrorHandlerService', () => {
       const numberError = 42;
       const objectError = { message: 'Object error' };
 
-      errorHandlerService.handleError(stringError as Error);
-      errorHandlerService.handleError(numberError as Error);
+      errorHandlerService.handleError(stringError as unknown as Error);
+      errorHandlerService.handleError(numberError as unknown as Error);
       errorHandlerService.handleError(objectError as Error);
 
       expect(logger.error).toHaveBeenCalledTimes(3);

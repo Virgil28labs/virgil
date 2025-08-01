@@ -6,7 +6,7 @@
  */
 
 import { LLMService, llmService, complete, completeStream, getModels, countTokens } from '../index';
-import type { LLMRequest, LLMResponse, StreamChunk } from '../../types/llm.types';
+import type { LLMRequest, LLMResponse, StreamChunk } from '../../../types/llm.types';
 
 // Mock the LLMService
 jest.mock('../LLMService', () => {
@@ -78,8 +78,8 @@ describe('LLM Service Index', () => {
         const testOptions = { 
           messages: [{ role: 'user' as const, content: 'test' }], 
         };
-        const expectedResponse = {
-          choices: [{ message: { content: 'Test response' } }],
+        const expectedResponse: LLMResponse = {
+          content: 'Test response',
           usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
         };
 
@@ -92,8 +92,8 @@ describe('LLM Service Index', () => {
       });
 
       it('handles empty options', async () => {
-        const expectedResponse = {
-          choices: [{ message: { content: 'Default response' } }],
+        const expectedResponse: LLMResponse = {
+          content: 'Default response',
           usage: { prompt_tokens: 5, completion_tokens: 3, total_tokens: 8 },
         };
 
@@ -119,9 +119,9 @@ describe('LLM Service Index', () => {
         const testOptions = { 
           messages: [{ role: 'user' as const, content: 'stream test' }], 
         };
-        const mockGenerator = (async function* () {
-          yield { delta: { content: 'chunk1' } };
-          yield { delta: { content: 'chunk2' } };
+        const mockGenerator = (async function* (): AsyncGenerator<StreamChunk> {
+          yield { text: 'chunk1' };
+          yield { text: 'chunk2' };
         })();
 
         mockLLMServiceInstance.completeStream.mockReturnValue(mockGenerator);
@@ -133,8 +133,8 @@ describe('LLM Service Index', () => {
       });
 
       it('handles empty options for streaming', () => {
-        const mockGenerator = (async function* () {
-          yield { delta: { content: 'default stream' } };
+        const mockGenerator = (async function* (): AsyncGenerator<StreamChunk> {
+          yield { text: 'default stream' };
         })();
 
         mockLLMServiceInstance.completeStream.mockReturnValue(mockGenerator);
@@ -222,7 +222,7 @@ describe('LLM Service Index', () => {
     it('convenience methods use the same singleton instance', async () => {
       const testOptions = { messages: [{ role: 'user' as const, content: 'test' }] };
       
-      mockLLMServiceInstance.complete.mockResolvedValue({ choices: [] });
+      mockLLMServiceInstance.complete.mockResolvedValue({ content: '' } as LLMResponse);
       mockLLMServiceInstance.getModels.mockResolvedValue({});
       mockLLMServiceInstance.countTokens.mockResolvedValue(0);
 
@@ -263,7 +263,7 @@ describe('LLM Service Index', () => {
         max_tokens: 100,
       };
 
-      mockLLMServiceInstance.complete.mockResolvedValue({ choices: [] });
+      mockLLMServiceInstance.complete.mockResolvedValue({ content: '' } as LLMResponse);
 
       await expect(complete(validOptions)).resolves.toBeDefined();
       expect(mockLLMServiceInstance.complete).toHaveBeenCalledWith(validOptions);
@@ -274,7 +274,7 @@ describe('LLM Service Index', () => {
         messages: [{ role: 'user' as const, content: 'test' }],
       };
 
-      mockLLMServiceInstance.complete.mockResolvedValue({ choices: [] });
+      mockLLMServiceInstance.complete.mockResolvedValue({ content: '' } as LLMResponse);
 
       await expect(complete(partialOptions)).resolves.toBeDefined();
       expect(mockLLMServiceInstance.complete).toHaveBeenCalledWith(partialOptions);

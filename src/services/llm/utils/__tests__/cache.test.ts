@@ -7,7 +7,7 @@
 
 import { ResponseCache } from '../cache';
 import { timeService } from '../../../TimeService';
-import type { MockGlobal } from '../../../../test-utils/mockTypes';
+// MockGlobal type import removed - not used
 
 // Mock the TimeService
 jest.mock('../../../TimeService', () => ({
@@ -28,7 +28,7 @@ describe('ResponseCache', () => {
     mockTimeService.getTimestamp.mockImplementation(() => currentTime);
     
     // Helper to advance time in tests
-    (global as MockGlobal).advanceTime = (ms: number) => {
+    (global as any).advanceTime = (ms: number) => {
       currentTime += ms;
     };
     
@@ -41,7 +41,7 @@ describe('ResponseCache', () => {
 
   afterEach(() => {
     cache.destroy();
-    delete (global as MockGlobal).advanceTime;
+    delete (global as any).advanceTime;
   });
 
   describe('Constructor and Configuration', () => {
@@ -150,7 +150,7 @@ describe('ResponseCache', () => {
       expect(await cache.get(key)).toEqual(value);
       
       // Advance time by 2 seconds
-      (global as MockGlobal).advanceTime(2000);
+      (global as any).advanceTime(2000);
       
       // Should be expired
       expect(await cache.get(key)).toBeNull();
@@ -164,7 +164,7 @@ describe('ResponseCache', () => {
       await cache.set(longKey, 'long', 10); // 10 seconds
       
       // Advance time by 2 seconds
-      (global as MockGlobal).advanceTime(2000);
+      (global as any).advanceTime(2000);
       
       expect(await cache.get(shortKey)).toBeNull();
       expect(await cache.get(longKey)).toBe('long');
@@ -175,11 +175,11 @@ describe('ResponseCache', () => {
       await cache.set(key, 'value'); // Uses cache default (300s)
       
       // Should still be valid after 200 seconds
-      (global as MockGlobal).advanceTime(200000);
+      (global as any).advanceTime(200000);
       expect(await cache.get(key)).toBe('value');
       
       // Should expire after 400 seconds total
-      (global as MockGlobal).advanceTime(200000);
+      (global as any).advanceTime(200000);
       expect(await cache.get(key)).toBeNull();
     });
   });
@@ -251,7 +251,7 @@ describe('ResponseCache', () => {
       await cache.get('key1');
       
       // Advance time to expire entry
-      (global as MockGlobal).advanceTime(2000);
+      (global as any).advanceTime(2000);
       
       // Should count as miss
       await cache.get('key1');
@@ -312,7 +312,7 @@ describe('ResponseCache', () => {
       await cache.set('default', 'value3'); // Default TTL
       
       // Advance time to expire only short entry
-      (global as MockGlobal).advanceTime(2000);
+      (global as any).advanceTime(2000);
       
       const cleanedCount = cache.cleanup();
       
@@ -327,7 +327,7 @@ describe('ResponseCache', () => {
       await cache.set('expire2', 'value2', 1);
       await cache.set('keep', 'value3', 10);
       
-      (global as MockGlobal).advanceTime(2000);
+      (global as any).advanceTime(2000);
       
       const cleanedCount = cache.cleanup();
       expect(cleanedCount).toBe(2);
@@ -387,7 +387,7 @@ describe('ResponseCache', () => {
       
       // With zero TTL, entry expires immediately (expiresAt = now + 0)
       // Advance time slightly to ensure expiration
-      (global as MockGlobal).advanceTime(1);
+      (global as any).advanceTime(1);
       
       expect(await cache.get('zero-ttl')).toBeNull();
     });

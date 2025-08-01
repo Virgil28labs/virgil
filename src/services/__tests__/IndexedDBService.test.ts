@@ -7,10 +7,38 @@
 
 import { IndexedDBService } from '../IndexedDBService';
 import { logger } from '../../lib/logger';
-import type { MockGlobal, MockIndexedDBServicePrivate, MockDBResult, MockIndexedDBRequest } from '../../test-utils/mockTypes';
+import type { MockIndexedDBServicePrivate, MockDBResult, MockIndexedDBRequest } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger');
+
+// Helper to create mock events
+function createMockEvent(target: MockIDBRequest): Event {
+  return {
+    target,
+    bubbles: false,
+    cancelBubble: false,
+    cancelable: false,
+    composed: false,
+    currentTarget: target,
+    defaultPrevented: false,
+    eventPhase: 0,
+    isTrusted: true,
+    returnValue: true,
+    srcElement: target,
+    timeStamp: Date.now(),
+    type: 'success',
+    preventDefault: () => {},
+    stopImmediatePropagation: () => {},
+    stopPropagation: () => {},
+    AT_TARGET: 2,
+    BUBBLING_PHASE: 3,
+    CAPTURING_PHASE: 1,
+    NONE: 0,
+    composedPath: () => [],
+    initEvent: () => {},
+  } as Event;
+}
 
 // Mock IndexedDB
 class MockIDBRequest implements MockIndexedDBRequest {
@@ -24,6 +52,11 @@ class MockIDBRequest implements MockIndexedDBRequest {
     this.result = result;
     this.error = error ?? null;
   }
+  
+  // EventTarget implementation
+  addEventListener(): void {}
+  dispatchEvent(): boolean { return true; }
+  removeEventListener(): void {}
 }
 
 class MockIDBTransaction {
@@ -45,11 +78,11 @@ class MockIDBObjectStore {
   
   constructor(name: string) {
     // Get or create global data store
-    const globalStore = (global as MockGlobal).__mockIDBStores || {};
+    const globalStore = (global as any).__mockIDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as MockGlobal).__mockIDBStores = globalStore;
+    (global as any).__mockIDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -57,7 +90,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       request.result = this.data.get(key);
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -66,7 +99,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       request.result = Array.from(this.data.values());
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -74,14 +107,14 @@ class MockIDBObjectStore {
   add(value: unknown) {
     const request = new MockIDBRequest();
     setTimeout(() => {
-      const key = value.id || Math.random().toString();
+      const key = (value as any).id || Math.random().toString();
       if (this.data.has(key)) {
         request.error = new Error('Key already exists');
-        if (request.onerror) request.onerror({ target: request });
+        if (request.onerror) request.onerror(createMockEvent(request));
       } else {
         this.data.set(key, value);
         request.result = key;
-        if (request.onsuccess) request.onsuccess({ target: request });
+        if (request.onsuccess) request.onsuccess(createMockEvent(request));
       }
     }, 0);
     return request;
@@ -93,7 +126,7 @@ class MockIDBObjectStore {
       const key = (value as { id?: string }).id || Math.random().toString();
       this.data.set(key, value);
       request.result = key;
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -102,7 +135,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.delete(key);
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -111,7 +144,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.clear();
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -120,7 +153,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       request.result = this.data.size;
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }
@@ -131,7 +164,7 @@ class MockIDBObjectStore {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.result = Array.from(this.data.values());
-          if (request.onsuccess) request.onsuccess({ target: request });
+          if (request.onsuccess) request.onsuccess(createMockEvent(request));
         }, 0);
         return request;
       },
@@ -182,12 +215,35 @@ const mockIndexedDB = {
         const db = new MockIDBDatabase(name, version || 1);
         const event = {
           target: { result: db },
-        };
-        request.onupgradeneeded(event as IDBVersionChangeEvent);
+          newVersion: version || 1,
+          oldVersion: 0,
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          composed: false,
+          currentTarget: request,
+          defaultPrevented: false,
+          eventPhase: 0,
+          isTrusted: true,
+          returnValue: true,
+          srcElement: request,
+          timeStamp: Date.now(),
+          type: 'upgradeneeded',
+          preventDefault: () => {},
+          stopImmediatePropagation: () => {},
+          stopPropagation: () => {},
+          AT_TARGET: 2,
+          BUBBLING_PHASE: 3,
+          CAPTURING_PHASE: 1,
+          NONE: 0,
+          composedPath: () => [],
+          initEvent: () => {},
+        } as unknown as IDBVersionChangeEvent;
+        request.onupgradeneeded(event);
       }
       
       request.result = new MockIDBDatabase(name, version || 1);
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     
     return request;
@@ -196,7 +252,7 @@ const mockIndexedDB = {
   deleteDatabase: jest.fn((_name: string) => {
     const request = new MockIDBRequest();
     setTimeout(() => {
-      if (request.onsuccess) request.onsuccess({ target: request });
+      if (request.onsuccess) request.onsuccess(createMockEvent(request));
     }, 0);
     return request;
   }),
@@ -224,7 +280,7 @@ describe('IndexedDBService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (global as MockGlobal).__mockIDBStores = {};
+    (global as any).__mockIDBStores = {};
     
     // Reset singleton instance
     (IndexedDBService as unknown as MockIndexedDBServicePrivate).instance = undefined;
@@ -307,7 +363,8 @@ describe('IndexedDBService', () => {
       // Simulate version change
       const db = (service as unknown as MockIndexedDBServicePrivate).databases.get('TestDB');
       if (db && db.onversionchange) {
-        db.onversionchange();
+        const event = new Event('versionchange') as IDBVersionChangeEvent;
+        db.onversionchange(event);
       }
       
       // Database should be removed from cache
@@ -566,10 +623,10 @@ describe('IndexedDBService', () => {
         setTimeout(() => {
           if (attempts < 2) {
             request.error = new Error('Temporary failure');
-            if (request.onerror) request.onerror({ target: request });
+            if (request.onerror) request.onerror(createMockEvent(request));
           } else {
             request.result = { id: key, data: 'success after retry' };
-            if (request.onsuccess) request.onsuccess({ target: request });
+            if (request.onsuccess) request.onsuccess(createMockEvent(request));
           }
         }, 0);
         return request;
@@ -592,7 +649,7 @@ describe('IndexedDBService', () => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Persistent failure');
-          if (request.onerror) request.onerror({ target: request });
+          if (request.onerror) request.onerror(createMockEvent(request));
         }, 0);
         return request;
       };
@@ -661,7 +718,8 @@ describe('IndexedDBService', () => {
       // First establish connection
       await service.get('ManagementTestDB', 'items', 'test');
       
-      const closeSpy = jest.spyOn((service as unknown as MockIndexedDBServicePrivate).databases.get('ManagementTestDB'), 'close');
+      const db = (service as unknown as MockIndexedDBServicePrivate).databases.get('ManagementTestDB');
+      const closeSpy = db ? jest.spyOn(db, 'close') : jest.fn();
       
       service.closeDatabase('ManagementTestDB');
       
@@ -686,8 +744,8 @@ describe('IndexedDBService', () => {
       
       const db1 = (service as unknown as MockIndexedDBServicePrivate).databases.get('ManagementTestDB');
       const db2 = (service as unknown as MockIndexedDBServicePrivate).databases.get('TestDB2');
-      const closeSpy1 = jest.spyOn(db1, 'close');
-      const closeSpy2 = jest.spyOn(db2, 'close');
+      const closeSpy1 = db1 ? jest.spyOn(db1, 'close') : jest.fn();
+      const closeSpy2 = db2 ? jest.spyOn(db2, 'close') : jest.fn();
       
       service.closeAll();
       
@@ -709,7 +767,7 @@ describe('IndexedDBService', () => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Delete failed');
-          if (request.onerror) request.onerror({ target: request });
+          if (request.onerror) request.onerror(createMockEvent(request));
         }, 0);
         return request;
       });
@@ -759,7 +817,7 @@ describe('IndexedDBService', () => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Operation failed');
-          if (request.onerror) request.onerror({ target: request });
+          if (request.onerror) request.onerror(createMockEvent(request));
         }, 0);
         return request;
       };

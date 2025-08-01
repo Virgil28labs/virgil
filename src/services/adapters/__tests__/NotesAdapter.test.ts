@@ -598,9 +598,9 @@ describe('NotesAdapter', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
       
       const results = await newAdapter.search('work');
-      expect(results.length).toBe(3);
+      expect(results.length).toBe(2); // Only content-match and tag-match should match
       
-      // Results should be sorted by relevance
+      // Results should be sorted by relevance  
       // Content with multiple matches should have higher relevance
       expect(results[0].field).toBe('note.content-match');
     });

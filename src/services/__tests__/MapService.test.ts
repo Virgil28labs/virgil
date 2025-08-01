@@ -10,7 +10,7 @@ import { MapService } from '../MapService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 import { createLocationMarker } from '../../utils/googleMaps';
-import type { MockGoogleMaps, MockAdvancedMarkerElement, MockMapServicePrivate } from '../../test-utils/mockTypes';
+import type { MockGoogleMaps, MockMapServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
@@ -54,7 +54,7 @@ const mockTrafficLayer = {
 };
 
 // Mock Google Maps classes
-global.google = {
+(global as any).google = {
   maps: {
     DirectionsService: jest.fn(() => mockDirectionsService),
     Geocoder: jest.fn(() => mockGeocoder),

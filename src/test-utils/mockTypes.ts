@@ -7,6 +7,7 @@
 
 import type { MockedFunction } from 'jest-mock';
 import { fn } from 'jest-mock';
+import type React from 'react';
 
 // ========== Authentication & Session Types ==========
 
@@ -93,7 +94,7 @@ export interface MockSupabaseClient {
 
 // ========== Browser/DOM Mock Types ==========
 
-export interface MockWindow extends Partial<Window> {
+export interface MockWindow {
   innerWidth?: number;
   innerHeight?: number;
   localStorage?: Storage;
@@ -102,13 +103,13 @@ export interface MockWindow extends Partial<Window> {
   navigator?: Partial<Navigator>;
 }
 
-export interface MockDocument extends Partial<Document> {
+export interface MockDocument {
   createElement?: MockedFunction<(tagName: string) => HTMLElement>;
   getElementById?: MockedFunction<(id: string) => HTMLElement | null>;
   querySelector?: MockedFunction<(selector: string) => Element | null>;
 }
 
-export interface MockElement extends Partial<HTMLElement> {
+export interface MockElement {
   click?: MockedFunction<() => void>;
   focus?: MockedFunction<() => void>;
   blur?: MockedFunction<() => void>;
@@ -352,7 +353,7 @@ export interface MockCache<T = unknown> {
 // ========== React/Component Mock Types ==========
 
 export interface MockReactComponent<P = {}> {
-  (props: P): JSX.Element;
+  (props: P): React.JSX.Element;
   displayName?: string;
 }
 
@@ -366,10 +367,11 @@ export interface MockInputChangeEvent {
     name: string;
     value: string;
   };
+  preventDefault?: () => void;
 }
 
 export interface MockFormEvent {
-  preventDefault: MockedFunction<() => void>;
+  preventDefault: () => void;
 }
 
 // ========== Network/HTTP Mock Types ==========
@@ -457,8 +459,8 @@ export const createMockApiResponse = <T>(data: T, ok = true): MockApiResponse<T>
   ok,
   status: ok ? 200 : 400,
   statusText: ok ? 'OK' : 'Bad Request',
-  json: fn().mockResolvedValue(data),
-  text: fn().mockResolvedValue(JSON.stringify(data)),
+  json: fn<() => Promise<T>>().mockResolvedValue(data),
+  text: fn<() => Promise<string>>().mockResolvedValue(JSON.stringify(data)),
 });
 
 export const createMockSession = (overrides: Partial<MockSession> = {}): MockSession => ({
@@ -476,3 +478,4 @@ export const createMockError = (message: string, code?: string | number): MockEr
   code,
   stack: new Error().stack,
 });
+

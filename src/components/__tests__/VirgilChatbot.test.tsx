@@ -11,7 +11,6 @@ import userEvent from '@testing-library/user-event';
 import { VirgilChatbot } from '../VirgilChatbot';
 import { AllTheProviders } from '../../test-utils/AllTheProviders';
 import type { ChatContextValue, ChatMessage } from '../../types/chat.types';
-import type { MockReactComponent } from '../../test-utils/mockTypes';
 
 // Mock chat context and services
 jest.mock('../chat/useChatContext', () => ({

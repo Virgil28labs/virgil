@@ -46,9 +46,9 @@ class TestAdapter extends BaseAdapter<{ message: string; count: number }> {
     return {
       appName: 'test-adapter',
       displayName: 'Test Adapter',
-      isActive: this.isActive,
+      isActive: this.isActive && this.data !== null,
       lastUsed: this.lastFetchTime,
-      data: this.data ?? {},
+      data: this.data ?? { message: '', count: 0 },
       summary: this.data ? this.generateSummary(this.data) : 'No data available',
       capabilities: ['test', 'mock'],
     };

@@ -8,7 +8,7 @@
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { DashboardAppService, CONFIDENCE_THRESHOLDS } from '../DashboardAppService';
 import { confidenceService } from '../ConfidenceService';
-import type { MockDashboardAppServicePrivate, TestMockAdapter } from '../../test-utils/mockTypes';
+import type { MockDashboardAppServicePrivate } from '../../test-utils/mockTypes';
 import { timeService } from '../TimeService';
 import { logger } from '../../lib/logger';
 
@@ -41,29 +41,29 @@ jest.mock('../../lib/logger', () => ({
 }));
 
 // Mock adapter implementations
-class TestTestMockAdapter implements AppDataAdapter<unknown> {
+class TestMockAdapter implements AppDataAdapter<unknown> {
   constructor(
     public readonly appName: string,
     public readonly displayName: string,
     public readonly icon: string = '📱',
-    private mockData: unknown = {},
+    private mockData: Record<string, unknown> = {},
   ) {}
 
   getContextData(): AppContextData {
     return {
       appName: this.appName,
       displayName: this.displayName,
-      isActive: this.mockData.isActive || false,
-      lastUsed: this.mockData.lastUsed || 0,
-      data: this.mockData.data || {},
-      summary: this.mockData.summary !== undefined ? this.mockData.summary : `${this.displayName} summary`,
-      capabilities: this.mockData.capabilities || ['basic'],
+      isActive: (this.mockData.isActive as boolean | undefined) ?? false,
+      lastUsed: (this.mockData.lastUsed as number | undefined) ?? 0,
+      data: (this.mockData.data as object | undefined) ?? {},
+      summary: (this.mockData.summary as string | undefined) !== undefined ? (this.mockData.summary as string) : `${this.displayName} summary`,
+      capabilities: (this.mockData.capabilities as string[] | undefined) ?? ['basic'],
       icon: this.icon,
     };
   }
 
   getKeywords(): string[] {
-    return this.mockData.keywords || [this.appName];
+    return (this.mockData.keywords as string[] | undefined) ?? [this.appName];
   }
 
   async getConfidence(query: string): Promise<number> {
@@ -88,11 +88,11 @@ class TestTestMockAdapter implements AppDataAdapter<unknown> {
   }
 
   supportsAggregation(): boolean {
-    return this.mockData.supportsAgg || false;
+    return (this.mockData.supportsAgg as boolean | undefined) ?? false;
   }
 
   getAggregateData(): AggregateableData[] {
-    return this.mockData.aggregateData || [];
+    return (this.mockData.aggregateData as AggregateableData[] | undefined) || [];
   }
 }
 
@@ -127,7 +127,7 @@ describe('DashboardAppService', () => {
 
   describe('Adapter Registration', () => {
     it('registers adapters successfully', () => {
-      const mockAdapter = new TestTestMockAdapter('notes', 'Notes App', '📝');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App', '📝');
       
       service.registerAdapter(mockAdapter);
       
@@ -137,8 +137,8 @@ describe('DashboardAppService', () => {
     });
 
     it('allows duplicate adapter registration (overwrites but cache may persist)', () => {
-      const adapter1 = new TestTestMockAdapter('notes', 'Notes App 1');
-      const adapter2 = new TestTestMockAdapter('notes', 'Notes App 2');
+      const adapter1 = new TestMockAdapter('notes', 'Notes App 1');
+      const adapter2 = new TestMockAdapter('notes', 'Notes App 2');
       
       service.registerAdapter(adapter1);
       
@@ -232,7 +232,7 @@ describe('DashboardAppService', () => {
       // Set up subscription mock
       mockAdapter.subscribe = jest.fn((callback: () => void) => {
         // Store callback to simulate real-time updates
-        (mockAdapter as TestMockAdapter).updateCallback = callback;
+        (mockAdapter as any).updateCallback = callback;
         return () => {}; // Return unsubscribe function
       });
       
@@ -243,8 +243,8 @@ describe('DashboardAppService', () => {
       service.getAppData('notes'); // cache data
       
       // Simulate adapter update
-      if ((mockAdapter as TestMockAdapter).updateCallback) {
-        (mockAdapter as TestMockAdapter).updateCallback();
+      if ((mockAdapter as any).updateCallback) {
+        (mockAdapter as any).updateCallback();
       }
       
       // Should get fresh data
@@ -707,7 +707,8 @@ describe('DashboardAppService', () => {
       expect(aggregated).toBeInstanceOf(Map);
       expect(aggregated.has('image')).toBe(true);
       expect(aggregated.get('image')).toHaveLength(1);
-      expect(aggregated.get('image')[0].count).toBe(25);
+      const imageData = aggregated.get('image');
+      expect((imageData?.[0] as { count: number } | undefined)?.count).toBe(25);
     });
   });
 

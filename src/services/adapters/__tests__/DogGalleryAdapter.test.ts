@@ -7,7 +7,7 @@
 
 import { DogGalleryAdapter } from '../DogGalleryAdapter';
 import { logger } from '../../../lib/logger';
-import type { MockDogData, MockImageData, MockAdapterPrivate } from '../../../test-utils/mockTypes';
+import type { MockAdapterPrivate } from '../../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../../lib/logger', () => ({

@@ -14,7 +14,6 @@ import type { MarkedMemory } from '../MemoryService';
 import type { 
   MockIndexedDBRequest, 
   MockMemoryServicePrivate,
-  MockGlobal,
 } from '../../test-utils/mockTypes';
 
 // Mock dependencies
@@ -86,11 +85,11 @@ class MockIDBObjectStore {
   private data: Map<string, unknown> = new Map();
   constructor(name: string) {
     // Get or create data store
-    const globalStore = (global as MockGlobal).__mockDBStores || {};
+    const globalStore = (global as any).__mockDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as MockGlobal).__mockDBStores = globalStore;
+    (global as any).__mockDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -153,8 +152,8 @@ class MockIDBObjectStore {
     setTimeout(() => {
       const values = Array.from(this.data.values());
       // Sort by timestamp if direction is 'prev'
-      if (direction === 'prev' && values.length > 0 && values[0].timestamp) {
-        values.sort((a, b) => b.timestamp - a.timestamp);
+      if (direction === 'prev' && values.length > 0 && (values[0] as any).timestamp) {
+        values.sort((a: any, b: any) => b.timestamp - a.timestamp);
       }
       
       let index = 0;
@@ -210,7 +209,7 @@ const mockIndexedDB = {
         const event = {
           target: { result: new MockIDBDatabase() },
         };
-        request.onupgradeneeded(event as IDBVersionChangeEvent);
+        request.onupgradeneeded(event as unknown as IDBVersionChangeEvent);
       }
       
       request.result = new MockIDBDatabase();
@@ -255,7 +254,7 @@ describe('MemoryService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     // Clear mock data stores
-    (global as MockGlobal).__mockDBStores = {};
+    (global as any).__mockDBStores = {};
     mockDashboardContextService.getTimestamp.mockReturnValue(Date.now());
     
     memoryService = new MemoryService();
@@ -282,7 +281,7 @@ describe('MemoryService', () => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.error = new Error('Failed to open DB');
-          if (request.onerror) request.onerror();
+          if (request.onerror) request.onerror({ target: request } as Event);
         }, 0);
         return request;
       });

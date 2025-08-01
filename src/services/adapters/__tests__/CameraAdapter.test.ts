@@ -9,7 +9,7 @@ import { CameraAdapter } from '../CameraAdapter';
 import { PhotoStorage } from '../../../components/camera/utils/photoStorage';
 import { timeService } from '../../TimeService';
 import type { SavedPhoto } from '../../../types/camera.types';
-import type { MockAdapter } from '../../../test-utils/mockTypes';
+// MockAdapter type import removed - not used
 
 // Mock dependencies
 jest.mock('../../../components/camera/utils/photoStorage', () => ({

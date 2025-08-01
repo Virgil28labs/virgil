@@ -119,7 +119,7 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
       streak: habit.streak,
       longestStreak: habit.longestStreak,
       lastCheckIn: habit.lastCheckIn,
-      totalCheckIns: habit.checkIns.length,
+      totalCheckIns: habit.checkIns?.length || 0,
       isCheckedToday: habit.lastCheckIn === today,
     }));
 
@@ -293,6 +293,9 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
 
     // Count check-ins per day
     for (const habit of this.userData.habits) {
+      if (!habit.checkIns || !Array.isArray(habit.checkIns)) {
+        continue;
+      }
       for (const checkIn of habit.checkIns) {
         if (last7Days.includes(checkIn)) {
           if (!activity[checkIn]) {
@@ -397,6 +400,29 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
     parts.push(`⭐ Perfect days: ${data.stats.perfectDaysCount}`);
     
     return parts.join('\n');
+  }
+
+  protected override getInactiveResponse(): string {
+    // Check if we have empty habits data vs no data at all
+    if (this.userData && this.userData.habits.length === 0) {
+      return "You haven't set up any habits yet. Let me know when you're ready to start tracking!";
+    }
+    return super.getInactiveResponse();
+  }
+
+  protected override isAskingForAdvice(query: string): boolean {
+    const lowerQuery = query.toLowerCase();
+    const advicePatterns = [
+      'should i start',
+      'what habits should',
+      'recommend',
+      'advice',
+      'suggest',
+      'help me choose',
+      'what should i',
+    ];
+    
+    return advicePatterns.some(pattern => lowerQuery.includes(pattern));
   }
 }
 
