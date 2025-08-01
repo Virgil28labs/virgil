@@ -170,7 +170,6 @@ export const Dashboard = memo(function Dashboard() {
       >
         <div className="power-icon" aria-hidden="true" />
         <span className="sr-only">{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
-        {isSigningOut ? 'Signing out...' : 'Sign Out'}
       </button>
 
       {/* Main content */}
@@ -251,17 +250,16 @@ export const Dashboard = memo(function Dashboard() {
           <div className="elevation-info">
             {coordinates?.elevation !== undefined ? (
               <p
-                className="elevation"
+                className="elevation clickable"
                 onClick={toggleElevationUnit}
-                style={{ cursor: 'pointer' }}
                 title="Click to toggle unit"
               >
                 Elevation: {elevationUnit === 'meters'
                   ? `${Math.round(coordinates.elevation)}`
                   : `${Math.round(coordinates.elevation * 3.28084)}`}
                 <button 
+                  className="elevation-unit-toggle"
                   onClick={toggleElevationUnit}
-                  style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   {elevationUnit === 'meters' ? 'm' : 'ft'}
                 </button>

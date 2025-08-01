@@ -19,6 +19,13 @@ jest.mock('../utils/cameraUtils', () => ({
   CameraUtils: {
     generatePhotoName: jest.fn(),
     downloadPhoto: jest.fn(),
+    formatFileSize: jest.fn((bytes) => {
+      if (bytes === 0) return '0 B';
+      if (bytes >= 1024 * 1024) {
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }),
   },
 }));
 
@@ -111,7 +118,7 @@ describe('PhotoActions', () => {
       renderPhotoActions();
 
       expect(screen.getByText('Test Photo')).toBeInTheDocument();
-      expect(screen.getByText(/1 KB/)).toBeInTheDocument();
+      expect(screen.getByText(/1\.0 KB/)).toBeInTheDocument();
     });
 
     it('should show formatted timestamp', () => {
@@ -203,16 +210,14 @@ describe('PhotoActions', () => {
       const downloadButton = screen.getByRole('button', { name: /download/i });
       
       // Click and check processing state
-      const clickPromise = userEvent.click(downloadButton);
+      await userEvent.click(downloadButton);
       
       // Should be disabled during processing
       await waitFor(() => {
         expect(downloadButton).toBeDisabled();
       });
 
-      await clickPromise;
-      
-      // Should be enabled again after processing
+      // Wait for the download to complete
       await waitFor(() => {
         expect(downloadButton).toBeEnabled();
       });
@@ -287,16 +292,14 @@ describe('PhotoActions', () => {
       const shareButton = screen.getByRole('button', { name: /share/i });
       
       // Click and check processing state
-      const clickPromise = userEvent.click(shareButton);
+      await userEvent.click(shareButton);
       
       // Should be disabled during processing
       await waitFor(() => {
         expect(shareButton).toBeDisabled();
       });
 
-      await clickPromise;
-      
-      // Should be enabled again after processing
+      // Wait for the share to complete
       await waitFor(() => {
         expect(shareButton).toBeEnabled();
       });
@@ -397,7 +400,7 @@ describe('PhotoActions', () => {
       const deleteButton = screen.getByRole('button', { name: /delete/i });
       
       // Start processing
-      const clickPromise = userEvent.click(downloadButton);
+      await userEvent.click(downloadButton);
       
       // All buttons should be disabled
       await waitFor(() => {
@@ -407,9 +410,7 @@ describe('PhotoActions', () => {
         expect(deleteButton).toBeDisabled();
       });
 
-      await clickPromise;
-      
-      // All buttons should be enabled again
+      // Wait for the operation to complete
       await waitFor(() => {
         expect(downloadButton).toBeEnabled();
         expect(shareButton).toBeEnabled();
@@ -429,7 +430,7 @@ describe('PhotoActions', () => {
       const downloadButton = screen.getByRole('button', { name: /download/i });
       
       // Start processing
-      const clickPromise = userEvent.click(downloadButton);
+      await userEvent.click(downloadButton);
       
       // Should show processing state
       await waitFor(() => {
@@ -437,7 +438,10 @@ describe('PhotoActions', () => {
         expect(processingElement).toBeInTheDocument();
       });
 
-      await clickPromise;
+      // Wait for processing to complete
+      await waitFor(() => {
+        expect(screen.queryByText(/processing|loading/i)).not.toBeInTheDocument();
+      });
     });
   });
 
@@ -516,7 +520,7 @@ describe('PhotoActions', () => {
       const largePhoto = { ...mockPhoto, size: 1024 * 1024 * 5 }; // 5MB
       renderPhotoActions({ photo: largePhoto });
 
-      expect(screen.getByText(/5 MB/)).toBeInTheDocument();
+      expect(screen.getByText(/5\.0 MB/)).toBeInTheDocument();
     });
 
     it('should handle photo without timestamp', () => {

@@ -40,6 +40,13 @@ describe('Chat Routes', () => {
             message: {
               content: 'Hello! How can I help you today?',
             },
+            logprobs: {
+              content: [
+                { logprob: -0.5 },
+                { logprob: -0.3 },
+                { logprob: -0.7 },
+              ],
+            },
           }],
           usage: {
             prompt_tokens: 10,
@@ -66,6 +73,7 @@ describe('Chat Routes', () => {
         message: {
           role: 'assistant',
           content: 'Hello! How can I help you today?',
+          confidence: expect.any(Number),
         },
         usage: {
           prompt_tokens: 10,
@@ -90,7 +98,12 @@ describe('Chat Routes', () => {
       const mockOpenAIResponse = {
         ok: true,
         json: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: 'Response' } }],
+          choices: [{
+            message: { content: 'Response' },
+            logprobs: {
+              content: [{ logprob: -0.4 }],
+            },
+          }],
           usage: {},
         }),
       };
@@ -229,7 +242,10 @@ describe('Chat Routes', () => {
         })
         .expect(500);
 
-      expect(response.body).toHaveProperty('error');
+      expect(response.body).toEqual({
+        error: 'Internal server error',
+        message: 'Failed to process chat request',
+      });
     });
   });
 
@@ -266,8 +282,15 @@ describe('Chat Routes', () => {
 
   describe('Rate Limiting', () => {
     it('should apply rate limiting middleware', async () => {
-      // Since we mocked the rate limiter, we just verify it was called
+      // Since we load the router after mocking express-rate-limit,
+      // we need to force a fresh require to check the mock was called
+      jest.resetModules();
+      jest.mock('express-rate-limit', () => jest.fn(() => (req, res, next) => next()));
       const rateLimit = require('express-rate-limit');
+
+      // Force re-require of the router to trigger rate limiter creation
+      require('../chat');
+
       expect(rateLimit).toHaveBeenCalledWith({
         windowMs: 60 * 1000,
         max: 30,

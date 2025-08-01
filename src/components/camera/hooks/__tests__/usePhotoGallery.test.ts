@@ -73,7 +73,7 @@ const mockUsePhotosReturn = {
   deletePhotos: jest.fn(),
   toggleFavorite: jest.fn(),
   getPhotoById: jest.fn(),
-  searchPhotos: jest.fn(),
+  searchPhotos: jest.fn(() => []),
   sortPhotos: jest.fn(),
   clearError: jest.fn(),
 };
@@ -86,7 +86,7 @@ describe('usePhotoGallery', () => {
     mockUsePhotosReturn.getPhotoById.mockImplementation(id => 
       mockPhotos.find(photo => photo.id === id),
     );
-    mockUsePhotosReturn.searchPhotos.mockResolvedValue(mockPhotos);
+    mockUsePhotosReturn.searchPhotos.mockReturnValue([mockPhoto1]); // Return filtered results synchronously
     mockUsePhotosReturn.sortPhotos.mockImplementation((photos) => photos);
     mockUsePhotosReturn.loadPhotos.mockResolvedValue();
     mockUsePhotosReturn.savePhoto.mockResolvedValue(mockPhoto1);
@@ -404,7 +404,6 @@ describe('usePhotoGallery', () => {
     });
 
     it('should apply search filter', async () => {
-      mockUsePhotosReturn.searchPhotos.mockResolvedValue([mockPhoto1]);
       const { result } = renderHook(() => usePhotoGallery());
 
       act(() => {
@@ -419,8 +418,8 @@ describe('usePhotoGallery', () => {
 
       const currentPhotos = result.current.getCurrentPhotos();
       expect(mockUsePhotosReturn.searchPhotos).toHaveBeenCalledWith('Photo 1');
-      // Since searchPhotos is async but getCurrentPhotos is sync, we need to mock the sync behavior
-      expect(currentPhotos).toEqual(mockPhotos); // Will return all photos since sync implementation doesn't wait
+      // searchPhotos returns filtered results
+      expect(currentPhotos).toEqual([mockPhoto1]);
     });
 
     it('should apply favorites filter', () => {

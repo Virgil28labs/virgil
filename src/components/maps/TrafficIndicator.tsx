@@ -28,17 +28,22 @@ export const TrafficIndicator = memo(function TrafficIndicator({
     // In a real implementation, you would analyze traffic data from the map
     // For now, we'll simulate it based on time of day
     const updateTrafficLevel = () => {
-      const hour = timeService.getHours(timeService.getCurrentDateTime());
+      try {
+        const hour = timeService.getHours(timeService.getCurrentDateTime());
 
-      // Rush hour patterns
-      if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {
-        setTrafficLevel('heavy');
-      } else if ((hour >= 6 && hour <= 7) || (hour >= 9 && hour <= 10) ||
-                 (hour >= 16 && hour <= 17) || (hour >= 19 && hour <= 20)) {
-        setTrafficLevel('moderate');
-      } else if (hour >= 22 || hour <= 5) {
-        setTrafficLevel('light');
-      } else {
+        // Rush hour patterns
+        if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {
+          setTrafficLevel('heavy');
+        } else if ((hour >= 6 && hour <= 7) || (hour >= 9 && hour <= 10) ||
+                   (hour >= 16 && hour <= 17) || (hour >= 19 && hour <= 20)) {
+          setTrafficLevel('moderate');
+        } else if (hour >= 22 || hour <= 5) {
+          setTrafficLevel('light');
+        } else {
+          setTrafficLevel('moderate');
+        }
+      } catch (_error) {
+        // Fallback to moderate traffic if time service fails
         setTrafficLevel('moderate');
       }
     };

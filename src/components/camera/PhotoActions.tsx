@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect } from 'react';
 import type { SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';
@@ -22,6 +22,41 @@ export const PhotoActions = memo(function PhotoActions({
 }: PhotoActionsProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON') {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          target.click();
+        } else if (e.key === 'Tab') {
+          // Allow default tab behavior for button navigation
+          // Find next/previous button based on shift key
+          const buttons = Array.from(document.querySelectorAll('.photo-action-btn')) as HTMLButtonElement[];
+          const currentIndex = buttons.indexOf(target as HTMLButtonElement);
+          
+          if (currentIndex !== -1) {
+            let nextIndex: number;
+            if (e.shiftKey) {
+              nextIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
+            } else {
+              nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
+            }
+            
+            if (buttons[nextIndex]) {
+              e.preventDefault();
+              buttons[nextIndex].focus();
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleFavoriteToggle = useCallback(() => {
     onFavoriteToggle(photo.id);
@@ -110,6 +145,11 @@ export const PhotoActions = memo(function PhotoActions({
 
   return (
     <div className={`photo-actions ${className}`}>
+      {isProcessing && (
+        <div className="processing-indicator">
+          <span>Processing...</span>
+        </div>
+      )}
       <div className="photo-actions-grid">
         {/* Favorite Action */}
         <button
@@ -117,6 +157,7 @@ export const PhotoActions = memo(function PhotoActions({
           onClick={handleFavoriteToggle}
           disabled={isProcessing}
           title={photo.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          tabIndex={0}
         >
           <span className="action-icon">
             {photo.isFavorite ? '❤️' : '🤍'}
@@ -132,6 +173,7 @@ export const PhotoActions = memo(function PhotoActions({
           onClick={handleDownload}
           disabled={isProcessing}
           title="Download photo"
+          tabIndex={0}
         >
           <span className="action-icon">📥</span>
           <span className="action-label">Download</span>
@@ -177,7 +219,7 @@ export const PhotoActions = memo(function PhotoActions({
             </span>
           </div>
 
-          {photo.size && (
+          {photo.size !== undefined && (
             <div className="metadata-item">
               <span className="metadata-label">Size:</span>
               <span className="metadata-value">

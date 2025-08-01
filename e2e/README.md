@@ -1,145 +1,211 @@
-# Virgil E2E Test Suite
+# Virgil E2E Tests
 
-Comprehensive end-to-end testing for critical user flows using Playwright.
+Comprehensive end-to-end testing suite with multi-browser support powered by Playwright.
 
-## Test Coverage
+## Features
 
-### 🔐 Authentication Flow (`auth.spec.ts`)
-- Login/logout workflows
-- Registration process
-- Session management
-- Error handling and validation
-- Accessibility and keyboard navigation
+- 🌐 **Multi-Browser Testing**: Chrome, Firefox, Safari, and mobile browsers
+- 📸 **Visual Regression Testing**: Automated screenshot comparison
+- ⚡ **Performance Testing**: Core Web Vitals and custom metrics
+- ♿ **Accessibility Testing**: WCAG compliance and screen reader support
+- 📱 **Responsive Testing**: Multiple viewport sizes
+- 🎨 **Theme Testing**: Light/dark mode variations
+- 🔄 **Cross-Tab Sync Testing**: LocalStorage synchronization
+- 📊 **Detailed Reporting**: HTML, JUnit, and JSON reports
 
-### 💬 Chat Functionality (`chat.spec.ts`)
-- Message sending and receiving
-- Streaming responses
-- Multi-intent queries
-- Error recovery and retry logic
-- Accessibility and screen reader support
+## Setup
 
-### 📊 Dashboard Functionality (`dashboard.spec.ts`)
-- App card interactions
-- Real-time data updates
-- Search and filtering
-- Responsive design
-- Performance with large datasets
-
-### 🔄 Integration Workflows (`integration.spec.ts`)
-- Complete user journeys
-- Cross-feature data integration
-- Offline/online state handling
-- Data persistence and sync
-- System resilience testing
-
-## Quick Start
-
+1. Install dependencies:
 ```bash
-# Install dependencies
+cd e2e
 npm install
-
-# Run all E2E tests
-npm run test:e2e
-
-# Run with UI mode for debugging
-npm run test:e2e:ui
-
-# Run in headed mode to see browser
-npm run test:e2e:headed
-
-# Debug specific test
-npm run test:e2e:debug
-
-# View test reports
-npm run test:e2e:report
 ```
 
-## Test Structure
-
-```
-e2e/
-├── auth.spec.ts           # Authentication workflows
-├── chat.spec.ts           # Chat functionality
-├── dashboard.spec.ts      # Dashboard interactions
-├── integration.spec.ts    # Full user journeys
-├── fixtures/
-│   └── test-data.ts       # Test data and constants
-├── utils/
-│   └── test-helpers.ts    # Common utilities
-└── setup/
-    ├── global-setup.ts    # Pre-test setup
-    └── global-teardown.ts # Post-test cleanup
+2. Install browsers:
+```bash
+npm run install-browsers
 ```
 
-## Test Data
+## Running Tests
 
-All test data is centralized in `fixtures/test-data.ts`:
+### All Tests
+```bash
+npm test
+```
 
-- **TestUsers**: Valid/invalid user credentials
-- **TestMessages**: Chat message variations
-- **ApiResponses**: Mock API response data
-- **Selectors**: UI element selectors
-- **URLs**: Application routes
+### Specific Browser
+```bash
+npm run test:chrome
+npm run test:firefox
+npm run test:safari
+```
 
-## Test Helpers
+### Mobile Tests
+```bash
+npm run test:mobile
+```
 
-Common utilities in `utils/test-helpers.ts`:
+### Performance Tests
+```bash
+npm run test:performance
+```
 
-- **waitForAppReady()**: Wait for React app initialization
-- **clearStorageData()**: Clean storage between tests
-- **mockApiResponse()**: Mock API endpoints
-- **checkAccessibility()**: Basic accessibility validation
-- **testKeyboardNavigation()**: Keyboard interaction testing
+### Accessibility Tests
+```bash
+npm run test:accessibility
+```
+
+### Visual Regression Tests
+```bash
+npm run test:visual
+```
+
+### Debug Mode
+```bash
+npm run test:debug
+```
+
+### UI Mode (Interactive)
+```bash
+npm run test:ui
+```
+
+## Writing Tests
+
+### Basic Test Structure
+```typescript
+import { test, expect } from './utils/test-helpers';
+
+test('should do something', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('h1')).toContainText('Virgil');
+});
+```
+
+### Using Test Helpers
+```typescript
+import { TestHelpers } from './utils/test-helpers';
+
+test('with helpers', async ({ page }) => {
+  // Mock API
+  await TestHelpers.mockAPI(page, 'weather', { temp: 72 });
+  
+  // Wait for app
+  await TestHelpers.waitForAppLoad(page);
+  
+  // Take screenshot
+  await TestHelpers.screenshot(page, 'home-page');
+});
+```
+
+### Visual Regression
+```typescript
+import { VisualRegression } from './utils/visual-regression';
+
+test('visual test', async ({ page }) => {
+  await page.goto('/');
+  
+  // Compare full page
+  await VisualRegression.comparePageSnapshot(page, 'home');
+  
+  // Compare element
+  await VisualRegression.compareElementSnapshot(
+    page,
+    '[data-testid="header"]',
+    'header'
+  );
+  
+  // Test responsive
+  await VisualRegression.testResponsiveDesign(page, 'home', [
+    VisualRegression.VIEWPORTS.mobile,
+    VisualRegression.VIEWPORTS.desktop,
+  ]);
+});
+```
+
+### Performance Testing
+```typescript
+import { PerformanceTest } from './utils/performance';
+
+test('performance', async ({ page }) => {
+  const budget = {
+    lcp: 2500, // 2.5s
+    fcp: 1800, // 1.8s
+    cls: 0.1,
+  };
+  
+  const { metrics, violations } = await PerformanceTest.runTest(
+    page,
+    '/',
+    budget
+  );
+  
+  expect(violations).toHaveLength(0);
+});
+```
+
+### Accessibility Testing
+```typescript
+import { AccessibilityTest } from './utils/accessibility';
+
+test('accessibility', async ({ page }) => {
+  await page.goto('/');
+  
+  const violations = await AccessibilityTest.scan(page);
+  expect(violations).toHaveLength(0);
+});
+```
 
 ## Configuration
 
-See `playwright.config.ts` for:
+See `playwright.config.ts` for all configuration options.
 
-- Multi-browser testing (Chrome, Firefox, Safari)
-- Mobile device testing
-- Screenshot/video capture on failure
-- Network conditions and timeouts
+### Environment Variables
+- `PLAYWRIGHT_BASE_URL`: Base URL for tests (default: http://localhost:5173)
+- `CI`: Set to true for CI-specific behavior
 
-## CI Integration
+## Reports
 
-Tests are configured for CI with:
-
-- Parallel execution
-- Retry on failure
-- Multiple output formats (HTML, JSON, JUnit)
-- Performance monitoring
-
-## Best Practices
-
-1. **Use data-testid attributes** for stable element selection
-2. **Mock external APIs** to ensure test reliability  
-3. **Test real user workflows** rather than implementation details
-4. **Include accessibility testing** in all user interface tests
-5. **Handle async operations** with proper waiting strategies
-6. **Clean up state** between tests to avoid interference
-
-## Debugging
-
-For debugging failed tests:
-
+After running tests, view reports:
 ```bash
-# Run specific test file
-npx playwright test auth.spec.ts
-
-# Run specific test case
-npx playwright test -g "should login successfully"
-
-# Debug with browser developer tools
-npx playwright test --debug
-
-# Generate and view trace
-npx playwright test --trace on
-npx playwright show-trace trace.zip
+npm run test:report
 ```
 
-## Maintenance
+Reports are saved to:
+- HTML: `test-results/html/`
+- JUnit: `test-results/junit.xml`
+- JSON: `test-results/results.json`
+- Screenshots: `test-results/screenshots/`
+- Videos: `test-results/videos/`
 
-- Update selectors when UI changes
-- Refresh test data when API contracts change
-- Review and update accessibility checks
-- Monitor test execution times and optimize slow tests
+## Updating Visual Baselines
+
+When intentional visual changes are made:
+```bash
+npm run update-snapshots
+```
+
+## Tips
+
+1. **Use data-testid**: Add `data-testid` attributes to elements for reliable selection
+2. **Mock External APIs**: Use `TestHelpers.mockAPI()` for consistent tests
+3. **Wait for Stability**: Use `waitForLoadState('networkidle')` before screenshots
+4. **Browser-Specific Tests**: Use `test.skip()` for browser-specific features
+5. **Parallel Execution**: Tests run in parallel by default for speed
+
+## Troubleshooting
+
+### Tests Failing on CI
+- Check if browsers are installed: `npm run install-browsers`
+- Verify environment variables are set
+- Check for timing issues - add explicit waits if needed
+
+### Visual Tests Failing
+- Review diff images in `test-results/`
+- Update baselines if changes are intentional
+- Check for animation or dynamic content issues
+
+### Performance Tests Failing
+- Run on consistent hardware
+- Close other applications
+- Use performance budgets appropriate for test environment

@@ -150,7 +150,7 @@ export class UserProfileAdapter extends BaseAdapter<UserProfile> {
     }
 
     // Birthday/age queries
-    if (lowerQuery.includes('birthday') || lowerQuery.includes('birth') || lowerQuery.includes('age')) {
+    if (lowerQuery.includes('birthday') || lowerQuery.includes('birth') || lowerQuery.includes('age') || lowerQuery.includes('old')) {
       if (this.profile.dateOfBirth) {
         const birthDate = timeService.parseDate(this.profile.dateOfBirth) || timeService.getCurrentDateTime();
         const age = this.calculateAge(birthDate);

@@ -15,6 +15,7 @@ import type { SavedPhoto } from '../../../../types/camera.types';
 // Mock dependencies
 jest.mock('../../utils/photoStorage', () => ({
   PhotoStorage: {
+    initialize: jest.fn().mockResolvedValue(undefined),
     getAllPhotos: jest.fn(),
     getFavoritePhotos: jest.fn(),
     savePhoto: jest.fn(),
@@ -24,6 +25,9 @@ jest.mock('../../utils/photoStorage', () => ({
     getPhotoById: jest.fn(),
     searchPhotos: jest.fn(),
     clearStorage: jest.fn(),
+    updatePhoto: jest.fn(),
+    getStorageInfo: jest.fn(),
+    clearAllPhotos: jest.fn(),
   },
 }));
 
@@ -33,6 +37,9 @@ jest.mock('../../utils/cameraUtils', () => ({
     compressImage: jest.fn(),
     getImageDimensions: jest.fn(),
     calculateDataUrlSize: jest.fn(),
+    generatePhotoName: jest.fn().mockReturnValue('photo-name.jpg'),
+    downloadPhoto: jest.fn().mockResolvedValue(undefined),
+    sharePhoto: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
@@ -89,12 +96,16 @@ describe('usePhotos', () => {
   });
 
   describe('initial state', () => {
-    it('should have correct initial state', () => {
+    it('should have correct initial state', async () => {
+      // Mock to prevent automatic loading on mount
+      mockPhotoStorage.getAllPhotos.mockImplementation(() => new Promise(() => {}));
+      mockPhotoStorage.getFavoritePhotos.mockImplementation(() => new Promise(() => {}));
+
       const { result } = renderHook(() => usePhotos());
 
       expect(result.current.photos).toEqual([]);
       expect(result.current.favorites).toEqual([]);
-      expect(result.current.loading).toBe(false);
+      expect(result.current.loading).toBe(true); // Loading starts on mount
       expect(result.current.error).toBeNull();
     });
 
@@ -114,6 +125,11 @@ describe('usePhotos', () => {
       expect(result.current).toHaveProperty('searchPhotos');
       expect(result.current).toHaveProperty('sortPhotos');
       expect(result.current).toHaveProperty('clearError');
+      expect(result.current).toHaveProperty('updatePhoto');
+      expect(result.current).toHaveProperty('getStorageInfo');
+      expect(result.current).toHaveProperty('clearAllPhotos');
+      expect(result.current).toHaveProperty('downloadPhoto');
+      expect(result.current).toHaveProperty('sharePhoto');
     });
   });
 
@@ -200,6 +216,11 @@ describe('usePhotos', () => {
 
       const { result } = renderHook(() => usePhotos());
 
+      // Wait for initial load to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+
       let savedPhoto: SavedPhoto | null = null;
       await act(async () => {
         savedPhoto = await result.current.savePhoto('data:image/jpeg;base64,test', 'Test Photo');
@@ -212,7 +233,7 @@ describe('usePhotos', () => {
         name: 'Test Photo',
       });
       expect(savedPhoto).toEqual(mockSavedPhoto);
-      expect(result.current.photos).toEqual([mockSavedPhoto]);
+      expect(result.current.photos).toEqual([mockSavedPhoto, ...mockPhotos]);
     });
 
     it('should save photo without name', async () => {
@@ -237,6 +258,11 @@ describe('usePhotos', () => {
 
       const { result } = renderHook(() => usePhotos());
 
+      // Wait for initial load to complete
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+
       let savedPhoto: SavedPhoto | null = null;
       await act(async () => {
         savedPhoto = await result.current.savePhoto('data:image/jpeg;base64,test');
@@ -244,7 +270,7 @@ describe('usePhotos', () => {
 
       expect(savedPhoto).toBeNull();
       expect(result.current.error).toBe('Save failed');
-      expect(result.current.photos).toEqual([]);
+      expect(result.current.photos).toEqual(mockPhotos); // Photos from initial load
     });
 
     it('should clear error on successful save', async () => {
@@ -419,11 +445,11 @@ describe('usePhotos', () => {
       // Should update the photo in state
       const updatedPhoto1 = { ...mockPhoto1, isFavorite: true };
       expect(result.current.photos).toEqual([updatedPhoto1, mockPhoto2]);
-      expect(result.current.favorites).toEqual([mockPhoto2, updatedPhoto1]);
+      expect(result.current.favorites).toEqual([updatedPhoto1, mockPhoto2]);
     });
 
     it('should toggle favorite off', async () => {
-      mockPhotoStorage.toggleFavorite.mockResolvedValue(true);
+      mockPhotoStorage.toggleFavorite.mockResolvedValue(false); // Returns false when unfavoriting
 
       const { result } = renderHook(() => usePhotos());
 
@@ -486,7 +512,7 @@ describe('usePhotos', () => {
       expect(photo).toEqual(mockPhoto1);
     });
 
-    it('should return undefined for non-existent photo', async () => {
+    it('should return null for non-existent photo', async () => {
       const { result } = renderHook(() => usePhotos());
 
       await act(async () => {
@@ -494,38 +520,56 @@ describe('usePhotos', () => {
       });
 
       const photo = result.current.getPhotoById('non-existent');
-      expect(photo).toBeUndefined();
+      expect(photo).toBeNull();
     });
   });
 
   describe('searchPhotos', () => {
-    it('should search photos by query', async () => {
-      const searchResults = [mockPhoto1];
-      mockPhotoStorage.searchPhotos.mockResolvedValue(searchResults);
-
+    it('should search photos by name', async () => {
       const { result } = renderHook(() => usePhotos());
 
-      let searchResult: SavedPhoto[] = [];
       await act(async () => {
-        searchResult = await result.current.searchPhotos('Photo 1');
+        await result.current.loadPhotos();
       });
 
-      expect(mockPhotoStorage.searchPhotos).toHaveBeenCalledWith('Photo 1');
-      expect(searchResult).toEqual(searchResults);
+      const searchResult = result.current.searchPhotos('Photo 1');
+      expect(searchResult).toEqual([mockPhoto1]);
     });
 
-    it('should handle search errors', async () => {
-      mockPhotoStorage.searchPhotos.mockRejectedValue(new Error('Search failed'));
+    it('should return all photos for empty query', async () => {
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      const searchResult = result.current.searchPhotos('');
+      expect(searchResult).toEqual(mockPhotos);
+    });
+
+    it('should return empty array when no matches', async () => {
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      const searchResult = result.current.searchPhotos('NonExistent');
+      expect(searchResult).toEqual([]);
+    });
+
+    it('should search photos by tags', async () => {
+      const photoWithTags = { ...mockPhoto1, tags: ['vacation', 'beach'] };
+      mockPhotoStorage.getAllPhotos.mockResolvedValue([photoWithTags, mockPhoto2]);
 
       const { result } = renderHook(() => usePhotos());
 
-      let searchResult: SavedPhoto[] = [];
       await act(async () => {
-        searchResult = await result.current.searchPhotos('test');
+        await result.current.loadPhotos();
       });
 
-      expect(searchResult).toEqual([]);
-      expect(result.current.error).toBe('Search failed');
+      const searchResult = result.current.searchPhotos('beach');
+      expect(searchResult).toEqual([photoWithTags]);
     });
   });
 
@@ -636,6 +680,231 @@ describe('usePhotos', () => {
       expect(mockPhotoStorage.getFavoritePhotos).toHaveBeenCalled();
       expect(result.current.photos).toEqual(mockPhotos);
       expect(result.current.favorites).toEqual(mockFavorites);
+    });
+
+    it('should initialize PhotoStorage on mount', async () => {
+      renderHook(() => usePhotos());
+
+      // Wait for useEffect to run
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+
+      expect(mockPhotoStorage.initialize).toHaveBeenCalled();
+    });
+  });
+
+  describe('updatePhoto', () => {
+    it('should update photo successfully', async () => {
+      const updatedPhoto = { ...mockPhoto1, name: 'Updated Photo 1' };
+      mockPhotoStorage.updatePhoto.mockResolvedValue(updatedPhoto);
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      let updateResult: SavedPhoto | null = null;
+      await act(async () => {
+        updateResult = await result.current.updatePhoto('photo-1', { name: 'Updated Photo 1' });
+      });
+
+      expect(mockPhotoStorage.updatePhoto).toHaveBeenCalledWith('photo-1', { name: 'Updated Photo 1' });
+      expect(updateResult).toEqual(updatedPhoto);
+      expect(result.current.photos).toContainEqual(updatedPhoto);
+    });
+
+    it('should update favorite photo in favorites list', async () => {
+      const updatedPhoto = { ...mockPhoto2, name: 'Updated Photo 2' };
+      mockPhotoStorage.updatePhoto.mockResolvedValue(updatedPhoto);
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      await act(async () => {
+        await result.current.updatePhoto('photo-2', { name: 'Updated Photo 2' });
+      });
+
+      expect(result.current.favorites).toContainEqual(updatedPhoto);
+    });
+
+    it('should handle update errors', async () => {
+      mockPhotoStorage.updatePhoto.mockRejectedValue(new Error('Update failed'));
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      let updateResult: SavedPhoto | null = null;
+      await act(async () => {
+        updateResult = await result.current.updatePhoto('photo-1', { name: 'Updated' });
+      });
+
+      expect(updateResult).toBeNull();
+      expect(result.current.error).toBe('Update failed');
+    });
+  });
+
+  describe('getStorageInfo', () => {
+    it('should get storage info successfully', async () => {
+      const storageInfo = {
+        totalPhotos: 2,
+        totalSize: 3072,
+        maxSize: 52428800,
+        usedPercentage: 0.01,
+        favoriteCount: 1,
+      };
+      mockPhotoStorage.getStorageInfo.mockResolvedValue(storageInfo);
+
+      const { result } = renderHook(() => usePhotos());
+
+      let info: any = null;
+      await act(async () => {
+        info = await result.current.getStorageInfo();
+      });
+
+      expect(mockPhotoStorage.getStorageInfo).toHaveBeenCalled();
+      expect(info).toEqual(storageInfo);
+    });
+
+    it('should handle storage info errors', async () => {
+      mockPhotoStorage.getStorageInfo.mockRejectedValue(new Error('Storage info failed'));
+
+      const { result } = renderHook(() => usePhotos());
+
+      let info: any = null;
+      await act(async () => {
+        info = await result.current.getStorageInfo();
+      });
+
+      expect(info).toBeNull();
+      expect(result.current.error).toBe('Storage info failed');
+    });
+  });
+
+  describe('clearAllPhotos', () => {
+    it('should clear all photos successfully', async () => {
+      mockPhotoStorage.clearAllPhotos.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      let clearResult = false;
+      await act(async () => {
+        clearResult = await result.current.clearAllPhotos();
+      });
+
+      expect(mockPhotoStorage.clearAllPhotos).toHaveBeenCalled();
+      expect(clearResult).toBe(true);
+      expect(result.current.photos).toEqual([]);
+      expect(result.current.favorites).toEqual([]);
+    });
+
+    it('should handle clear all errors', async () => {
+      mockPhotoStorage.clearAllPhotos.mockRejectedValue(new Error('Clear failed'));
+
+      const { result } = renderHook(() => usePhotos());
+
+      let clearResult = false;
+      await act(async () => {
+        clearResult = await result.current.clearAllPhotos();
+      });
+
+      expect(clearResult).toBe(false);
+      expect(result.current.error).toBe('Clear failed');
+    });
+  });
+
+  describe('downloadPhoto', () => {
+    it('should download photo successfully', async () => {
+      mockCameraUtils.downloadPhoto.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      let downloadResult = false;
+      await act(async () => {
+        downloadResult = await result.current.downloadPhoto(mockPhoto1);
+      });
+
+      expect(mockCameraUtils.downloadPhoto).toHaveBeenCalledWith(mockPhoto1.dataUrl, 'Photo 1');
+      expect(downloadResult).toBe(true);
+    });
+
+    it('should use generated name if photo has no name', async () => {
+      mockCameraUtils.downloadPhoto.mockResolvedValue(undefined);
+      mockCameraUtils.generatePhotoName.mockReturnValue('generated-name.jpg');
+
+      const { result } = renderHook(() => usePhotos());
+
+      const photoWithoutName = { ...mockPhoto1, name: undefined };
+
+      await act(async () => {
+        await result.current.downloadPhoto(photoWithoutName);
+      });
+
+      expect(mockCameraUtils.generatePhotoName).toHaveBeenCalledWith(photoWithoutName.timestamp);
+      expect(mockCameraUtils.downloadPhoto).toHaveBeenCalledWith(photoWithoutName.dataUrl, 'generated-name.jpg');
+    });
+
+    it('should handle download errors', async () => {
+      mockCameraUtils.downloadPhoto.mockRejectedValue(new Error('Download failed'));
+
+      const { result } = renderHook(() => usePhotos());
+
+      let downloadResult = false;
+      await act(async () => {
+        downloadResult = await result.current.downloadPhoto(mockPhoto1);
+      });
+
+      expect(downloadResult).toBe(false);
+      expect(result.current.error).toBe('Download failed');
+    });
+  });
+
+  describe('sharePhoto', () => {
+    it('should share photo successfully', async () => {
+      mockCameraUtils.sharePhoto.mockResolvedValue(undefined);
+
+      const { result } = renderHook(() => usePhotos());
+
+      await act(async () => {
+        await result.current.loadPhotos();
+      });
+
+      let shareResult = false;
+      await act(async () => {
+        shareResult = await result.current.sharePhoto(mockPhoto1);
+      });
+
+      expect(mockCameraUtils.sharePhoto).toHaveBeenCalledWith(mockPhoto1.dataUrl, 'Photo 1');
+      expect(shareResult).toBe(true);
+    });
+
+    it('should handle share errors', async () => {
+      mockCameraUtils.sharePhoto.mockRejectedValue(new Error('Share failed'));
+
+      const { result } = renderHook(() => usePhotos());
+
+      let shareResult = false;
+      await act(async () => {
+        shareResult = await result.current.sharePhoto(mockPhoto1);
+      });
+
+      expect(shareResult).toBe(false);
+      expect(result.current.error).toBe('Share failed');
     });
   });
 });

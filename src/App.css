@@ -306,9 +306,41 @@ html, body {
   overflow: hidden;
 }
 
+/* Dashboard Content */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Dashboard Mobile Layout */
+.dashboard.mobile-layout {
+  padding: 1rem;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+.dashboard.mobile-layout .dashboard-content {
+  gap: 0.75rem;
+  max-width: none;
+}
+
+/* Dashboard Error States */
+.address-error {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--brand-light-gray);
+  line-height: 1.2;
+  font-weight: 400;
+  opacity: 0.4;
+}
 
 .user-info {
-  margin: 0 0 0.15rem 0;
+  margin: 0 0 1rem 0;
   text-align: center;
 }
 
@@ -326,7 +358,38 @@ html, body {
 }
 
 .user-email {
+  /* Button Reset */
+  background: none;
+  border: none;
+  padding: 0;
   margin-bottom: 0;
+  
+  /* Dashboard Typography */
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--brand-light-gray);
+  line-height: 1.2;
+  font-weight: 400;
+  
+  /* Interactive States */
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.user-email:hover {
+  color: var(--brand-accent-purple);
+  transform: translateY(-1px);
+}
+
+.user-email:focus {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.user-email:active {
+  transform: translateY(0);
 }
 
 .user-created {
@@ -357,6 +420,7 @@ html, body {
 
 .location-info {
   text-align: center;
+  margin-top: -2rem;
 }
 
 .address-info {
@@ -385,6 +449,40 @@ html, body {
 .street-address.clickable:hover {
   color: var(--brand-accent-purple);
   transform: translateY(-1px);
+}
+
+.elevation.clickable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.elevation.clickable:hover {
+  color: var(--brand-accent-purple);
+  transform: translateY(-1px);
+}
+
+.elevation-unit-toggle {
+  background: none;
+  border: none;
+  color: var(--brand-light-gray);
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: inherit;
+  font-weight: 400;
+  margin-left: 4px;
+  padding: 0;
+  transition: all var(--transition-fast);
+}
+
+.elevation-unit-toggle:hover {
+  color: var(--brand-accent-purple);
+}
+
+.elevation-unit-toggle:focus {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .address-loading {
@@ -498,8 +596,8 @@ html, body {
 /* Power Button */
 .power-button {
   position: fixed;
-  top: 2rem;
-  right: 2rem;
+  top: 1.5rem;
+  right: 22px;
   width: 20px;
   height: 20px;
   min-width: 20px;

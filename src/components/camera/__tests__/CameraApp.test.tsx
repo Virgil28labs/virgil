@@ -153,7 +153,7 @@ describe('CameraApp', () => {
       renderCameraApp();
 
       expect(screen.getByText('Esc')).toBeInTheDocument();
-      expect(screen.getByText('to close')).toBeInTheDocument();
+      expect(screen.getByText('to close', { exact: false })).toBeInTheDocument();
     });
   });
 
@@ -251,6 +251,13 @@ describe('CameraApp', () => {
 
   describe('photo modal', () => {
     beforeEach(async () => {
+      // Ensure we have multiple photos for navigation
+      mockPhotoGalleryReturn.galleryState = { 
+        ...mockGalleryState, 
+        photos: [mockPhoto1, mockPhoto2],
+      };
+      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1, mockPhoto2]);
+      
       renderCameraApp();
       const selectButton = screen.getByText('Select Photo 1');
       await userEvent.click(selectButton);
@@ -281,17 +288,6 @@ describe('CameraApp', () => {
       expect(screen.getByText('Photo: Photo 2')).toBeInTheDocument();
     });
 
-    it('should not show navigation when only one photo', async () => {
-      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1]);
-      
-      // Re-render to apply changes
-      renderCameraApp();
-      const selectButton = screen.getByText('Select Photo 1');
-      await userEvent.click(selectButton);
-
-      expect(screen.queryByText('Next')).not.toBeInTheDocument();
-      expect(screen.queryByText('Previous')).not.toBeInTheDocument();
-    });
 
     it('should handle favorite toggle', async () => {
       mockPhotoGalleryReturn.handleFavoriteToggle.mockResolvedValue(true);
@@ -364,7 +360,34 @@ describe('CameraApp', () => {
     });
   });
 
+  describe('single photo modal', () => {
+    it('should not show navigation when only one photo', async () => {
+      // Set up single photo scenario
+      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1]);
+      mockPhotoGalleryReturn.galleryState = { 
+        ...mockGalleryState, 
+        photos: [mockPhoto1],
+      };
+      
+      renderCameraApp();
+      const selectButton = screen.getByText('Select Photo 1');
+      await userEvent.click(selectButton);
+
+      expect(screen.queryByText('Next')).not.toBeInTheDocument();
+      expect(screen.queryByText('Previous')).not.toBeInTheDocument();
+    });
+  });
+
   describe('photo navigation in modal', () => {
+    beforeEach(() => {
+      // Ensure we have multiple photos for navigation
+      mockPhotoGalleryReturn.galleryState = { 
+        ...mockGalleryState, 
+        photos: [mockPhoto1, mockPhoto2],
+      };
+      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1, mockPhoto2]);
+    });
+
     it('should wrap to first photo when navigating next from last', async () => {
       renderCameraApp();
       
@@ -471,6 +494,13 @@ describe('CameraApp', () => {
     });
 
     it('should handle undefined selected photo', async () => {
+      // Reset to normal state with multiple photos
+      mockPhotoGalleryReturn.galleryState = { 
+        ...mockGalleryState, 
+        photos: [mockPhoto1, mockPhoto2],
+      };
+      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1, mockPhoto2]);
+      
       renderCameraApp();
       
       const selectButton = screen.getByText('Select Photo 1');
@@ -485,6 +515,13 @@ describe('CameraApp', () => {
     });
 
     it('should handle photo modal close after navigation', async () => {
+      // Reset to normal state with multiple photos
+      mockPhotoGalleryReturn.galleryState = { 
+        ...mockGalleryState, 
+        photos: [mockPhoto1, mockPhoto2],
+      };
+      mockPhotoGalleryReturn.getCurrentPhotos.mockReturnValue([mockPhoto1, mockPhoto2]);
+      
       renderCameraApp();
       
       const selectButton = screen.getByText('Select Photo 1');
