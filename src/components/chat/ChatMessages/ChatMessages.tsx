@@ -99,7 +99,7 @@ const ChatMessages = memo(function ChatMessages({
 
   return (
     <div
-      className={styles.messagesArea}
+      className={messages.length === 0 ? styles.messagesAreaEmpty : styles.messagesArea}
       role="log"
       aria-label="Chat messages"
       aria-live="polite"

@@ -356,6 +356,15 @@
   font-size: 0.8rem;
 }
 
+/* Chat conversation wrapper */
+[role="log"][aria-label="Chat conversation"] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Messages area */
 .messages-area {
   flex: 1;
@@ -364,6 +373,9 @@
   padding: 1rem 1rem 0.5rem;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* Allow flex shrinking to prevent overflow */
+  /* Ensure proper boundaries */
+  contain: layout style paint;
 }
 
 .messages-area::-webkit-scrollbar {

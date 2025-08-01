@@ -6,7 +6,7 @@
 
 /* Quick Actions Section */
 .quickActions {
-  padding: 0 1rem 1rem;
+  padding: 0.25rem 1rem 1rem; /* Reduced top padding to close gap with welcome message */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -39,7 +39,7 @@
 
 /* Input Area */
 .inputArea {
-  padding: 0.75rem 1rem 1rem;
+  padding: 0.5rem 1rem 1rem; /* Reduced top padding to close gap in empty state */
   background: var(--off-white);
   border-top: 1px solid var(--silver-grey);
 }
