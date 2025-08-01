@@ -1,0 +1,328 @@
+/* Auth Page Styles */
+
+.authPage {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 5vw, 3rem);
+  background: var(--brand-dark-purple);
+  overflow: hidden;
+}
+
+.authContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 6vh, 4rem);
+  width: 100%;
+  max-width: min(90vw, 500px);
+  min-height: 60vh;
+}
+
+.authPage header {
+  text-align: center;
+}
+
+.authPage header h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 400;
+  color: var(--brand-light-gray);
+  margin: 0;
+}
+
+.authContainer {
+  background: transparent;
+  padding: 0;
+  border: none;
+  width: 100%;
+  max-width: clamp(280px, 80vw, 400px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.authToggle {
+  display: flex;
+  margin-bottom: clamp(1rem, 3vh, 2rem);
+  gap: clamp(1.5rem, 6vw, 3rem);
+  justify-content: center;
+}
+
+.authToggle button {
+  background: none;
+  color: var(--brand-light-gray);
+  opacity: 0.7;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: 400;
+  transition: opacity 0.3s ease;
+  padding: clamp(0.5rem, 2vw, 1rem);
+}
+
+.authToggle button.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.authToggle button:hover {
+  opacity: 0.9;
+}
+
+.authToggle button:focus-visible {
+  outline: 2px solid var(--brand-accent-pink);
+  outline-offset: 2px;
+}
+
+.authSwitch {
+  text-align: center;
+  margin-top: clamp(1rem, 3vh, 1.5rem);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--brand-light-gray);
+  opacity: 0.6;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--brand-light-gray);
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: 'Montserrat', sans-serif;
+  font-size: inherit;
+  opacity: 0.8;
+}
+
+.linkBtn:hover {
+  opacity: 1;
+}
+
+.linkBtn:focus-visible {
+  outline: 2px solid var(--brand-accent-pink);
+  outline-offset: 2px;
+}
+
+/* Form Styles */
+.formGroup {
+  margin-bottom: clamp(1rem, 3vh, 1.8rem);
+  text-align: center;
+  width: 100%;
+  max-width: min(90vw, 600px);
+}
+
+/* Compact spacing for sign-up form with 3 fields */
+.signupForm .formGroup {
+  margin-bottom: clamp(0.8rem, 2.5vh, 1.4rem);
+}
+
+.formGroup label {
+  display: none;
+}
+
+.formGroup input {
+  width: 100%;
+  min-width: 280px;
+  padding: clamp(0.5rem, 2vh, 1rem) 0;
+  border: none;
+  border-bottom: 1px solid var(--brand-accent-purple);
+  background: transparent;
+  color: var(--brand-light-gray);
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  font-weight: 400;
+  text-align: left;
+  opacity: 0.8;
+  transition: border-color 0.3s ease, opacity 0.3s ease;
+  box-sizing: border-box;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--brand-accent-purple);
+  opacity: 1;
+}
+
+.formGroup input::placeholder {
+  color: var(--brand-light-gray);
+  opacity: 0.4;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.formGroup input:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.formGroup input.disabledInput {
+  background: transparent;
+  opacity: 0.3;
+}
+
+.formGroup small {
+  color: var(--brand-light-gray);
+  opacity: 0.6;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+}
+
+.signupForm button,
+.loginForm button {
+  width: clamp(160px, 50vw, 220px);
+  padding: 0;
+  background: none;
+  color: var(--brand-accent-purple);
+  border: 1px solid var(--brand-accent-purple);
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: clamp(1rem, 3vh, 2rem);
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  height: clamp(40px, 8vh, 55px);
+  line-height: 1;
+  text-align: center;
+  border-radius: 0;
+}
+
+.signupForm button:hover,
+.loginForm button:hover {
+  background: var(--brand-accent-purple);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(108, 59, 170, 0.3);
+}
+
+.signupForm button:active,
+.loginForm button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(108, 59, 170, 0.3);
+}
+
+.signupForm button:disabled,
+.loginForm button:disabled {
+  background: transparent;
+  color: var(--brand-accent-purple);
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Message Styles */
+.message {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  color: var(--brand-light-gray);
+  margin-top: clamp(1rem, 3vh, 1.5rem);
+  text-align: center;
+  opacity: 0.8;
+}
+
+.message.error {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  opacity: 1;
+}
+
+.message.success {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  opacity: 1;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .authPage {
+    gap: 2rem;
+    padding: 1rem;
+  }
+  
+  .authPage header h1 {
+    font-size: 36px;
+  }
+  
+  .authToggle {
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .authToggle button {
+    font-size: 20px;
+    padding: 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+  
+  .authSwitch {
+    margin-top: 1.5rem;
+    font-size: 14px;
+  }
+  
+  /* Form Mobile */
+  .formGroup {
+    margin-bottom: 1.5rem;
+    max-width: 95vw;
+  }
+  
+  .signupForm button,
+  .loginForm button {
+    width: 180px;
+    height: 45px;
+    font-size: 18px;
+    margin-top: 1.5rem;
+  }
+  
+  .message {
+    margin-top: 1.5rem;
+    font-size: 14px;
+  }
+  
+  /* Prevent zoom on form inputs for iOS */
+  .formGroup input[type="email"],
+  .formGroup input[type="password"],
+  .formGroup input[type="text"] {
+    font-size: 16px;
+    -webkit-appearance: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .authPage header h1 {
+    font-size: 28px;
+  }
+  
+  .authToggle {
+    gap: 1.5rem;
+  }
+  
+  .authToggle button {
+    font-size: 18px;
+  }
+  
+  .formGroup input {
+    font-size: 16px;
+    min-width: 250px;
+  }
+  
+  .signupForm button,
+  .loginForm button {
+    width: 160px;
+    height: 40px;
+    font-size: 16px;
+  }
+}

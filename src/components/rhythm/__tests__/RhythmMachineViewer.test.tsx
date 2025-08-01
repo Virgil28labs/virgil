@@ -238,7 +238,7 @@ describe('RhythmMachineViewer', () => {
 
     it('shows generating state during pattern generation', async () => {
       const user = userEvent.setup();
-      let resolveGeneration: (value: any) => void;
+      let resolveGeneration: (value: unknown) => void;
       const generationPromise = new Promise(resolve => {
         resolveGeneration = resolve;
       });

@@ -8,6 +8,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { EditableDataPoint } from './EditableDataPoint';
 import { SelectDataPoint } from './SelectDataPoint';
 import { logger } from '../lib/logger';
+import styles from './UserProfileViewer.module.css';
 
 interface UserProfileViewerProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Element;
-      if (!target.closest('.user-profile-viewer') && !target.closest('.virgil-logo-button')) {
+      if (!target.closest(`.${styles.userProfileViewer}`) && !target.closest('.virgil-logo-button')) {
         onClose();
       }
     };
@@ -98,72 +99,72 @@ export const UserProfileViewer = memo(function UserProfileViewer({
 
   return (
     <>
-      <div className="profile-backdrop" onClick={onClose} aria-hidden="true" />
+      <div className={styles.profileBackdrop} onClick={onClose} aria-hidden="true" />
       <div
         ref={containerRef as React.RefObject<HTMLDivElement>}
-        className="user-profile-viewer"
+        className={styles.userProfileViewer}
         role="dialog"
         aria-modal="true"
         aria-label="User Profile"
       >
-        <div className="profile-viewer-header">
+        <div className={styles.profileViewerHeader}>
           <button
-            className="profile-close-btn"
+            className={styles.profileCloseBtn}
             onClick={onClose}
             aria-label="Close profile viewer"
             data-keyboard-nav
           >
             ✕
           </button>
-          <div className="profile-user-info">
-            <div className="profile-avatar-container">
-              <div className="profile-avatar-small">
+          <div className={styles.profileUserInfo}>
+            <div className={styles.profileAvatarContainer}>
+              <div className={styles.profileAvatarSmall}>
                 {user?.user_metadata?.avatarUrl ? (
                   <img
                     src={user.user_metadata.avatarUrl}
                     alt="Profile avatar"
-                    className="avatar-image"
+                    className={styles.avatarImage}
                   />
                 ) : profile.fullName ?
                   profile.fullName.charAt(0).toUpperCase() :
                   '👤'}
               </div>
-              <svg className="profile-completion-ring" viewBox="0 0 36 36">
+              <svg className={styles.profileCompletionRing} viewBox="0 0 36 36">
                 <path
-                  className="completion-bg"
+                  className={styles.completionBg}
                   d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
-                  className="completion-progress"
+                  className={styles.completionProgress}
                   strokeDasharray={`${profileCompletion}, 100`}
                   d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <div className="completion-text">{profileCompletion}%</div>
+              <div className={styles.completionText}>{profileCompletion}%</div>
             </div>
-            <div className="profile-user-details">
-              <div className="profile-user-name">{profile.fullName || profile.nickname || 'User'}</div>
-              <div className="profile-user-email">{user?.email}</div>
+            <div className={styles.profileUserDetails}>
+              <div className={styles.profileUserName}>{profile.fullName || profile.nickname || 'User'}</div>
+              <div className={styles.profileUserEmail}>{user?.email}</div>
               {profile.uniqueId && (
-                <div className="profile-unique-id">
-                  <span className="id-badge">ID: {profile.uniqueId}</span>
+                <div className={styles.profileUniqueId}>
+                  <span className={styles.idBadge}>ID: {profile.uniqueId}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="profile-tabs" role="tablist">
+        <div className={styles.profileTabs} role="tablist">
           <button
             role="tab"
             aria-selected={activeTab === 'user'}
             aria-controls="user-tab-panel"
             id="user-tab"
-            className={activeTab === 'user' ? 'active' : ''}
+            className={activeTab === 'user' ? styles.active : ''}
             onClick={() => setActiveTab('user')}
             data-keyboard-nav
           >
@@ -174,7 +175,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
             aria-selected={activeTab === 'virgil'}
             aria-controls="virgil-tab-panel"
             id="virgil-tab"
-            className={activeTab === 'virgil' ? 'active' : ''}
+            className={activeTab === 'virgil' ? styles.active : ''}
             onClick={() => setActiveTab('virgil')}
             data-keyboard-nav
           >
@@ -182,34 +183,34 @@ export const UserProfileViewer = memo(function UserProfileViewer({
           </button>
         </div>
 
-        <div className="profile-viewer-content">
+        <div className={styles.profileViewerContent}>
           {activeTab === 'user' ? (
             <div
               role="tabpanel"
               id="user-tab-panel"
               aria-labelledby="user-tab"
-              className="tab-content user-tab-content"
+              className={`${styles.tabContent} ${styles.userTabContent}`}
             >
               {profileLoading ? (
-                <div className="profile-loading">
-                  <span className="loading-spinner">🔄</span> Loading profile...
+                <div className={styles.profileLoading}>
+                  <span className={styles.loadingSpinner}>🔄</span> Loading profile...
                 </div>
               ) : (
-                <div className="profile-cards-container">
+                <div className={styles.profileCardsContainer}>
                   {/* Primary Info Card */}
-                  <div className="profile-card primary-card">
-                    <div className="card-header">
+                  <div className={`${styles.profileCard} ${styles.primaryCard}`}>
+                    <div className={styles.cardHeader}>
                       <h4>Essential Information</h4>
-                      <span className="card-icon">✨</span>
+                      <span className={styles.cardIcon}>✨</span>
                     </div>
-                    <div className="card-content">
+                    <div className={styles.cardContent}>
                       <EditableDataPoint
                         icon="📝"
                         label="Full Name"
                         value={profile.fullName}
                         onChange={(value) => updateField('fullName', value)}
                         placeholder="Enter your full name"
-                        className="primary-field"
+                        className={styles.primaryField}
                       />
                       <EditableDataPoint
                         icon="👤"
@@ -217,7 +218,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         value={profile.nickname}
                         onChange={(value) => updateField('nickname', value)}
                         placeholder="Choose a nickname"
-                        className="primary-field"
+                        className={styles.primaryField}
                       />
                       <EditableDataPoint
                         icon="✉️"
@@ -226,18 +227,18 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         onChange={(value) => updateField('email', value)}
                         type="email"
                         readOnly
-                        className="primary-field email-field"
+                        className={`${styles.primaryField} ${styles.emailField}`}
                       />
                     </div>
                   </div>
 
                   {/* Personal Details Card */}
-                  <div className="profile-card details-card">
-                    <div className="card-header">
+                  <div className={`${styles.profileCard} ${styles.detailsCard}`}>
+                    <div className={styles.cardHeader}>
                       <h4>Personal Details</h4>
-                      <span className="card-icon">🎭</span>
+                      <span className={styles.cardIcon}>🎭</span>
                     </div>
-                    <div className="card-content details-grid">
+                    <div className={`${styles.cardContent} ${styles.detailsGrid}`}>
                       <EditableDataPoint
                         icon="🎂"
                         label="Date of Birth"
@@ -278,12 +279,12 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                   </div>
 
                   {/* Contact Card */}
-                  <div className="profile-card contact-card">
-                    <div className="card-header">
+                  <div className={`${styles.profileCard} ${styles.contactCard}`}>
+                    <div className={styles.cardHeader}>
                       <h4>Contact Information</h4>
-                      <span className="card-icon">📞</span>
+                      <span className={styles.cardIcon}>📞</span>
                     </div>
-                    <div className="card-content">
+                    <div className={styles.cardContent}>
                       <EditableDataPoint
                         icon="📱"
                         label="Phone Number"
@@ -291,19 +292,19 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                         onChange={(value) => updateField('phone', value)}
                         type="tel"
                         placeholder="+1 (555) 123-4567"
-                        className="phone-field"
+                        className={styles.phoneField}
                       />
                     </div>
                   </div>
 
                   {/* Address Card */}
-                  <div className={`profile-card address-card ${showAddress ? 'expanded' : ''}`}>
-                    <div className="card-header" onClick={() => setShowAddress(!showAddress)}>
+                  <div className={`${styles.profileCard} ${styles.addressCard} ${showAddress ? styles.expanded : ''}`}>
+                    <div className={styles.cardHeader} onClick={() => setShowAddress(!showAddress)}>
                       <h4>Address</h4>
-                      <div className="card-header-actions">
-                        <span className="card-icon">🏠</span>
+                      <div className={styles.cardHeaderActions}>
+                        <span className={styles.cardIcon}>🏠</span>
                         <button
-                          className="address-expand-btn"
+                          className={styles.addressExpandBtn}
                           aria-expanded={showAddress}
                           aria-label={showAddress ? 'Hide address' : 'Show address'}
                         >
@@ -312,16 +313,16 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                       </div>
                     </div>
                     {showAddress && (
-                      <div className="card-content address-content">
+                      <div className={`${styles.cardContent} ${styles.addressContent}`}>
                         <EditableDataPoint
                           icon="🛣️"
                           label="Street Address"
                           value={profile.address.street}
                           onChange={(value) => updateAddress('street', value)}
                           placeholder="123 Main Street"
-                          className="full-width"
+                          className={styles.fullWidth}
                         />
-                        <div className="address-row">
+                        <div className={styles.addressRow}>
                           <EditableDataPoint
                             icon="🏙️"
                             label="City"
@@ -337,7 +338,7 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                             placeholder="State"
                           />
                         </div>
-                        <div className="address-row">
+                        <div className={styles.addressRow}>
                           <EditableDataPoint
                             icon="🔢"
                             label="ZIP Code"
@@ -358,25 +359,25 @@ export const UserProfileViewer = memo(function UserProfileViewer({
                   </div>
 
                   {/* Actions */}
-                  <div className="profile-actions-container">
+                  <div className={styles.profileActionsContainer}>
                     <button
-                      className={`profile-action-btn signout ${isSigningOut ? 'signing-out' : ''}`}
+                      className={`${styles.profileActionBtn} ${styles.signout} ${isSigningOut ? styles.signingOut : ''}`}
                       onClick={handleSignOut}
                       data-keyboard-nav
                       disabled={isSigningOut}
                     >
-                      <span className="action-icon">🚪</span>
-                      <span className="action-text">{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
+                      <span className={styles.actionIcon}>🚪</span>
+                      <span className={styles.actionText}>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
                     </button>
                   </div>
 
                   {/* Save Progress Bar */}
                   {(saving || saveSuccess) && (
-                    <div className="save-progress-container">
-                      <div className={`save-progress-bar ${saveSuccess ? 'success' : ''}`}>
-                        <div className="progress-fill" />
+                    <div className={styles.saveProgressContainer}>
+                      <div className={`${styles.saveProgressBar} ${saveSuccess ? styles.success : ''}`}>
+                        <div className={styles.progressFill} />
                       </div>
-                      <span className="save-status">
+                      <span className={styles.saveStatus}>
                         {saving ? 'Saving changes...' : 'All changes saved'}
                       </span>
                     </div>
@@ -389,186 +390,186 @@ export const UserProfileViewer = memo(function UserProfileViewer({
               role="tabpanel"
               id="virgil-tab-panel"
               aria-labelledby="virgil-tab"
-              className="tab-content"
+              className={styles.tabContent}
             >
               {deviceInfo && (
                 <>
-                  <div className="virgil-data-section">
+                  <div className={styles.virgilDataSection}>
                     <h4>🖥️ Device & Browser</h4>
-                    <div className="virgil-data-grid">
-                      <div className="data-point">
-                        <span className="data-icon">🌍</span>
-                        <span className="data-label">Location</span>
-                        <span className="data-value">{deviceInfo.location}</span>
+                    <div className={styles.virgilDataGrid}>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🌍</span>
+                        <span className={styles.dataLabel}>Location</span>
+                        <span className={styles.dataValue}>{deviceInfo.location}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">📡</span>
-                        <span className="data-label">IP</span>
-                        <span className="data-value">{deviceInfo.ip}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>📡</span>
+                        <span className={styles.dataLabel}>IP</span>
+                        <span className={styles.dataValue}>{deviceInfo.ip}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">💻</span>
-                        <span className="data-label">Device</span>
-                        <span className="data-value">{deviceInfo.device}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>💻</span>
+                        <span className={styles.dataLabel}>Device</span>
+                        <span className={styles.dataValue}>{deviceInfo.device}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🖥️</span>
-                        <span className="data-label">OS</span>
-                        <span className="data-value">{deviceInfo.os}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🖥️</span>
+                        <span className={styles.dataLabel}>OS</span>
+                        <span className={styles.dataValue}>{deviceInfo.os}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🌐</span>
-                        <span className="data-label">Browser</span>
-                        <span className="data-value">{deviceInfo.browser}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🌐</span>
+                        <span className={styles.dataLabel}>Browser</span>
+                        <span className={styles.dataValue}>{deviceInfo.browser}</span>
                       </div>
-                      <div className="data-point live">
-                        <span className="data-icon">⏰</span>
-                        <span className="data-label">Time</span>
-                        <span className="data-value">{deviceInfo.localTime}</span>
+                      <div className={`${styles.dataPoint} ${styles.live}`}>
+                        <span className={styles.dataIcon}>⏰</span>
+                        <span className={styles.dataLabel}>Time</span>
+                        <span className={styles.dataValue}>{deviceInfo.localTime}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🌏</span>
-                        <span className="data-label">Timezone</span>
-                        <span className="data-value">{deviceInfo.timezone}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🌏</span>
+                        <span className={styles.dataLabel}>Timezone</span>
+                        <span className={styles.dataValue}>{deviceInfo.timezone}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🗣️</span>
-                        <span className="data-label">Language</span>
-                        <span className="data-value">{deviceInfo.language}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🗣️</span>
+                        <span className={styles.dataLabel}>Language</span>
+                        <span className={styles.dataValue}>{deviceInfo.language}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">📐</span>
-                        <span className="data-label">Screen</span>
-                        <span className="data-value">{deviceInfo.screen} @{deviceInfo.pixelRatio}x</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>📐</span>
+                        <span className={styles.dataLabel}>Screen</span>
+                        <span className={styles.dataValue}>{deviceInfo.screen} @{deviceInfo.pixelRatio}x</span>
                       </div>
-                      <div className="data-point live">
-                        <span className="data-icon">🪟</span>
-                        <span className="data-label">Window</span>
-                        <span className="data-value">{deviceInfo.windowSize}</span>
+                      <div className={`${styles.dataPoint} ${styles.live}`}>
+                        <span className={styles.dataIcon}>🪟</span>
+                        <span className={styles.dataLabel}>Window</span>
+                        <span className={styles.dataValue}>{deviceInfo.windowSize}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🎨</span>
-                        <span className="data-label">Theme</span>
-                        <span className="data-value">{deviceInfo.colorScheme === 'dark' ? 'Dark' : 'Light'}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🎨</span>
+                        <span className={styles.dataLabel}>Theme</span>
+                        <span className={styles.dataValue}>{deviceInfo.colorScheme === 'dark' ? 'Dark' : 'Light'}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🧮</span>
-                        <span className="data-label">CPU</span>
-                        <span className="data-value">{deviceInfo.cpu} {typeof deviceInfo.cpu === 'number' ? 'cores' : ''}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🧮</span>
+                        <span className={styles.dataLabel}>CPU</span>
+                        <span className={styles.dataValue}>{deviceInfo.cpu} {typeof deviceInfo.cpu === 'number' ? 'cores' : ''}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">💾</span>
-                        <span className="data-label">Memory</span>
-                        <span className="data-value">{deviceInfo.memory}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>💾</span>
+                        <span className={styles.dataLabel}>Memory</span>
+                        <span className={styles.dataValue}>{deviceInfo.memory}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">{deviceInfo.online ? '🟢' : '🔴'}</span>
-                        <span className="data-label">Network</span>
-                        <span className="data-value">{deviceInfo.online ? 'Online' : 'Offline'}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>{deviceInfo.online ? '🟢' : '🔴'}</span>
+                        <span className={styles.dataLabel}>Network</span>
+                        <span className={styles.dataValue}>{deviceInfo.online ? 'Online' : 'Offline'}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">📶</span>
-                        <span className="data-label">Type</span>
-                        <span className="data-value">{deviceInfo.networkType}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>📶</span>
+                        <span className={styles.dataLabel}>Type</span>
+                        <span className={styles.dataValue}>{deviceInfo.networkType}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">⚡</span>
-                        <span className="data-label">Speed</span>
-                        <span className="data-value">{deviceInfo.downlink}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>⚡</span>
+                        <span className={styles.dataLabel}>Speed</span>
+                        <span className={styles.dataValue}>{deviceInfo.downlink}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">⏱️</span>
-                        <span className="data-label">Latency</span>
-                        <span className="data-value">{deviceInfo.rtt}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>⏱️</span>
+                        <span className={styles.dataLabel}>Latency</span>
+                        <span className={styles.dataValue}>{deviceInfo.rtt}</span>
                       </div>
                       {deviceInfo.batteryLevel !== null && (
-                        <div className="data-point">
-                          <span className="data-icon">
+                        <div className={styles.dataPoint}>
+                          <span className={styles.dataIcon}>
                             {deviceInfo.batteryCharging ? '🔌' : '🔋'}
                           </span>
-                          <span className="data-label">Battery</span>
-                          <span className="data-value">
+                          <span className={styles.dataLabel}>Battery</span>
+                          <span className={styles.dataValue}>
                             {deviceInfo.batteryLevel}%
                           </span>
                         </div>
                       )}
-                      <div className="data-point">
-                        <span className="data-icon">{deviceInfo.tabVisible ? '👀' : '😴'}</span>
-                        <span className="data-label">Tab</span>
-                        <span className="data-value">{deviceInfo.tabVisible ? 'Active' : 'Hidden'}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>{deviceInfo.tabVisible ? '👀' : '😴'}</span>
+                        <span className={styles.dataLabel}>Tab</span>
+                        <span className={styles.dataValue}>{deviceInfo.tabVisible ? 'Active' : 'Hidden'}</span>
                       </div>
-                      <div className="data-point live">
-                        <span className="data-icon">⏳</span>
-                        <span className="data-label">Session</span>
-                        <span className="data-value">
+                      <div className={`${styles.dataPoint} ${styles.live}`}>
+                        <span className={styles.dataIcon}>⏳</span>
+                        <span className={styles.dataLabel}>Session</span>
+                        <span className={styles.dataValue}>
                           {Math.floor(deviceInfo.sessionDuration / 60)}:{(deviceInfo.sessionDuration % 60).toString().padStart(2, '0')}
                         </span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🍪</span>
-                        <span className="data-label">Cookies</span>
-                        <span className="data-value">{deviceInfo.cookiesEnabled ? 'Enabled' : 'Disabled'}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🍪</span>
+                        <span className={styles.dataLabel}>Cookies</span>
+                        <span className={styles.dataValue}>{deviceInfo.cookiesEnabled ? 'Enabled' : 'Disabled'}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">🚫</span>
-                        <span className="data-label">DNT</span>
-                        <span className="data-value">{deviceInfo.doNotTrack || 'Off'}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>🚫</span>
+                        <span className={styles.dataLabel}>DNT</span>
+                        <span className={styles.dataValue}>{deviceInfo.doNotTrack || 'Off'}</span>
                       </div>
-                      <div className="data-point">
-                        <span className="data-icon">💽</span>
-                        <span className="data-label">Storage</span>
-                        <span className="data-value">{deviceInfo.storageQuota}</span>
+                      <div className={styles.dataPoint}>
+                        <span className={styles.dataIcon}>💽</span>
+                        <span className={styles.dataLabel}>Storage</span>
+                        <span className={styles.dataValue}>{deviceInfo.storageQuota}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="virgil-data-section">
+                  <div className={styles.virgilDataSection}>
                     <h4>🔐 Permissions</h4>
-                    <div className="permission-grid">
+                    <div className={styles.permissionGrid}>
                       <button
-                        className={`permission-btn ${permissions.geolocation}`}
+                        className={`${styles.permissionBtn} ${permissions.geolocation ? styles[permissions.geolocation] : ''}`}
                         onClick={() => requestPermission('geolocation')}
                         disabled={permissions.geolocation === 'granted'}
                       >
-                        <span className="perm-icon">📍</span>
-                        <span className="perm-name">Location</span>
-                        {permissions.geolocation === 'granted' && <span className="check">✓</span>}
+                        <span className={styles.permIcon}>📍</span>
+                        <span className={styles.permName}>Location</span>
+                        {permissions.geolocation === 'granted' && <span className={styles.check}>✓</span>}
                       </button>
                       <button
-                        className={`permission-btn ${permissions.camera}`}
+                        className={`${styles.permissionBtn} ${permissions.camera ? styles[permissions.camera] : ''}`}
                         onClick={() => requestPermission('camera')}
                         disabled={permissions.camera === 'granted'}
                       >
-                        <span className="perm-icon">📷</span>
-                        <span className="perm-name">Camera</span>
-                        {permissions.camera === 'granted' && <span className="check">✓</span>}
+                        <span className={styles.permIcon}>📷</span>
+                        <span className={styles.permName}>Camera</span>
+                        {permissions.camera === 'granted' && <span className={styles.check}>✓</span>}
                       </button>
                       <button
-                        className={`permission-btn ${permissions.microphone}`}
+                        className={`${styles.permissionBtn} ${permissions.microphone ? styles[permissions.microphone] : ''}`}
                         onClick={() => requestPermission('microphone')}
                         disabled={permissions.microphone === 'granted'}
                       >
-                        <span className="perm-icon">🎤</span>
-                        <span className="perm-name">Microphone</span>
-                        {permissions.microphone === 'granted' && <span className="check">✓</span>}
+                        <span className={styles.permIcon}>🎤</span>
+                        <span className={styles.permName}>Microphone</span>
+                        {permissions.microphone === 'granted' && <span className={styles.check}>✓</span>}
                       </button>
                       <button
-                        className={`permission-btn ${permissions.notifications}`}
+                        className={`${styles.permissionBtn} ${permissions.notifications ? styles[permissions.notifications] : ''}`}
                         onClick={() => requestPermission('notifications')}
                         disabled={permissions.notifications === 'granted'}
                       >
-                        <span className="perm-icon">🔔</span>
-                        <span className="perm-name">Notifications</span>
-                        {permissions.notifications === 'granted' && <span className="check">✓</span>}
+                        <span className={styles.permIcon}>🔔</span>
+                        <span className={styles.permName}>Notifications</span>
+                        {permissions.notifications === 'granted' && <span className={styles.check}>✓</span>}
                       </button>
                       <button
-                        className={`permission-btn ${permissions.clipboard}`}
+                        className={`${styles.permissionBtn} ${permissions.clipboard ? styles[permissions.clipboard] : ''}`}
                         onClick={() => requestPermission('clipboard')}
                         disabled={permissions.clipboard === 'granted'}
                       >
-                        <span className="perm-icon">📋</span>
-                        <span className="perm-name">Clipboard</span>
-                        {permissions.clipboard === 'granted' && <span className="check">✓</span>}
+                        <span className={styles.permIcon}>📋</span>
+                        <span className={styles.permName}>Clipboard</span>
+                        {permissions.clipboard === 'granted' && <span className={styles.check}>✓</span>}
                       </button>
                     </div>
                   </div>

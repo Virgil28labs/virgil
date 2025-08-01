@@ -42,7 +42,7 @@ export const DateTime = memo(function DateTime() {
       clickToOpen
     >
       <div className="datetime-display">
-        <div className="time">
+        <div className="time" data-raccoon-collision="time">
           {(() => {
             const timeParts = formatters.time(currentTime).split(':');
             return (
@@ -53,8 +53,8 @@ export const DateTime = memo(function DateTime() {
             );
           })()}
         </div>
-        <div className="date">{formatters.date(currentTime)}</div>
-        <div className="day">{formatters.day()}</div>
+        <div className="date" data-raccoon-collision="date">{formatters.date(currentTime)}</div>
+        <div className="day" data-raccoon-collision="day">{formatters.day()}</div>
       </div>
     </TimezoneWidget>
   );

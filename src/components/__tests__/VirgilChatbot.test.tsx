@@ -316,14 +316,14 @@ describe('VirgilChatbot', () => {
   const defaultAuthState = {
     user: mockUser,
     loading: false,
-    signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
-    refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
+    signOut: jest.fn().mockResolvedValue({ error: undefined }),
+    refreshUser: jest.fn().mockResolvedValue(undefined),
   };
 
   const defaultMemoryService = {
-    initializeMemory: jest.fn<any, any>().mockResolvedValue(undefined),
-    markAsImportant: jest.fn<any, any>().mockResolvedValue(undefined),
-    loadRecentMessages: jest.fn<any, any>().mockResolvedValue(undefined),
+    initializeMemory: jest.fn().mockResolvedValue(undefined),
+    markAsImportant: jest.fn().mockResolvedValue(undefined),
+    loadRecentMessages: jest.fn().mockResolvedValue(undefined),
     isRealtimeConnected: true,
   };
 
@@ -674,8 +674,8 @@ describe('VirgilChatbot', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: false,
-        signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
-        refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
+        signOut: jest.fn().mockResolvedValue({ error: undefined }),
+        refreshUser: jest.fn().mockResolvedValue(undefined),
       });
       
       renderChatbot();
@@ -689,8 +689,8 @@ describe('VirgilChatbot', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: true,
-        signOut: jest.fn<any, any>().mockResolvedValue({ error: undefined }),
-        refreshUser: jest.fn<any, any>().mockResolvedValue(undefined),
+        signOut: jest.fn().mockResolvedValue({ error: undefined }),
+        refreshUser: jest.fn().mockResolvedValue(undefined),
       });
       
       renderChatbot();

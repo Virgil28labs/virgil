@@ -232,7 +232,7 @@ describe('DashboardContextService Integration Tests', () => {
 
   describe('Dashboard App Integration', () => {
     it('integrates with dashboard apps and updates context', async () => {
-      let appUpdateCallback: ((data: any) => void) | undefined;
+      let appUpdateCallback: ((data: unknown) => void) | undefined;
       
       mockDashboardAppService.subscribe.mockImplementation((callback) => {
         appUpdateCallback = callback;
@@ -273,7 +273,7 @@ describe('DashboardContextService Integration Tests', () => {
     });
 
     it('updates when dashboard apps change state', async () => {
-      let appUpdateCallback: ((data: any) => void) | undefined;
+      let appUpdateCallback: ((data: unknown) => void) | undefined;
       
       mockDashboardAppService.subscribe.mockImplementation((callback) => {
         appUpdateCallback = callback;

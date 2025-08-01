@@ -48,6 +48,7 @@ export const Weather = memo(function Weather() {
     <div
       ref={componentRef}
       className="weather-widget"
+      data-raccoon-collision="weather-widget"
       style={showForecast ? { zIndex: 1000 } : undefined}
       role="region"
       aria-label="Weather information"

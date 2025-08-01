@@ -17,10 +17,10 @@ import { MemoryModal } from '../MemoryModal/MemoryModal';
 // Mock all services
 jest.mock('../../../services/MemoryService', () => ({
   MemoryService: jest.fn(() => ({
-    init: jest.fn<any, any>().mockResolvedValue(undefined),
-    getContextForPrompt: jest.fn<any, any>().mockResolvedValue('Memory context: Previous conversation about weather and tasks'),
-    markAsImportant: jest.fn<any, any>().mockResolvedValue(undefined),
-    getRecentMessages: jest.fn<any, any>().mockResolvedValue([
+    init: jest.fn().mockResolvedValue(undefined),
+    getContextForPrompt: jest.fn().mockResolvedValue('Memory context: Previous conversation about weather and tasks'),
+    markAsImportant: jest.fn().mockResolvedValue(undefined),
+    getRecentMessages: jest.fn().mockResolvedValue([
       {
         id: 'prev-1',
         role: 'user',
@@ -34,8 +34,8 @@ jest.mock('../../../services/MemoryService', () => ({
         timestamp: new Date(Date.now() - 299000).toISOString(),
       },
     ]),
-    saveConversation: jest.fn<any, any>().mockResolvedValue(undefined),
-    getMarkedMemories: jest.fn<any, any>().mockResolvedValue([
+    saveConversation: jest.fn().mockResolvedValue(undefined),
+    getMarkedMemories: jest.fn().mockResolvedValue([
       {
         id: 'mem-1',
         content: 'User prefers morning weather updates',
@@ -44,17 +44,17 @@ jest.mock('../../../services/MemoryService', () => ({
         tag: 'preferences',
       },
     ]),
-    searchConversations: jest.fn<any, any>().mockResolvedValue([]),
+    searchConversations: jest.fn().mockResolvedValue([]),
   })),
 }));
 
 jest.mock('../../../services/SupabaseMemoryService', () => ({
   supabaseMemoryService: {
     isConnected: jest.fn(() => true),
-    connect: jest.fn<any, any>().mockResolvedValue(undefined),
+    connect: jest.fn().mockResolvedValue(undefined),
     disconnect: jest.fn(),
-    storeVector: jest.fn<any, any>().mockResolvedValue(undefined),
-    searchSimilar: jest.fn<any, any>().mockResolvedValue([
+    storeVector: jest.fn().mockResolvedValue(undefined),
+    searchSimilar: jest.fn().mockResolvedValue([
       {
         content: 'Similar conversation about weather preferences',
         similarity: 0.85,

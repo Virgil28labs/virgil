@@ -16,6 +16,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NasaApodButton } from '../NasaApodButton';
+import React from 'react';
 
 // Mock the EmojiButton component
 jest.mock('../common/EmojiButton', () => ({
@@ -56,7 +57,7 @@ jest.mock('../common/EmojiButton', () => ({
 
 // Mock the DashboardAppErrorBoundary
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: any) => (
+  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>
@@ -64,7 +65,7 @@ jest.mock('../common/DashboardAppErrorBoundary', () => ({
 }));
 
 // Mock the lazy-loaded NasaApodViewer
-const mockNasaApodViewer = jest.fn(({ isOpen, onClose }: any) => (
+const mockNasaApodViewer = jest.fn(({ isOpen, onClose }: unknown) => (
   <div data-testid="nasa-apod-viewer" data-is-open={isOpen}>
     <button onClick={onClose} data-testid="close-viewer">
       Close Viewer

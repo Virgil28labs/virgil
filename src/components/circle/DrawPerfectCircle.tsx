@@ -1,5 +1,5 @@
 import React, { memo, useState, useRef, useEffect, useCallback } from 'react';
-import './DrawPerfectCircle.css';
+import styles from './DrawPerfectCircle.module.css';
 import type {
   DrawPerfectCircleProps,
   Point,
@@ -446,22 +446,22 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
 
   return (
     <div
-      className="circle-game-backdrop"
+      className={styles.circleGameBackdrop}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Draw Perfect Circle Game"
     >
       <div
-        className="circle-game-panel"
+        className={styles.circleGamePanel}
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
-        <div className="circle-game-header">
-          <h2 className="circle-game-title">Draw Perfect Circle</h2>
+        <div className={styles.circleGameHeader}>
+          <h2 className={styles.circleGameTitle}>Draw Perfect Circle</h2>
           <button
-            className="circle-game-close"
+            className={styles.circleGameClose}
             onClick={onClose}
             aria-label="Close circle game"
           >
@@ -470,10 +470,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
         </div>
 
         {/* Canvas Container */}
-        <div className="circle-game-canvas-container">
+        <div className={styles.circleGameCanvasContainer}>
           <canvas
             ref={canvasRef}
-            className="circle-game-canvas"
+            className={styles.circleGameCanvas}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -485,10 +485,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
 
           {/* Instructions */}
           {points.length === 0 && !result && (
-            <div className="circle-game-instructions">
+            <div className={styles.circleGameInstructions}>
               <h3>Draw a perfect circle</h3>
               <p>Click and drag to draw your circle</p>
-              <p className="circle-game-stats">
+              <p className={styles.circleGameStats}>
                 Best score: {bestScore} | Attempts: {attempts}
               </p>
             </div>
@@ -496,15 +496,15 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
 
           {/* Result Display */}
           {result && (
-            <div className="circle-game-result">
-              <div className="circle-game-score">{result.score}/100</div>
-              <div className="circle-game-message">{result.message}</div>
-              <div className="circle-game-stats">
+            <div className={styles.circleGameResult}>
+              <div className={styles.circleGameScore}>{result.score}/100</div>
+              <div className={styles.circleGameMessage}>{result.message}</div>
+              <div className={styles.circleGameStats}>
                 Best score: {bestScore} | Attempts: {attempts}
               </div>
               <button
                 onClick={clearCanvas}
-                className="circle-game-try-again"
+                className={styles.circleGameTryAgain}
               >
                 Try again
               </button>
@@ -513,10 +513,10 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
         </div>
 
         {/* Controls */}
-        <div className="circle-game-controls">
+        <div className={styles.circleGameControls}>
           <button
             onClick={clearCanvas}
-            className="circle-game-control-button"
+            className={styles.circleGameControlButton}
           >
             Clear
           </button>
@@ -524,7 +524,7 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
             onClick={() => {
               setShowGrid(prev => !prev);
             }}
-            className="circle-game-control-button"
+            className={styles.circleGameControlButton}
           >
             {showGrid ? 'Hide grid' : 'Show grid'}
           </button>

@@ -13,7 +13,7 @@ import { RouteInputBar } from './RouteInputBar';
 import { RouteInfoBar } from './RouteInfoBar';
 import { TrafficIndicator } from './TrafficIndicator';
 import { useRouteState } from '../../hooks/useRouteState';
-import './maps.css';
+import styles from './Maps.module.css';
 import { logger } from '../../lib/logger';
 
 export const GoogleMapsModal = memo(function GoogleMapsModal({
@@ -555,19 +555,19 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Check Traffic"
-      className="google-maps-modal"
+      className={styles.googleMapsModal}
       size="extra-large"
     >
-      <div className={`maps-container ${routeInfoVisible && currentRoute ? 'has-route-info' : ''}`}>
+      <div className={`${styles.mapsContainer} ${routeInfoVisible && currentRoute ? styles.hasRouteInfo : ''}`}>
         {isLoading && (
-          <div className="maps-loading">
-            <div className="maps-spinner" />
+          <div className={styles.mapsLoading}>
+            <div className={styles.mapsSpinner} />
             <p>Loading map...</p>
           </div>
         )}
 
         {error && (
-          <div className="maps-error">
+          <div className={styles.mapsError}>
             <p>{error}</p>
             <button onClick={() => window.location.reload()}>Reload</button>
           </div>
@@ -575,7 +575,7 @@ export const GoogleMapsModal = memo(function GoogleMapsModal({
 
         <div
           ref={mapRef}
-          className={`map-view ${!isLoading && mapsLoaded ? 'active' : ''}`}
+          className={`${styles.mapView} ${!isLoading && mapsLoaded ? styles.active : ''}`}
         />
 
         {/* Map controls */}

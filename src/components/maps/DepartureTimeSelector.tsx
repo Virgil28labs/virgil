@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import './maps.css';
+import styles from './Maps.module.css';
 import { timeService } from '../../services/TimeService';
 
 interface DepartureTimeSelectorProps {
@@ -103,9 +103,9 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
   };
 
   return (
-    <div className={`departure-time-selector ${showDropdown ? 'open' : ''}`} ref={dropdownRef}>
+    <div className={`${styles.departureTimeSelector} ${showDropdown ? styles.open : ''}`} ref={dropdownRef}>
       <button
-        className={`departure-time-btn ${isCompact ? 'compact' : ''}`}
+        className={`${styles.departureTimeBtn} ${isCompact ? styles.compact : ''}`}
         onClick={() => setShowDropdown(!showDropdown)}
         type="button"
       >
@@ -115,14 +115,14 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
         </svg>
         <span>{getDisplayText()}</span>
         {!isCompact && (
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="chevron">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={styles.chevron}>
             <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         )}
       </button>
 
       {showDropdown && (
-        <div className="departure-time-dropdown">
+        <div className={styles.departureTimeDropdown}>
           <button onClick={() => { onTimeChange('now'); setShowDropdown(false); }}>
             Leave now
           </button>
@@ -138,7 +138,7 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
           <button onClick={() => handleQuickOption(120)}>
             In 2 hours
           </button>
-          <div className="dropdown-divider" />
+          <div className={styles.dropdownDivider} />
           <button onClick={() => handleQuickDate(1, 9)}>
             Tomorrow at 9 AM
           </button>
@@ -148,13 +148,13 @@ export const DepartureTimeSelector = memo(function DepartureTimeSelector({
           <button onClick={() => handleQuickDate(7, 9)}>
             Next week
           </button>
-          <div className="dropdown-divider" />
+          <div className={styles.dropdownDivider} />
           <button onClick={() => setShowCustomPicker(!showCustomPicker)}>
             Pick specific date & time...
           </button>
 
           {showCustomPicker && (
-            <div className="custom-time-picker">
+            <div className={styles.customTimePicker}>
               <input
                 type="datetime-local"
                 value={getCurrentDateTimeString()}

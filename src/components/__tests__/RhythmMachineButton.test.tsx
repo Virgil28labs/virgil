@@ -13,7 +13,7 @@ import { RhythmMachineButton } from '../RhythmMachineButton';
 
 // Mock dependencies
 jest.mock('../common/EmojiButton', () => ({
-  EmojiButton: ({ emoji, ariaLabel, title, className, position, hoverScale, hoverColor, GalleryComponent }: any) => (
+  EmojiButton: ({ emoji, ariaLabel, title, className, position, hoverScale, hoverColor, GalleryComponent }: unknown) => (
     <div data-testid="emoji-button">
       <span data-testid="emoji">{emoji}</span>
       <span data-testid="aria-label">{ariaLabel}</span>
@@ -28,7 +28,7 @@ jest.mock('../common/EmojiButton', () => ({
 }));
 
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: any) => (
+  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>
@@ -36,7 +36,7 @@ jest.mock('../common/DashboardAppErrorBoundary', () => ({
 }));
 
 jest.mock('../rhythm/RhythmMachineViewer', () => ({
-  RhythmMachineViewer: ({ isOpen, onClose }: any) => (
+  RhythmMachineViewer: ({ isOpen, onClose }: unknown) => (
     <div data-testid="rhythm-machine-viewer" data-is-open={isOpen}>
       <button onClick={onClose}>Close</button>
     </div>

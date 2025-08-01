@@ -47,7 +47,7 @@ describe('lazyImport', () => {
 
   describe('lazyImport', () => {
     it('handles default exports correctly', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -64,7 +64,7 @@ describe('lazyImport', () => {
     });
 
     it('handles named exports with componentName', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         NamedComponent: MockNamedComponent,
         otherExport: () => 'other',
       });
@@ -78,7 +78,7 @@ describe('lazyImport', () => {
     });
 
     it('falls back to first export when no default', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         FirstComponent: MockComponent,
         SecondComponent: MockNamedComponent,
       });
@@ -92,7 +92,7 @@ describe('lazyImport', () => {
     });
 
     it('throws error when no valid export found', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({});
+      const mockImportFn = jest.fn().mockResolvedValue({});
 
       lazyImport(mockImportFn);
       
@@ -104,7 +104,7 @@ describe('lazyImport', () => {
 
     it('logs error when component fails to load', async () => {
       const importError = new Error('Module load failed');
-      const mockImportFn = jest.fn<any, any>().mockRejectedValue(importError);
+      const mockImportFn = jest.fn().mockRejectedValue(importError);
 
       lazyImport(mockImportFn, 'TestComponent');
       
@@ -157,7 +157,7 @@ describe('lazyImport', () => {
 
   describe('lazyWithPreload', () => {
     it('returns component and preload function', () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -180,7 +180,7 @@ describe('lazyImport', () => {
         $$typeof: Symbol.for('react.lazy'),
       }) as unknown as React.LazyExoticComponent<ComponentType<unknown>> & { _payload?: () => void });
 
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -194,7 +194,7 @@ describe('lazyImport', () => {
 
   describe('Edge Cases', () => {
     it('handles undefined componentName gracefully', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -207,7 +207,7 @@ describe('lazyImport', () => {
     });
 
     it('handles empty string componentName', async () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -220,19 +220,19 @@ describe('lazyImport', () => {
     });
 
     it('handles import function returning null', () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue(null);
+      const mockImportFn = jest.fn().mockResolvedValue(null);
 
       expect(() => lazyImport(mockImportFn)).not.toThrow();
     });
 
     it('handles import function returning undefined', () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue(undefined);
+      const mockImportFn = jest.fn().mockResolvedValue(undefined);
 
       expect(() => lazyImport(mockImportFn)).not.toThrow();
     });
 
     it('preserves component types', () => {
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue({
+      const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,
       });
 
@@ -254,7 +254,7 @@ describe('lazyImport', () => {
         },
       };
 
-      const mockImportFn = jest.fn<any, any>().mockResolvedValue(complexModule);
+      const mockImportFn = jest.fn().mockResolvedValue(complexModule);
 
       // Test with default export (should use default)
       lazyImport(mockImportFn);

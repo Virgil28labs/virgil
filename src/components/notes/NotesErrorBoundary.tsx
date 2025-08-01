@@ -7,7 +7,7 @@ import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
 import { NotesError, ErrorType } from './types';
 import { logger } from '../../lib/logger';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface Props {
   children: ReactNode
@@ -106,16 +106,16 @@ export class NotesErrorBoundary extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="notes-error-boundary">
-          <div className="notes-error-content">
-            <h2 className="notes-error-title">Oops! Something went wrong</h2>
-            <p className="notes-error-message">
+        <div className={styles.notesErrorBoundary}>
+          <div className={styles.notesErrorContent}>
+            <h2 className={styles.notesErrorTitle}>Oops! Something went wrong</h2>
+            <p className={styles.notesErrorMessage}>
               {this.getErrorMessage(this.state.error)}
             </p>
 
             {/* Show technical details in development */}
             {process.env.NODE_ENV === 'development' && (
-              <details className="notes-error-details">
+              <details className={styles.notesErrorDetails}>
                 <summary>Technical Details</summary>
                 <pre>{this.state.error.stack}</pre>
                 {this.state.errorInfo && (
@@ -124,16 +124,16 @@ export class NotesErrorBoundary extends Component<Props, State> {
               </details>
             )}
 
-            <div className="notes-error-actions">
+            <div className={styles.notesErrorActions}>
               <button
                 onClick={this.reset}
-                className="notes-error-button primary"
+                className={`${styles.notesErrorButton} ${styles.primary}`}
               >
                 Try Again
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="notes-error-button secondary"
+                className={`${styles.notesErrorButton} ${styles.secondary}`}
               >
                 Refresh Page
               </button>

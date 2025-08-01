@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { TabType } from '../../types';
+import styles from './DogGallery.module.css';
 
 interface DogImageStatesProps {
   loading: boolean
@@ -19,9 +20,9 @@ export const DogImageStates = memo(function DogImageStates({
   // Loading State
   if (loading) {
     return (
-      <div className="doggo-loading">
-        <div className="doggo-loading-spinner" />
-        <p className="doggo-loading-text">Fetching adorable doggos...</p>
+      <div className={styles.doggoLoading}>
+        <div className={styles.doggoLoadingSpinner} />
+        <p className={styles.doggoLoadingText}>Fetching adorable doggos...</p>
       </div>
     );
   }
@@ -29,9 +30,9 @@ export const DogImageStates = memo(function DogImageStates({
   // Error State
   if (error && !loading) {
     return (
-      <div className="doggo-error">
-        <div className="doggo-error-icon">😢</div>
-        <p className="doggo-error-message">{error}</p>
+      <div className={styles.doggoError}>
+        <div className={styles.doggoErrorIcon}>😢</div>
+        <p className={styles.doggoErrorMessage}>{error}</p>
       </div>
     );
   }
@@ -39,21 +40,21 @@ export const DogImageStates = memo(function DogImageStates({
   // Empty State
   if (!loading && !error && dogsCount === 0) {
     return (
-      <div className="doggo-empty">
-        <div className="doggo-empty-icon">🏠</div>
-        <h3 className="doggo-empty-title">
+      <div className={styles.doggoEmpty}>
+        <div className={styles.doggoEmptyIcon}>🏠</div>
+        <h3 className={styles.doggoEmptyTitle}>
           {activeTab === 'fetch'
             ? 'Ready to meet some doggos?'
             : 'Your Doggo Sanctuary is empty!'}
         </h3>
-        <p className="doggo-empty-message">
+        <p className={styles.doggoEmptyMessage}>
           {activeTab === 'fetch'
             ? "Choose your preferences and click 'Fetch'"
             : 'Start by fetching some adorable friends'}
         </p>
         {activeTab === 'gallery' && onSwitchToFetch && (
           <button
-            className="doggo-empty-button"
+            className={styles.doggoEmptyButton}
             onClick={onSwitchToFetch}
             aria-label="Switch to fetch tab to get dogs"
           >
@@ -70,13 +71,13 @@ export const DogImageStates = memo(function DogImageStates({
 
 // Specialized loading component for individual images
 export const DogImageSkeleton = memo(function DogImageSkeleton() {
-  return <div className="doggo-image-skeleton" />;
+  return <div className={styles.doggoImageSkeleton} />;
 });
 
 // Specialized error component for individual images
 export const DogImageError = memo(function DogImageError() {
   return (
-    <div className="doggo-image-error" aria-label="Image failed to load">
+    <div className={styles.doggoImageError} aria-label="Image failed to load">
       🐕‍🦺
     </div>
   );

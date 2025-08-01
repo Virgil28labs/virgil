@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import styles from './DogGallery.module.css';
 
 interface FetchControlsProps {
   selectedBreed: string
@@ -22,14 +23,14 @@ export const FetchControls = memo(function FetchControls({
   onFetch,
 }: FetchControlsProps) {
   return (
-    <div className="doggo-fetch-controls">
-      <div className="doggo-control-group">
-        <label className="doggo-control-label" htmlFor="breed-select">
+    <div className={styles.doggoFetchControls}>
+      <div className={styles.doggoControlGroup}>
+        <label className={styles.doggoControlLabel} htmlFor="breed-select">
           Breed:
         </label>
         <select
           id="breed-select"
-          className="doggo-breed-select"
+          className={styles.doggoBreedSelect}
           value={selectedBreed}
           onChange={(e) => onBreedChange(e.target.value)}
         >
@@ -42,13 +43,13 @@ export const FetchControls = memo(function FetchControls({
         </select>
       </div>
 
-      <div className="doggo-control-group">
-        <label className="doggo-control-label" htmlFor="count-select">
+      <div className={styles.doggoControlGroup}>
+        <label className={styles.doggoControlLabel} htmlFor="count-select">
           Count:
         </label>
         <select
           id="count-select"
-          className="doggo-count-select"
+          className={styles.doggoCountSelect}
           value={fetchCount}
           onChange={(e) => onCountChange(Number(e.target.value))}
         >
@@ -59,7 +60,7 @@ export const FetchControls = memo(function FetchControls({
       </div>
 
       <button
-        className="doggo-fetch-btn"
+        className={styles.doggoFetchBtn}
         onClick={onFetch}
         disabled={loading}
       >

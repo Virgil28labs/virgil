@@ -7,7 +7,7 @@ import { useNotesStore } from './useNotesStore';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { NotesErrorBoundary } from './NotesErrorBoundary';
 import type { FilterType, ActionFilterType, TagType } from './types';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface NotesAppProps {
   isOpen: boolean
@@ -121,11 +121,11 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
           </button>
         </div>
       )}
-      className="notes-modal"
+      className={styles.notesModal}
       size="medium"
     >
-      <div className="notes-container">
-        <div className="notes-header">
+      <div className={styles.notesContainer}>
+        <div className={styles.notesHeader}>
           {showSettings ? (
             <div style={{
               padding: '1rem',
@@ -182,18 +182,18 @@ const NotesAppContent = ({ isOpen, onClose }: NotesAppProps) => {
           )}
         </div>
 
-        <div className="notes-content">
+        <div className={styles.notesContent}>
           {isLoading ? (
-            <div className="notes-loading">
-              <div className="notes-loading-spinner" />
+            <div className={styles.notesLoading}>
+              <div className={styles.notesLoadingSpinner} />
               <p>Loading your notes...</p>
             </div>
           ) : error ? (
-            <div className="notes-error">
-              <p className="notes-error-message">{error.message}</p>
+            <div className={styles.notesError}>
+              <p className={styles.notesErrorMessage}>{error.message}</p>
               <button
                 onClick={clearError}
-                className="notes-error-retry"
+                className={styles.notesErrorRetry}
                 aria-label="Dismiss error"
               >
                 Dismiss

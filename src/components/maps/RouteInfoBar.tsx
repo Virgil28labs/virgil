@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { DepartureTimeSelector } from './DepartureTimeSelector';
-import './maps.css';
+import styles from './Maps.module.css';
 
 interface RouteInfoBarProps {
   route: google.maps.DirectionsRoute | null
@@ -74,29 +74,29 @@ export const RouteInfoBar = memo(function RouteInfoBar({
   };
 
   return (
-    <div className={`route-info-bar ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div className={`${styles.routeInfoBar} ${isExpanded ? styles.expanded : styles.collapsed}`}>
       {/* Main info row with grid layout */}
-      <div className="route-info-grid">
+      <div className={styles.routeInfoGrid}>
         {/* Time and distance section */}
-        <div className="route-metrics">
-          <div className="route-time">
-            <span className="time-value" style={{ color: getTrafficColor(trafficSeverity) }}>
+        <div className={styles.routeMetrics}>
+          <div className={styles.routeTime}>
+            <span className={styles.timeValue} style={{ color: getTrafficColor(trafficSeverity) }}>
               {formatDuration(duration)}
             </span>
             {leg.duration_in_traffic && leg.duration && isExpanded && (
-              <span className="time-comparison">
+              <span className={styles.timeComparison}>
                 (typically {formatDuration(leg.duration)})
               </span>
             )}
           </div>
-          <div className="route-distance">
-            <span className="distance-value">{distance?.text || '--'}</span>
+          <div className={styles.routeDistance}>
+            <span className={styles.distanceValue}>{distance?.text || '--'}</span>
           </div>
         </div>
 
         {/* Departure time selector - moved after metrics */}
         {onDepartureTimeChange && (
-          <div className="departure-section">
+          <div className={styles.departureSection}>
             <DepartureTimeSelector
               selectedTime={departureTime}
               onTimeChange={onDepartureTimeChange}
@@ -106,8 +106,8 @@ export const RouteInfoBar = memo(function RouteInfoBar({
         )}
 
         {/* Traffic status - pushed to right */}
-        <div className="traffic-section">
-          <div className={`traffic-icon ${trafficSeverity}`}>
+        <div className={styles.trafficSection}>
+          <div className={`${styles.trafficIcon} ${styles[trafficSeverity]}`}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <rect x="8" y="2" width="4" height="5" rx="1" fill={trafficSeverity === 'light' ? 'currentColor' : '#ccc'} />
               <rect x="8" y="8" width="4" height="4" rx="1" fill={trafficSeverity === 'moderate' ? 'currentColor' : '#ccc'} />
@@ -115,7 +115,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
             </svg>
           </div>
           {isExpanded && (
-            <span className="traffic-label">
+            <span className={styles.trafficLabel}>
               {trafficSeverity === 'heavy' ? 'Heavy traffic' :
                 trafficSeverity === 'moderate' ? 'Moderate traffic' :
                   'Light traffic'}
@@ -124,10 +124,10 @@ export const RouteInfoBar = memo(function RouteInfoBar({
         </div>
 
         {/* Control buttons */}
-        <div className="route-controls">
+        <div className={styles.routeControls}>
           {onToggleExpand && alternativeRoutes.length > 0 && (
             <button
-              className="expand-toggle-btn"
+              className={styles.expandToggleBtn}
               onClick={onToggleExpand}
               title={isExpanded ? 'Collapse' : 'Expand'}
             >
@@ -144,7 +144,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
           )}
           {onClose && (
             <button
-              className="close-btn"
+              className={styles.closeBtn}
               onClick={onClose}
               title="Close"
             >
@@ -162,9 +162,9 @@ export const RouteInfoBar = memo(function RouteInfoBar({
       </div>
 
       {isExpanded && alternativeRoutes.length > 0 && (
-        <div className="alternative-routes">
-          <div className="routes-header">Routes</div>
-          <div className="routes-list">
+        <div className={styles.alternativeRoutes}>
+          <div className={styles.routesHeader}>Routes</div>
+          <div className={styles.routesList}>
             {[route, ...alternativeRoutes].slice(0, 3).map((r, index) => {
               const routeLeg = r.legs[0];
               const routeDuration = routeLeg.duration_in_traffic || routeLeg.duration;
@@ -172,12 +172,12 @@ export const RouteInfoBar = memo(function RouteInfoBar({
               return (
                 <button
                   key={index}
-                  className={`route-option ${index === selectedRouteIndex ? 'selected' : ''}`}
+                  className={`${styles.routeOption} ${index === selectedRouteIndex ? styles.selected : ''}`}
                   onClick={() => onRouteSelect?.(index)}
                 >
-                  <div className="route-name">{r.summary}</div>
-                  <div className="route-time">{formatDuration(routeDuration)}</div>
-                  {index === 0 && <span className="fastest-badge">Fastest</span>}
+                  <div className={styles.routeName}>{r.summary}</div>
+                  <div className={styles.routeTime}>{formatDuration(routeDuration)}</div>
+                  {index === 0 && <span className={styles.fastestBadge}>Fastest</span>}
                 </button>
               );
             })}
@@ -185,7 +185,7 @@ export const RouteInfoBar = memo(function RouteInfoBar({
         </div>
       )}
 
-      <div className="route-summary">
+      <div className={styles.routeSummary}>
         via {route.summary}
       </div>
     </div>

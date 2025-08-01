@@ -2,6 +2,7 @@ import React, { memo, useEffect, useCallback, useState } from 'react';
 import type { ImageModalProps } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 import { logger } from '../../lib/logger';
+import styles from './DogGallery.module.css';
 
 export const ImageModal = memo(function ImageModal({
   dogs,
@@ -111,23 +112,23 @@ export const ImageModal = memo(function ImageModal({
 
   return (
     <div
-      className="doggo-image-modal"
+      className={styles.doggoImageModal}
       onClick={(e) => {
         e.stopPropagation();
         onClose();
       }}
     >
-      <div className="doggo-modal-content">
+      <div className={styles.doggoModalContent}>
         <img
           src={currentDog.url}
           alt={`${currentDog.breed} dog`}
-          className="doggo-modal-image"
+          className={styles.doggoModalImage}
           onClick={(e) => e.stopPropagation()}
         />
 
-        <div className="doggo-modal-actions">
+        <div className={styles.doggoModalActions}>
           <button
-            className={`doggo-modal-action ${isFavorited(currentDog.url) ? 'favorited' : ''}`}
+            className={`${styles.doggoModalAction} ${isFavorited(currentDog.url) ? styles.favorited : ''}`}
             onClick={handleFavoriteToggle}
             aria-label={isFavorited(currentDog.url) ? 'Remove from favorites' : 'Add to favorites'}
             title={isFavorited(currentDog.url) ? 'Remove from favorites' : 'Add to favorites'}
@@ -135,7 +136,7 @@ export const ImageModal = memo(function ImageModal({
             {isFavorited(currentDog.url) ? '❤️' : '🤍'}
           </button>
           <button
-            className="doggo-modal-action"
+            className={styles.doggoModalAction}
             onClick={handleDownload}
             aria-label="Download image"
             title="Download"
@@ -143,7 +144,7 @@ export const ImageModal = memo(function ImageModal({
             {showDownloaded ? '✓' : '⬇️'}
           </button>
           <button
-            className="doggo-modal-action"
+            className={styles.doggoModalAction}
             onClick={handleCopy}
             aria-label="Copy image"
             title="Copy image"
@@ -154,7 +155,7 @@ export const ImageModal = memo(function ImageModal({
       </div>
 
       <button
-        className="doggo-modal-close"
+        className={styles.doggoModalClose}
         onClick={onClose}
         aria-label="Close image"
       >
@@ -163,7 +164,7 @@ export const ImageModal = memo(function ImageModal({
 
       {hasPrevious && (
         <button
-          className="doggo-modal-nav doggo-modal-prev"
+          className={`${styles.doggoModalNav} ${styles.doggoModalPrev}`}
           onClick={handlePrevious}
           aria-label="Previous image"
         >
@@ -173,7 +174,7 @@ export const ImageModal = memo(function ImageModal({
 
       {hasNext && (
         <button
-          className="doggo-modal-nav doggo-modal-next"
+          className={`${styles.doggoModalNav} ${styles.doggoModalNext}`}
           onClick={handleNext}
           aria-label="Next image"
         >
@@ -181,7 +182,7 @@ export const ImageModal = memo(function ImageModal({
         </button>
       )}
 
-      <div className="doggo-modal-counter">
+      <div className={styles.doggoModalCounter}>
         {currentIndex + 1} / {dogs.length}
       </div>
     </div>

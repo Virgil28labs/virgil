@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useAuthForm } from '../hooks/useAuthForm';
 import { useFocusManagement } from '../hooks/useFocusManagement';
+import styles from './AuthPage.module.css';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -27,10 +28,10 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
   });
 
   return (
-    <div ref={containerRef as React.RefObject<HTMLDivElement>} className="login-form" role="form" aria-labelledby="login-title">
+    <div ref={containerRef as React.RefObject<HTMLDivElement>} className={styles.loginForm} role="form" aria-labelledby="login-title">
       <h2 id="login-title">Login</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -46,7 +47,7 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -70,7 +71,7 @@ export const LoginForm = memo(function LoginForm({ onSuccess }: LoginFormProps) 
       {message && (
         <div
           id="login-message"
-          className={`message ${isSuccess ? 'success' : 'error'}`}
+          className={`${styles.message} ${isSuccess ? styles.success : styles.error}`}
           role="alert"
           aria-live="polite"
         >

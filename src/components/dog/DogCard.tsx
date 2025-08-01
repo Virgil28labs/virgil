@@ -3,6 +3,7 @@ import type { DogCardProps } from '../../types';
 import { DogFavoriteOverlay } from './DogFavoriteOverlay';
 import { DogCardActions } from './DogCardActions';
 import { DogImageSkeleton, DogImageError } from './DogImageStates';
+import styles from './DogGallery.module.css';
 
 export const DogCard = memo(function DogCard({
   dog,
@@ -16,7 +17,7 @@ export const DogCard = memo(function DogCard({
 
   return (
     <div
-      className="doggo-grid-item"
+      className={styles.doggoGridItem}
       onClick={onImageClick}
       style={{ '--index': index } as React.CSSProperties}
       data-loaded={imageLoaded}
@@ -29,7 +30,7 @@ export const DogCard = memo(function DogCard({
         <img
           src={dog.url}
           alt={`${dog.breed} dog`}
-          className="doggo-grid-image"
+          className={styles.doggoGridImage}
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}

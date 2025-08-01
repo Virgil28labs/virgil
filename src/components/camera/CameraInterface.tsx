@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Camera } from 'react-camera-pro';
 import type { CameraControlsProps } from '../../types/camera.types';
 import { useCamera } from './hooks/useCamera';
+import styles from './Camera.module.css';
 
 interface CameraInterfaceProps {
   onPhotoCapture: (dataUrl: string) => Promise<void>
@@ -72,7 +73,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
           disabled={disabled}
           title={`Flash: ${cameraState.flashMode}`}
         >
-          <span className="camera-control-icon">
+          <span className={styles.cameraControlIcon}>
             {cameraState.flashMode === 'off' ? '🔦' :
               cameraState.flashMode === 'on' ? '⚡' : '🔄'}
           </span>
@@ -101,7 +102,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
           disabled={disabled || cameraState.numberOfCameras <= 1}
           title="Switch Camera"
         >
-          <span className="camera-control-icon">🔄</span>
+          <span className={styles.cameraControlIcon}>🔄</span>
         </button>
       </div>
 
@@ -114,7 +115,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
           disabled={disabled || isCountingDown}
           title={`Timer: ${cameraState.timer ? `${cameraState.timer}s` : 'Off'}`}
         >
-          <span className="camera-control-icon">
+          <span className={styles.cameraControlIcon}>
             {cameraState.timer ? `⏱️${cameraState.timer}` : '⏱️'}
           </span>
         </button>
@@ -126,7 +127,7 @@ const CameraControls: React.FC<CameraControlsProps> = ({
           disabled={disabled}
           title="Toggle Grid"
         >
-          <span className="camera-control-icon">⚏</span>
+          <span className={styles.cameraControlIcon}>⚏</span>
         </button>
       </div>
     </div>

@@ -4,7 +4,7 @@ export class RhythmService {
     // baseUrl is not needed in the mock implementation
   }
 
-  async generatePattern(options: any): Promise<any> {
+  async generatePattern(options: unknown): Promise<unknown> {
     return {
       pattern: Array(5).fill(null).map(() => Array(options.barLength).fill(false)),
       description: options.description,
@@ -15,7 +15,7 @@ export class RhythmService {
     };
   }
 
-  async getStats(): Promise<any> {
+  async getStats(): Promise<unknown> {
     return {
       totalGenerations: 0,
       successRate: 0,

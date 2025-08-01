@@ -4,6 +4,7 @@ import { CameraUtils } from './utils/cameraUtils';
 import { PhotoExport } from './utils/photoExport';
 import { timeService } from '../../services/TimeService';
 import { logger } from '../../lib/logger';
+import styles from './Camera.module.css';
 
 interface PhotoActionsProps {
   photo: SavedPhoto
@@ -119,20 +120,20 @@ export const PhotoActions = memo(function PhotoActions({
 
   if (showDeleteConfirm) {
     return (
-      <div className={`photo-actions delete-confirm ${className}`}>
-        <div className="delete-confirm-content">
-          <div className="delete-confirm-icon">🗑️</div>
+      <div className={`${styles.photoActions} ${styles.deleteConfirm} ${className}`}>
+        <div className={styles.deleteConfirmContent}>
+          <div className={styles.deleteConfirmIcon}>🗑️</div>
           <h3>Delete Photo?</h3>
           <p>This action cannot be undone.</p>
-          <div className="delete-confirm-actions">
+          <div className={styles.deleteConfirmActions}>
             <button
-              className="delete-confirm-btn cancel"
+              className={`${styles.deleteConfirmBtn} ${styles.cancel}`}
               onClick={handleDeleteCancel}
             >
               Cancel
             </button>
             <button
-              className="delete-confirm-btn confirm"
+              className={`${styles.deleteConfirmBtn} ${styles.confirm}`}
               onClick={handleDeleteConfirm}
             >
               Delete
@@ -144,94 +145,94 @@ export const PhotoActions = memo(function PhotoActions({
   }
 
   return (
-    <div className={`photo-actions ${className}`}>
+    <div className={`${styles.photoActions} ${className}`}>
       {isProcessing && (
-        <div className="processing-indicator">
+        <div className={styles.processingIndicator}>
           <span>Processing...</span>
         </div>
       )}
-      <div className="photo-actions-grid">
+      <div className={styles.photoActionsGrid}>
         {/* Favorite Action */}
         <button
-          className={`photo-action-btn favorite-action ${photo.isFavorite ? 'favorited' : ''}`}
+          className={`${styles.photoActionBtn} ${styles.favoriteAction} ${photo.isFavorite ? styles.favorited : ''}`}
           onClick={handleFavoriteToggle}
           disabled={isProcessing}
           title={photo.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           tabIndex={0}
         >
-          <span className="action-icon">
+          <span className={styles.actionIcon}>
             {photo.isFavorite ? '❤️' : '🤍'}
           </span>
-          <span className="action-label">
+          <span className={styles.actionLabel}>
             {photo.isFavorite ? 'Favorited' : 'Favorite'}
           </span>
         </button>
 
         {/* Download Action */}
         <button
-          className="photo-action-btn download-action"
+          className={`${styles.photoActionBtn} ${styles.downloadAction}`}
           onClick={handleDownload}
           disabled={isProcessing}
           title="Download photo"
           tabIndex={0}
         >
-          <span className="action-icon">📥</span>
-          <span className="action-label">Download</span>
+          <span className={styles.actionIcon}>📥</span>
+          <span className={styles.actionLabel}>Download</span>
         </button>
 
         {/* Share Action */}
         <button
-          className="photo-action-btn share-action"
+          className={`${styles.photoActionBtn} ${styles.shareAction}`}
           onClick={handleShare}
           disabled={isProcessing}
           title="Share photo"
         >
-          <span className="action-icon">📤</span>
-          <span className="action-label">Share</span>
+          <span className={styles.actionIcon}>📤</span>
+          <span className={styles.actionLabel}>Share</span>
         </button>
 
         {/* Delete Action */}
         <button
-          className="photo-action-btn delete-action"
+          className={`${styles.photoActionBtn} ${styles.deleteAction}`}
           onClick={handleDeleteClick}
           disabled={isProcessing}
           title="Delete photo"
         >
-          <span className="action-icon">🗑️</span>
-          <span className="action-label">Delete</span>
+          <span className={styles.actionIcon}>🗑️</span>
+          <span className={styles.actionLabel}>Delete</span>
         </button>
       </div>
 
       {/* Photo Info */}
-      <div className="photo-info">
-        <div className="photo-metadata">
-          <div className="metadata-item">
-            <span className="metadata-label">Date:</span>
-            <span className="metadata-value">
+      <div className={styles.photoInfo}>
+        <div className={styles.photoMetadata}>
+          <div className={styles.metadataItem}>
+            <span className={styles.metadataLabel}>Date:</span>
+            <span className={styles.metadataValue}>
               {timeService.formatDateToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
 
-          <div className="metadata-item">
-            <span className="metadata-label">Time:</span>
-            <span className="metadata-value">
+          <div className={styles.metadataItem}>
+            <span className={styles.metadataLabel}>Time:</span>
+            <span className={styles.metadataValue}>
               {timeService.formatTimeToLocal(timeService.fromTimestamp(photo.timestamp))}
             </span>
           </div>
 
           {photo.size !== undefined && (
-            <div className="metadata-item">
-              <span className="metadata-label">Size:</span>
-              <span className="metadata-value">
+            <div className={styles.metadataItem}>
+              <span className={styles.metadataLabel}>Size:</span>
+              <span className={styles.metadataValue}>
                 {CameraUtils.formatFileSize(photo.size)}
               </span>
             </div>
           )}
 
           {photo.width && photo.height && (
-            <div className="metadata-item">
-              <span className="metadata-label">Dimensions:</span>
-              <span className="metadata-value">
+            <div className={styles.metadataItem}>
+              <span className={styles.metadataLabel}>Dimensions:</span>
+              <span className={styles.metadataValue}>
                 {photo.width} × {photo.height}
               </span>
             </div>
@@ -239,18 +240,18 @@ export const PhotoActions = memo(function PhotoActions({
         </div>
 
         {photo.name && (
-          <div className="photo-name">
-            <span className="metadata-label">Name:</span>
-            <span className="metadata-value">{photo.name}</span>
+          <div className={styles.photoName}>
+            <span className={styles.metadataLabel}>Name:</span>
+            <span className={styles.metadataValue}>{photo.name}</span>
           </div>
         )}
 
         {photo.tags && photo.tags.length > 0 && (
-          <div className="photo-tags">
-            <span className="metadata-label">Tags:</span>
-            <div className="tags-list">
+          <div className={styles.photoTags}>
+            <span className={styles.metadataLabel}>Tags:</span>
+            <div className={styles.tagsList}>
               {photo.tags.map((tag, index) => (
-                <span key={index} className="tag">
+                <span key={index} className={styles.tag}>
                   {tag}
                 </span>
               ))}

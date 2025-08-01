@@ -1,6 +1,6 @@
 import type { Entry } from './types';
 import { NotesEntry } from './NotesEntry';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface NotesListProps {
   entries: Entry[]
@@ -14,16 +14,16 @@ export const NotesList = ({ entries, onToggleTask, onUpdateEntry, onDeleteEntry,
 
   if (entries.length === 0) {
     return (
-      <div className="notes-empty">
-        <span className="notes-empty-icon">📝</span>
-        <p className="notes-empty-text">No notes yet</p>
-        <p className="notes-empty-hint">Start typing above to capture your first thought</p>
+      <div className={styles.notesEmptyState}>
+        <span className={styles.notesEmptyIcon}>📝</span>
+        <p className={styles.notesEmptyText}>No notes yet</p>
+        <p className={styles.notesEmptyHint}>Start typing above to capture your first thought</p>
       </div>
     );
   }
 
   return (
-    <div className="notes-list">
+    <div className={styles.notesList}>
       {entries.map(entry => (
         <NotesEntry
           key={entry.id}

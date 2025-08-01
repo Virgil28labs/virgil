@@ -35,6 +35,7 @@ import { GiphyAdapter } from '../services/adapters/GiphyAdapter';
 import { RhythmMachineAdapter } from '../services/adapters/RhythmMachineAdapter';
 import { CircleGameAdapter } from '../services/adapters/CircleGameAdapter';
 import { logger } from '../lib/logger';
+import styles from './Dashboard.module.css';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
@@ -147,7 +148,7 @@ export const Dashboard = memo(function Dashboard() {
   return (
     <div 
       ref={containerRef as React.RefObject<HTMLDivElement>} 
-      className={`dashboard ${deviceInfo?.device === 'mobile' ? 'mobile-layout' : ''}`}
+      className={`${styles.dashboard} ${deviceInfo?.device === 'mobile' ? styles.mobileLayout : ''}`}
       role="main" 
       aria-label="Dashboard main content"
       data-testid="dashboard-container"
@@ -161,23 +162,25 @@ export const Dashboard = memo(function Dashboard() {
 
       {/* Power button */}
       <button
-        className={`power-button ${isSigningOut ? 'signing-out' : ''}`}
+        className={`${styles.powerButton} ${isSigningOut ? styles.signingOut : ''}`}
+        data-raccoon-collision="power-button"
         onClick={handleSignOut}
         title={isSigningOut ? 'Signing out...' : 'Sign Out'}
         aria-label={isSigningOut ? 'Signing out...' : 'Sign out of your account'}
         data-keyboard-nav
         disabled={isSigningOut}
       >
-        <div className="power-icon" aria-hidden="true" />
+        <div className={styles.powerIcon} aria-hidden="true" />
         <span className="sr-only">{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
       </button>
 
       {/* Main content */}
-      <div id="main-content" className="dashboard-content" aria-label="User profile and settings">
-        <div className="user-info">
-          <p className="user-name">{user?.user_metadata?.name || 'Anonymous User'}</p>
+      <div id="main-content" className={styles.dashboardContent} aria-label="User profile and settings">
+        <div className={styles.userInfo}>
+          <p className={styles.userName} data-raccoon-collision="user-name">{user?.user_metadata?.name || 'Anonymous User'}</p>
           <button 
-            className="user-email" 
+            className={styles.userEmail} 
+            data-raccoon-collision="user-email"
             onClick={handleShowProfileViewer}
             tabIndex={0}
             aria-label="View user profile"
@@ -186,12 +189,13 @@ export const Dashboard = memo(function Dashboard() {
           </button>
         </div>
 
-        <div className="location-info">
-          <div className="address-info">
+        <div className={styles.locationInfo}>
+          <div className={styles.addressInfo}>
             {address ? (
               address.street ? (
                 <p
-                  className="street-address clickable"
+                  className={`${styles.streetAddress} ${styles.clickable}`}
+                  data-raccoon-collision="street-address"
                   onClick={handleShowMapsModal}
                   title="Click to view on map"
                 >
@@ -199,7 +203,8 @@ export const Dashboard = memo(function Dashboard() {
                 </p>
               ) : address.formatted ? (
                 <p
-                  className="street-address clickable"
+                  className={`${styles.streetAddress} ${styles.clickable}`}
+                  data-raccoon-collision="street-address"
                   onClick={handleShowMapsModal}
                   title="Click to view on map"
                 >
@@ -215,25 +220,26 @@ export const Dashboard = memo(function Dashboard() {
             ) : ipLocation?.city ? (
               <p
                 className="street-address clickable"
+                data-raccoon-collision="street-address"
                 onClick={handleShowMapsModal}
                 title="Click to view on map (IP-based location)"
               >
                 📍 {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}{ipLocation.country ? `, ${ipLocation.country}` : ''}
               </p>
             ) : (
-              <p className="address-error">Location unavailable</p>
+              <p className={styles.addressError}>Location unavailable</p>
             )}
           </div>
 
-          <div className="ip-info">
+          <div className={styles.ipInfo}>
             {ipLocation ? (
               <div
                 ref={ipRef}
-                className="ip-hover-container"
+                className={styles.ipHoverContainer}
                 onMouseEnter={handleShowIPHover}
                 onMouseLeave={handleHideIPHover}
               >
-                <p className="ip-address">{ipLocation.ip}</p>
+                <p className={styles.ipAddress} data-raccoon-collision="ip-address">{ipLocation.ip}</p>
                 <PositionedIPHoverCard
                   ipLocation={ipLocation}
                   isVisible={showIPHover}
@@ -243,14 +249,15 @@ export const Dashboard = memo(function Dashboard() {
             ) : locationLoading ? (
               <Skeleton className="w-32 h-4" />
             ) : (
-              <p className="ip-error">IP address unavailable</p>
+              <p className={styles.ipError}>IP address unavailable</p>
             )}
           </div>
 
-          <div className="elevation-info">
+          <div className={styles.elevationInfo}>
             {coordinates?.elevation !== undefined ? (
               <p
-                className="elevation clickable"
+                className={`${styles.elevation} ${styles.clickable}`}
+                data-raccoon-collision="elevation"
                 onClick={toggleElevationUnit}
                 title="Click to toggle unit"
               >
@@ -258,14 +265,14 @@ export const Dashboard = memo(function Dashboard() {
                   ? `${Math.round(coordinates.elevation)}`
                   : `${Math.round(coordinates.elevation * 3.28084)}`}
                 <button 
-                  className="elevation-unit-toggle"
+                  className={styles.elevationUnitToggle}
                   onClick={toggleElevationUnit}
                 >
                   {elevationUnit === 'meters' ? 'm' : 'ft'}
                 </button>
               </p>
             ) : coordinates && !locationLoading ? (
-              <p className="elevation" style={{ opacity: 0.6 }}>
+              <p className={styles.elevation} style={{ opacity: 0.6 }}>
                 Elevation: unavailable
               </p>
             ) : locationLoading ? (

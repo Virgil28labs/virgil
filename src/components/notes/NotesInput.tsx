@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { INPUT_PLACEHOLDERS, UI_CONFIG } from './constants';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface NotesInputProps {
   /** Callback when a note is submitted */
@@ -72,9 +72,9 @@ export const NotesInput = ({ onSubmit }: NotesInputProps) => {
   }, [handleSubmit]);
 
   return (
-    <form onSubmit={handleSubmit} className="notes-input-form">
-      <div className={`notes-input-wrapper ${isFocused ? 'focused' : ''}`}>
-        <span className="notes-input-icon">💭</span>
+    <form onSubmit={handleSubmit} className={styles.notesInputForm}>
+      <div className={`${styles.notesInputWrapper} ${isFocused ? styles.focused : ''}`}>
+        <span className={styles.notesInputIcon}>💭</span>
         <textarea
           ref={textareaRef}
           value={value}
@@ -83,7 +83,7 @@ export const NotesInput = ({ onSubmit }: NotesInputProps) => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="notes-input"
+          className={styles.notesInput}
           rows={1}
           maxLength={UI_CONFIG.MAX_NOTE_LENGTH}
           aria-label="Note input"
@@ -94,7 +94,7 @@ export const NotesInput = ({ onSubmit }: NotesInputProps) => {
         {value && (
           <button
             type="submit"
-            className="notes-submit-button"
+            className={styles.notesSubmitButton}
             aria-label="Submit note"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -109,7 +109,7 @@ export const NotesInput = ({ onSubmit }: NotesInputProps) => {
           </button>
         )}
       </div>
-      <span id="notes-input-hint" className="notes-input-hint">
+      <span id="notes-input-hint" className={styles.notesInputHint}>
         Press {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+Enter to submit
       </span>
     </form>

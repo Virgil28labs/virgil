@@ -36,7 +36,7 @@ jest.mock('../../lib/logger');
 
 // Mock child components
 jest.mock('../EditableDataPoint', () => ({
-  EditableDataPoint: ({ icon, label, value, onChange, placeholder, type, readOnly, className }: any) => (
+  EditableDataPoint: ({ icon, label, value, onChange, placeholder, type, readOnly, className }: unknown) => (
     <div className={`data-point ${className || ''}`}>
       <span>{icon}</span>
       <span>{label}</span>
@@ -53,7 +53,7 @@ jest.mock('../EditableDataPoint', () => ({
 }));
 
 jest.mock('../SelectDataPoint', () => ({
-  SelectDataPoint: ({ icon, label, value, onChange, options, allowCustom }: any) => (
+  SelectDataPoint: ({ icon, label, value, onChange, options, allowCustom }: unknown) => (
     <div className="data-point">
       <span>{icon}</span>
       <span>{label}</span>
@@ -63,7 +63,7 @@ jest.mock('../SelectDataPoint', () => ({
         aria-label={label}
       >
         <option value="">Select...</option>
-        {options.map((opt: any) => (
+        {options.map((opt: unknown) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
@@ -471,7 +471,7 @@ describe('UserProfileViewer', () => {
       render(<UserProfileViewer isOpen onClose={mockOnClose} />);
       
       // Expand address
-      await user.click(screen.getByText('Address').parentElement!);
+      await user.click(screen.getByText('Address').parentElement);
       
       const streetInput = screen.getByLabelText('Street Address');
       await user.type(streetInput, 'A');

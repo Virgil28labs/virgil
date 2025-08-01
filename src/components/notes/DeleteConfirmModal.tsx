@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean
@@ -19,22 +19,22 @@ export const DeleteConfirmModal = ({ isOpen, onConfirm, onCancel }: DeleteConfir
   if (!isOpen) return null;
 
   return (
-    <div className="delete-confirm-backdrop" onClick={handleCancel}>
-      <div className="delete-confirm-dialog" onClick={e => e.stopPropagation()}>
-        <h3 className="delete-confirm-title">Delete Note</h3>
-        <p className="delete-confirm-message">
+    <div className={styles.deleteConfirmBackdrop} onClick={handleCancel}>
+      <div className={styles.deleteConfirmDialog} onClick={e => e.stopPropagation()}>
+        <h3 className={styles.deleteConfirmTitle}>Delete Note</h3>
+        <p className={styles.deleteConfirmMessage}>
           Are you sure you want to delete this note? This action cannot be undone.
         </p>
-        <div className="delete-confirm-actions">
+        <div className={styles.deleteConfirmActions}>
           <button
             onClick={handleCancel}
-            className="delete-confirm-button cancel"
+            className={`${styles.deleteConfirmButton} ${styles.cancel}`}
           >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
-            className="delete-confirm-button delete"
+            className={`${styles.deleteConfirmButton} ${styles.delete}`}
           >
             Delete
           </button>

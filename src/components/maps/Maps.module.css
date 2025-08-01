@@ -1,0 +1,993 @@
+/* ========================================
+   VIRGIL MAPS MODULE CSS - Minimalist Design
+   Ultra-clean Google Maps integration
+   ======================================== */
+
+/* Google Maps Modal - Frameless Design */
+.googleMapsModal {
+  z-index: 1000;
+}
+
+.googleMapsModal .modalBackdrop {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.googleMapsModal .modalPanel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.googleMapsModal.modalExtraLarge .modalContent {
+  padding: 0;
+  max-height: 100%;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
+
+.googleMapsModal .modalContent {
+  padding: 0;
+  max-height: 85vh;
+  min-height: 500px;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.googleMapsContent {
+  max-height: 80vh;
+  min-height: 400px;
+  width: 90vw;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.mapsHeader {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.mapsTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--deep-plum);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--silver-grey);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+.closeButton:hover {
+  color: var(--deep-plum);
+  background: var(--off-white);
+}
+
+.mapsContainer {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 400px;
+  overflow: hidden;
+  background: var(--off-white);
+  display: flex;
+}
+
+/* For extra-large modal, use all available space */
+.googleMapsModal.modalExtraLarge .mapsContainer {
+  height: 100%;
+}
+
+/* Map View */
+.mapView {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-normal);
+}
+
+.mapView.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.googleMap {
+  width: 100%;
+  height: 100%;
+}
+
+/* Route Input Bar - Compact Left-Aligned Design */
+.routeInputBar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 320px;
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(57, 41, 62, 0.06);
+  z-index: 50;
+  padding: 12px;
+}
+
+.routeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.routeInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.locationDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.locationDot.origin {
+  background: var(--violet-purple);
+  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.15);
+}
+
+.locationDot.destination {
+  background: var(--soft-pink);
+  box-shadow: 0 0 0 2px rgba(239, 176, 194, 0.2);
+}
+
+.routeInput {
+  flex: 1;
+  padding: 8px 12px 8px 32px;
+  background: var(--off-white);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--deep-plum);
+  transition: all var(--transition-fast);
+  outline: none;
+  height: 36px;
+}
+
+.routeInput:focus {
+  background: #ffffff;
+  border-color: rgba(108, 59, 170, 0.3);
+  box-shadow: 0 0 0 2px rgba(108, 59, 170, 0.06);
+}
+
+.routeInput.currentLocation {
+  color: var(--violet-purple);
+  font-style: normal;
+}
+
+.routeInput::placeholder {
+  color: var(--silver-grey);
+  font-weight: 400;
+}
+
+.swapButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--violet-purple);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  z-index: 1;
+}
+
+.swapButton:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--off-white);
+}
+
+.swapButton:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.swapButton svg {
+  width: 12px;
+  height: 12px;
+}
+
+.autocompleteDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(57, 41, 62, 0.08);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.autocompleteItem {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid rgba(179, 179, 179, 0.1);
+  text-align: left;
+  width: 100%;
+  display: block;
+}
+
+.autocompleteItem:last-child {
+  border-bottom: none;
+}
+
+.autocompleteItem:hover,
+.autocompleteItem.highlighted {
+  background: var(--off-white);
+}
+
+.autocompleteMain {
+  color: var(--deep-plum);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.autocompleteSecondary {
+  color: var(--silver-grey);
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  display: block;
+}
+
+/* Route Info Bar - Minimal Pill Design */
+.routeInfoBar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(57, 41, 62, 0.08);
+  padding: 12px 20px;
+  z-index: 40;
+  transition: all var(--transition-fast);
+  overflow: visible;
+  min-width: 320px;
+  max-width: 90%;
+}
+
+/* Minimal Info Layout */
+.routeInfoGrid {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+}
+
+/* Route metrics section */
+.routeMetrics {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.routeTime {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--deep-plum);
+}
+
+.timeComparison {
+  font-size: 12px;
+  color: var(--silver-grey);
+  margin-top: 2px;
+}
+
+.routeDistance {
+  display: flex;
+  align-items: center;
+}
+
+.distanceValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--deep-plum);
+}
+
+.routeInfoItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.routeInfoIcon {
+  color: var(--lavender);
+  font-size: 16px;
+}
+
+.routeInfoValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--deep-plum);
+}
+
+.routeInfoLabel {
+  display: none; /* Hide labels for minimal design */
+}
+
+/* Departure Time Selector - Minimal */
+.departureTimeSelector {
+  position: relative;
+}
+
+.departureTimeBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--off-white);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--deep-plum);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.departureTimeBtn:hover {
+  background: #ffffff;
+  border-color: rgba(179, 179, 179, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Departure Time Dropdown - Clean Design */
+.departureTimeDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(57, 41, 62, 0.08);
+  min-width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1000;
+  -webkit-overflow-scrolling: touch;
+  animation: subtleFadeIn var(--transition-fast);
+}
+
+@keyframes subtleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading State - Minimal */
+.mapsLoading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.mapsSpinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 12px;
+  border: 2px solid var(--off-white);
+  border-top-color: var(--violet-purple);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mapsLoading p {
+  color: var(--silver-grey);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Error State - Clean Alert */
+.mapsError {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(57, 41, 62, 0.08);
+  max-width: 360px;
+  width: 90%;
+}
+
+.mapsError p {
+  color: var(--deep-plum);
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mapsError button {
+  padding: 10px 24px;
+  background: var(--violet-purple);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.mapsError button:hover {
+  background: color-mix(in srgb, var(--violet-purple) 90%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(108, 59, 170, 0.2);
+}
+
+.timeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeInput {
+  padding: 8px 12px;
+  background: var(--off-white);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--deep-plum);
+  font-size: 13px;
+  transition: all var(--transition-fast);
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: rgba(108, 59, 170, 0.3);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.08);
+}
+
+/* Traffic Indicator - Minimal Pill */
+.trafficIndicator {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(57, 41, 62, 0.06);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 30;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--deep-plum);
+  height: 40px;
+}
+
+.trafficIndicator:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(57, 41, 62, 0.1);
+  background: var(--off-white);
+}
+
+.trafficIndicator:active {
+  transform: translateY(0);
+}
+
+.trafficIndicator.enabled {
+  border-color: rgba(108, 59, 170, 0.2);
+  background: #ffffff;
+}
+
+.trafficIndicator.animating {
+  animation: subtlePulse 0.2s ease-out;
+}
+
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.trafficIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.trafficIconWrapper svg {
+  width: 16px;
+  height: 16px;
+  transition: all var(--transition-fast);
+  color: var(--traffic-color, var(--silver-grey));
+}
+
+/* Subtle pulsing for enabled state */
+.trafficIndicator.enabled .trafficPulse {
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.trafficStatusDot {
+  width: 6px;
+  height: 6px;
+  background: var(--traffic-color);
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+/* Traffic status colors - Subtle */
+.trafficIndicator.light {
+  --traffic-color: #10b981;
+}
+
+.trafficIndicator.moderate {
+  --traffic-color: #f59e0b;
+}
+
+.trafficIndicator.heavy {
+  --traffic-color: #ef4444;
+}
+
+.trafficIndicator.severe {
+  --traffic-color: #dc2626;
+}
+
+/* Hide dot when disabled */
+.trafficIndicator:not(.enabled) .trafficStatusDot {
+  display: none;
+}
+
+/* Clear Route Button */
+.clearRouteBtn {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--silver-grey);
+  transition: all var(--transition-fast);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearRouteBtn:hover {
+  background: rgba(239, 176, 194, 0.15);
+  color: var(--soft-pink);
+}
+
+.clearRouteBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Swap Locations Button */
+.swapLocationsBtn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid rgba(179, 179, 179, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--violet-purple);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  z-index: 1;
+}
+
+.swapLocationsBtn:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--off-white);
+}
+
+.swapLocationsBtn:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.swapLocationsBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.swapLocationsBtn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Route Connection Line */
+.routeConnectionLine {
+  position: absolute;
+  left: 18px;
+  top: 44px;
+  bottom: 44px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--violet-purple) 0%, var(--soft-pink) 100%);
+  opacity: 0.3;
+}
+
+/* Additional UI Components - Minimal Controls */
+.currentLocationBtn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--violet-purple);
+  transition: all var(--transition-fast);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.currentLocationBtn:hover {
+  background: var(--off-white);
+}
+
+.currentLocationBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Departure section */
+.departureSection {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Traffic section */
+.trafficSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.trafficIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trafficIcon.light {
+  color: #10b981;
+}
+
+.trafficIcon.moderate {
+  color: #f59e0b;
+}
+
+.trafficIcon.heavy {
+  color: #ef4444;
+}
+
+.trafficLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--deep-plum);
+}
+
+/* Control buttons - Clean Icons */
+.routeControls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.expandToggleBtn,
+.closeBtn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  color: var(--silver-grey);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expandToggleBtn:hover {
+  background: var(--off-white);
+  color: var(--violet-purple);
+}
+
+.closeBtn:hover {
+  background: rgba(239, 176, 194, 0.15);
+  color: var(--soft-pink);
+}
+
+.expandToggleBtn:active,
+.closeBtn:active {
+  transform: scale(0.95);
+}
+
+.expandToggleBtn svg {
+  transition: transform var(--transition-fast);
+  font-size: 14px;
+}
+
+/* Route Summary */
+.routeSummary {
+  font-size: 12px;
+  color: var(--silver-grey);
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(179, 179, 179, 0.1);
+}
+
+/* Alternative Routes */
+.alternativeRoutes {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(179, 179, 179, 0.1);
+}
+
+.routesHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--deep-plum);
+  margin-bottom: 8px;
+}
+
+.routesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.routeOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--off-white);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.routeOption:hover {
+  background: #ffffff;
+  border-color: rgba(179, 179, 179, 0.2);
+}
+
+.routeOption.selected {
+  background: #ffffff;
+  border-color: var(--violet-purple);
+  box-shadow: 0 0 0 3px rgba(108, 59, 170, 0.08);
+}
+
+.routeName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--deep-plum);
+  flex: 1;
+}
+
+.routeOption .routeTime {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--deep-plum);
+  margin-left: 12px;
+}
+
+.fastestBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--violet-purple);
+  background: rgba(108, 59, 170, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* Collapsed state - Compact Mode */
+.routeInfoBar.collapsed {
+  padding: 8px 16px;
+  min-width: 240px;
+}
+
+.routeInfoBar.collapsed .routeInfoGrid {
+  gap: 16px;
+}
+
+.routeInfoBar.collapsed .departureSection,
+.routeInfoBar.collapsed .trafficSection {
+  display: none; /* Hide in collapsed state for minimal design */
+}
+
+.routeInfoBar.collapsed .routeSummary {
+  display: none;
+}
+
+/* Responsive Design - Mobile Optimized */
+@media (max-width: 768px) {
+  .googleMapsModal .modalContent {
+    max-height: 100vh;
+    width: 100vw;
+    max-width: none;
+    border-radius: 0;
+  }
+
+  .routeInputBar {
+    width: calc(100% - 32px);
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: none;
+  }
+
+  .routeInfoBar {
+    bottom: 16px;
+    padding: 10px 16px;
+    min-width: auto;
+    width: calc(100% - 32px);
+    left: 16px;
+    right: 16px;
+    transform: none;
+  }
+
+  .trafficIndicator {
+    bottom: 70px;
+    left: 16px;
+  }
+
+  .departureTimeSelector {
+    position: static;
+    margin-top: 8px;
+  }
+}

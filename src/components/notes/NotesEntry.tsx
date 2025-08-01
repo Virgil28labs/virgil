@@ -7,7 +7,7 @@ import { useState, useCallback, useMemo, memo } from 'react';
 import type { Entry } from './types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { timeService } from '../../services/TimeService';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface NotesEntryProps {
   entry: Entry
@@ -49,17 +49,17 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
         const task = entry.tasks[currentTaskIndex];
 
         return (
-          <div key={lineIndex} className="notes-task-line">
-            <label className="notes-checkbox-label">
+          <div key={lineIndex} className={styles.notesTaskLine}>
+            <label className={styles.notesCheckboxLabel}>
               <input
                 type="checkbox"
                 checked={task?.completed || false}
                 onChange={() => onToggleTask(entry.id, currentTaskIndex)}
-                className="notes-checkbox"
+                className={styles.notesCheckbox}
                 aria-label={`Task: ${checkboxMatch[2].trim()}`}
               />
-              <span className="notes-checkbox-custom" />
-              <span className={`notes-task-text ${task?.completed ? 'completed' : ''}`}>
+              <span className={styles.notesCheckboxCustom} />
+              <span className={`${styles.notesTaskText} ${task?.completed ? styles.completed : ''}`}>
                 {checkboxMatch[2].trim()}
               </span>
             </label>
@@ -69,7 +69,7 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
 
       // Regular text line
       return (
-        <p key={lineIndex} className="notes-text-line">
+        <p key={lineIndex} className={styles.notesTextLine}>
           {line || '\u00A0'} {/* Non-breaking space for empty lines */}
         </p>
       );
@@ -95,46 +95,46 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
 
   return (
     <article
-      className={`notes-entry ${isProcessing ? 'ai-processing' : ''}`}
+      className={`${styles.notesEntry} ${isProcessing ? styles.aiProcessing : ''}`}
       aria-label={`Note from ${formattedTime}`}
     >
-      <header className="notes-entry-header">
-        <time className="notes-entry-time">
+      <header className={styles.notesEntryHeader}>
+        <time className={styles.notesEntryTime}>
           {formattedTime}
-          {isProcessing && <span className="notes-processing-indicator"> • Processing...</span>}
+          {isProcessing && <span className={styles.notesProcessingIndicator}> • Processing...</span>}
         </time>
         {(entry.tags.length > 0 || entry.actionType) && (
-          <div className="notes-entry-tags">
+          <div className={styles.notesEntryTags}>
             {entry.actionType && (
-              <span className="notes-action-type" title={`Action type: ${entry.actionType}`}>
+              <span className={styles.notesActionType} title={`Action type: ${entry.actionType}`}>
                 {entry.actionType}
               </span>
             )}
             {entry.tags.map((tag, index) => (
-              <span key={index} className="notes-tag">
+              <span key={index} className={styles.notesEntryTag}>
                 {tag}
               </span>
             ))}
           </div>
         )}
-        {entry.isEdited && <span className="notes-edited-indicator">edited</span>}
+        {entry.isEdited && <span className={styles.notesEditedIndicator}>edited</span>}
       </header>
 
-      <div className="notes-entry-content">
+      <div className={styles.notesEntryContent}>
         {isEditing ? (
-          <div className="notes-edit-mode">
+          <div className={styles.notesEditMode}>
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="notes-edit-textarea"
+              className={styles.notesEditTextarea}
               autoFocus
               aria-label="Edit note content"
             />
-            <div className="notes-edit-actions">
-              <button onClick={handleSave} className="notes-button save">
+            <div className={styles.notesEditActions}>
+              <button onClick={handleSave} className={`${styles.notesButton} ${styles.save}`}>
                 Save
               </button>
-              <button onClick={handleCancel} className="notes-button cancel">
+              <button onClick={handleCancel} className={`${styles.notesButton} ${styles.cancel}`}>
                 Cancel
               </button>
             </div>
@@ -143,11 +143,11 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
           <>
             {renderedContent}
             {entry.tasks.filter(task => task.extracted).length > 0 && (
-              <div className="notes-extracted-tasks">
-                <p className="notes-extracted-label">AI-extracted tasks:</p>
+              <div className={styles.notesExtractedTasks}>
+                <p className={styles.notesExtractedLabel}>AI-extracted tasks:</p>
                 {entry.tasks.filter(task => task.extracted).map((task, index) => (
-                  <div key={index} className="notes-task-line">
-                    <label className="notes-checkbox-label">
+                  <div key={index} className={styles.notesTaskLine}>
+                    <label className={styles.notesCheckboxLabel}>
                       <input
                         type="checkbox"
                         checked={task.completed}
@@ -155,11 +155,11 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
                           const taskIndex = entry.tasks.findIndex(t => t === task);
                           onToggleTask(entry.id, taskIndex);
                         }}
-                        className="notes-checkbox"
+                        className={styles.notesCheckbox}
                         aria-label={`AI task: ${task.text}`}
                       />
-                      <span className="notes-checkbox-custom" />
-                      <span className={`notes-task-text ${task.completed ? 'completed' : ''}`}>
+                      <span className={styles.notesCheckboxCustom} />
+                      <span className={`${styles.notesTaskText} ${task.completed ? styles.completed : ''}`}>
                         {task.text}
                       </span>
                     </label>
@@ -172,10 +172,10 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
       </div>
 
       {!isEditing && (
-        <div className="notes-entry-actions">
+        <div className={styles.notesEntryActions}>
           <button
             onClick={() => setIsEditing(true)}
-            className="notes-action-button"
+            className={styles.notesActionButton}
             aria-label="Edit note"
             title="Edit"
           >
@@ -183,7 +183,7 @@ const NotesEntryComponent = ({ entry, onToggleTask, onUpdate, onDelete, isProces
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="notes-action-button notes-delete-button"
+            className={`${styles.notesActionButton} ${styles.delete}`}
             aria-label="Delete note"
             title="Delete"
           >

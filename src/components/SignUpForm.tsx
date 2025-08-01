@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useAuthForm } from '../hooks/useAuthForm';
 import { AUTH_CONFIG } from '../constants/auth.constants';
+import styles from './AuthPage.module.css';
 
 interface SignUpFormProps {
   onSuccess?: () => void;
@@ -21,10 +22,10 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
   } = useAuthForm('signup', onSuccess);
 
   return (
-    <div className="signup-form" role="form" aria-labelledby="signup-title">
+    <div className={styles.signupForm} role="form" aria-labelledby="signup-title">
       <h2 id="signup-title">Sign Up</h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="name">Name:</label>
           <input
             type="text"
@@ -40,7 +41,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -56,7 +57,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -84,7 +85,7 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
       {message && (
         <div
           id="signup-message"
-          className={`message ${isSuccess ? 'success' : 'error'}`}
+          className={`${styles.message} ${isSuccess ? styles.success : styles.error}`}
           role="alert"
           aria-live="polite"
         >

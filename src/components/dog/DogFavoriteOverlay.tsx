@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { MouseEvent } from 'react';
+import styles from './DogGallery.module.css';
 
 interface DogFavoriteOverlayProps {
   isFavorited: boolean
@@ -12,7 +13,7 @@ export const DogFavoriteOverlay = memo(function DogFavoriteOverlay({
 }: DogFavoriteOverlayProps) {
   return (
     <button
-      className={`doggo-favorite-overlay ${isFavorited ? 'favorited' : ''}`}
+      className={`${styles.doggoFavoriteOverlay} ${isFavorited ? styles.favorited : ''}`}
       onClick={onFavoriteToggle}
       aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
       title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}

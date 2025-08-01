@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import type { FilterType, ActionFilterType } from './types';
 import { DOMAIN_FILTERS, ACTION_FILTERS } from './constants';
-import './notes.css';
+import styles from './Notes.module.css';
 
 interface NotesFilterProps {
   /** Currently active filter */
@@ -51,13 +51,13 @@ export const NotesFilter = ({
   const actionFilters = ACTION_FILTERS;
 
   return (
-    <div className="notes-filter-container" role="toolbar" aria-label="Note filters">
-      <div className="notes-filter-bar" role="tablist" aria-label="Filter by tag">
+    <div className={styles.notesFilterContainer} role="toolbar" aria-label="Note filters">
+      <div className={styles.notesFilterBar} role="tablist" aria-label="Filter by tag">
         {filters.map(filter => (
           <button
             key={filter.value}
             onClick={() => onFilterChange(filter.value as FilterType)}
-            className={`notes-filter-button ${activeFilter === filter.value ? 'active' : ''}`}
+            className={`${styles.notesFilterButton} ${activeFilter === filter.value ? styles.active : ''}`}
             aria-label={`Filter by ${filter.label}`}
             aria-pressed={activeFilter === filter.value}
             role="tab"
@@ -69,7 +69,7 @@ export const NotesFilter = ({
 
         <button
           onClick={() => setShowSearch(!showSearch)}
-          className={`notes-search-toggle ${showSearch ? 'active' : ''}`}
+          className={`${styles.notesSearchToggle} ${showSearch ? styles.active : ''}`}
           aria-label="Toggle search"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -85,12 +85,12 @@ export const NotesFilter = ({
       </div>
 
       {onActionFilterChange && (
-        <div className="notes-filter-bar notes-action-filters" role="tablist" aria-label="Filter by action type">
+        <div className={`${styles.notesFilterBar} ${styles.notesActionFilters}`} role="tablist" aria-label="Filter by action type">
           {actionFilters.map(filter => (
             <button
               key={filter.value}
               onClick={() => onActionFilterChange(filter.value as ActionFilterType)}
-              className={`notes-filter-button ${activeActionFilter === filter.value ? 'active' : ''}`}
+              className={`${styles.notesFilterButton} ${activeActionFilter === filter.value ? styles.active : ''}`}
               aria-label={`Filter by ${filter.label}`}
               aria-pressed={activeActionFilter === filter.value}
               role="tab"
@@ -103,14 +103,15 @@ export const NotesFilter = ({
       )}
 
       {showSearch && (
-        <div className="notes-search-container">
+        <div className={styles.notesSearchWrapper}>
+          <span className={styles.notesSearchIcon}>🔍</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="Search notes..."
-            className="notes-search-input"
+            className={styles.notesSearchInput}
             autoFocus
             aria-label="Search notes"
             aria-describedby="search-hint"
@@ -118,7 +119,7 @@ export const NotesFilter = ({
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="notes-search-clear"
+              className={styles.notesSearchClear}
               aria-label="Clear search"
             >
               ×

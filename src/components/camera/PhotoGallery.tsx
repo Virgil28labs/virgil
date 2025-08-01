@@ -4,6 +4,7 @@ import { PhotoGrid } from './PhotoGrid';
 import { CameraInterface } from './CameraInterface';
 import { usePhotoGallery } from './hooks/usePhotoGallery';
 import type { SavedPhoto } from '../../types/camera.types';
+import styles from './Camera.module.css';
 
 interface PhotoGalleryProps {
   onPhotoSelect: (photo: SavedPhoto) => void
@@ -54,21 +55,21 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
   }
 
   return (
-    <div className="gallery-toolbar">
+    <div className={styles.galleryToolbar}>
       {/* Search Bar */}
-      <div className="gallery-search">
-        <div className="search-input-container">
-          <span className="search-icon">🔍</span>
+      <div className={styles.gallerySearch}>
+        <div className={styles.searchInputContainer}>
+          <span className={styles.searchIcon}>🔍</span>
           <input
             type="text"
-            className="search-input"
+            className={styles.searchInput}
             placeholder="Search photos..."
             value={localSearchQuery}
             onChange={handleSearchChange}
           />
           {localSearchQuery && (
             <button
-              className="search-clear"
+              className={styles.searchClear}
               onClick={handleSearchClear}
               aria-label="Clear search"
             >
@@ -79,26 +80,26 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
       </div>
 
       {/* Selection Actions */}
-      <div className="gallery-actions">
+      <div className={styles.galleryActions}>
         {!isSelectionMode ? (
           <button
-            className="gallery-action-btn select-btn"
+            className={`${styles.galleryActionBtn} ${styles.selectBtn}`}
             onClick={onToggleSelection}
           >
-            <span className="btn-icon">☑️</span>
+            <span className={styles.btnIcon}>☑️</span>
             Select
           </button>
         ) : (
-          <div className="selection-actions">
+          <div className={styles.selectionActions}>
             <button
-              className="gallery-action-btn select-all-btn"
+              className={`${styles.galleryActionBtn} ${styles.selectAllBtn}`}
               onClick={onSelectAll}
             >
               Select All
             </button>
 
             <button
-              className="gallery-action-btn clear-selection-btn"
+              className={`${styles.galleryActionBtn} ${styles.clearSelectionBtn}`}
               onClick={onClearSelection}
             >
               Clear ({selectedCount})
@@ -107,26 +108,26 @@ const GalleryToolbar: React.FC<GalleryToolbarProps> = ({
             {selectedCount > 0 && (
               <>
                 <button
-                  className="gallery-action-btn favorite-btn"
+                  className={`${styles.galleryActionBtn} ${styles.favoriteBtn}`}
                   onClick={() => onBulkFavorite(true)}
                 >
-                  <span className="btn-icon">❤️</span>
+                  <span className={styles.btnIcon}>❤️</span>
                   Favorite
                 </button>
 
                 <button
-                  className="gallery-action-btn unfavorite-btn"
+                  className={`${styles.galleryActionBtn} ${styles.unfavoriteBtn}`}
                   onClick={() => onBulkFavorite(false)}
                 >
-                  <span className="btn-icon">🤍</span>
+                  <span className={styles.btnIcon}>🤍</span>
                   Unfavorite
                 </button>
 
                 <button
-                  className="gallery-action-btn delete-btn"
+                  className={`${styles.galleryActionBtn} ${styles.deleteBtn}`}
                   onClick={onBulkDelete}
                 >
-                  <span className="btn-icon">🗑️</span>
+                  <span className={styles.btnIcon}>🗑️</span>
                   Delete
                 </button>
               </>
@@ -233,7 +234,7 @@ export const PhotoGallery = memo(function PhotoGallery({
   }, [error, onError]);
 
   return (
-    <div className="photo-gallery">
+    <div className={styles.photoGallery}>
       {/* Tabs */}
       <PhotoGalleryTabs
         activeTab={galleryState.activeTab}
@@ -257,12 +258,12 @@ export const PhotoGallery = memo(function PhotoGallery({
       />
 
       {/* Content */}
-      <div className="gallery-content">
+      <div className={styles.galleryContent}>
         {galleryState.activeTab === 'camera' ? (
           <CameraInterface
             onPhotoCapture={handleCameraCapture}
             onError={onError}
-            className="gallery-camera"
+            className={styles.galleryCamera}
           />
         ) : (
           <PhotoGrid

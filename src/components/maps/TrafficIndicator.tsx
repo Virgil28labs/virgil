@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { timeService } from '../../services/TimeService';
-import './maps.css';
+import styles from './Maps.module.css';
 
 interface TrafficIndicatorProps {
   map: google.maps.Map | null
@@ -109,7 +109,7 @@ export const TrafficIndicator = memo(function TrafficIndicator({
             cy="9"
             r="2.5"
             fill="currentColor"
-            className="traffic-pulse"
+            className={styles.trafficPulse}
           />
         </svg>
       );
@@ -136,18 +136,18 @@ export const TrafficIndicator = memo(function TrafficIndicator({
 
   return (
     <button
-      className={`traffic-indicator ${isTrafficEnabled ? 'enabled' : 'disabled'} ${isAnimating ? 'animating' : ''}`}
+      className={`${styles.trafficIndicator} ${isTrafficEnabled ? styles.enabled : styles.disabled} ${isAnimating ? styles.animating : ''}`}
       onClick={handleToggle}
       style={{ '--traffic-color': getTrafficColor() } as React.CSSProperties}
       title={getTrafficLabel()}
     >
-      <div className="traffic-icon-wrapper">
+      <div className={styles.trafficIconWrapper}>
         {getTrafficIcon()}
         {isTrafficEnabled && trafficLevel !== 'unknown' && (
-          <div className="traffic-status-dot" />
+          <div className={styles.trafficStatusDot} />
         )}
       </div>
-      <span className="traffic-label">{getTrafficLabel()}</span>
+      <span className={styles.trafficLabel}>{getTrafficLabel()}</span>
     </button>
   );
 });

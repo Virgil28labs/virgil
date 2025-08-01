@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { DogCard } from './DogCard';
 import type { DogImage } from './hooks/useDogApi';
+import styles from './DogGallery.module.css';
 
 interface DogGridProps {
   dogs: DogImage[]
@@ -21,7 +22,7 @@ export const DogGrid = memo(function DogGrid({
   }, [onFavoriteToggle]);
 
   return (
-    <div className="doggo-grid">
+    <div className={styles.doggoGrid}>
       {dogs.map((dog, index) => (
         <DogCard
           key={dog.id}

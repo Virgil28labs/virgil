@@ -1,0 +1,761 @@
+/* Doggo Sanctuary - Ultra Optimized */
+
+/* CSS Variables */
+:root {
+  --doggo-spacing-xs: 0.5rem;
+  --doggo-spacing-sm: 0.75rem;
+  --doggo-spacing-md: 1rem;
+  --doggo-spacing-lg: 1.5rem;
+  --doggo-spacing-xl: 2rem;
+  --doggo-spacing-2xl: 2.5rem;
+  --doggo-radius-sm: 0.75rem;
+  --doggo-radius-md: 1.25rem;
+  --doggo-radius-lg: 1.5rem;
+  --doggo-radius-xl: 2rem;
+  --doggo-radius-full: 50%;
+  --doggo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --doggo-bg-primary: rgba(57, 41, 62, 0.8);
+  --doggo-bg-secondary: rgba(45, 34, 51, 0.4);
+  --doggo-bg-tertiary: rgba(45, 34, 51, 0.3);
+  --doggo-border: rgba(178, 165, 193, 0.3);
+}
+
+/* Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes heartPop {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.3) rotate(-10deg); }
+}
+
+/* Base Styles */
+.doggoSanctuaryBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 40, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+  padding: 60px;
+}
+
+.doggoSanctuaryPanel {
+  background: var(--doggo-bg-primary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--doggo-border);
+  border-radius: var(--doggo-radius-xl);
+  padding: var(--doggo-spacing-2xl);
+  width: calc(100vw - 120px);
+  max-width: 1400px;
+  height: calc(100vh - 120px);
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* Header */
+.doggoSanctuaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--doggo-spacing-xl);
+  padding-bottom: var(--doggo-spacing-lg);
+  border-bottom: 1px solid rgba(178, 165, 193, 0.2);
+}
+
+.doggoSanctuaryTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--lavender, #b2a5c1);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--doggo-spacing-sm);
+  letter-spacing: -0.5px;
+}
+
+.doggoSanctuaryTitle span {
+  font-size: 2rem;
+}
+
+.doggoSanctuarySubtitle {
+  font-size: 0.95rem;
+  color: var(--lavender, #b2a5c1);
+  margin-top: 0.25rem;
+  opacity: 0.8;
+}
+
+.doggoSanctuaryClose {
+  background: rgba(178, 165, 193, 0.1);
+  border: 1px solid rgba(178, 165, 193, 0.2);
+  font-size: 1.5rem;
+  color: var(--lavender, #b2a5c1);
+  cursor: pointer;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--doggo-radius-full);
+  transition: all var(--doggo-transition);
+}
+
+.doggoSanctuaryClose:hover {
+  background: rgba(178, 165, 193, 0.2);
+  color: var(--off-white, #f5f5f5);
+  transform: rotate(90deg) scale(1.1);
+  border-color: var(--violet-purple, #6c3baa);
+}
+
+/* Tabs */
+.doggoSanctuaryTabs {
+  display: flex;
+  gap: var(--doggo-spacing-md);
+  margin-bottom: var(--doggo-spacing-md);
+  background: var(--doggo-bg-secondary);
+  padding: var(--doggo-spacing-xs);
+  border-radius: var(--doggo-radius-lg);
+}
+
+.doggoSanctuaryTab {
+  flex: 1;
+  padding: var(--doggo-spacing-md) var(--doggo-spacing-xl);
+  background: transparent;
+  border: none;
+  color: var(--lavender, #b2a5c1);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--doggo-radius-md);
+  transition: all var(--doggo-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.doggoSanctuaryTab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: var(--doggo-radius-md);
+}
+
+.doggoSanctuaryTab.active {
+  color: var(--off-white, #f5f5f5);
+}
+
+.doggoSanctuaryTab.active::before {
+  opacity: 1;
+}
+
+.doggoSanctuaryTab span {
+  position: relative;
+  z-index: 1;
+}
+
+.doggoSanctuaryTab:hover:not(.active) {
+  transform: translateY(-2px);
+  color: var(--off-white, #f5f5f5);
+}
+
+/* Content Area */
+.doggoSanctuaryContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--doggo-spacing-lg);
+  background: var(--doggo-bg-tertiary);
+  border-radius: var(--doggo-radius-lg);
+  scrollbar-width: thin;
+  scrollbar-color: #ff6b9d transparent;
+}
+
+.doggoSanctuaryContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.doggoSanctuaryContent::-webkit-scrollbar-track {
+  background: rgba(45, 34, 51, 0.3);
+  border-radius: 4px;
+}
+
+.doggoSanctuaryContent::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff6b9d 0%, #ee5a6f 100%);
+  border-radius: 4px;
+}
+
+/* Fetch Controls */
+.doggoFetchControls {
+  display: flex;
+  align-items: center;
+  gap: var(--doggo-spacing-lg);
+  max-width: 800px;
+  margin: 0 auto var(--doggo-spacing-md);
+  justify-content: center;
+}
+
+.doggoControlGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--doggo-spacing-sm);
+}
+
+.doggoControlLabel {
+  color: var(--lavender, #b2a5c1);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.doggoBreedSelect,
+.doggoCountSelect {
+  padding: var(--doggo-spacing-sm) var(--doggo-spacing-md);
+  border-radius: var(--doggo-radius-sm);
+  background: rgba(57, 41, 62, 0.6);
+  color: var(--off-white, #f5f5f5);
+  border: 1px solid var(--doggo-border);
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--doggo-transition);
+  min-width: 150px;
+}
+
+.doggoBreedSelect:hover,
+.doggoBreedSelect:focus,
+.doggoCountSelect:hover,
+.doggoCountSelect:focus {
+  background: rgba(108, 59, 170, 0.3);
+  border-color: var(--violet-purple, #6c3baa);
+  transform: translateY(-1px);
+}
+
+.doggoFetchBtn {
+  padding: 0.875rem 2.5rem;
+  background: var(--lavender, #b2a5c1);
+  color: var(--deep-plum, #39293e);
+  border: none;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--doggo-transition);
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
+  box-shadow: 0 2px 10px rgba(178, 165, 193, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.doggoFetchBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(178, 165, 193, 0.4);
+  background: rgba(178, 165, 193, 0.9);
+}
+
+.doggoFetchBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Dog Grid */
+.doggoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--doggo-spacing-md);
+  padding: var(--doggo-spacing-sm);
+}
+
+.doggoGridItem {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--doggo-radius-md);
+  cursor: pointer;
+  transition: all var(--doggo-transition);
+  background: rgba(45, 34, 51, 0.5);
+  animation: slideUpFade 0.5s ease-out backwards;
+  animation-delay: calc(var(--index, 0) * 0.1s);
+}
+
+.doggoGridItem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.doggoGridItem:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px var(--doggo-border);
+}
+
+.doggoGridItem:hover::before {
+  opacity: 1;
+}
+
+.doggoGridImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.doggoGridItem:hover .doggoGridImage {
+  transform: scale(1.1);
+}
+
+/* Image Loading States */
+.doggoImageSkeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, 
+    rgba(178, 165, 193, 0.1) 0%, 
+    rgba(178, 165, 193, 0.2) 50%, 
+    rgba(178, 165, 193, 0.1) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.doggoImageError {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  opacity: 0.5;
+  background: var(--doggo-bg-tertiary);
+}
+
+.doggoFavoriteOverlay {
+  position: absolute;
+  top: var(--doggo-spacing-sm);
+  right: var(--doggo-spacing-sm);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--doggo-radius-full);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  font-size: 1.25rem;
+}
+
+.doggoFavoriteOverlay:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.15);
+  border-color: var(--violet-purple, #6c3baa);
+}
+
+.doggoFavoriteOverlay.favorited {
+  animation: heartPop 0.4s ease;
+}
+
+/* Loading State */
+.doggoLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: var(--doggo-spacing-lg);
+}
+
+.doggoLoadingSpinner {
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(178, 165, 193, 0.2);
+  border-top-color: var(--violet-purple, #6c3baa);
+  border-radius: var(--doggo-radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.doggoLoadingText {
+  color: var(--lavender, #b2a5c1);
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+/* Error State */
+.doggoError {
+  text-align: center;
+  padding: 3rem;
+}
+
+.doggoErrorIcon {
+  font-size: 3rem;
+  margin-bottom: var(--doggo-spacing-md);
+  opacity: 0.7;
+}
+
+.doggoErrorMessage {
+  color: var(--soft-pink, #efb0c2);
+  font-size: 1.15rem;
+  margin-bottom: var(--doggo-spacing-lg);
+}
+
+/* Empty State */
+.doggoEmpty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.doggoEmptyIcon {
+  font-size: 4rem;
+  opacity: 0.5;
+  margin-bottom: var(--doggo-spacing-lg);
+}
+
+.doggoEmptyTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--off-white, #f5f5f5);
+  margin-bottom: var(--doggo-spacing-xs);
+}
+
+.doggoEmptyMessage {
+  font-size: 1.1rem;
+  color: var(--lavender, #b2a5c1);
+  margin-bottom: var(--doggo-spacing-xl);
+  opacity: 0.8;
+}
+
+.doggoEmptyButton {
+  padding: var(--doggo-spacing-sm) var(--doggo-spacing-xl);
+  background: var(--violet-purple, #6c3baa);
+  color: var(--off-white, #f5f5f5);
+  border: none;
+  border-radius: var(--doggo-radius-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--doggo-transition);
+}
+
+.doggoEmptyButton:hover {
+  background: var(--soft-pink, #efb0c2);
+  transform: translateY(-2px);
+}
+
+/* Image Modal */
+.doggoImageModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+.doggoModalImage {
+  max-width: 85vw;
+  max-height: 70vh;
+  border-radius: var(--doggo-radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUpFade 0.3s ease-out;
+}
+
+.doggoModalClose {
+  position: absolute;
+  top: var(--doggo-spacing-xl);
+  right: var(--doggo-spacing-xl);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--doggo-radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.doggoModalClose:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1) rotate(90deg);
+  border-color: var(--violet-purple, #6c3baa);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .doggoSanctuaryPanel {
+    max-width: calc(100vw - 80px);
+    max-height: calc(100vh - 80px);
+  }
+
+  .doggoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .doggoSanctuaryBackdrop {
+    padding: 20px;
+  }
+
+  .doggoSanctuaryPanel {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    padding: var(--doggo-spacing-lg);
+  }
+
+  .doggoSanctuaryTitle {
+    font-size: 1.75rem;
+  }
+
+  .doggoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--doggo-spacing-md);
+  }
+
+  .doggoFetchControls {
+    padding: var(--doggo-spacing-md);
+    flex-direction: column;
+    gap: var(--doggo-spacing-md);
+  }
+
+  .doggoControlGroup {
+    width: 100%;
+  }
+
+  .doggoBreedSelect,
+  .doggoCountSelect {
+    width: 100%;
+  }
+
+  .doggoFetchBtn {
+    width: 100%;
+    margin-top: var(--doggo-spacing-xs);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Action Buttons */
+.doggoActionButtons {
+  position: absolute;
+  bottom: var(--doggo-spacing-sm);
+  left: var(--doggo-spacing-sm);
+  display: flex;
+  gap: var(--doggo-spacing-xs);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.doggoGridItem:hover .doggoActionButtons {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.doggoActionBtn {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--doggo-radius-sm);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  color: white;
+  position: relative;
+  z-index: 4;
+}
+
+.doggoActionBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+  border-color: var(--violet-purple, #6c3baa);
+}
+
+/* Modal Navigation */
+.doggoModalNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 3rem;
+  font-weight: 300;
+  width: 4rem;
+  height: 5rem;
+  border-radius: var(--doggo-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.doggoModalPrev {
+  left: var(--doggo-spacing-xl);
+}
+
+.doggoModalNext {
+  right: var(--doggo-spacing-xl);
+}
+
+.doggoModalNav:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.05);
+  border-color: var(--violet-purple, #6c3baa);
+}
+
+.doggoModalCounter {
+  position: absolute;
+  bottom: var(--doggo-spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: var(--doggo-spacing-xs) var(--doggo-spacing-md);
+  border-radius: var(--doggo-radius-sm);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Modal Content Container */
+.doggoModalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--doggo-spacing-lg);
+}
+
+/* Modal Action Buttons */
+.doggoModalActions {
+  display: flex;
+  gap: var(--doggo-spacing-md);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  padding: var(--doggo-spacing-sm) var(--doggo-spacing-lg);
+  border-radius: var(--doggo-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.doggoModalAction {
+  background: transparent;
+  border: none;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.75rem;
+  padding: 0;
+  border-radius: var(--doggo-radius-sm);
+}
+
+.doggoModalAction:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.15);
+}
+
+.doggoModalAction.favorited {
+  animation: heartPop 0.4s ease;
+}
+
+/* Mobile adjustments for action buttons */
+@media (max-width: 768px) {
+  .doggoActionButtons {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .doggoActionBtn {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+  
+  .doggoModalNav {
+    width: 3rem;
+    height: 4rem;
+    font-size: 2rem;
+  }
+  
+  .doggoModalPrev {
+    left: var(--doggo-spacing-md);
+  }
+  
+  .doggoModalNext {
+    right: var(--doggo-spacing-md);
+  }
+  
+  .doggoModalActions {
+    padding: var(--doggo-spacing-xs) var(--doggo-spacing-md);
+    gap: var(--doggo-spacing-sm);
+  }
+  
+  .doggoModalAction {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.5rem;
+  }
+}

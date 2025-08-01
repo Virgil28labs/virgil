@@ -16,6 +16,7 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
     return (
       <button
         className="virgil-logo virgil-logo-button"
+        data-raccoon-collision="virgil-logo"
         onClick={onClick}
         aria-label="Virgil - Open user profile"
         title="Open user profile"
@@ -27,7 +28,7 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
   }
 
   return (
-    <div className="virgil-logo">
+    <div className="virgil-logo" data-raccoon-collision="virgil-logo">
       Virgil
     </div>
   );

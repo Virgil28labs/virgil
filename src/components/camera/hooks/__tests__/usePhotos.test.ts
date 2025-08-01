@@ -15,7 +15,7 @@ import type { SavedPhoto } from '../../../../types/camera.types';
 // Mock dependencies
 jest.mock('../../utils/photoStorage', () => ({
   PhotoStorage: {
-    initialize: jest.fn<any, any>().mockResolvedValue(undefined),
+    initialize: jest.fn().mockResolvedValue(undefined),
     getAllPhotos: jest.fn(),
     getFavoritePhotos: jest.fn(),
     savePhoto: jest.fn(),
@@ -38,8 +38,8 @@ jest.mock('../../utils/cameraUtils', () => ({
     getImageDimensions: jest.fn(),
     calculateDataUrlSize: jest.fn(),
     generatePhotoName: jest.fn().mockReturnValue('photo-name.jpg'),
-    downloadPhoto: jest.fn<any, any>().mockResolvedValue(undefined),
-    sharePhoto: jest.fn<any, any>().mockResolvedValue(undefined),
+    downloadPhoto: jest.fn().mockResolvedValue(undefined),
+    sharePhoto: jest.fn().mockResolvedValue(undefined),
   },
 }));
 

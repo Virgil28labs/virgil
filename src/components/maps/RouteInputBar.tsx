@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
-import './maps.css';
+import styles from './Maps.module.css';
 import { logger } from '../../lib/logger';
 import { useGooglePlacesAutocomplete, type PlaceSuggestion } from '../../hooks/useGooglePlacesAutocomplete';
 
@@ -176,11 +176,11 @@ export const RouteInputBar = memo(function RouteInputBar({
   }, [selectDestinationPlace]);
 
   return (
-    <div className="route-input-bar">
-      <div className="route-inputs">
-        <div className="route-input-group">
-          <div className="input-icon">
-            <div className="location-dot origin" />
+    <div className={styles.routeInputBar}>
+      <div className={styles.routeInputs}>
+        <div className={styles.routeInputGroup}>
+          <div className={styles.inputIcon}>
+            <div className={`${styles.locationDot} ${styles.origin}`} />
           </div>
           <input
             ref={originInputRef}
@@ -190,11 +190,11 @@ export const RouteInputBar = memo(function RouteInputBar({
             onFocus={handleOriginFocus}
             onBlur={handleOriginBlur}
             placeholder="From"
-            className={`route-input ${isOriginCurrentLocation ? 'current-location' : ''}`}
+            className={`${styles.routeInput} ${isOriginCurrentLocation ? styles.currentLocation : ''}`}
           />
           {!isOriginCurrentLocation && currentLocation && (
             <button
-              className="current-location-btn"
+              className={styles.currentLocationBtn}
               onClick={handleUseCurrentLocation}
               title="Use current location"
             >
@@ -207,16 +207,16 @@ export const RouteInputBar = memo(function RouteInputBar({
 
           {/* Origin autocomplete suggestions */}
           {showOriginSuggestions && originSuggestions.length > 0 && (
-            <div className="autocomplete-dropdown">
+            <div className={styles.autocompleteDropdown}>
               {originSuggestions.map((suggestion, index) => (
                 <button
                   key={index}
-                  className="autocomplete-item"
+                  className={styles.autocompleteItem}
                   onClick={() => handleOriginSuggestionSelect(suggestion)}
                   type="button"
                 >
-                  <div className="autocomplete-main">{suggestion.suggestion.mainText}</div>
-                  <div className="autocomplete-secondary">{suggestion.suggestion.secondaryText}</div>
+                  <div className={styles.autocompleteMain}>{suggestion.suggestion.mainText}</div>
+                  <div className={styles.autocompleteSecondary}>{suggestion.suggestion.secondaryText}</div>
                 </button>
               ))}
             </div>
@@ -224,7 +224,7 @@ export const RouteInputBar = memo(function RouteInputBar({
         </div>
 
         <button
-          className="swap-locations-btn"
+          className={styles.swapLocationsBtn}
           onClick={handleSwapLocations}
           disabled={!origin || !destination}
           title="Swap locations"
@@ -240,9 +240,9 @@ export const RouteInputBar = memo(function RouteInputBar({
           </svg>
         </button>
 
-        <div className="route-input-group">
-          <div className="input-icon">
-            <div className="location-dot destination" />
+        <div className={styles.routeInputGroup}>
+          <div className={styles.inputIcon}>
+            <div className={`${styles.locationDot} ${styles.destination}`} />
           </div>
           <input
             ref={destinationInputRef}
@@ -252,11 +252,11 @@ export const RouteInputBar = memo(function RouteInputBar({
             onClick={handleDestinationClick}
             onBlur={handleDestinationBlur}
             placeholder="To"
-            className="route-input"
+            className={styles.routeInput}
           />
           {hasRoute && onClearRoute && (
             <button
-              className="clear-route-btn"
+              className={styles.clearRouteBtn}
               onClick={onClearRoute}
               title="Clear route"
               type="button"
@@ -274,16 +274,16 @@ export const RouteInputBar = memo(function RouteInputBar({
 
           {/* Destination autocomplete suggestions */}
           {showDestinationSuggestions && destinationSuggestions.length > 0 && (
-            <div className="autocomplete-dropdown">
+            <div className={styles.autocompleteDropdown}>
               {destinationSuggestions.map((suggestion, index) => (
                 <button
                   key={index}
-                  className="autocomplete-item"
+                  className={styles.autocompleteItem}
                   onClick={() => handleDestinationSuggestionSelect(suggestion)}
                   type="button"
                 >
-                  <div className="autocomplete-main">{suggestion.suggestion.mainText}</div>
-                  <div className="autocomplete-secondary">{suggestion.suggestion.secondaryText}</div>
+                  <div className={styles.autocompleteMain}>{suggestion.suggestion.mainText}</div>
+                  <div className={styles.autocompleteSecondary}>{suggestion.suggestion.secondaryText}</div>
                 </button>
               ))}
             </div>
@@ -292,7 +292,7 @@ export const RouteInputBar = memo(function RouteInputBar({
       </div>
 
       {/* Visual connection line */}
-      <div className="route-connection-line" />
+      <div className={styles.routeConnectionLine} />
     </div>
   );
 });

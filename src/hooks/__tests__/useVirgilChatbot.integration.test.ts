@@ -139,10 +139,10 @@ describe('VirgilChatbot Hook Integration Tests', () => {
 
     it('updates context when dashboard state changes', async () => {
       const mockDispatch = jest.fn();
-      let contextUpdateCallback: ((context: any) => void) | undefined;
+      let contextUpdateCallback: ((context: unknown) => void) | undefined;
       
       const dashboardContextService = require('../../services/DashboardContextService').dashboardContextService;
-      dashboardContextService.subscribe.mockImplementation((callback: (context: any) => void) => {
+      dashboardContextService.subscribe.mockImplementation((callback: (context: unknown) => void) => {
         contextUpdateCallback = callback;
         return jest.fn();
       });

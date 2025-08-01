@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { TabType } from '../../types';
+import styles from './DogGallery.module.css';
 
 interface DogGalleryTabsProps {
   activeTab: TabType
@@ -13,9 +14,9 @@ export const DogGalleryTabs = memo(function DogGalleryTabs({
   onTabChange,
 }: DogGalleryTabsProps) {
   return (
-    <div className="doggo-sanctuary-tabs" role="tablist">
+    <div className={styles.doggoSanctuaryTabs} role="tablist">
       <button
-        className={`doggo-sanctuary-tab ${activeTab === 'fetch' ? 'active' : ''}`}
+        className={`${styles.doggoSanctuaryTab} ${activeTab === 'fetch' ? styles.active : ''}`}
         onClick={() => onTabChange('fetch')}
         role="tab"
         aria-selected={activeTab === 'fetch'}
@@ -25,7 +26,7 @@ export const DogGalleryTabs = memo(function DogGalleryTabs({
         <span>Fetch Doggos</span>
       </button>
       <button
-        className={`doggo-sanctuary-tab ${activeTab === 'gallery' ? 'active' : ''}`}
+        className={`${styles.doggoSanctuaryTab} ${activeTab === 'gallery' ? styles.active : ''}`}
         onClick={() => onTabChange('gallery')}
         role="tab"
         aria-selected={activeTab === 'gallery'}

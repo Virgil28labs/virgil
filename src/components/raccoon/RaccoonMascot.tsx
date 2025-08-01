@@ -244,15 +244,15 @@ const RaccoonMascot = memo(function RaccoonMascot() {
 
     const elements: UIElement[] = [];
     const textSelectors = new Set([
-      '.virgil-logo',
-      '.datetime-display .time',
-      '.datetime-display .date',
-      '.datetime-display .day',
-      '.user-name',
-      '.user-email',
-      '.street-address',
-      '.ip-address',
-      '.elevation',
+      '[data-raccoon-collision="virgil-logo"]',
+      '[data-raccoon-collision="time"]',
+      '[data-raccoon-collision="date"]',
+      '[data-raccoon-collision="day"]',
+      '[data-raccoon-collision="user-name"]',
+      '[data-raccoon-collision="user-email"]',
+      '[data-raccoon-collision="street-address"]',
+      '[data-raccoon-collision="ip-address"]',
+      '[data-raccoon-collision="elevation"]',
     ]);
 
     UI_SELECTORS.forEach((selector) => {
@@ -300,8 +300,8 @@ const RaccoonMascot = memo(function RaccoonMascot() {
             element: element as HTMLElement,
             textBaseline: textBaseline,
             isText: textSelectors.has(selector),
-            isPowerButton: selector === '.power-button',
-            isWeatherWidget: selector === '.weather-widget',
+            isPowerButton: selector === '[data-raccoon-collision="power-button"]',
+            isWeatherWidget: selector === '[data-raccoon-collision="weather-widget"]',
           });
         }
       });

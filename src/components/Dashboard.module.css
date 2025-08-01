@@ -1,0 +1,511 @@
+/* Dashboard Styles */
+
+.dashboard {
+  height: 100vh;
+  width: 100vw;
+  background: var(--brand-dark-purple);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Dashboard Content */
+.dashboardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Dashboard Mobile Layout */
+.dashboard.mobileLayout {
+  padding: 1rem;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+.dashboard.mobileLayout .dashboardContent {
+  gap: 0.75rem;
+  max-width: none;
+}
+
+/* User Info */
+.userInfo {
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.userInfo p {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--brand-light-gray);
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.userName {
+  margin-bottom: 0;
+}
+
+.userEmail {
+  /* Button Reset */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: inherit;
+  
+  /* Styling */
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+}
+
+.userEmail:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.userEmail:focus-visible {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Location Info */
+.locationInfo {
+  text-align: center;
+  margin-top: -2rem;
+}
+
+.addressInfo {
+  margin-bottom: 0.15rem;
+}
+
+.ipInfo {
+  margin-bottom: 0.15rem;
+}
+
+.elevationInfo {
+  margin-bottom: 0.15rem;
+}
+
+/* Common text styles for location data */
+.coordinates,
+.streetAddress,
+.addressLoading,
+.elevation,
+.ipAddress,
+.ipLoading,
+.ipError,
+.addressError {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--brand-light-gray);
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.streetAddress.clickable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+}
+
+.streetAddress.clickable:hover {
+  color: var(--brand-accent-purple);
+  transform: translateY(-1px);
+  text-shadow: 0 2px 4px rgba(108, 59, 170, 0.2);
+}
+
+.streetAddress.clickable:focus-visible {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.addressError {
+  opacity: 0.4;
+}
+
+.addressLoading {
+  opacity: 0.6;
+}
+
+.ipLoading {
+  opacity: 0.6;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+}
+
+.ipError {
+  opacity: 0.4;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Elevation Toggle */
+.elevationUnitToggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: inherit;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  width: 100%;
+}
+
+.elevationUnitToggle:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.elevationUnitToggle:focus-visible {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Location Error States */
+.userLocationError {
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: var(--brand-accent-purple);
+}
+
+.userLocationErrorDetails {
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+}
+
+.userLocationRetry {
+  background: none;
+  border: 1px solid var(--brand-accent-purple);
+  color: var(--brand-accent-purple);
+  padding: 0.5rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.userLocationRetry:hover {
+  opacity: 1;
+  background: var(--brand-accent-purple);
+  color: white;
+}
+
+/* Power Button / Sign Out */
+.powerButton {
+  position: fixed;
+  top: 1.5rem;
+  right: 22px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+  border: 1px solid #60a5fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 0 10px rgba(59, 130, 246, 0.7),
+    0 0 20px rgba(99, 102, 241, 0.5),
+    0 0 30px rgba(139, 92, 246, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(99, 102, 241, 0.3);
+  animation: powerButtonGlow 3s ease-in-out infinite;
+}
+
+.powerButton:hover {
+  transform: scale(1.15);
+  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
+  border: 2px solid var(--brand-accent-pink);
+  box-shadow: 
+    0 0 20px rgba(239, 176, 194, 1),
+    0 0 30px rgba(244, 114, 182, 0.8),
+    0 0 45px rgba(236, 72, 153, 0.6),
+    inset 0 1px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 4px rgba(244, 114, 182, 0.4);
+}
+
+.powerButton:focus-visible {
+  outline: 2px solid var(--brand-accent-pink);
+  outline-offset: 2px;
+}
+
+.powerButton.signingOut {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.powerButton.signingOut:hover {
+  transform: scale(1);
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+  border: 1px solid #60a5fa;
+}
+
+.powerIcon {
+  width: 10px;
+  height: 10px;
+  border: 1px solid white;
+  border-radius: 50%;
+  position: relative;
+}
+
+.powerIcon::before {
+  content: '';
+  position: absolute;
+  width: 1.5px;
+  height: 5px;
+  background: white;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Old sign-out styles for compatibility */
+.signOutIcon {
+  background: none;
+  border: none;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  color: var(--brand-accent-purple);
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  padding: clamp(0.5rem, 2vw, 1rem);
+  margin-top: clamp(1rem, 3vh, 2rem);
+}
+
+.signOutIcon:hover {
+  opacity: 0.8;
+}
+
+.signOutFixed {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+  border: 2px solid #60a5fa;
+  border-radius: 50%;
+  font-size: clamp(0.7rem, 3vw, 1.3rem);
+  color: white;
+  opacity: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.15rem;
+  z-index: 1000;
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.8),
+    0 0 25px rgba(99, 102, 241, 0.6),
+    0 0 35px rgba(139, 92, 246, 0.4);
+  animation: powerButtonGlow 3s ease-in-out infinite;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signOutFixed:hover {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
+  color: white;
+  transform: scale(1.15);
+  border: 2px solid var(--brand-accent-pink);
+  box-shadow: 
+    0 0 20px rgba(239, 176, 194, 1),
+    0 0 30px rgba(244, 114, 182, 0.8),
+    0 0 45px rgba(236, 72, 153, 0.6),
+    inset 0 1px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 4px rgba(244, 114, 182, 0.4);
+}
+
+/* Animations */
+@keyframes powerButtonGlow {
+  0% {
+    box-shadow: 
+      0 0 10px rgba(59, 130, 246, 0.7),
+      0 0 20px rgba(99, 102, 241, 0.5),
+      0 0 30px rgba(139, 92, 246, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4),
+      inset 0 -1px 2px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 15px rgba(59, 130, 246, 0.9),
+      0 0 25px rgba(99, 102, 241, 0.7),
+      0 0 35px rgba(139, 92, 246, 0.5),
+      inset 0 1px 3px rgba(255, 255, 255, 0.5),
+      inset 0 -1px 3px rgba(99, 102, 241, 0.4);
+  }
+  100% {
+    box-shadow: 
+      0 0 10px rgba(59, 130, 246, 0.7),
+      0 0 20px rgba(99, 102, 241, 0.5),
+      0 0 30px rgba(139, 92, 246, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4),
+      inset 0 -1px 2px rgba(99, 102, 241, 0.3);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+  
+  .powerButton {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* IP Hover Info (from App.css) */
+.ipHoverContainer {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.ipHoverCard {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(45, 38, 64, 0.98);
+  border: 1px solid rgba(178, 165, 193, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 1px rgba(178, 165, 193, 0.5);
+  min-width: 250px;
+  max-width: 300px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.ipHoverCard.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ipHoverCardWrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.ipHoverCardWrapper.bottom .ipHoverCard {
+  top: calc(100% + 10px);
+}
+
+.ipHoverCardWrapper.top .ipHoverCard {
+  bottom: calc(100% + 10px);
+}
+
+/* IP hover card content styles */
+.ipDetailLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--brand-light-gray);
+}
+
+.ipDetailLine:last-child {
+  margin-bottom: 0;
+}
+
+.ipDetailLabel {
+  opacity: 0.6;
+  font-weight: 500;
+}
+
+.ipDetailValue {
+  text-align: right;
+  font-weight: 400;
+}
+
+.ipLocationLine {
+  font-size: 0.875rem;
+  color: var(--brand-accent-purple);
+  margin-bottom: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(178, 165, 193, 0.2);
+}
+
+.ipInfoGroup {
+  margin-bottom: 0.75rem;
+}
+
+.ipIspLine {
+  font-size: 0.875rem;
+  color: var(--brand-light-gray);
+  margin-bottom: 0.25rem;
+}
+
+.ipConnectionLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}

@@ -29,7 +29,7 @@ jest.mock('../common/EmojiButton', () => ({
     title, 
     className,
     ...props 
-  }: any) => (
+  }: unknown) => (
     <div data-testid="emoji-button">
       <button
         aria-label={ariaLabel}
@@ -56,7 +56,7 @@ jest.mock('../common/EmojiButton', () => ({
 
 // Mock the DashboardAppErrorBoundary
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: any) => (
+  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>

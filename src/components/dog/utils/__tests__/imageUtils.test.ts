@@ -64,7 +64,7 @@ describe('imageUtils', () => {
     it('should download image successfully', async () => {
       const mockBlob = new Blob(['mock image data'], { type: 'image/jpeg' });
       const mockResponse = {
-        blob: jest.fn<any, any>().mockResolvedValue(mockBlob),
+        blob: jest.fn().mockResolvedValue(mockBlob),
       }
       ;(global.fetch as jest.Mock).mockResolvedValue(mockResponse);
 

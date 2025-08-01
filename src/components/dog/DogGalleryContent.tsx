@@ -3,6 +3,7 @@ import { FetchControls } from './FetchControls';
 import { DogGrid } from './DogGrid';
 import { DogImageStates } from './DogImageStates';
 import { useDogGallery } from './hooks/useDogGallery';
+import styles from './DogGallery.module.css';
 
 export const DogGalleryContent = memo(function DogGalleryContent() {
   const {
@@ -37,7 +38,7 @@ export const DogGalleryContent = memo(function DogGalleryContent() {
   };
 
   return (
-    <div className="doggo-sanctuary-content">
+    <div className={styles.doggoSanctuaryContent}>
       {/* Fetch Controls - Only show in fetch tab */}
       {state.activeTab === 'fetch' && (
         <FetchControls

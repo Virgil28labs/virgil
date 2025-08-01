@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import styles from './GiphyGallery.module.css';
 
 export interface GiphyTabsProps {
   currentTab: 'search' | 'trending' | 'favorites'
@@ -16,37 +17,37 @@ export const GiphyTabs = memo(function GiphyTabs({
   onTabChange,
 }: GiphyTabsProps) {
   return (
-    <div className="giphy-gallery-tabs">
+    <div className={styles.giphyGalleryTabs}>
       <button
-        className={`giphy-gallery-tab ${currentTab === 'search' ? 'active' : ''}`}
+        className={`${styles.giphyGalleryTab} ${currentTab === 'search' ? styles.active : ''}`}
         onClick={() => onTabChange('search')}
         aria-label="Search GIFs"
       >
         <span>🔍 Search</span>
         {searchCount > 0 && (
-          <span className="giphy-tab-count">{searchCount}</span>
+          <span className={styles.giphyTabCount}>{searchCount}</span>
         )}
       </button>
 
       <button
-        className={`giphy-gallery-tab ${currentTab === 'trending' ? 'active' : ''}`}
+        className={`${styles.giphyGalleryTab} ${currentTab === 'trending' ? styles.active : ''}`}
         onClick={() => onTabChange('trending')}
         aria-label="Trending GIFs"
       >
         <span>🔥 Trending</span>
         {trendingCount > 0 && (
-          <span className="giphy-tab-count">{trendingCount}</span>
+          <span className={styles.giphyTabCount}>{trendingCount}</span>
         )}
       </button>
 
       <button
-        className={`giphy-gallery-tab ${currentTab === 'favorites' ? 'active' : ''}`}
+        className={`${styles.giphyGalleryTab} ${currentTab === 'favorites' ? styles.active : ''}`}
         onClick={() => onTabChange('favorites')}
         aria-label="Favorite GIFs"
       >
         <span>❤️ Favorites</span>
         {favoritesCount > 0 && (
-          <span className="giphy-tab-count">{favoritesCount}</span>
+          <span className={styles.giphyTabCount}>{favoritesCount}</span>
         )}
       </button>
     </div>

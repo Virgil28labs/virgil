@@ -6,7 +6,7 @@ import { GiphySearchControls } from './GiphySearchControls';
 import { GiphyGrid } from './GiphyGrid';
 import { GiphyModal } from './GiphyModal';
 import type { GiphyImage } from '../../types';
-import './GiphyGallery.css';
+import styles from './GiphyGallery.module.css';
 
 // Props for the gallery
 export interface GiphyGalleryProps {
@@ -137,7 +137,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
         )}
 
         {/* Content Area */}
-        <div className="giphy-gallery-content">
+        <div className={styles.giphyGalleryContent}>
           {error && (
             <div className="giphy-error">
               <div className="giphy-error-icon">⚠️</div>
@@ -177,7 +177,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
                 <>
                   <div className="giphy-empty-icon">🔥</div>
                   <div className="giphy-empty-title">No trending GIFs</div>
-                  <div className="giphy-empty-message">
+                  <div className={styles.giphyEmptyMessage}>
                     Unable to load trending GIFs. Please try again later.
                   </div>
                 </>
@@ -185,7 +185,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
                 <>
                   <div className="giphy-empty-icon">❤️</div>
                   <div className="giphy-empty-title">No favorites yet</div>
-                  <div className="giphy-empty-message">
+                  <div className={styles.giphyEmptyMessage}>
                     Save GIFs to your favorites by clicking the heart icon
                   </div>
                 </>

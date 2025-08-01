@@ -2,25 +2,26 @@ import React, { useState, memo } from 'react';
 import { SignUpForm } from './SignUpForm';
 import { LoginForm } from './LoginForm';
 import { RaccoonMascot } from './raccoon/RaccoonMascot';
+import styles from './AuthPage.module.css';
 
 export const AuthPage = memo(function AuthPage(): React.ReactElement {
   const [isLogin, setIsLogin] = useState<boolean>(true);
 
   return (
-    <div className="auth-page">
-      <div className="auth-content">
+    <div className={styles.authPage}>
+      <div className={styles.authContent}>
         <header>
           <h1>Virgil</h1>
         </header>
 
-        <div className="auth-container">
+        <div className={styles.authContainer}>
           <div
-            className="auth-toggle"
+            className={styles.authToggle}
             role="tablist"
             aria-label="Authentication mode selection"
           >
             <button
-              className={isLogin ? 'active' : ''}
+              className={isLogin ? styles.active : ''}
               onClick={() => setIsLogin(true)}
               role="tab"
               aria-selected={isLogin}
@@ -31,7 +32,7 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
               Login
             </button>
             <button
-              className={!isLogin ? 'active' : ''}
+              className={!isLogin ? styles.active : ''}
               onClick={() => setIsLogin(false)}
               role="tab"
               aria-selected={!isLogin}
@@ -55,18 +56,18 @@ export const AuthPage = memo(function AuthPage(): React.ReactElement {
             )}
           </div>
 
-          <div className="auth-switch">
+          <div className={styles.authSwitch}>
             {isLogin ? (
               <p>
                 No account?{' '}
-                <button onClick={() => setIsLogin(false)} className="link-btn">
+                <button onClick={() => setIsLogin(false)} className={styles.linkBtn}>
                   Sign up here
                 </button>
               </p>
             ) : (
               <p>
                 Have account?{' '}
-                <button onClick={() => setIsLogin(true)} className="link-btn">
+                <button onClick={() => setIsLogin(true)} className={styles.linkBtn}>
                   Login here
                 </button>
               </p>

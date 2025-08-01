@@ -10,7 +10,7 @@ jest.mock('../../TimeService', () => ({
     getTimestamp: jest.fn(() => Date.now()),
     parseDate: jest.fn((date: string) => new Date(date)),
     getCurrentDateTime: jest.fn(() => new Date('2024-01-01T12:00:00Z')),
-    formatDateToLocal: jest.fn((date: Date, options: any) => {
+    formatDateToLocal: jest.fn((date: Date, options: unknown) => {
       return new Intl.DateTimeFormat('en-US', options).format(date);
     }),
     getYear: jest.fn((date: Date) => date.getFullYear()),

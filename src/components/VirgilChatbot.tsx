@@ -19,7 +19,7 @@ import {
   useChatContext,
 } from './chat';
 import type { ModelOption } from '../types/chat.types';
-import './VirgilChatbot.css';
+import styles from './VirgilChatbot.module.css';
 
 // Available models - defined at module level for reuse
 const AVAILABLE_MODELS: ModelOption[] = [
@@ -160,18 +160,18 @@ function VirgilChatbotInner() {
   if (!state.isOpen) {
     return (
       <button
-        className="virgil-chatbot-bubble"
+        className={styles.virgilChatbotBubble}
         onClick={() => setOpen(true)}
         title="Chat with Virgil AI Assistant"
         aria-label="Open chat with Virgil AI Assistant"
         aria-expanded="false"
         role="button"
       >
-        <div className="chat-icon" aria-hidden="true">
-          <div className="chat-line" />
-          <div className="chat-line" />
+        <div className={styles.chatIcon} aria-hidden="true">
+          <div className={styles.chatLine} />
+          <div className={styles.chatLine} />
         </div>
-        <div className="pulse-ring" aria-hidden="true" />
+        <div className={styles.pulseRing} aria-hidden="true" />
       </button>
     );
   }
@@ -182,7 +182,7 @@ function VirgilChatbotInner() {
         if (chatContainerRef) chatContainerRef.current = el;
         if (keyboardNavRef) keyboardNavRef.current = el;
       }}
-      className={`virgil-chatbot-container ${state.windowSize}`}
+      className={`${styles.virgilChatbotContainer} ${styles[state.windowSize]}`}
       role="dialog"
       aria-label="Virgil AI Assistant"
       aria-modal="true"

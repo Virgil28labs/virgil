@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import type { PhotoGridProps, SavedPhoto } from '../../types/camera.types';
 import { CameraUtils } from './utils/cameraUtils';
+import styles from './Camera.module.css';
 
 interface PhotoCardProps {
   photo: SavedPhoto
@@ -50,20 +51,20 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 
   return (
     <div
-      className={`photo-card ${isSelected ? 'selected' : ''} ${isSelectionMode ? 'selection-mode' : ''}`}
+      className={`${styles.photoCard} ${isSelected ? styles.selected : ''} ${isSelectionMode ? styles.selectionMode : ''}`}
       onClick={handleCardClick}
     >
-      <div className="photo-card-image">
+      <div className={styles.photoCardImage}>
         {!imageLoaded && !imageError && (
-          <div className="photo-loading">
-            <div className="photo-loading-spinner" />
+          <div className={styles.photoLoading}>
+            <div className={styles.photoLoadingSpinner} />
           </div>
         )}
 
         {imageError ? (
-          <div className="photo-error">
-            <span className="photo-error-icon">🖼️</span>
-            <span className="photo-error-text">Error loading image</span>
+          <div className={styles.photoError}>
+            <span className={styles.photoErrorIcon}>🖼️</span>
+            <span className={styles.photoErrorText}>Error loading image</span>
           </div>
         ) : (
           <img
@@ -77,43 +78,43 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 
         {/* Selection Checkbox */}
         {isSelectionMode && (
-          <div className="photo-selection-checkbox">
+          <div className={styles.photoSelectionCheckbox}>
             <button
-              className={`selection-checkbox ${isSelected ? 'checked' : ''}`}
+              className={`${styles.selectionCheckbox} ${isSelected ? styles.checked : ''}`}
               onClick={handleSelectClick}
               aria-label={isSelected ? 'Deselect photo' : 'Select photo'}
             >
-              {isSelected && <span className="checkbox-check">✓</span>}
+              {isSelected && <span className={styles.checkboxCheck}>✓</span>}
             </button>
           </div>
         )}
 
         {/* Favorite Button */}
         <button
-          className={`photo-favorite-btn ${photo.isFavorite ? 'favorited' : ''}`}
+          className={`${styles.photoFavoriteBtn} ${photo.isFavorite ? styles.favorited : ''}`}
           onClick={handleFavoriteClick}
           aria-label={photo.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
-          <span className="favorite-icon">
+          <span className={styles.favoriteIcon}>
             {photo.isFavorite ? '❤️' : '🤍'}
           </span>
         </button>
       </div>
 
-      <div className="photo-card-info">
-        <div className="photo-metadata">
-          <span className="photo-date">
+      <div className={styles.photoCardInfo}>
+        <div className={styles.photoMetadata}>
+          <span className={styles.photoDate}>
             {CameraUtils.formatTimestamp(photo.timestamp)}
           </span>
           {photo.size && (
-            <span className="photo-size">
+            <span className={styles.photoSize}>
               {CameraUtils.formatFileSize(photo.size)}
             </span>
           )}
         </div>
 
         {photo.name && (
-          <div className="photo-name">
+          <div className={styles.photoName}>
             {photo.name}
           </div>
         )}
@@ -138,9 +139,9 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
   if (loading) {
     return (
-      <div className="photo-grid loading">
-        <div className="photo-grid-loading">
-          <div className="loading-spinner" />
+      <div className={`${styles.photoGrid} ${styles.loading}`}>
+        <div className={styles.photoGridLoading}>
+          <div className={styles.loadingSpinner} />
           <p>Loading photos...</p>
         </div>
       </div>
@@ -149,9 +150,9 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
 
   if (photos.length === 0) {
     return (
-      <div className="photo-grid empty">
-        <div className="photo-grid-empty">
-          <div className="empty-icon">📸</div>
+      <div className={`${styles.photoGrid} ${styles.empty}`}>
+        <div className={styles.photoGridEmpty}>
+          <div className={styles.emptyIcon}>📸</div>
           <h3>No Photos Yet</h3>
           <p>Start taking photos to build your gallery!</p>
         </div>
@@ -160,8 +161,8 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
   }
 
   return (
-    <div className="photo-grid" ref={gridRef}>
-      <div className="photo-grid-container">
+    <div className={styles.photoGrid} ref={gridRef}>
+      <div className={styles.photoGridContainer}>
         {photos.map(photo => (
           <PhotoCard
             key={photo.id}
@@ -176,13 +177,13 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({
       </div>
 
       {/* Grid Footer */}
-      <div className="photo-grid-footer">
-        <div className="photo-count">
+      <div className={styles.photoGridFooter}>
+        <div className={styles.photoCount}>
           {photos.length} photo{photos.length !== 1 ? 's' : ''}
         </div>
 
         {isSelectionMode && selectedPhotos.size > 0 && (
-          <div className="selection-count">
+          <div className={styles.selectionCount}>
             {selectedPhotos.size} selected
           </div>
         )}

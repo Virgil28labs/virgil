@@ -24,20 +24,21 @@ export const RACCOON_EMOJIS = ['🦝', '🐾', '🍃', '🌰', '🗑️', '🌙'
 export const WEATHER_EMOJIS = ['⛅', '🌤️', '🌧️', '🌦️', '☀️', '🌩️', '❄️', '🌪️', '🌈'] as const;
 
 // UI selectors for collision detection
+// Using data attributes to support CSS modules
 export const UI_SELECTORS = [
-  '.virgil-logo', // Virgil "V" logo text
-  '.datetime-display .time', // Time display
-  '.datetime-display .date', // Date display
-  '.datetime-display .day', // Day display
-  '.user-name', // User name text
-  '.user-email', // Email text
-  '.street-address', // Street address
-  '.ip-address', // IP address text
-  '.elevation', // Elevation text
-  '.weather-widget', // Weather display widget
-  '.power-button', // Power button
-  '.virgil-chatbot-bubble', // Chatbot floating button
-  '.emoji-button-interactive', // All emoji buttons (camera, pomodoro, notes, etc.)
+  '[data-raccoon-collision="virgil-logo"]', // Virgil "V" logo text
+  '[data-raccoon-collision="time"]', // Time display
+  '[data-raccoon-collision="date"]', // Date display
+  '[data-raccoon-collision="day"]', // Day display
+  '[data-raccoon-collision="user-name"]', // User name text
+  '[data-raccoon-collision="user-email"]', // Email text
+  '[data-raccoon-collision="street-address"]', // Street address
+  '[data-raccoon-collision="ip-address"]', // IP address text
+  '[data-raccoon-collision="elevation"]', // Elevation text
+  '[data-raccoon-collision="weather-widget"]', // Weather display widget
+  '[data-raccoon-collision="power-button"]', // Power button
+  '[data-raccoon-collision="virgil-chatbot-bubble"]', // Chatbot floating button
+  '[data-raccoon-collision="emoji-button-interactive"]', // All emoji buttons (camera, pomodoro, notes, etc.)
 ] as const;
 
 // Animation timings

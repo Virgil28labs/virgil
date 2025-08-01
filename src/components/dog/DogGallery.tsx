@@ -6,7 +6,7 @@ import { DogGalleryContent } from './DogGalleryContent';
 import { ImageModal } from './ImageModal';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import type { DogGalleryProps } from '../../types';
-import './DogGallery.css';
+import styles from './DogGallery.module.css';
 
 // Inner component that has access to the context
 const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGalleryProps) {
@@ -44,18 +44,18 @@ const DogGalleryInner = memo(function DogGalleryInner({ isOpen, onClose }: DogGa
   if (!isOpen) return null;
 
   return (
-    <div className="doggo-sanctuary-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Doggo Sanctuary">
-      <div className="doggo-sanctuary-panel" onClick={(e) => e.stopPropagation()} role="document">
+    <div className={styles.doggoSanctuaryBackdrop} onClick={onClose} role="dialog" aria-modal="true" aria-label="Doggo Sanctuary">
+      <div className={styles.doggoSanctuaryPanel} onClick={(e) => e.stopPropagation()} role="document">
         {/* Header */}
-        <div className="doggo-sanctuary-header">
+        <div className={styles.doggoSanctuaryHeader}>
           <div>
-            <h2 className="doggo-sanctuary-title">
+            <h2 className={styles.doggoSanctuaryTitle}>
               <span>🐕</span>
               Doggo Sanctuary
             </h2>
           </div>
           <button
-            className="doggo-sanctuary-close"
+            className={styles.doggoSanctuaryClose}
             onClick={onClose}
             aria-label="Close sanctuary"
           >

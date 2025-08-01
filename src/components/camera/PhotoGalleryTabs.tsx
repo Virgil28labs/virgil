@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import styles from './Camera.module.css';
 
 interface PhotoGalleryTabsProps {
   activeTab: 'camera' | 'gallery' | 'favorites'
@@ -35,18 +36,18 @@ export const PhotoGalleryTabs = memo(function PhotoGalleryTabs({
   ];
 
   return (
-    <div className="photo-gallery-tabs">
+    <div className={styles.photoGalleryTabs}>
       {tabs.map(tab => (
         <button
           key={tab.id}
-          className={`photo-gallery-tab ${activeTab === tab.id ? 'active' : ''}`}
+          className={`${styles.photoGalleryTab} ${activeTab === tab.id ? styles.active : ''}`}
           onClick={() => onTabChange(tab.id)}
           aria-label={`Switch to ${tab.label} tab`}
         >
-          <span className="tab-icon">{tab.icon}</span>
-          <span className="tab-label">{tab.label}</span>
+          <span className={styles.tabIcon}>{tab.icon}</span>
+          <span className={styles.tabLabel}>{tab.label}</span>
           {tab.count !== null && (
-            <span className="tab-count">{tab.count}</span>
+            <span className={styles.tabCount}>{tab.count}</span>
           )}
         </button>
       ))}

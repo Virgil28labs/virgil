@@ -4,7 +4,7 @@ import { PhotoModal } from './PhotoModal';
 import { usePhotoGallery } from './hooks/usePhotoGallery';
 import { useToast } from '../../hooks/useToast';
 import type { CameraModalProps, SavedPhoto } from '../../types/camera.types';
-import './Camera.css';
+import styles from './Camera.module.css';
 
 export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModalProps) {
   const { addToast } = useToast();
@@ -135,16 +135,16 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
   return (
     <>
       {/* Main Camera App Modal */}
-      <div className="camera-app-backdrop" onClick={handleBackdropClick}>
-        <div className="camera-app-panel" onClick={(e) => e.stopPropagation()}>
+      <div className={styles.cameraAppBackdrop} onClick={handleBackdropClick}>
+        <div className={styles.cameraAppPanel} onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div className="camera-app-header">
-            <div className="camera-app-title">
-              <span className="camera-app-icon">📸</span>
+          <div className={styles.cameraAppHeader}>
+            <div className={styles.cameraAppTitle}>
+              <span className={styles.cameraAppIcon}>📸</span>
               <h2>Virgil Camera</h2>
             </div>
             <button
-              className="camera-app-close"
+              className={styles.cameraAppClose}
               onClick={onClose}
               aria-label="Close camera app"
             >
@@ -153,7 +153,7 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
           </div>
 
           {/* Content */}
-          <div className="camera-app-content">
+          <div className={styles.cameraAppContent}>
             <PhotoGallery
               onPhotoSelect={handlePhotoSelect}
               onError={handleError}
@@ -161,8 +161,8 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
           </div>
 
           {/* Footer */}
-          <div className="camera-app-footer">
-            <div className="camera-app-info">
+          <div className={styles.cameraAppFooter}>
+            <div className={styles.cameraAppInfo}>
               {galleryState.activeTab === 'gallery' && (
                 <span>{galleryState.photos.length} photo{galleryState.photos.length !== 1 ? 's' : ''}</span>
               )}
@@ -171,8 +171,8 @@ export const CameraApp = memo(function CameraApp({ isOpen, onClose }: CameraModa
               )}
             </div>
 
-            <div className="camera-app-shortcuts">
-              <span className="shortcut-hint">
+            <div className={styles.cameraAppShortcuts}>
+              <span className={styles.shortcutHint}>
                 Press <kbd>Esc</kbd> to close
               </span>
             </div>

@@ -2,6 +2,7 @@ import React, { memo, useState, useCallback } from 'react';
 import type { DogImage } from '../../types';
 import { stopEvent, downloadImage, copyImageToClipboard } from './utils/imageUtils';
 import { logger } from '../../lib/logger';
+import styles from './DogGallery.module.css';
 
 interface DogCardActionsProps {
   dog: DogImage
@@ -50,9 +51,9 @@ export const DogCardActions = memo(function DogCardActions({ dog }: DogCardActio
   }, [dog.url]);
 
   return (
-    <div className="doggo-action-buttons">
+    <div className={styles.doggoActionButtons}>
       <button
-        className="doggo-action-btn"
+        className={styles.doggoActionBtn}
         onClick={handleDownload}
         aria-label="Download image"
         title="Download"
@@ -60,7 +61,7 @@ export const DogCardActions = memo(function DogCardActions({ dog }: DogCardActio
         {showDownloaded ? '✓' : '⬇️'}
       </button>
       <button
-        className="doggo-action-btn"
+        className={styles.doggoActionBtn}
         onClick={handleCopy}
         aria-label="Copy image"
         title="Copy image"
