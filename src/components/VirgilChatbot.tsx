@@ -1,4 +1,4 @@
-import { useEffect, useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
 import { useFocusManagement } from '../hooks/useFocusManagement';
@@ -58,7 +58,7 @@ function VirgilChatbotInner() {
   });
 
   // Use custom hooks for complex logic
-  const { markAsImportant, loadRecentMessages, isRealtimeConnected } = useMemoryService({
+  const { markAsImportant, isRealtimeConnected } = useMemoryService({
     dispatch,
     setError,
     dashboardContext: state.dashboardContext,
@@ -98,13 +98,14 @@ function VirgilChatbotInner() {
     messages: state.messages,
   });
 
-  // Load recent messages from continuous conversation on mount
-  useEffect(() => {
-    if (state.messages.length === 0) {
-      loadRecentMessages();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only on mount - we intentionally only want this to run once
+  // Don't automatically load recent messages - start with a clean chat
+  // Users can access history through the memory feature if needed
+  // useEffect(() => {
+  //   if (state.messages.length === 0) {
+  //     loadRecentMessages();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []); // Only on mount - we intentionally only want this to run once
 
   // Use localStorage hook for selected model
   const [, setStoredModel] = useLocalStorage('virgil-selected-model', 'gpt-4.1-mini');
