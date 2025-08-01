@@ -128,6 +128,10 @@ export class DynamicContextBuilder {
   }
 
   private static calculateKeywordRelevance(words: string[], keywords: string[]): number {
+    if (words.length === 0) {
+      return 0;
+    }
+
     const matches = words.filter(word =>
       keywords.some(keyword => word.includes(keyword) || keyword.includes(word)),
     );
@@ -172,8 +176,8 @@ export class DynamicContextBuilder {
       }
     }
 
-    // Weather context - require higher confidence
-    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData) {
+    // Weather context - require higher confidence and valid data
+    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData && context.weather.temperature !== undefined) {
       contextSections.push(this.buildWeatherContext(context));
       contextUsed.push('weather');
     }
@@ -508,8 +512,8 @@ export class DynamicContextBuilder {
       }
     }
 
-    // Weather context - require higher confidence
-    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData) {
+    // Weather context - require higher confidence and valid data
+    if (relevanceScores.weatherContext > 0.6 && context.weather.hasData && context.weather.temperature !== undefined) {
       contextSections.push(this.buildWeatherContext(context));
       contextUsed.push('weather');
     }

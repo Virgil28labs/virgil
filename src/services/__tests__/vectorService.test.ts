@@ -10,6 +10,14 @@ import type { VectorSearchResult } from '../vectorService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 import { supabase } from '../../lib/supabase';
+import type { 
+  MockSession, 
+  MockLogger,
+  MockTimeService,
+  MockSupabaseClient,
+  MockVectorServicePrivate,
+} from '../../test-utils/mockTypes';
+import { createMockApiResponse, createMockSession } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
@@ -40,18 +48,12 @@ global.fetch = mockFetch;
 
 
 describe('vectorService', () => {
-  const mockLogger = logger as jest.Mocked<typeof logger>;
-  const mockTimeService = timeService as jest.Mocked<typeof timeService>;
-  const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+  const mockLogger = logger as unknown as MockLogger;
+  const mockTimeService = timeService as unknown as MockTimeService;
+  const mockSupabase = supabase as unknown as MockSupabaseClient;
 
   // Sample data
-  const mockSession = {
-    access_token: 'test-token',
-    refresh_token: 'refresh-token',
-    user: { id: 'user-id' },
-    expires_in: 3600,
-    token_type: 'bearer',
-  } as any;
+  const mockSession: MockSession = createMockSession();
 
   const mockVectorResults: VectorSearchResult[] = [
     {
@@ -78,11 +80,12 @@ describe('vectorService', () => {
     });
     
     // Reset circuit breaker state by accessing private properties
-    (vectorService as any).consecutiveFailures = 0;
-    (vectorService as any).circuitBreakerOpenUntil = 0;
-    (vectorService as any).activeRequests = 0;
-    (vectorService as any).requestQueue = [];
-    (vectorService as any).lastRequestTime = 0;
+    const privateService = vectorService as unknown as MockVectorServicePrivate;
+    privateService.consecutiveFailures = 0;
+    privateService.circuitBreakerOpenUntil = 0;
+    privateService.activeRequests = 0;
+    privateService.requestQueue = [];
+    privateService.lastRequestTime = 0;
     
     // Default to successful auth
     (mockSupabase.auth.getSession as jest.MockedFunction<typeof mockSupabase.auth.getSession>).mockResolvedValue({
@@ -91,18 +94,12 @@ describe('vectorService', () => {
     });
 
     // Default to successful API responses
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ success: true }),
-    } as any);
+    mockFetch.mockResolvedValue(createMockApiResponse({ success: true }));
   });
 
   describe('Authentication', () => {
     it('includes auth headers in requests', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue({ id: 'stored-id' }),
-      } as any);
+      mockFetch.mockResolvedValue(createMockApiResponse({ id: 'stored-id' }));
 
       await vectorService.store('test content');
 
@@ -130,7 +127,7 @@ describe('vectorService', () => {
     it('throws error when session error occurs', async () => {
       (mockSupabase.auth.getSession as jest.MockedFunction<typeof mockSupabase.auth.getSession>).mockResolvedValue({
         data: { session: null },
-        error: new Error('Session error') as any,
+        error: new Error('Session error'),
       });
 
       await expect(vectorService.store('test')).rejects.toThrow('No active session');
@@ -142,7 +139,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'stored-vector-id' }),
-      } as any);
+      });
 
       const result = await vectorService.store('Important memory content');
 
@@ -160,7 +157,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         json: jest.fn().mockResolvedValue({ error: 'Storage failed' }),
-      } as any);
+      });
 
       await expect(vectorService.store('test')).rejects.toThrow('Storage failed');
       
@@ -178,7 +175,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         json: jest.fn().mockResolvedValue({}),
-      } as any);
+      });
 
       await expect(vectorService.store('test')).rejects.toThrow('Failed to store memory');
     });
@@ -204,7 +201,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ results: mockVectorResults }),
-      } as any);
+      });
 
       const results = await vectorService.search('test query');
 
@@ -222,7 +219,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ results: mockVectorResults }),
-      } as any);
+      });
 
       await vectorService.search('test query', 5);
 
@@ -238,7 +235,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({}),
-      } as any);
+      });
 
       const results = await vectorService.search('no matches');
 
@@ -249,7 +246,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         json: jest.fn().mockResolvedValue({ error: 'Search failed' }),
-      } as any);
+      });
 
       await expect(vectorService.search('test')).rejects.toThrow('Search failed');
       
@@ -267,7 +264,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         json: jest.fn().mockResolvedValue({}),
-      } as any);
+      });
 
       await expect(vectorService.search('test')).rejects.toThrow('Failed to search memories');
     });
@@ -293,7 +290,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ healthy: true }),
-      } as any);
+      });
 
       const isHealthy = await vectorService.isHealthy();
 
@@ -305,7 +302,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ healthy: false }),
-      } as any);
+      });
 
       const isHealthy = await vectorService.isHealthy();
 
@@ -316,7 +313,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({}),
-      } as any);
+      });
 
       const isHealthy = await vectorService.isHealthy();
 
@@ -345,7 +342,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ count: 42 }),
-      } as any);
+      });
 
       const count = await vectorService.getCount();
 
@@ -357,7 +354,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({}),
-      } as any);
+      });
 
       const count = await vectorService.getCount();
 
@@ -405,7 +402,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'test-id' }),
-      } as any);
+      });
 
       // Start first request
       const promise1 = vectorService.store('content 1');
@@ -533,7 +530,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'after-breaker' }),
-      } as any);
+      });
 
       const result = await vectorService.store('after breaker timeout');
       expect(result).toBe('after-breaker');
@@ -554,7 +551,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'success' }),
-      } as any);
+      });
 
       await vectorService.store('successful request');
 
@@ -588,7 +585,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
-      } as any);
+      });
 
       await expect(vectorService.store('test')).rejects.toThrow('Invalid JSON');
     });
@@ -613,7 +610,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'env-test-id' }),
-      } as any);
+      });
 
       await vectorService.store('test content');
 
@@ -632,19 +629,19 @@ describe('vectorService', () => {
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ id: 'stored-1' }),
-        } as any)
+        })
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ results: mockVectorResults }),
-        } as any)
+        })
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ healthy: true }),
-        } as any)
+        })
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ count: 1 }),
-        } as any);
+        });
 
       // Execute operations sequentially to avoid rate limiting issues
       const storeResult = await vectorService.store('Important information');
@@ -666,16 +663,16 @@ describe('vectorService', () => {
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ id: 'success-1' }),
-        } as any)
+        })
         .mockResolvedValueOnce({
           ok: false,
           json: jest.fn().mockResolvedValue({ error: 'Search failed' }),
-        } as any)
+        })
         .mockRejectedValueOnce(new Error('Health check network error'))
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({ count: 5 }),
-        } as any);
+        });
 
       // Execute operations and handle their success/failure
       const storeResult = await vectorService.store('content');
@@ -696,7 +693,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ results: [] }),
-      } as any);
+      });
 
       const results = await vectorService.search('');
 
@@ -715,7 +712,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'large-content-id' }),
-      } as any);
+      });
 
       const result = await vectorService.store(largeContent);
 
@@ -734,7 +731,7 @@ describe('vectorService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue({ id: 'special-id' }),
-      } as any);
+      });
 
       await vectorService.store(specialContent);
 

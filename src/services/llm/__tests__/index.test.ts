@@ -6,6 +6,7 @@
  */
 
 import { LLMService, llmService, complete, completeStream, getModels, countTokens } from '../index';
+import type { LLMRequest, LLMResponse, StreamChunk } from '../../types/llm.types';
 
 // Mock the LLMService
 jest.mock('../LLMService', () => {
@@ -22,13 +23,20 @@ jest.mock('../LLMService', () => {
   };
 });
 
+interface MockLLMInstance {
+  complete: jest.MockedFunction<(options: Partial<LLMRequest>) => Promise<LLMResponse>>;
+  completeStream: jest.MockedFunction<(options: Partial<LLMRequest>) => AsyncGenerator<StreamChunk, void, unknown>>;
+  getModels: jest.MockedFunction<() => Promise<Record<string, string[]>>>;
+  countTokens: jest.MockedFunction<(text: string, model?: string) => Promise<number>>;
+}
+
 describe('LLM Service Index', () => {
-  let mockLLMServiceInstance: any;
+  let mockLLMServiceInstance: MockLLMInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Get the mock instance
-    mockLLMServiceInstance = (require('../LLMService') as any).__mockInstance;
+    mockLLMServiceInstance = (require('../LLMService') as { __mockInstance: MockLLMInstance }).__mockInstance;
   });
 
   describe('Exports', () => {

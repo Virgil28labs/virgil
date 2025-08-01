@@ -564,10 +564,10 @@ describe('Dashboard', () => {
     });
 
     it('handles escape key correctly', () => {
-      let escapeHandler: () => void;
+      let escapeHandler: (() => void) | undefined;
       mockUseKeyboardNavigation.mockImplementation((options) => {
         if (options && 'onEscape' in options) {
-          escapeHandler = options.onEscape!;
+          escapeHandler = options.onEscape;
         }
         return defaultKeyboardNav;
       });
@@ -581,7 +581,9 @@ describe('Dashboard', () => {
       expect(screen.getByTestId('profile-viewer')).toBeInTheDocument();
       
       // Simulate escape key
-      escapeHandler!();
+      if (escapeHandler) {
+        escapeHandler();
+      }
       
       expect(screen.queryByTestId('profile-viewer')).not.toBeInTheDocument();
     });

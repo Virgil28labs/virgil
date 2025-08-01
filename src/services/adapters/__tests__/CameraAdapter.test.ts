@@ -9,6 +9,7 @@ import { CameraAdapter } from '../CameraAdapter';
 import { PhotoStorage } from '../../../components/camera/utils/photoStorage';
 import { timeService } from '../../TimeService';
 import type { SavedPhoto } from '../../../types/camera.types';
+import type { MockAdapter } from '../../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../../components/camera/utils/photoStorage', () => ({
@@ -639,7 +640,7 @@ describe('CameraAdapter', () => {
       const malformedPhotos = [
         { id: 'photo-1', dataUrl: '', timestamp: 1642672800000, isFavorite: false }, // Valid but minimal
         { id: 'photo-2', dataUrl: '', timestamp: 1642586400000, isFavorite: false }, // Valid but minimal
-      ] as any;
+      ] as SavedPhoto[];
       
       mockPhotoStorage.getAllPhotos.mockResolvedValue(malformedPhotos);
       

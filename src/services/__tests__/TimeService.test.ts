@@ -266,7 +266,7 @@ describe('TimeService', () => {
     it('isValidDate validates correctly', () => {
       expect(service.isValidDate(new Date())).toBe(true);
       expect(service.isValidDate(new Date('invalid'))).toBe(false);
-      expect(service.isValidDate('not a date' as any)).toBe(false);
+      expect(service.isValidDate('not a date' as unknown as Date)).toBe(false);
     });
 
     it('parseDate handles various inputs', () => {
@@ -323,8 +323,8 @@ describe('TimeService', () => {
     });
 
     it('handles null/undefined inputs in parseDate', () => {
-      expect(service.parseDate(null as any)).toBeNull();
-      expect(service.parseDate(undefined as any)).toBeNull();
+      expect(service.parseDate(null as unknown as string)).toBeNull();
+      expect(service.parseDate(undefined as unknown as string)).toBeNull();
     });
 
     it('handles timezone edge cases', () => {

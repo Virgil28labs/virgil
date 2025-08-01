@@ -7,6 +7,7 @@
 
 import { NasaApodAdapter } from '../NasaApodAdapter';
 import { logger } from '../../../lib/logger';
+import type { MockAdapterPrivate } from '../../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../../lib/logger', () => ({
@@ -409,7 +410,7 @@ describe('NasaApodAdapter', () => {
         newValue: JSON.stringify([mockStoredApods[0]]),
       };
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       storageHandler(mockEvent);
       
       expect(spy).toHaveBeenCalled();
@@ -420,7 +421,7 @@ describe('NasaApodAdapter', () => {
         call => call[0] === 'storage',
       )?.[1];
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       
       const mockEvent = {
         key: 'other_key',
@@ -490,7 +491,7 @@ describe('NasaApodAdapter', () => {
       // First call loads data
       adapter.getContextData();
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       
       // Second call should use cached data
       adapter.getContextData();
@@ -500,9 +501,9 @@ describe('NasaApodAdapter', () => {
 
     it('refreshes data when cache expires', () => {
       // Mock expired cache
-      (adapter as any).lastFetchTime = 0;
+      (adapter as unknown as MockAdapterPrivate).lastFetchTime = 0;
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       adapter.getContextData();
       
       expect(spy).toHaveBeenCalled();

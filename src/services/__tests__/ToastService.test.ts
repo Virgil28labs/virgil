@@ -7,6 +7,7 @@
 
 import { toastService } from '../ToastService';
 import { timeService } from '../TimeService';
+import type { MockToastServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock timeService
 jest.mock('../TimeService', () => ({
@@ -22,7 +23,7 @@ describe('ToastService', () => {
     jest.clearAllMocks();
     mockListener = jest.fn();
     // Clear any existing listeners
-    (toastService as any).listeners = [];
+    (toastService as unknown as MockToastServicePrivate).listeners = [];
   });
 
   describe('Basic Toast Operations', () => {
@@ -348,7 +349,7 @@ describe('ToastService', () => {
     it('handles null/undefined options', () => {
       toastService.subscribe(mockListener);
       
-      expect(() => toastService.error('Test', null as any)).not.toThrow();
+      expect(() => toastService.error('Test', null as unknown as Error)).not.toThrow();
       expect(() => toastService.warning('Test', undefined)).not.toThrow();
     });
   });

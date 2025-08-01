@@ -8,6 +8,7 @@
 import type { AppDataAdapter, AppContextData, AggregateableData } from '../DashboardAppService';
 import { DashboardAppService, CONFIDENCE_THRESHOLDS } from '../DashboardAppService';
 import { confidenceService } from '../ConfidenceService';
+import type { MockDashboardAppServicePrivate, TestMockAdapter } from '../../test-utils/mockTypes';
 import { timeService } from '../TimeService';
 import { logger } from '../../lib/logger';
 
@@ -40,12 +41,12 @@ jest.mock('../../lib/logger', () => ({
 }));
 
 // Mock adapter implementations
-class MockAdapter implements AppDataAdapter<any> {
+class TestTestMockAdapter implements AppDataAdapter<unknown> {
   constructor(
     public readonly appName: string,
     public readonly displayName: string,
     public readonly icon: string = '📱',
-    private mockData: any = {},
+    private mockData: unknown = {},
   ) {}
 
   getContextData(): AppContextData {
@@ -77,13 +78,13 @@ class MockAdapter implements AppDataAdapter<any> {
     return `${this.displayName} response to: ${query}`;
   }
 
-  subscribe(_callback: (data: any) => void): () => void {
+  subscribe(_callback: (data: unknown) => void): () => void {
     // Mock subscription - return an unsubscribe function
     return () => {};
   }
 
-  async search(_query: string): Promise<any[]> {
-    return this.mockData.searchResults || [];
+  async search(_query: string): Promise<unknown[]> {
+    return (this.mockData as { searchResults?: unknown[] })?.searchResults || [];
   }
 
   supportsAggregation(): boolean {
@@ -126,7 +127,7 @@ describe('DashboardAppService', () => {
 
   describe('Adapter Registration', () => {
     it('registers adapters successfully', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App', '📝');
+      const mockAdapter = new TestTestMockAdapter('notes', 'Notes App', '📝');
       
       service.registerAdapter(mockAdapter);
       
@@ -136,8 +137,8 @@ describe('DashboardAppService', () => {
     });
 
     it('allows duplicate adapter registration (overwrites but cache may persist)', () => {
-      const adapter1 = new MockAdapter('notes', 'Notes App 1');
-      const adapter2 = new MockAdapter('notes', 'Notes App 2');
+      const adapter1 = new TestTestMockAdapter('notes', 'Notes App 1');
+      const adapter2 = new TestTestMockAdapter('notes', 'Notes App 2');
       
       service.registerAdapter(adapter1);
       
@@ -156,7 +157,7 @@ describe('DashboardAppService', () => {
     });
 
     it('unregisters adapters successfully', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       
       service.registerAdapter(mockAdapter);
       expect(service.getAllAppData().apps.has('notes')).toBe(true);
@@ -171,7 +172,7 @@ describe('DashboardAppService', () => {
     });
 
     it('gets single adapter data', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         lastUsed: 1234567890,
         data: { count: 5 },
@@ -198,7 +199,7 @@ describe('DashboardAppService', () => {
 
   describe('Caching System', () => {
     it('caches adapter data', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(mockAdapter);
       
       // First call should hit adapter
@@ -210,7 +211,7 @@ describe('DashboardAppService', () => {
     });
 
     it('respects cache TTL', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(mockAdapter);
       
       // First call
@@ -227,11 +228,11 @@ describe('DashboardAppService', () => {
     });
 
     it('invalidates cache when adapter updates', () => {
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       // Set up subscription mock
       mockAdapter.subscribe = jest.fn((callback: () => void) => {
         // Store callback to simulate real-time updates
-        (mockAdapter as any).updateCallback = callback;
+        (mockAdapter as TestMockAdapter).updateCallback = callback;
         return () => {}; // Return unsubscribe function
       });
       
@@ -242,8 +243,8 @@ describe('DashboardAppService', () => {
       service.getAppData('notes'); // cache data
       
       // Simulate adapter update
-      if ((mockAdapter as any).updateCallback) {
-        (mockAdapter as any).updateCallback();
+      if ((mockAdapter as TestMockAdapter).updateCallback) {
+        (mockAdapter as TestMockAdapter).updateCallback();
       }
       
       // Should get fresh data
@@ -252,7 +253,7 @@ describe('DashboardAppService', () => {
     });
 
     it('handles cache cleanup during getAllAppData', () => {
-      const adapter = new MockAdapter('notes', 'Notes App');
+      const adapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(adapter);
       
       // Cache data
@@ -269,12 +270,12 @@ describe('DashboardAppService', () => {
 
   describe('Active Apps Tracking', () => {
     it('identifies active apps correctly', () => {
-      const activeAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const activeAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         lastUsed: 1705748400000,
       });
       
-      const inactiveAdapter = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const inactiveAdapter = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         isActive: false,
         lastUsed: 0,
       });
@@ -288,17 +289,17 @@ describe('DashboardAppService', () => {
     });
 
     it('includes apps based on isActive flag', () => {
-      const adapter1 = new MockAdapter('notes', 'Notes App', '📝', {
+      const adapter1 = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         lastUsed: 1000,
       });
       
-      const adapter2 = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const adapter2 = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         isActive: true,
         lastUsed: 2000,
       });
       
-      const adapter3 = new MockAdapter('photos', 'Photos App', '📷', {
+      const adapter3 = new TestMockAdapter('photos', 'Photos App', '📷', {
         isActive: true,
         lastUsed: 1500,
       });
@@ -315,17 +316,17 @@ describe('DashboardAppService', () => {
     });
 
     it('excludes inactive apps', () => {
-      const activeAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const activeAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         lastUsed: 1705748400000,
       });
       
-      const inactiveAdapter1 = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const inactiveAdapter1 = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         isActive: false,
         lastUsed: 1705748400000,
       });
       
-      const inactiveAdapter2 = new MockAdapter('photos', 'Photos App', '📷', {
+      const inactiveAdapter2 = new TestMockAdapter('photos', 'Photos App', '📷', {
         isActive: false,
         lastUsed: 1500,
       });
@@ -341,11 +342,11 @@ describe('DashboardAppService', () => {
 
   describe('Intent Classification', () => {
     beforeEach(() => {
-      const notesAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const notesAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         keywords: ['note', 'notes', 'write', 'text'],
       });
       
-      const tasksAdapter = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const tasksAdapter = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         keywords: ['task', 'tasks', 'todo', 'reminder'],
       });
       
@@ -388,14 +389,14 @@ describe('DashboardAppService', () => {
       // Mock very low confidence scores
       mockConfidenceService.calculateConfidence.mockResolvedValue([
         {
-          adapter: new MockAdapter('notes', 'Notes App'),
+          adapter: new TestMockAdapter('notes', 'Notes App'),
           totalScore: 0.05, // Below 0.1 threshold
           breakdown: { semantic: 0.03, keyword: 0.02, context: 0.0 },
           weights: { semantic: 0.6, keyword: 0.3, context: 0.1 },
           metadata: { isActive: false, lastUsed: 0, cacheHit: false },
         },
         {
-          adapter: new MockAdapter('tasks', 'Tasks App'),
+          adapter: new TestMockAdapter('tasks', 'Tasks App'),
           totalScore: 0.3,
           breakdown: { semantic: 0.2, keyword: 0.1, context: 0.0 },
           weights: { semantic: 0.6, keyword: 0.3, context: 0.1 },
@@ -411,7 +412,7 @@ describe('DashboardAppService', () => {
     });
 
     it('explains confidence for debugging', async () => {
-      const notesAdapter = new MockAdapter('notes', 'Notes App');
+      const notesAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(notesAdapter);
       
       mockConfidenceService.calculateConfidence.mockResolvedValue([
@@ -466,12 +467,12 @@ describe('DashboardAppService', () => {
 
   describe('Utility Methods', () => {
     it('gets context summary for all apps', () => {
-      const activeAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const activeAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         summary: '5 notes available',
       });
       
-      const inactiveAdapter = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const inactiveAdapter = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         isActive: false,
         summary: 'No tasks yet',
       });
@@ -486,7 +487,7 @@ describe('DashboardAppService', () => {
     });
 
     it('returns default message when no app summaries', () => {
-      const inactiveAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const inactiveAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: false,
         summary: '',
       });
@@ -498,7 +499,7 @@ describe('DashboardAppService', () => {
     });
 
     it('gets detailed context for specific apps', () => {
-      const adapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const adapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         summary: '5 notes available',
         capabilities: ['create', 'read', 'search'],
@@ -515,11 +516,11 @@ describe('DashboardAppService', () => {
     });
 
     it('gets all app keywords', () => {
-      const adapter1 = new MockAdapter('notes', 'Notes App', '📝', {
+      const adapter1 = new TestMockAdapter('notes', 'Notes App', '📝', {
         keywords: ['note', 'notes', 'write'],
       });
       
-      const adapter2 = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const adapter2 = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         keywords: ['task', 'tasks', 'todo'],
       });
       
@@ -535,14 +536,14 @@ describe('DashboardAppService', () => {
 
   describe('Search Functionality', () => {
     beforeEach(() => {
-      const notesAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const notesAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         searchResults: [
           { id: 1, title: 'Note 1', content: 'Content 1' },
           { id: 2, title: 'Note 2', content: 'Content 2' },
         ],
       });
       
-      const tasksAdapter = new MockAdapter('tasks', 'Tasks App', '✅', {
+      const tasksAdapter = new TestMockAdapter('tasks', 'Tasks App', '✅', {
         searchResults: [
           { id: 3, title: 'Task 1', done: false },
         ],
@@ -587,7 +588,7 @@ describe('DashboardAppService', () => {
     });
 
     it('handles search errors gracefully', async () => {
-      const errorAdapter = new MockAdapter('error', 'Error App', '⚠️');
+      const errorAdapter = new TestMockAdapter('error', 'Error App', '⚠️');
       errorAdapter.search = jest.fn().mockRejectedValue(new Error('Search failed'));
       
       service.registerAdapter(errorAdapter);
@@ -637,7 +638,7 @@ describe('DashboardAppService', () => {
 
   describe('Cross-App Concepts', () => {
     it('identifies cross-app concepts in queries', () => {
-      const concepts = (service as any).crossAppConcepts; // Access private property for testing
+      const concepts = (service as unknown as MockDashboardAppServicePrivate).crossAppConcepts; // Access private property for testing
       
       expect(concepts).toContainEqual(
         expect.objectContaining({
@@ -674,7 +675,7 @@ describe('DashboardAppService', () => {
 
     it('handles cross-app query detection', () => {
       // Test private method through public interface
-      const isCrossAppQuery = (service as any).isCrossAppQuery.bind(service);
+      const isCrossAppQuery = (service as unknown as MockDashboardAppServicePrivate).isCrossAppQuery.bind(service);
       
       expect(isCrossAppQuery('show me all apps')).toBe(true);
       expect(isCrossAppQuery('across all apps')).toBe(true);
@@ -685,7 +686,7 @@ describe('DashboardAppService', () => {
     });
 
     it('aggregates data internally for cross-app queries', () => {
-      const photosAdapter = new MockAdapter('photos', 'Photos App', '📷', {
+      const photosAdapter = new TestMockAdapter('photos', 'Photos App', '📷', {
         supportsAgg: true,
         aggregateData: [
           {
@@ -701,7 +702,7 @@ describe('DashboardAppService', () => {
       service.registerAdapter(photosAdapter);
       
       // Test private aggregation method
-      const aggregated = (service as any).getAggregatedData();
+      const aggregated = (service as unknown as MockDashboardAppServicePrivate).getAggregatedData();
       
       expect(aggregated).toBeInstanceOf(Map);
       expect(aggregated.has('image')).toBe(true);
@@ -726,7 +727,7 @@ describe('DashboardAppService', () => {
       listener.mockClear();
       
       // Should notify again when adapter is added
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(mockAdapter);
       
       expect(listener).toHaveBeenCalledWith(expect.objectContaining({
@@ -745,7 +746,7 @@ describe('DashboardAppService', () => {
       
       unsubscribe();
       
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(mockAdapter);
       
       expect(listener).not.toHaveBeenCalled();
@@ -762,7 +763,7 @@ describe('DashboardAppService', () => {
       listener1.mockClear();
       listener2.mockClear();
       
-      const mockAdapter = new MockAdapter('notes', 'Notes App');
+      const mockAdapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(mockAdapter);
       
       expect(listener1).toHaveBeenCalled();
@@ -787,7 +788,7 @@ describe('DashboardAppService', () => {
 
   describe('Cleanup', () => {
     it('cleans up resources on destroy', () => {
-      const adapter = new MockAdapter('notes', 'Notes App');
+      const adapter = new TestMockAdapter('notes', 'Notes App');
       service.registerAdapter(adapter);
       
       const listener = jest.fn();
@@ -795,14 +796,14 @@ describe('DashboardAppService', () => {
       
       // Verify setup
       expect(service.getAllAppData().apps.has('notes')).toBe(true);
-      expect((service as any).listeners).toHaveLength(1);
+      expect((service as unknown as MockDashboardAppServicePrivate).listeners).toHaveLength(1);
       
       // Destroy should clear everything
       service.destroy();
       
       // Verify cleanup
       expect(service.getAllAppData().apps.size).toBe(0);
-      expect((service as any).listeners).toHaveLength(0);
+      expect((service as unknown as MockDashboardAppServicePrivate).listeners).toHaveLength(0);
       expect(mockConfidenceService.clearCache).toHaveBeenCalled();
     });
   });
@@ -811,23 +812,23 @@ describe('DashboardAppService', () => {
     it('limits cache size to prevent memory leaks', () => {
       // Register many adapters to test cache limits
       for (let i = 0; i < 100; i++) {
-        const adapter = new MockAdapter(`app${i}`, `App ${i}`);
+        const adapter = new TestMockAdapter(`app${i}`, `App ${i}`);
         service.registerAdapter(adapter);
         service.getAppData(`app${i}`); // Cache the data
       }
       
       // Cache should not grow indefinitely
-      const cacheSize = (service as any).cache.size;
+      const cacheSize = (service as unknown as MockDashboardAppServicePrivate).cache.size;
       expect(cacheSize).toBeLessThanOrEqual(100);
     });
 
     it('cleans up expired cache entries', () => {
-      const adapter = new MockAdapter('test', 'Test App');
+      const adapter = new TestMockAdapter('test', 'Test App');
       service.registerAdapter(adapter);
       
       // Cache data
       service.getAppData('test');
-      expect((service as any).cache.has('test')).toBe(true);
+      expect((service as unknown as MockDashboardAppServicePrivate).cache.has('test')).toBe(true);
       
       // Advance time beyond TTL
       mockTimeService.getTimestamp.mockReturnValue(1705748400000 + 31000); // +31 seconds
@@ -836,7 +837,7 @@ describe('DashboardAppService', () => {
       service.getAppData('test');
       
       // Old cache entry should be cleaned up and new one created
-      expect((service as any).cache.has('test')).toBe(true);
+      expect((service as unknown as MockDashboardAppServicePrivate).cache.has('test')).toBe(true);
     });
   });
 
@@ -867,7 +868,7 @@ describe('DashboardAppService', () => {
     });
 
     it('handles getAllAppData errors gracefully', () => {
-      const errorAdapter = new MockAdapter('error', 'Error App');
+      const errorAdapter = new TestMockAdapter('error', 'Error App');
       errorAdapter.getContextData = jest.fn().mockImplementation(() => {
         throw new Error('Context error');
       });
@@ -892,7 +893,7 @@ describe('DashboardAppService', () => {
     });
 
     it('handles explainConfidence errors gracefully', async () => {
-      const adapter = new MockAdapter('test', 'Test App');
+      const adapter = new TestMockAdapter('test', 'Test App');
       service.registerAdapter(adapter);
       
       mockConfidenceService.calculateConfidence.mockRejectedValue(new Error('Confidence error'));
@@ -905,7 +906,7 @@ describe('DashboardAppService', () => {
   describe('Integration Patterns', () => {
     it('works with real adapter patterns', async () => {
       // Simulate a more realistic adapter
-      const realisticAdapter = new MockAdapter('notes', 'Notes App', '📝', {
+      const realisticAdapter = new TestMockAdapter('notes', 'Notes App', '📝', {
         isActive: true,
         lastUsed: 1705748400000,
         data: {
@@ -939,7 +940,7 @@ describe('DashboardAppService', () => {
       
       // Test all functionality
       const appData = service.getAppData('notes');
-      expect((appData?.data as any).totalNotes).toBe(42);
+      expect((appData?.data as { totalNotes: number }).totalNotes).toBe(42);
       expect(appData?.capabilities).toContain('search');
       
       const allData = service.getAllAppData();

@@ -126,7 +126,7 @@ describe('errorUtils', () => {
 
     it('handles Error instances with code property', () => {
       const error = new Error('Test error');
-      (error as any).code = 'CUSTOM_ERROR';
+      (error as { code: string }).code = 'CUSTOM_ERROR';
       expect(hasErrorCode(error, 'CUSTOM_ERROR')).toBe(true);
     });
 
@@ -313,8 +313,8 @@ describe('errorUtils', () => {
 
     it('handles Error instances with additional properties', () => {
       const error = new Error('Enhanced error');
-      (error as any).code = 'ENHANCED_ERROR';
-      (error as any).status = 500;
+      (error as { code: string }).code = 'ENHANCED_ERROR';
+      (error as { status: number }).status = 500;
 
       expect(getErrorMessage(error)).toBe('Enhanced error');
       expect(hasErrorCode(error, 'ENHANCED_ERROR')).toBe(true);

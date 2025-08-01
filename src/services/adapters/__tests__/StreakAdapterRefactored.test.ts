@@ -263,7 +263,7 @@ describe('StreakAdapterRefactored', () => {
         ...mockHabitsData,
         stats: {
           ...mockHabitsData.stats,
-          perfectDays: undefined as any,
+          perfectDays: undefined as string[] | undefined,
         },
       };
       mockStorageService.get.mockReturnValue(dataWithoutPerfectDays);
@@ -603,7 +603,7 @@ describe('StreakAdapterRefactored', () => {
         ...mockHabitsData,
         habits: [
           { id: 'habit-1', name: 'Test' }, // Missing required fields
-        ] as any,
+        ] as Array<{ id: string; name: string }>,
       };
       mockStorageService.get.mockReturnValue(malformedData);
       

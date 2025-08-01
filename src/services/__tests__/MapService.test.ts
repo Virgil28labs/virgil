@@ -10,6 +10,7 @@ import { MapService } from '../MapService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
 import { createLocationMarker } from '../../utils/googleMaps';
+import type { MockGoogleMaps, MockAdvancedMarkerElement, MockMapServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
@@ -83,7 +84,7 @@ global.google = {
       AdvancedMarkerElement: jest.fn(() => mockAdvancedMarkerElement),
     },
   },
-} as any;
+} as unknown as MockGoogleMaps;
 
 const mockCreateLocationMarker = createLocationMarker as jest.MockedFunction<typeof createLocationMarker>;
 
@@ -93,10 +94,10 @@ describe('MapService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateLocationMarker.mockResolvedValue(mockAdvancedMarkerElement as any);
+    mockCreateLocationMarker.mockResolvedValue(mockAdvancedMarkerElement as unknown as google.maps.marker.AdvancedMarkerElement);
     
     // Clear the WeakMap instances to ensure fresh state
-    (MapService as any).instances = new WeakMap();
+    (MapService as unknown as MockMapServicePrivate).instances = new WeakMap();
   });
 
   describe('Singleton Pattern', () => {
@@ -296,7 +297,7 @@ describe('MapService', () => {
     it('throws error when DirectionsService not initialized', async () => {
       // Create service with null directionsService
       const mapService = MapService.getInstance(mockMap);
-      (mapService as any).directionsService = null;
+      (mapService as unknown as MockMapServicePrivate).directionsService = null;
 
       const config: DirectionsRequestConfig = {
         origin: 'San Francisco, CA',
@@ -371,7 +372,7 @@ describe('MapService', () => {
 
     it('throws error when Geocoder not initialized', async () => {
       const mapService = MapService.getInstance(mockMap);
-      (mapService as any).geocoder = null;
+      (mapService as unknown as MockMapServicePrivate).geocoder = null;
 
       const location = { lat: 37.4224764, lng: -122.0842499 };
 
@@ -560,8 +561,9 @@ describe('MapService', () => {
 
       mapService.cleanup();
 
-      expect((mapService as any).directionsService).toBeNull();
-      expect((mapService as any).geocoder).toBeNull();
+      const privateService = mapService as unknown as MockMapServicePrivate;
+      expect(privateService.directionsService).toBeNull();
+      expect(privateService.geocoder).toBeNull();
     });
   });
 

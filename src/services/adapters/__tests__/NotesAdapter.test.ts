@@ -586,7 +586,7 @@ describe('NotesAdapter', () => {
           content: 'Another note about something',
           timestamp: new Date(baseTime.getTime() - 3600000), // Medium age
           tags: [],
-          actionType: 'work' as any, // Using work as action type for test
+          actionType: 'task' as ActionType, // Use valid action type for test
           tasks: [],
           aiProcessed: false,
           isEdited: false,

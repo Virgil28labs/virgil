@@ -27,23 +27,20 @@ describe('LLMService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Mock successful API response
+    // Mock successful API response - LLMService expects data.content directly
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve({
-        choices: [
-          {
-            message: {
-              role: 'assistant',
-              content: 'Test response',
-            },
+        data: {
+          content: 'Test response',
+          usage: {
+            total_tokens: 30,
+            prompt_tokens: 10,
+            completion_tokens: 20,
           },
-        ],
-        usage: {
-          prompt_tokens: 10,
-          completion_tokens: 20,
-          total_tokens: 30,
+          model: 'gpt-4o-mini',
+          id: 'test-id',
         },
       }),
     } as Response);

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { AppError } from '../../lib/errors';
 import { AUTH_CONFIG, AUTH_MESSAGES } from '../../constants/auth.constants';
 import { timeService } from '../TimeService';
+import type { MockAuthServicePrivate, MockSession } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/supabase');
@@ -17,7 +18,7 @@ describe('AuthService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset session cache
-    (authService as any).sessionCache = null;
+    (authService as unknown as MockAuthServicePrivate).sessionCache = null;
   });
 
   describe('login', () => {
@@ -46,7 +47,7 @@ describe('AuthService', () => {
       });
 
       // Should cache the session
-      expect((authService as any).sessionCache).toEqual({
+      expect((authService as unknown as MockAuthServicePrivate).sessionCache).toEqual({
         data: mockSession,
         timestamp: expect.any(Number),
       });
@@ -313,7 +314,7 @@ describe('AuthService', () => {
       });
 
       // Set a cached session
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: { access_token: 'test' },
         timestamp: timeService.getTimestamp(),
       };
@@ -321,7 +322,7 @@ describe('AuthService', () => {
       await authService.signOut();
 
       expect(supabase.auth.signOut).toHaveBeenCalled();
-      expect((authService as any).sessionCache).toBeNull();
+      expect((authService as unknown as MockAuthServicePrivate).sessionCache).toBeNull();
     });
 
     it('should handle sign out errors', async () => {
@@ -345,7 +346,7 @@ describe('AuthService', () => {
       const mockUser = { id: 'test-id', email: 'test@example.com' };
       
       // Set valid cache
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: { user: mockUser },
         timestamp: timeService.getTimestamp(),
       };
@@ -361,7 +362,7 @@ describe('AuthService', () => {
       const mockSession = { user: mockUser, access_token: 'test' };
 
       // Set expired cache
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: { user: { id: 'old' } },
         timestamp: timeService.getTimestamp() - AUTH_CONFIG.SESSION_CACHE_TIME - 1000,
       };
@@ -378,7 +379,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual(mockUser);
       expect(supabase.auth.getUser).toHaveBeenCalled();
-      expect((authService as any).sessionCache.data).toEqual(mockSession);
+      expect((authService as unknown as MockAuthServicePrivate).sessionCache.data).toEqual(mockSession);
     });
 
     it('should return null if no user', async () => {
@@ -407,7 +408,7 @@ describe('AuthService', () => {
       const mockSession = { access_token: 'test-token' };
       
       // Set valid cache
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: mockSession,
         timestamp: timeService.getTimestamp(),
       };
@@ -429,7 +430,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual(mockSession);
       expect(supabase.auth.getSession).toHaveBeenCalled();
-      expect((authService as any).sessionCache.data).toEqual(mockSession);
+      expect((authService as unknown as MockAuthServicePrivate).sessionCache.data).toEqual(mockSession);
     });
   });
 
@@ -445,7 +446,7 @@ describe('AuthService', () => {
       const result = await authService.refreshSession();
 
       expect(result).toEqual(mockSession);
-      expect((authService as any).sessionCache.data).toEqual(mockSession);
+      expect((authService as unknown as MockAuthServicePrivate).sessionCache.data).toEqual(mockSession);
     });
 
     it('should handle refresh errors', async () => {
@@ -467,7 +468,7 @@ describe('AuthService', () => {
 
   describe('private methods', () => {
     it('should map various Supabase errors correctly', () => {
-      const mapError = (authService as any).mapSupabaseError.bind(authService);
+      const mapError = (authService as unknown as MockAuthServicePrivate).mapSupabaseError.bind(authService);
 
       expect(mapError({ message: 'Invalid login credentials' })).toBe(AUTH_MESSAGES.INVALID_CREDENTIALS);
       expect(mapError({ message: 'Email not confirmed' })).toBe(AUTH_MESSAGES.EMAIL_NOT_CONFIRMED);
@@ -479,21 +480,21 @@ describe('AuthService', () => {
     });
 
     it('should validate cache correctly', () => {
-      const isCacheValid = (authService as any).isCacheValid.bind(authService);
+      const isCacheValid = (authService as unknown as MockAuthServicePrivate).isCacheValid.bind(authService);
 
       // No cache
-      (authService as any).sessionCache = null;
+      (authService as unknown as MockAuthServicePrivate).sessionCache = null;
       expect(isCacheValid()).toBe(false);
 
       // Valid cache
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: {},
         timestamp: timeService.getTimestamp(),
       };
       expect(isCacheValid()).toBe(true);
 
       // Expired cache
-      (authService as any).sessionCache = {
+      (authService as unknown as MockAuthServicePrivate).sessionCache = {
         data: {},
         timestamp: timeService.getTimestamp() - AUTH_CONFIG.SESSION_CACHE_TIME - 1000,
       };

@@ -49,7 +49,7 @@ class MockAdapter implements AppDataAdapter {
   constructor(
     public readonly appName: string,
     public readonly displayName: string,
-    private mockData: any = {},
+    private mockData: Record<string, unknown> = {},
   ) {}
 
   getContextData(): AppContextData {
@@ -434,7 +434,7 @@ describe('ConfidenceService', () => {
 
   describe('Confidence Explanation', () => {
     let adapter: MockAdapter;
-    let score: any;
+    let score: unknown;
 
     beforeEach(() => {
       adapter = new MockAdapter('notes', 'Notes App');

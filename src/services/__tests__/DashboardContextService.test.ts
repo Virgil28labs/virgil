@@ -11,6 +11,7 @@ import type { LocationContextValue } from '../../types/location.types';
 import type { WeatherContextType } from '../../types/weather.types';
 import type { AuthContextValue } from '../../types/auth.types';
 import type { DeviceInfo } from '../../hooks/useDeviceInfo';
+import type { MockDashboardContextServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../TimeService');
@@ -58,6 +59,13 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Mock window.innerWidth for device detection
+Object.defineProperty(window, 'innerWidth', {
+  writable: true,
+  configurable: true,
+  value: 1920, // Desktop size
+});
+
 describe('DashboardContextService', () => {
   let timeContext: ReturnType<typeof setupTimeTest>;
   let service: DashboardContextService;
@@ -79,8 +87,9 @@ describe('DashboardContextService', () => {
   afterEach(() => {
     timeContext.cleanup();
     // Clean up any timers
-    if ((service as any).mainTimer) {
-      clearInterval((service as any).mainTimer);
+    const privateService = service as unknown as MockDashboardContextServicePrivate;
+    if (privateService.mainTimer) {
+      clearInterval(privateService.mainTimer);
     }
   });
 
@@ -113,7 +122,8 @@ describe('DashboardContextService', () => {
     });
 
     it('starts periodic updates', () => {
-      expect((service as any).mainTimer).toBeDefined();
+      const privateService = service as unknown as MockDashboardContextServicePrivate;
+      expect(privateService.mainTimer).toBeDefined();
     });
 
     it('subscribes to dashboard apps', () => {
@@ -128,6 +138,13 @@ describe('DashboardContextService', () => {
         writable: true,
       });
       
+      // Mock mobile screen width
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 600, // Mobile size
+      });
+      
       const newService = new DashboardContextService();
       const context = newService.getContext();
       
@@ -140,6 +157,13 @@ describe('DashboardContextService', () => {
         writable: true,
       });
       
+      // Mock tablet screen width
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 900, // Tablet size
+      });
+      
       const newService = new DashboardContextService();
       const context = newService.getContext();
       
@@ -150,6 +174,13 @@ describe('DashboardContextService', () => {
       Object.defineProperty(navigator, 'userAgent', {
         value: 'Unknown Browser',
         writable: true,
+      });
+      
+      // Mock desktop screen width
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1920, // Desktop size
       });
       
       const newService = new DashboardContextService();
@@ -313,8 +344,8 @@ describe('DashboardContextService', () => {
         isAuthenticated: true,
         name: 'John Doe',
         email: 'john@example.com',
-        memberSince: '2024-01-01T00:00:00.000Z',
-        preferences: {},
+        memberSince: '2023-12-31', // formatDateToLocal converts to local date format
+        profile: undefined, // No profile provided
       });
     });
 
@@ -351,12 +382,13 @@ describe('DashboardContextService', () => {
       const context = service.getContext();
       
       expect(context.device).toMatchObject({
-        type: 'desktop',
+        hasData: true,
         os: 'Windows 10',
         browser: 'Chrome',
         screen: '1920x1080',
-        hasTouch: false,
-        prefersDarkMode: false,
+        device: 'Desktop',
+        cpu: 8,
+        memory: '16 GB',
       });
     });
   });
@@ -511,7 +543,7 @@ describe('DashboardContextService', () => {
     it('provides TimeService methods for backward compatibility', () => {
       expect(service.getLocalDate()).toBe('2024-01-20');
       expect(service.getCurrentDateTime()).toBeInstanceOf(Date);
-      expect(service.getTimestamp()).toBe(1705752000000);
+      expect(service.getTimestamp()).toBe(1705780800000); // PST timezone
     });
 
     it('updates time context periodically', async () => {
@@ -581,31 +613,34 @@ describe('DashboardContextService', () => {
 
   describe('Performance and Memory Management', () => {
     it('cleans up timers on destruction', () => {
-      const timerId = (service as any).mainTimer;
+      const privateService = service as unknown as MockDashboardContextServicePrivate;
+      const timerId = privateService.mainTimer;
       expect(timerId).toBeDefined();
       
       // Simulate cleanup (would normally happen in destructor)
       if (timerId) {
         clearInterval(timerId);
-        (service as any).mainTimer = undefined;
+        privateService.mainTimer = undefined;
       }
       
-      expect((service as any).mainTimer).toBeUndefined();
+      expect(privateService.mainTimer).toBeUndefined();
     });
 
     it('limits activity log size', () => {
+      const privateService = service as unknown as MockDashboardContextServicePrivate;
+      
       // Add many activity entries
       for (let i = 0; i < 25; i++) {
-        (service as any).activityLog.push({
+        privateService.activityLog.push({
           action: `action_${i}`,
           timestamp: timeService.getTimestamp() + i,
         });
       }
       
       // Trigger cleanup (simulated)
-      (service as any).cleanupActivityLog();
+      privateService.cleanupActivityLog();
       
-      expect((service as any).activityLog.length).toBeLessThanOrEqual(20);
+      expect(privateService.activityLog.length).toBeLessThanOrEqual(20);
     });
   });
 

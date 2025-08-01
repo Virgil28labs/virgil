@@ -48,7 +48,7 @@ class TestAdapter extends BaseAdapter<{ message: string; count: number }> {
       displayName: 'Test Adapter',
       isActive: this.isActive,
       lastUsed: this.lastFetchTime,
-      data: this.data!,
+      data: this.data ?? {},
       summary: this.data ? this.generateSummary(this.data) : 'No data available',
       capabilities: ['test', 'mock'],
     };
@@ -324,7 +324,7 @@ describe('BaseAdapter', () => {
       adapter.setCacheTime(oldTime);
       (timeService.getTimestamp as jest.Mock).mockReturnValue(currentTime);
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as { loadData: () => void }, 'loadData');
       adapter['ensureFreshData']();
       
       expect(spy).toHaveBeenCalled();
@@ -336,7 +336,7 @@ describe('BaseAdapter', () => {
       adapter.setCacheTime(currentTime - 1000); // 1 second ago
       (timeService.getTimestamp as jest.Mock).mockReturnValue(currentTime);
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as { loadData: () => void }, 'loadData');
       adapter['ensureFreshData']();
       
       expect(spy).not.toHaveBeenCalled();

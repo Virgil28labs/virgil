@@ -9,6 +9,10 @@ import { ChatService, chatService } from '../ChatService';
 import { setupTimeTest } from '../../test-utils/timeTestUtils';
 import type { ChatMessage } from '../../types/chat.types';
 
+interface MockChatServicePrivate {
+  createAssistantMessage: (content: string, confidence?: number) => ChatMessage;
+}
+
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
   logger: {
@@ -478,7 +482,7 @@ describe('ChatService', () => {
     });
 
     it('creates assistant messages with confidence', () => {
-      const message = (service as any).createAssistantMessage('Test content', 0.85);
+      const message = (service as unknown as MockChatServicePrivate).createAssistantMessage('Test content', 0.85);
 
       expect(message).toEqual({
         id: '1705752000000-assistant',
@@ -490,7 +494,7 @@ describe('ChatService', () => {
     });
 
     it('creates assistant messages without confidence', () => {
-      const message = (service as any).createAssistantMessage('Test content');
+      const message = (service as unknown as MockChatServicePrivate).createAssistantMessage('Test content');
 
       expect(message).toEqual({
         id: '1705752000000-assistant',

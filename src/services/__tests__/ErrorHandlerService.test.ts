@@ -7,6 +7,7 @@
 
 import { errorHandlerService, handleError, wrapFunction, createSafeAsync } from '../ErrorHandlerService';
 import { setupTimeTest } from '../../test-utils/timeTestUtils';
+import type { MockLogger, MockErrorHandlerServicePrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger', () => ({
@@ -44,7 +45,7 @@ describe('ErrorHandlerService', () => {
     Object.assign(timeService, timeContext.timeService);
     
     // Reset error queue
-    (errorHandlerService as any).errorQueue = [];
+    (errorHandlerService as unknown as MockErrorHandlerServicePrivate).errorQueue = [];
   });
 
   afterEach(() => {
@@ -193,7 +194,7 @@ describe('ErrorHandlerService', () => {
       }
 
       // Queue should be cleared
-      const errorQueue = (errorHandlerService as any).errorQueue;
+      const errorQueue = (errorHandlerService as unknown as MockErrorHandlerServicePrivate).errorQueue;
       expect(errorQueue).toHaveLength(0);
     });
 
@@ -211,7 +212,7 @@ describe('ErrorHandlerService', () => {
 
   describe('Function Wrapping', () => {
     it('wraps sync functions correctly', () => {
-      const testFn = jest.fn((..._args: any[]) => 'success');
+      const testFn = jest.fn((..._args: unknown[]) => 'success');
       const info = { component: 'TestComponent', action: 'testAction' };
       
       const wrappedFn = errorHandlerService.wrapFunction(testFn, info);
@@ -238,7 +239,7 @@ describe('ErrorHandlerService', () => {
     });
 
     it('wraps async functions correctly', async () => {
-      const testFn = jest.fn(async (..._args: any[]) => 'async success');
+      const testFn = jest.fn(async (..._args: unknown[]) => 'async success');
       const info = { component: 'TestComponent', action: 'asyncAction' };
       
       const wrappedFn = errorHandlerService.wrapFunction(testFn, info);
@@ -340,7 +341,7 @@ describe('ErrorHandlerService', () => {
 
     it('sets up unhandled rejection handler', () => {
       // Create new instance to trigger setup
-      new (errorHandlerService.constructor as any)();
+      new (errorHandlerService.constructor as new() => typeof errorHandlerService)();
 
       expect(window.addEventListener).toHaveBeenCalledWith(
         'unhandledrejection',
@@ -350,7 +351,7 @@ describe('ErrorHandlerService', () => {
 
     it('sets up global error handler', () => {
       // Create new instance to trigger setup
-      new (errorHandlerService.constructor as any)();
+      new (errorHandlerService.constructor as new() => typeof errorHandlerService)();
 
       expect(window.addEventListener).toHaveBeenCalledWith(
         'error',
@@ -362,12 +363,12 @@ describe('ErrorHandlerService', () => {
       const handler = jest.fn();
       window.addEventListener = jest.fn((event, callback) => {
         if (event === 'unhandledrejection') {
-          handler.mockImplementation(callback as (...args: any[]) => any);
+          handler.mockImplementation(callback as (...args: unknown[]) => unknown);
         }
       });
 
       // Create new instance to set up handlers
-      new (errorHandlerService.constructor as any)();
+      new (errorHandlerService.constructor as new() => typeof errorHandlerService)();
 
       // Simulate unhandled rejection
       const mockEvent = {
@@ -392,12 +393,12 @@ describe('ErrorHandlerService', () => {
       const handler = jest.fn();
       window.addEventListener = jest.fn((event, callback) => {
         if (event === 'error') {
-          handler.mockImplementation(callback as (...args: any[]) => any);
+          handler.mockImplementation(callback as (...args: unknown[]) => unknown);
         }
       });
 
       // Create new instance to set up handlers
-      new (errorHandlerService.constructor as any)();
+      new (errorHandlerService.constructor as new() => typeof errorHandlerService)();
 
       // Simulate window error
       const mockEvent = {
@@ -433,7 +434,7 @@ describe('ErrorHandlerService', () => {
       errorHandlerService.handleError(new Error('Error 1'));
       errorHandlerService.handleError(new Error('Error 2'));
 
-      const errorQueue = (errorHandlerService as any).errorQueue;
+      const errorQueue = (errorHandlerService as unknown as MockErrorHandlerServicePrivate).errorQueue;
       expect(errorQueue).toHaveLength(2);
       expect(errorQueue[0]).toHaveProperty('error');
       expect(errorQueue[0]).toHaveProperty('timestamp');
@@ -444,11 +445,11 @@ describe('ErrorHandlerService', () => {
       errorHandlerService.handleError(new Error('Error 1'));
       errorHandlerService.handleError(new Error('Error 2'));
       
-      const errorQueue = (errorHandlerService as any).errorQueue;
+      const errorQueue = (errorHandlerService as unknown as MockErrorHandlerServicePrivate).errorQueue;
       
       // Queue should contain the errors
       expect(errorQueue.length).toBeGreaterThan(0);
-      expect(errorQueue.every((entry: any) => entry.error && entry.timestamp)).toBe(true);
+      expect(errorQueue.every((entry: unknown) => (entry as { error: unknown; timestamp: number }).error && (entry as { error: unknown; timestamp: number }).timestamp)).toBe(true);
     });
   });
 
@@ -458,15 +459,15 @@ describe('ErrorHandlerService', () => {
       const numberError = 42;
       const objectError = { message: 'Object error' };
 
-      errorHandlerService.handleError(stringError as any);
-      errorHandlerService.handleError(numberError as any);
-      errorHandlerService.handleError(objectError as any);
+      errorHandlerService.handleError(stringError as Error);
+      errorHandlerService.handleError(numberError as Error);
+      errorHandlerService.handleError(objectError as Error);
 
       expect(logger.error).toHaveBeenCalledTimes(3);
     });
 
     it('handles errors with circular references in metadata', () => {
-      const circular: any = { name: 'test' };
+      const circular: { name: string; self?: unknown } = { name: 'test' };
       circular.self = circular;
 
       const error = new Error('Circular reference error');

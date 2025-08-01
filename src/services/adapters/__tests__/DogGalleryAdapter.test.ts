@@ -7,6 +7,7 @@
 
 import { DogGalleryAdapter } from '../DogGalleryAdapter';
 import { logger } from '../../../lib/logger';
+import type { MockDogData, MockImageData, MockAdapterPrivate } from '../../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../../lib/logger', () => ({
@@ -145,7 +146,7 @@ describe('DogGalleryAdapter', () => {
     it('handles mixed breed default for missing breed', () => {
       const dataWithMissingBreed = [
         { url: 'test.jpg', breed: '', id: 'test-1' },
-        { url: 'test2.jpg', breed: undefined as any, id: 'test-2' },
+        { url: 'test2.jpg', breed: undefined as string | undefined, id: 'test-2' },
       ];
       
       localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(dataWithMissingBreed));
@@ -163,7 +164,7 @@ describe('DogGalleryAdapter', () => {
       expect(recent[0].url).toBe(mockDogFavorites[0].url);
       expect(recent[0].breed).toBe(mockDogFavorites[0].breed);
       expect(recent[0].addedAt).toBe(1703020800000); // Most recent
-      expect(recent[1].addedAt).toBeLessThan(recent[0].addedAt!); // Older
+      expect(recent[1].addedAt).toBeLessThan(recent[0].addedAt ?? 0); // Older
     });
 
     it('limits recent favorites to 10 items', () => {
@@ -395,7 +396,7 @@ describe('DogGalleryAdapter', () => {
         newValue: JSON.stringify([mockDogFavorites[0]]),
       };
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       storageHandler(mockEvent);
       
       expect(spy).toHaveBeenCalled();
@@ -406,7 +407,7 @@ describe('DogGalleryAdapter', () => {
         call => call[0] === 'storage',
       )?.[1];
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       
       const mockEvent = {
         key: 'other_key',
@@ -500,7 +501,7 @@ describe('DogGalleryAdapter', () => {
       // First call loads data
       adapter.getContextData();
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       
       // Second call should use cached data
       adapter.getContextData();
@@ -510,9 +511,9 @@ describe('DogGalleryAdapter', () => {
 
     it('refreshes data when cache expires', () => {
       // Mock expired cache
-      (adapter as any).lastFetchTime = 0;
+      (adapter as unknown as MockAdapterPrivate).lastFetchTime = 0;
       
-      const spy = jest.spyOn(adapter as any, 'loadData');
+      const spy = jest.spyOn(adapter as unknown as MockAdapterPrivate, 'loadData');
       adapter.getContextData();
       
       expect(spy).toHaveBeenCalled();

@@ -636,8 +636,8 @@ describe('CircleGameAdapter', () => {
       expect(results.length).toBeGreaterThan(0);
       const firstPerfectResult = results.find(r => r.field.includes('firstPerfect'));
       expect(firstPerfectResult).toBeDefined();
-      expect(firstPerfectResult!.type).toBe('achievement');
-      expect(firstPerfectResult!.value).toBe('Unlocked');
+      expect(firstPerfectResult?.type).toBe('achievement');
+      expect(firstPerfectResult?.value).toBe('Unlocked');
     });
 
     it('returns empty results for non-matching queries', async () => {

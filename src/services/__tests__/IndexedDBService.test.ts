@@ -7,21 +7,22 @@
 
 import { IndexedDBService } from '../IndexedDBService';
 import { logger } from '../../lib/logger';
+import type { MockGlobal, MockIndexedDBServicePrivate, MockDBResult, MockIndexedDBRequest } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/logger');
 
 // Mock IndexedDB
-class MockIDBRequest {
-  result: any;
-  error: any;
-  onsuccess: any;
-  onerror: any;
-  onupgradeneeded: any;
+class MockIDBRequest implements MockIndexedDBRequest {
+  result: unknown;
+  error: Error | null;
+  onsuccess: ((event: Event) => void) | null = null;
+  onerror: ((event: Event) => void) | null = null;
+  onupgradeneeded: ((event: IDBVersionChangeEvent) => void) | null = null;
   
-  constructor(result?: any, error?: any) {
+  constructor(result?: unknown, error?: Error | null) {
     this.result = result;
-    this.error = error;
+    this.error = error ?? null;
   }
 }
 
@@ -40,15 +41,15 @@ class MockIDBTransaction {
 }
 
 class MockIDBObjectStore {
-  private data: Map<string, any> = new Map();
+  private data: Map<string, unknown> = new Map();
   
   constructor(name: string) {
     // Get or create global data store
-    const globalStore = (global as any).__mockIDBStores || {};
+    const globalStore = (global as MockGlobal).__mockIDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as any).__mockIDBStores = globalStore;
+    (global as MockGlobal).__mockIDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -70,7 +71,7 @@ class MockIDBObjectStore {
     return request;
   }
   
-  add(value: any) {
+  add(value: unknown) {
     const request = new MockIDBRequest();
     setTimeout(() => {
       const key = value.id || Math.random().toString();
@@ -86,10 +87,10 @@ class MockIDBObjectStore {
     return request;
   }
   
-  put(value: any) {
+  put(value: unknown) {
     const request = new MockIDBRequest();
     setTimeout(() => {
-      const key = value.id || Math.random().toString();
+      const key = (value as { id?: string }).id || Math.random().toString();
       this.data.set(key, value);
       request.result = key;
       if (request.onsuccess) request.onsuccess({ target: request });
@@ -126,7 +127,7 @@ class MockIDBObjectStore {
   
   index(_name: string) {
     return {
-      getAll: (_query?: any) => {
+      getAll: (_query?: IDBKeyRange | IDBValidKey) => {
         const request = new MockIDBRequest();
         setTimeout(() => {
           request.result = Array.from(this.data.values());
@@ -144,7 +145,7 @@ class MockIDBDatabase {
   name: string;
   version: number;
   objectStoreNames: { contains: (name: string) => boolean };
-  onversionchange: any;
+  onversionchange: ((event: IDBVersionChangeEvent) => void) | null = null;
   
   constructor(name: string, version: number) {
     this.name = name;
@@ -158,7 +159,7 @@ class MockIDBDatabase {
     return new MockIDBTransaction(storeNames, mode);
   }
   
-  createObjectStore(name: string, _options?: any) {
+  createObjectStore(name: string, _options?: IDBObjectStoreParameters) {
     const store = new MockIDBObjectStore(name);
     return {
       ...store,
@@ -182,7 +183,7 @@ const mockIndexedDB = {
         const event = {
           target: { result: db },
         };
-        request.onupgradeneeded(event as any);
+        request.onupgradeneeded(event as IDBVersionChangeEvent);
       }
       
       request.result = new MockIDBDatabase(name, version || 1);
@@ -223,10 +224,10 @@ describe('IndexedDBService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (global as any).__mockIDBStores = {};
+    (global as MockGlobal).__mockIDBStores = {};
     
     // Reset singleton instance
-    (IndexedDBService as any).instance = undefined;
+    (IndexedDBService as unknown as MockIndexedDBServicePrivate).instance = undefined;
     service = IndexedDBService.getInstance();
   });
 
@@ -304,13 +305,13 @@ describe('IndexedDBService', () => {
       await service.get('TestDB', 'testStore', 'key1');
       
       // Simulate version change
-      const db = (service as any).databases.get('TestDB');
+      const db = (service as unknown as MockIndexedDBServicePrivate).databases.get('TestDB');
       if (db && db.onversionchange) {
         db.onversionchange();
       }
       
       // Database should be removed from cache
-      expect((service as any).databases.has('TestDB')).toBe(false);
+      expect((service as unknown as MockIndexedDBServicePrivate).databases.has('TestDB')).toBe(false);
     });
   });
 
@@ -577,7 +578,7 @@ describe('IndexedDBService', () => {
       const result = await service.get('RetryTestDB', 'items', 'retry-test');
       
       expect(result.success).toBe(true);
-      expect((result.data as any)?.data).toBe('success after retry');
+      expect((result.data as MockDBResult)?.data).toBe('success after retry');
       expect(attempts).toBe(2);
       
       // Restore original method
@@ -660,12 +661,12 @@ describe('IndexedDBService', () => {
       // First establish connection
       await service.get('ManagementTestDB', 'items', 'test');
       
-      const closeSpy = jest.spyOn((service as any).databases.get('ManagementTestDB'), 'close');
+      const closeSpy = jest.spyOn((service as unknown as MockIndexedDBServicePrivate).databases.get('ManagementTestDB'), 'close');
       
       service.closeDatabase('ManagementTestDB');
       
       expect(closeSpy).toHaveBeenCalled();
-      expect((service as any).databases.has('ManagementTestDB')).toBe(false);
+      expect((service as unknown as MockIndexedDBServicePrivate).databases.has('ManagementTestDB')).toBe(false);
     });
 
     it('handles closing non-existent database', () => {
@@ -683,8 +684,8 @@ describe('IndexedDBService', () => {
       await service.get('ManagementTestDB', 'items', 'test1');
       await service.get('TestDB2', 'items', 'test2');
       
-      const db1 = (service as any).databases.get('ManagementTestDB');
-      const db2 = (service as any).databases.get('TestDB2');
+      const db1 = (service as unknown as MockIndexedDBServicePrivate).databases.get('ManagementTestDB');
+      const db2 = (service as unknown as MockIndexedDBServicePrivate).databases.get('TestDB2');
       const closeSpy1 = jest.spyOn(db1, 'close');
       const closeSpy2 = jest.spyOn(db2, 'close');
       
@@ -692,8 +693,8 @@ describe('IndexedDBService', () => {
       
       expect(closeSpy1).toHaveBeenCalled();
       expect(closeSpy2).toHaveBeenCalled();
-      expect((service as any).databases.size).toBe(0);
-      expect((service as any).pendingConnections.size).toBe(0);
+      expect((service as unknown as MockIndexedDBServicePrivate).databases.size).toBe(0);
+      expect((service as unknown as MockIndexedDBServicePrivate).pendingConnections.size).toBe(0);
     });
 
     it('deletes database', async () => {

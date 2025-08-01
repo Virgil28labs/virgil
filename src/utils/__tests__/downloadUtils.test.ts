@@ -32,7 +32,7 @@ const mockRevokeObjectURL = jest.fn();
 global.URL = {
   createObjectURL: mockCreateObjectURL,
   revokeObjectURL: mockRevokeObjectURL,
-} as any;
+} as unknown as URL;
 
 // Mock document methods
 const mockLink = {

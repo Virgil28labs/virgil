@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useAuthForm } from '../useAuthForm';
 import { authService } from '../../services/AuthService';
 import { AUTH_CONFIG, AUTH_MESSAGES } from '../../constants/auth.constants';
+import type { MockInputChangeEvent, MockFormEvent } from '../../test-utils/mockTypes';
 
 // Mock the AuthService
 jest.mock('../../services/AuthService');
@@ -39,7 +40,7 @@ describe('useAuthForm', () => {
       act(() => {
         result.current.handleInputChange({
           target: { name: 'email', value: 'test@example.com' },
-        } as any);
+        } as MockInputChangeEvent);
       });
       
       expect(result.current.formData.email).toBe('test@example.com');
@@ -53,16 +54,16 @@ describe('useAuthForm', () => {
       act(() => {
         result.current.handleInputChange({
           target: { name: 'email', value: 'test@example.com' },
-        } as any);
+        } as MockInputChangeEvent);
         result.current.handleInputChange({
           target: { name: 'password', value: 'password123' },
-        } as any);
+        } as MockInputChangeEvent);
       });
       
       // Submit form
       const mockEvent = { preventDefault: jest.fn() };
       await act(async () => {
-        await result.current.handleSubmit(mockEvent as any);
+        await result.current.handleSubmit(mockEvent as MockFormEvent);
       });
       
       expect(authService.login).toHaveBeenCalledWith({
@@ -84,16 +85,16 @@ describe('useAuthForm', () => {
       act(() => {
         result.current.handleInputChange({
           target: { name: 'email', value: 'test@example.com' },
-        } as any);
+        } as MockInputChangeEvent);
         result.current.handleInputChange({
           target: { name: 'password', value: 'wrong' },
-        } as any);
+        } as MockInputChangeEvent);
       });
       
       // Submit form
       const mockEvent = { preventDefault: jest.fn() };
       await act(async () => {
-        await result.current.handleSubmit(mockEvent as any);
+        await result.current.handleSubmit(mockEvent as MockFormEvent);
       });
       
       expect(result.current.message).toBe('Invalid credentials');
@@ -121,19 +122,19 @@ describe('useAuthForm', () => {
       act(() => {
         result.current.handleInputChange({
           target: { name: 'name', value: 'Test User' },
-        } as any);
+        } as MockInputChangeEvent);
         result.current.handleInputChange({
           target: { name: 'email', value: 'test@example.com' },
-        } as any);
+        } as MockInputChangeEvent);
         result.current.handleInputChange({
           target: { name: 'password', value: 'password123' },
-        } as any);
+        } as MockInputChangeEvent);
       });
       
       // Submit form
       const mockEvent = { preventDefault: jest.fn() };
       await act(async () => {
-        await result.current.handleSubmit(mockEvent as any);
+        await result.current.handleSubmit(mockEvent as MockFormEvent);
       });
       
       expect(authService.signUp).toHaveBeenCalledWith({
@@ -162,7 +163,7 @@ describe('useAuthForm', () => {
       act(() => {
         result.current.handleInputChange({
           target: { name: 'email', value: 'test' },
-        } as any);
+        } as MockInputChangeEvent);
       });
       
       // Clear message

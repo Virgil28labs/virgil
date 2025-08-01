@@ -5,11 +5,13 @@
  * memory integration, and user interactions. Critical chat interface component.
  */
 
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VirgilChatbot } from '../VirgilChatbot';
 import { AllTheProviders } from '../../test-utils/AllTheProviders';
 import type { ChatContextValue, ChatMessage } from '../../types/chat.types';
+import type { MockReactComponent } from '../../test-utils/mockTypes';
 
 // Mock chat context and services
 jest.mock('../chat/useChatContext', () => ({
@@ -48,12 +50,12 @@ jest.mock('../../services/ErrorHandlerService', () => ({
 
 // Mock chat components
 jest.mock('../chat/ChatMessages/ChatMessages', () => ({
-  ChatMessages: ({ messages, onRetry }: any) => (
+  ChatMessages: ({ messages, onMarkAsImportant }: { messages: Array<{ role: string; content: string; error?: string }>; onMarkAsImportant: (msg: { role: string; content: string; error?: string }) => void }) => (
     <div data-testid="chat-messages">
-      {messages.map((msg: any, index: number) => (
+      {messages.map((msg, index: number) => (
         <div key={index} data-testid={`message-${index}`}>
           <span>{msg.role}:</span> {msg.content}
-          {msg.error && <button onClick={() => onRetry(msg)}>Retry</button>}
+          {msg.error && <button onClick={() => onMarkAsImportant(msg)}>Retry</button>}
         </div>
       ))}
     </div>
@@ -61,7 +63,7 @@ jest.mock('../chat/ChatMessages/ChatMessages', () => ({
 }));
 
 jest.mock('../chat/ChatInput/ChatInput', () => ({
-  ChatInput: ({ onSend, disabled, isStreaming }: any) => (
+  ChatInput: ({ onSend, disabled, isStreaming }: { onSend: (value: string) => void; disabled: boolean; isStreaming: boolean }) => (
     <div data-testid="chat-input">
       <input 
         data-testid="message-input"
@@ -93,7 +95,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
 }));
 
 jest.mock('../chat/ChatHeader/ChatHeader', () => ({
-  ChatHeader: ({ onClear, onExport, messagesCount }: any) => (
+  ChatHeader: ({ onClear, onExport, messagesCount }: { onClear: () => void; onExport: () => void; messagesCount: number }) => (
     <div data-testid="chat-header">
       <span data-testid="message-count">{messagesCount} messages</span>
       <button data-testid="clear-button" onClick={onClear}>Clear</button>
@@ -104,7 +106,7 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
 
 // Mock external components
 jest.mock('../common/Modal', () => ({
-  Modal: ({ isOpen, onClose, children }: any) => 
+  Modal: ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => 
     isOpen ? (
       <div data-testid="modal">
         <button data-testid="modal-close" onClick={onClose}>×</button>

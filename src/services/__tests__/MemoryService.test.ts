@@ -11,6 +11,11 @@ import { dashboardContextService } from '../DashboardContextService';
 import { logger } from '../../lib/logger';
 import type { ChatMessage } from '../../types/chat.types';
 import type { MarkedMemory } from '../MemoryService';
+import type { 
+  MockIndexedDBRequest, 
+  MockMemoryServicePrivate,
+  MockGlobal,
+} from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../ToastService', () => ({
@@ -58,14 +63,14 @@ jest.mock('../TimeService', () => ({
 }));
 
 // Mock IndexedDB
-class MockIDBRequest {
-  result: any;
-  error: any;
-  onsuccess: any;
-  onerror: any;
-  onupgradeneeded: any;
+class MockIDBRequest implements MockIndexedDBRequest {
+  result?: unknown;
+  error?: Error | null;
+  onsuccess?: ((event: Event) => void) | null;
+  onerror?: ((event: Event) => void) | null;
+  onupgradeneeded?: ((event: IDBVersionChangeEvent) => void) | null;
   
-  constructor(result?: any, error?: any) {
+  constructor(result?: unknown, error?: Error | null) {
     this.result = result;
     this.error = error;
   }
@@ -78,14 +83,14 @@ class MockIDBTransaction {
 }
 
 class MockIDBObjectStore {
-  private data: Map<string, any> = new Map();
+  private data: Map<string, unknown> = new Map();
   constructor(name: string) {
     // Get or create data store
-    const globalStore = (global as any).__mockDBStores || {};
+    const globalStore = (global as MockGlobal).__mockDBStores || {};
     if (!globalStore[name]) {
       globalStore[name] = new Map();
     }
-    (global as any).__mockDBStores = globalStore;
+    (global as MockGlobal).__mockDBStores = globalStore;
     this.data = globalStore[name];
   }
   
@@ -93,7 +98,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.clear();
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
@@ -102,25 +107,25 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       request.result = this.data.get(key);
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
   
-  put(value: any) {
+  put(value: { id: string; [key: string]: unknown }) {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.set(value.id, value);
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
   
-  add(value: any) {
+  add(value: { id: string; [key: string]: unknown }) {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.set(value.id, value);
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
@@ -129,7 +134,7 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       this.data.delete(key);
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
@@ -138,12 +143,12 @@ class MockIDBObjectStore {
     const request = new MockIDBRequest();
     setTimeout(() => {
       request.result = Array.from(this.data.values());
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
   
-  openCursor(_range?: any, direction?: string) {
+  openCursor(_range?: IDBKeyRange | null, direction?: IDBCursorDirection) {
     const request = new MockIDBRequest();
     setTimeout(() => {
       const values = Array.from(this.data.values());
@@ -158,18 +163,18 @@ class MockIDBObjectStore {
         continue: () => {
           index++;
           if (index < values.length) {
-            cursor!.value = values[index];
+            if (cursor) cursor.value = values[index];
             request.result = cursor;
-            if (request.onsuccess) request.onsuccess();
+            if (request.onsuccess) request.onsuccess({ target: request } as Event);
           } else {
             request.result = null;
-            if (request.onsuccess) request.onsuccess();
+            if (request.onsuccess) request.onsuccess({ target: request } as Event);
           }
         },
       } : null;
       
       request.result = cursor;
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     return request;
   }
@@ -188,7 +193,7 @@ class MockIDBDatabase {
     return new MockIDBTransaction();
   }
   
-  createObjectStore(_name: string, _options: any) {
+  createObjectStore(_name: string, _options: IDBObjectStoreParameters) {
     return {
       createIndex: jest.fn(),
     };
@@ -205,11 +210,11 @@ const mockIndexedDB = {
         const event = {
           target: { result: new MockIDBDatabase() },
         };
-        request.onupgradeneeded(event as any);
+        request.onupgradeneeded(event as IDBVersionChangeEvent);
       }
       
       request.result = new MockIDBDatabase();
-      if (request.onsuccess) request.onsuccess();
+      if (request.onsuccess) request.onsuccess({ target: request } as Event);
     }, 0);
     
     return request;
@@ -250,7 +255,7 @@ describe('MemoryService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     // Clear mock data stores
-    (global as any).__mockDBStores = {};
+    (global as MockGlobal).__mockDBStores = {};
     mockDashboardContextService.getTimestamp.mockReturnValue(Date.now());
     
     memoryService = new MemoryService();
@@ -334,7 +339,7 @@ describe('MemoryService', () => {
 
     it('handles database errors gracefully', async () => {
       // Simulate DB not initialized
-      (memoryService as any).db = null;
+      (memoryService as unknown as MockMemoryServicePrivate).db = null;
       
       const conversation = await memoryService.getContinuousConversation();
       expect(conversation).toBeNull();
@@ -469,7 +474,7 @@ describe('MemoryService', () => {
 
     it('handles memory marking errors', async () => {
       // Mock transaction to throw
-      const db = (memoryService as any).db;
+      const db = (memoryService as unknown as MockMemoryServicePrivate).db;
       if (db) {
         db.transaction = jest.fn(() => {
           throw new Error('Transaction failed');
@@ -545,7 +550,7 @@ describe('MemoryService', () => {
   describe('Error Handling', () => {
     it('handles transaction errors gracefully', async () => {
       // Mock transaction to throw
-      const db = (memoryService as any).db;
+      const db = (memoryService as unknown as MockMemoryServicePrivate).db;
       if (db) {
         db.transaction = jest.fn(() => {
           throw new Error('Transaction failed');
@@ -559,7 +564,7 @@ describe('MemoryService', () => {
     });
 
     it('handles null database gracefully', async () => {
-      (memoryService as any).db = null;
+      (memoryService as unknown as MockMemoryServicePrivate).db = null;
       
       // All methods should handle null DB
       expect(await memoryService.getContinuousConversation()).toBeNull();

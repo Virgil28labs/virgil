@@ -16,6 +16,11 @@ import { supabase } from '../../lib/supabase';
 import type { ChatMessage } from '../../types/chat.types';
 import type { VectorSearchResult } from '../vectorService';
 import type { MarkedMemory } from '../SupabaseMemoryService';
+import type { 
+  MockSupabaseClient, 
+  MockApiResponse, 
+  MockedClass,
+} from '../../test-utils/mockTypes';
 
 // Mock all dependencies
 jest.mock('../SupabaseMemoryService');
@@ -66,7 +71,9 @@ jest.mock('../../lib/logger', () => ({
   },
 }));
 
+// Create mock functions before using them in jest.mock
 const mockGetUser = jest.fn();
+
 jest.mock('../../lib/supabase', () => ({
   supabase: {
     auth: {
@@ -100,7 +107,7 @@ describe('VectorMemoryService', () => {
     jest.clearAllMocks();
     
     // Reset singleton instance for testing
-    (VectorMemoryService as any).instance = undefined;
+    (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
     
     // Mock time service
     mockTimeService.getTimestamp.mockReturnValue(1705748400000); // January 20, 2024
@@ -179,7 +186,7 @@ describe('VectorMemoryService', () => {
     });
     
     const mockFrom = jest.fn();
-    mockSupabase.from.mockReturnValue(mockFrom as any);
+    mockSupabase.from.mockReturnValue(mockFrom);
     
     // Create service instance and wait for initialization
     service = VectorMemoryService.getInstance();
@@ -212,7 +219,7 @@ describe('VectorMemoryService', () => {
 
     it('handles health check failures gracefully', async () => {
       // Reset instance and mock failure before creating new instance
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockRejectedValue(new Error('Health check failed'));
       
       const newService = VectorMemoryService.getInstance();
@@ -231,7 +238,7 @@ describe('VectorMemoryService', () => {
 
     it('returns false when vector service throws non-Error object', async () => {
       // Reset instance and mock failure before creating new instance
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockRejectedValue('String error');
       
       const newService = VectorMemoryService.getInstance();
@@ -281,7 +288,7 @@ describe('VectorMemoryService', () => {
 
     it('skips storage when vector service is unhealthy', async () => {
       // Create a fresh service instance with unhealthy vector service
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       
       const unhealthyService = VectorMemoryService.getInstance();
@@ -404,7 +411,7 @@ describe('VectorMemoryService', () => {
 
     it('creates context string correctly', async () => {
       // Create a fresh healthy service instance
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(true);
       
       const healthyService = VectorMemoryService.getInstance();
@@ -432,7 +439,7 @@ describe('VectorMemoryService', () => {
 
     it('handles missing dashboard context gracefully', async () => {
       // Create a fresh healthy service instance
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(true);
       
       const healthyService = VectorMemoryService.getInstance();
@@ -537,7 +544,7 @@ describe('VectorMemoryService', () => {
 
     it('returns empty array when vector service is unhealthy', async () => {
       // Create a fresh service instance with unhealthy vector service
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       
       const unhealthyService = VectorMemoryService.getInstance();
@@ -662,7 +669,7 @@ describe('VectorMemoryService', () => {
 
     it('falls back to regular context when vector service unhealthy', async () => {
       // Create a fresh unhealthy service instance
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       
       const unhealthyService = VectorMemoryService.getInstance();
@@ -749,7 +756,7 @@ describe('VectorMemoryService', () => {
 
     it('skips sync when vector service is unhealthy', async () => {
       // Create a fresh service instance with unhealthy vector service
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       
       const unhealthyService = VectorMemoryService.getInstance();
@@ -791,7 +798,7 @@ describe('VectorMemoryService', () => {
 
     it('returns stats when unhealthy', async () => {
       // Create a fresh service instance with unhealthy vector service
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       mockVectorService.getCount.mockResolvedValue(15);
       
@@ -868,7 +875,7 @@ describe('VectorMemoryService', () => {
         gte: mockGte,
         lte: mockLte,
         order: mockOrder,
-      } as any);
+      });
 
       // Mock markAsImportant method
       service.markAsImportant = jest.fn().mockResolvedValue(undefined);
@@ -903,7 +910,7 @@ describe('VectorMemoryService', () => {
         gte: jest.fn().mockReturnThis(),
         lte: jest.fn().mockReturnThis(),
         order: mockOrder,
-      } as any);
+      });
 
       const summary = await service.createDailySummary();
 
@@ -922,7 +929,7 @@ describe('VectorMemoryService', () => {
         gte: jest.fn().mockReturnThis(),
         lte: jest.fn().mockReturnThis(),
         order: mockOrder,
-      } as any);
+      });
 
       const summary = await service.createDailySummary();
 
@@ -931,7 +938,7 @@ describe('VectorMemoryService', () => {
 
     it('handles unauthenticated user', async () => {
       (mockSupabase.auth.getUser as jest.MockedFunction<typeof mockSupabase.auth.getUser>).mockResolvedValue({
-        data: { user: null as any },
+        data: { user: null },
         error: null,
       });
 
@@ -970,7 +977,7 @@ describe('VectorMemoryService', () => {
         gte: jest.fn().mockReturnThis(),
         lte: jest.fn().mockReturnThis(),
         order: mockOrder,
-      } as any);
+      });
 
       mockTimeService.formatTimeToLocal.mockImplementation((date) => 
         date.toLocaleTimeString(),
@@ -1051,7 +1058,7 @@ describe('VectorMemoryService', () => {
 
     it('returns 0 confidence when vector service unhealthy', async () => {
       // Create a fresh service instance with unhealthy vector service
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockResolvedValue(false);
       
       const unhealthyService = VectorMemoryService.getInstance();
@@ -1340,7 +1347,7 @@ describe('VectorMemoryService', () => {
   describe('Error Handling', () => {
     it('handles non-Error objects in health check', async () => {
       // Create a fresh service instance with failing health check
-      (VectorMemoryService as any).instance = undefined;
+      (VectorMemoryService as unknown as { instance?: VectorMemoryService }).instance = undefined;
       mockVectorService.isHealthy.mockRejectedValue('String error');
 
       const errorService = VectorMemoryService.getInstance();

@@ -40,7 +40,7 @@ describe('lazyImport', () => {
         _payload: factory,
         $$typeof: Symbol.for('react.lazy'),
       };
-      return lazyComponent as any;
+      return lazyComponent as React.LazyExoticComponent<React.ComponentType>;
     });
   });
 
@@ -132,7 +132,7 @@ describe('lazyImport', () => {
       const mockPayload = jest.fn();
       const mockLazyComponent = {
         _payload: mockPayload,
-      } as any;
+      } as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
 
       preloadComponent(mockLazyComponent);
 
@@ -140,7 +140,7 @@ describe('lazyImport', () => {
     });
 
     it('handles lazy component without _payload', () => {
-      const mockLazyComponent = {} as any;
+      const mockLazyComponent = {} as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
 
       expect(() => preloadComponent(mockLazyComponent)).not.toThrow();
     });
@@ -148,7 +148,7 @@ describe('lazyImport', () => {
     it('handles lazy component with non-function _payload', () => {
       const mockLazyComponent = {
         _payload: 'not a function',
-      } as any;
+      } as React.LazyExoticComponent<React.ComponentType> & { _payload?: unknown };
 
       expect(() => preloadComponent(mockLazyComponent)).not.toThrow();
     });
@@ -177,7 +177,7 @@ describe('lazyImport', () => {
         _payload: mockPayload,
         _result: null,
         $$typeof: Symbol.for('react.lazy'),
-      }) as any);
+      }) as React.LazyExoticComponent<React.ComponentType> & { _payload?: () => void });
 
       const mockImportFn = jest.fn().mockResolvedValue({
         default: MockComponent,

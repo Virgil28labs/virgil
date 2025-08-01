@@ -10,6 +10,7 @@ import { vectorMemoryService } from '../VectorMemoryService';
 import { vectorService } from '../vectorService';
 import { logger } from '../../lib/logger';
 import { timeService } from '../TimeService';
+import type { MockIntentInitializerPrivate } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../VectorMemoryService');
@@ -62,7 +63,7 @@ describe('IntentInitializer', () => {
     localStorageMock.clear();
     
     // Reset singleton instance
-    (IntentInitializer as any).instance = undefined;
+    (IntentInitializer as unknown as MockIntentInitializerPrivate).instance = undefined;
     initializer = IntentInitializer.getInstance();
     
     // Default mock implementations
@@ -71,9 +72,10 @@ describe('IntentInitializer', () => {
     (timeService.getTimestamp as jest.Mock).mockReturnValue(Date.now());
     
     // Reset initialization state
-    (initializer as any).initialized = false;
-    (initializer as any).initializationPromise = null;
-    (initializer as any).initializedIntents.clear();
+    const privateInitializer = initializer as unknown as MockIntentInitializerPrivate;
+    privateInitializer.initialized = false;
+    privateInitializer.initializationPromise = null;
+    privateInitializer.initializedIntents.clear();
   });
 
   describe('Singleton Pattern', () => {
@@ -107,7 +109,7 @@ describe('IntentInitializer', () => {
 
     it('returns existing promise if initialization in progress', async () => {
       // Create a promise that takes some time to resolve
-      let resolveHealthCheck: any;
+      let resolveHealthCheck: ((value: boolean) => void) | undefined;
       mockVectorMemoryService.waitForHealthCheck.mockReturnValue(
         new Promise(resolve => { resolveHealthCheck = resolve; }),
       );
@@ -116,7 +118,8 @@ describe('IntentInitializer', () => {
       const promise2 = initializer.initializeIntents();
       
       // Same promise should be returned
-      expect((initializer as any).initializationPromise).toBeDefined();
+      const privateInit = initializer as unknown as MockIntentInitializerPrivate;
+      expect(privateInit.initializationPromise).toBeDefined();
       
       // Resolve the health check
       resolveHealthCheck(true);
@@ -187,9 +190,9 @@ describe('IntentInitializer', () => {
       const streakIntent = storeCalls.find(call => call[0].includes('[Intent: streaks]'));
       
       expect(streakIntent).toBeDefined();
-      expect(streakIntent![0]).toContain('habit');
-      expect(streakIntent![0]).toContain('What are my habits?');
-      expect(streakIntent![0]).toContain('Show me my streaks');
+      expect(streakIntent?.[0]).toContain('habit');
+      expect(streakIntent?.[0]).toContain('What are my habits?');
+      expect(streakIntent?.[0]).toContain('Show me my streaks');
     });
 
     it('handles individual intent storage failures', async () => {
@@ -369,7 +372,7 @@ describe('IntentInitializer', () => {
       );
       
       expect(notesCall).toBeDefined();
-      const content = notesCall![0];
+      const content = notesCall?.[0] ?? '';
       
       // Should include example queries
       expect(content).toContain('Show me my notes');
@@ -388,7 +391,7 @@ describe('IntentInitializer', () => {
       );
       
       expect(streaksCall).toBeDefined();
-      const content = streaksCall![0];
+      const content = streaksCall?.[0] ?? '';
       
       // Should include clarifying negative examples
       expect(content).toContain('track habits not workout advice');
@@ -420,7 +423,7 @@ describe('IntentInitializer', () => {
 
     it('handles concurrent lazy loads', async () => {
       // Create a delayed store implementation to test concurrent behavior
-      let resolveStore: any;
+      let resolveStore: ((value: string) => void) | undefined;
       const storePromise = new Promise<string>(resolve => { resolveStore = resolve; });
       mockVectorService.store.mockReturnValueOnce(storePromise);
       
