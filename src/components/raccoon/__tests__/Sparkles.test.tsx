@@ -5,7 +5,6 @@
  * Simple conditional rendering component with position-based animations.
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Sparkles } from '../Sparkles';
 
@@ -92,7 +91,7 @@ describe('Sparkles', () => {
       render(<Sparkles show />);
       
       // Should render multiple sparkle emojis (some may be duplicated)
-      const allSparkles = screen.getAllByText(/[✨💫⭐]/);
+      const allSparkles = screen.getAllByText(/[✨💫⭐]/u);
       expect(allSparkles.length).toBe(5);
       
       // Check specific emojis are present

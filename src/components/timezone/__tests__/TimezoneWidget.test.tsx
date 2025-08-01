@@ -10,7 +10,6 @@
  * - Timeout management
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TimezoneWidget } from '../TimezoneWidget';
@@ -101,7 +100,7 @@ describe('TimezoneWidget', () => {
 
     it('should update aria-label based on selected timezones', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York', 'Europe/London'],
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
@@ -152,7 +151,6 @@ describe('TimezoneWidget', () => {
     });
 
     it('should not open modal when clickToOpen is false', async () => {
-      const _user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
       render(<TimezoneWidget {...defaultProps} clickToOpen={false} />);
 
       const trigger = screen.getByRole('button');
@@ -197,7 +195,7 @@ describe('TimezoneWidget', () => {
       jest.useFakeTimers();
       // Mock multiple selected timezones to enable hover panel
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York', 'Europe/London'],
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
@@ -274,7 +272,7 @@ describe('TimezoneWidget', () => {
 
     it('should not show hover panel with only one timezone', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York'],
+        selectedTimezones: [{ timezone: 'America/New_York' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
         ],
@@ -411,7 +409,7 @@ describe('TimezoneWidget', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York', 'Europe/London'],
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
@@ -495,7 +493,7 @@ describe('TimezoneWidget', () => {
 
     it('should handle rapid mouse enter/leave', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York', 'Europe/London'],
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },
@@ -540,7 +538,7 @@ describe('TimezoneWidget', () => {
 
     it('should use default hover delay when not specified', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: ['America/New_York', 'Europe/London'],
+        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as any,
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as any, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as any, isValid: true },

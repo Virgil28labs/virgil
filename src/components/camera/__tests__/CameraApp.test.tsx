@@ -5,7 +5,6 @@
  * photo selection and modal functionality, and error handling.
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CameraApp } from '../CameraApp';
@@ -85,19 +84,59 @@ const mockGalleryState = {
 
 const mockPhotoGalleryReturn = {
   galleryState: mockGalleryState,
+  loading: false,
+  error: null,
   getCurrentPhotos: jest.fn(() => [mockPhoto1, mockPhoto2]),
+  setActiveTab: jest.fn(),
+  setSelectedPhoto: jest.fn(),
+  setSelectedPhotos: jest.fn(),
+  setSearchQuery: jest.fn(),
+  setSortBy: jest.fn(),
+  setSortOrder: jest.fn(),
+  setFilter: jest.fn(),
+  toggleSelectionMode: jest.fn(),
+  clearSelections: jest.fn(),
   handleFavoriteToggle: jest.fn(),
   handlePhotoDelete: jest.fn(),
+  updatePhoto: jest.fn(),
+  getStorageInfo: jest.fn(),
+  clearAllPhotos: jest.fn(),
+  downloadPhoto: jest.fn(),
+  sharePhoto: jest.fn(),
   navigatePhoto: jest.fn(),
+  loadPhotos: jest.fn(),
+  togglePhotoSelection: jest.fn(),
+  selectAllPhotos: jest.fn(),
+  clearSelection: jest.fn(),
+  handlePhotoCapture: jest.fn(),
+  savePhoto: jest.fn(),
+  deletePhoto: jest.fn(),
+  toggleFavorite: jest.fn(),
+  filterPhotos: jest.fn(),
 };
 
 const mockAddToast = jest.fn();
+const mockRemoveToast = jest.fn();
+const mockClearToasts = jest.fn();
+const mockSuccess = jest.fn();
+const mockError = jest.fn();
+const mockWarning = jest.fn();
+const mockInfo = jest.fn();
 
 describe('CameraApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn);
-    mockUseToast.mockReturnValue({ addToast: mockAddToast });
+    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn as any);
+    mockUseToast.mockReturnValue({
+      toasts: [],
+      addToast: mockAddToast,
+      removeToast: mockRemoveToast,
+      clearToasts: mockClearToasts,
+      success: mockSuccess,
+      error: mockError,
+      warning: mockWarning,
+      info: mockInfo,
+    } as any);
   });
 
   const renderCameraApp = (props = {}) => {
@@ -135,7 +174,11 @@ describe('CameraApp', () => {
     });
 
     it('should show correct favorites count for favorites tab', () => {
-      mockPhotoGalleryReturn.galleryState = { ...mockGalleryState, activeTab: 'favorites' };
+      const favoritesGalleryState = { ...mockGalleryState, activeTab: 'favorites' as const };
+      mockUsePhotoGallery.mockReturnValue({
+        ...mockPhotoGalleryReturn,
+        galleryState: favoritesGalleryState,
+      } as any);
       renderCameraApp();
 
       expect(screen.getByText('1 favorite')).toBeInTheDocument();

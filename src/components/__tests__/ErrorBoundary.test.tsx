@@ -12,7 +12,6 @@
  * - Component lifecycle methods
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { logger } from '../../lib/logger';
@@ -64,7 +63,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <div>Test child content</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Test child content')).toBeInTheDocument();
@@ -75,7 +74,7 @@ describe('ErrorBoundary', () => {
         <ErrorBoundary>
           <div>First child</div>
           <div>Second child</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('First child')).toBeInTheDocument();
@@ -90,7 +89,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ChildComponent testProp="test value" />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByTestId('child')).toHaveTextContent('test value');
@@ -102,7 +101,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -115,7 +114,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(mockLogger.error).toHaveBeenCalledWith(
@@ -127,7 +126,7 @@ describe('ErrorBoundary', () => {
           metadata: expect.objectContaining({
             errorInfo: expect.any(Object),
           }),
-        })
+        }),
       );
     });
 
@@ -137,20 +136,20 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary onError={mockOnError}>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(mockOnError).toHaveBeenCalledWith(
         expect.any(Error),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
     it('should update state to hasError: true when error occurs', () => {
-      const { container } = render(
+      render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // Error UI should be displayed instead of children
@@ -162,16 +161,16 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // In development mode, error details should be available
       process.env.NODE_ENV = 'development';
       
-      const { container } = render(
+      render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // Error details should be present in development
@@ -186,7 +185,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallback={customFallback}>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Custom error message')).toBeInTheDocument();
@@ -205,7 +204,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallback={customFallback}>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Custom Error')).toBeInTheDocument();
@@ -219,7 +218,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary fallback={customFallback}>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Custom fallback')).toBeInTheDocument();
@@ -232,8 +231,8 @@ describe('ErrorBoundary', () => {
     it('should reset error state when Try Again is clicked', () => {
       const { rerender } = render(
         <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+          <ThrowError shouldThrow />
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -245,7 +244,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Child component')).toBeInTheDocument();
@@ -256,7 +255,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const refreshButton = screen.getByText('Refresh Page');
@@ -269,7 +268,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const tryAgainButton = screen.getByText('Try Again');
@@ -291,7 +290,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Error Details (Development)')).toBeInTheDocument();
@@ -313,7 +312,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.queryByText('Error Details (Development)')).not.toBeInTheDocument();
@@ -332,7 +331,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorWithoutStack />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Error Details (Development)')).toBeInTheDocument();
@@ -344,7 +343,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const errorContainer = screen.getByText('Something went wrong').parentElement;
@@ -359,7 +358,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const tryAgainButton = screen.getByText('Try Again');
@@ -380,7 +379,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const heading = screen.getByRole('heading', { level: 2 });
@@ -397,7 +396,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       const details = screen.getByRole('group');
@@ -420,7 +419,7 @@ describe('ErrorBoundary', () => {
         render(
           <ErrorBoundary onError={faultyOnError}>
             <ErrorComponent />
-          </ErrorBoundary>
+          </ErrorBoundary>,
         );
       }).not.toThrow();
       
@@ -432,7 +431,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -444,7 +443,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -455,7 +454,7 @@ describe('ErrorBoundary', () => {
         <ErrorBoundary>
           {null}
           {undefined}
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // Should render without issues
@@ -464,7 +463,6 @@ describe('ErrorBoundary', () => {
 
     it('should handle error during getDerivedStateFromError', () => {
       // Mock getDerivedStateFromError to potentially fail
-      const originalGDSFE = ErrorBoundary.getDerivedStateFromError;
       
       // This is a static method test - mainly for coverage
       const error = new Error('Test error');
@@ -489,7 +487,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <AsyncErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // Async errors won't be caught by error boundaries
@@ -500,10 +498,10 @@ describe('ErrorBoundary', () => {
 
   describe('component lifecycle', () => {
     it('should initialize with correct initial state', () => {
-      const { container } = render(
+      render(
         <ErrorBoundary>
           <div>Normal content</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       // Should render children normally
@@ -515,7 +513,7 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <div>Content 1</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Content 1')).toBeInTheDocument();
@@ -523,7 +521,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <div>Content 2</div>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(screen.getByText('Content 2')).toBeInTheDocument();
@@ -536,7 +534,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary onError={mockOnError}>
           <ErrorComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
       
       expect(mockOnError).toHaveBeenCalledWith(
@@ -545,7 +543,7 @@ describe('ErrorBoundary', () => {
         }),
         expect.objectContaining({
           componentStack: expect.any(String),
-        })
+        }),
       );
     });
   });

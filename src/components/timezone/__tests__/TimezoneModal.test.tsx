@@ -11,9 +11,9 @@
  * - Focus trapping and escape handling
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { DateTime } from 'luxon';
 import { TimezoneModal } from '../TimezoneModal';
 import { useTimezones, useTimezoneFormatters } from '../useTimezones';
 import { logger } from '../../../lib/logger';
@@ -54,15 +54,17 @@ describe('TimezoneModal', () => {
       id: '1',
       timezone: 'America/New_York',
       label: 'New York',
-      currentTime: new Date('2023-12-01T12:00:00-05:00'),
+      currentTime: DateTime.fromISO('2023-12-01T12:00:00-05:00'),
       isValid: true,
+      order: 0,
     },
     {
       id: '2',
       timezone: 'Europe/London',
       label: 'London',
-      currentTime: new Date('2023-12-01T17:00:00Z'),
+      currentTime: DateTime.fromISO('2023-12-01T17:00:00Z'),
       isValid: true,
+      order: 1,
     },
   ];
 
@@ -76,15 +78,15 @@ describe('TimezoneModal', () => {
       addTimezone: jest.fn().mockReturnValue(true),
       removeTimezone: jest.fn(),
       updateTimezoneLabel: jest.fn(),
+      reorderTimezones: jest.fn(),
       clearAllTimezones: jest.fn(),
       canAddMoreTimezones: true,
-      getTimezoneInfo: jest.fn(),
+      isUpdating: false,
     });
 
     mockUseTimezoneFormatters.mockReturnValue({
       formatTime: jest.fn().mockReturnValue('12:00 PM'),
-      formatDate: jest.fn().mockReturnValue('Dec 1, 2023'),
-      formatDateTime: jest.fn().mockReturnValue('Dec 1, 2023 12:00 PM'),
+      formatRelativeTime: jest.fn().mockReturnValue('5 hours ahead'),
     });
   });
 
@@ -138,14 +140,20 @@ describe('TimezoneModal', () => {
 
     it('should not show search when at maximum timezones', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: new Array(5).fill(null).map((_, i) => ({ timezone: `tz${i}` })),
+        selectedTimezones: new Array(5).fill(null).map((_, i) => ({ 
+          id: `id${i}`,
+          timezone: `tz${i}`,
+          label: `Label ${i}`,
+          order: i,
+        })),
         timezonesWithTime: [],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: false,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -161,9 +169,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -179,9 +188,10 @@ describe('TimezoneModal', () => {
         addTimezone: mockAddTimezone,
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -201,9 +211,10 @@ describe('TimezoneModal', () => {
         addTimezone: mockAddTimezone,
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -228,9 +239,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
     });
 
@@ -260,9 +272,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -278,9 +291,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -302,9 +316,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -321,9 +336,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
     });
 
@@ -335,9 +351,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: mockRemoveTimezone,
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -357,9 +374,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: mockClearAllTimezones,
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -380,9 +398,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
     });
 
@@ -405,9 +424,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: mockUpdateTimezoneLabel,
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -436,9 +456,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: mockUpdateTimezoneLabel,
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -467,9 +488,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: mockUpdateTimezoneLabel,
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -501,9 +523,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: mockUpdateTimezoneLabel,
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -531,9 +554,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: mockUpdateTimezoneLabel,
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       const user = userEvent.setup();
@@ -572,9 +596,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -596,9 +621,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);
@@ -694,9 +720,10 @@ describe('TimezoneModal', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: false, // No search shown
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<TimezoneModal {...defaultProps} />);

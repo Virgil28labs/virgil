@@ -5,7 +5,6 @@
  * Simple conditional rendering component with different indicator types.
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Indicators } from '../Indicators';
 
@@ -102,14 +101,13 @@ describe('Indicators', () => {
       
       expect(parentDiv).toHaveStyle({
         position: 'absolute',
-        fontSize: '18px',
+        fontSize: '20px', // UI indicator has larger font size
         pointerEvents: 'none',
         zIndex: '5',
         top: '-40px',
         left: '50%',
         transform: 'translateX(-50%)',
         animation: 'bounce 0.5s ease-out',
-        fontSize: '20px', // UI indicator has larger font size
       });
     });
 
@@ -165,7 +163,7 @@ describe('Indicators', () => {
     it('indicators are decorative and do not interfere with interaction', () => {
       render(<Indicators {...defaultProps} isOnWall isOnUIElement />);
       
-      const indicators = screen.getAllByText(/[🧲🦝]/);
+      const indicators = screen.getAllByText(/[🧲🦝]/u);
       indicators.forEach(indicator => {
         const parentDiv = indicator.parentElement;
         expect(parentDiv).toHaveStyle({ pointerEvents: 'none' });
@@ -186,7 +184,7 @@ describe('Indicators', () => {
       expect(screen.getByText('⚡')).toBeInTheDocument();
       
       // Test weather widget interaction
-      const { rerender } = render(<Indicators {...defaultProps} isOnUIElement currentRaccoonEmoji="⛅" />);
+      render(<Indicators {...defaultProps} isOnUIElement currentRaccoonEmoji="⛅" />);
       expect(screen.getByText('⛅')).toBeInTheDocument();
     });
   });
@@ -234,7 +232,7 @@ describe('Indicators', () => {
       ];
 
       combinations.forEach(({ isOnWall, isOnUIElement }) => {
-        const { rerender } = render(
+        render(
           <Indicators 
             {...defaultProps} 
             isOnWall={isOnWall} 
@@ -268,7 +266,7 @@ describe('Indicators', () => {
       const specialEmojis = ['🏠', '🌟', '💝', '🎉', '🔥'];
 
       specialEmojis.forEach(emoji => {
-        const { rerender } = render(
+        render(
           <Indicators {...defaultProps} isOnUIElement currentRaccoonEmoji={emoji} />,
         );
         

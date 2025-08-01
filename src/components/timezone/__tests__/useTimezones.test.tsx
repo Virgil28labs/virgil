@@ -14,7 +14,6 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { DateTime } from 'luxon';
 import { useTimezones, useTimezoneFormatters } from '../useTimezones';
 import { getDefaultTimezones, generateTimezoneId, getTimezoneInfo } from '../timezoneData';
 import { dashboardContextService } from '../../../services/DashboardContextService';
@@ -97,6 +96,7 @@ describe('useTimezones', () => {
       country: 'United Kingdom',
       region: 'GMT',
       popular: true,
+      searchTerms: ['london', 'uk', 'britain', 'gmt'],
     });
     
     mockDashboardContextService.getCurrentDateTime.mockReturnValue(mockCurrentDateTime);
@@ -203,7 +203,7 @@ describe('useTimezones', () => {
 
     it('should update current time when time service emits', () => {
       const mockUnsubscribe = jest.fn();
-      let timeUpdateCallback: (params: { dateObject: Date }) => void;
+      let timeUpdateCallback: (time: { currentTime: string; currentDate: string; dateObject: Date; }) => void;
       
       mockDashboardContextService.subscribeToTimeUpdates.mockImplementation((callback) => {
         timeUpdateCallback = callback;
@@ -215,7 +215,11 @@ describe('useTimezones', () => {
       const newTime = new Date('2023-12-01T13:00:00Z');
       
       act(() => {
-        timeUpdateCallback({ dateObject: newTime });
+        timeUpdateCallback({ 
+          currentTime: '13:00:00',
+          currentDate: '2023-12-01',
+          dateObject: newTime, 
+        });
       });
       
       // Check that timezones with time are updated
@@ -275,7 +279,7 @@ describe('useTimezones', () => {
       
       // Mock DateTime setZone to throw error for invalid timezone
       const { DateTime } = require('luxon');
-      DateTime.fromJSDate.mockImplementation((date) => ({
+      DateTime.fromJSDate.mockImplementation((date: Date) => ({
         setZone: jest.fn((tz) => {
           if (tz === 'Invalid/Timezone') {
             throw new Error('Invalid timezone');
@@ -366,7 +370,7 @@ describe('useTimezones', () => {
     it('should validate timezone using time service', () => {
       // Mock invalid timezone in setZone
       const { DateTime } = require('luxon');
-      DateTime.fromJSDate.mockImplementation((date) => ({
+      DateTime.fromJSDate.mockImplementation((date: Date) => ({
         setZone: jest.fn((tz) => {
           if (tz === 'Invalid/Timezone') {
             return { isValid: false };
@@ -397,7 +401,7 @@ describe('useTimezones', () => {
     it('should handle timezone validation errors', () => {
       // Mock DateTime to throw error in setZone
       const { DateTime } = require('luxon');
-      DateTime.fromJSDate.mockImplementation((date) => ({
+      DateTime.fromJSDate.mockImplementation((date: Date) => ({
         setZone: jest.fn((tz) => {
           if (tz === 'Bad/Timezone') {
             throw new Error('Invalid timezone');
@@ -430,11 +434,11 @@ describe('useTimezones', () => {
     });
 
     it('should use timezone fallback when no city info available', () => {
-      mockGetTimezoneInfo.mockReturnValue(null);
+      mockGetTimezoneInfo.mockReturnValue(undefined);
       
       // Mock valid DateTime for timezone validation
       const { DateTime } = require('luxon');
-      DateTime.fromJSDate.mockImplementation((date) => ({
+      DateTime.fromJSDate.mockImplementation((date: Date) => ({
         setZone: jest.fn().mockReturnValue({
           toFormat: jest.fn().mockReturnValue('12:00'),
           isValid: true,
@@ -742,7 +746,7 @@ describe('useTimezones', () => {
     });
 
     it('should track isUpdating state during time updates', () => {
-      let timeUpdateCallback: (params: { dateObject: Date }) => void;
+      let timeUpdateCallback: (time: { currentTime: string; currentDate: string; dateObject: Date; }) => void;
       
       mockDashboardContextService.subscribeToTimeUpdates.mockImplementation((callback) => {
         timeUpdateCallback = callback;
@@ -754,7 +758,11 @@ describe('useTimezones', () => {
       expect(result.current.isUpdating).toBe(false);
       
       act(() => {
-        timeUpdateCallback({ dateObject: new Date() });
+        timeUpdateCallback({ 
+          currentTime: '12:00:00',
+          currentDate: '2023-12-01',
+          dateObject: new Date(), 
+        });
       });
       
       // After async setTimeout, isUpdating should be false again
@@ -766,9 +774,11 @@ describe('useTimezones', () => {
 });
 
 describe('useTimezoneFormatters', () => {
-  const _mockDateTime1 = DateTime.fromISO('2023-12-01T12:00:00Z');
-  const _mockDateTime2 = DateTime.fromISO('2023-12-01T15:00:00Z'); // 3 hours ahead
-  const _mockDateTime3 = DateTime.fromISO('2023-12-01T09:00:00Z'); // 3 hours behind
+  // Note: These DateTime objects were used for reference but are no longer needed
+  // as we now mock the DateTime objects directly in each test
+  // const _mockDateTime1 = DateTime.fromISO('2023-12-01T12:00:00Z');
+  // const _mockDateTime2 = DateTime.fromISO('2023-12-01T15:00:00Z'); // 3 hours ahead
+  // const _mockDateTime3 = DateTime.fromISO('2023-12-01T09:00:00Z'); // 3 hours behind
 
   describe('formatTime', () => {
     it('should format time in 24-hour format', () => {

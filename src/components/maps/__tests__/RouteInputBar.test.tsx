@@ -11,19 +11,16 @@
  * - Error handling
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RouteInputBar } from '../RouteInputBar';
 import { useGooglePlacesAutocomplete } from '../../../hooks/useGooglePlacesAutocomplete';
-import { logger } from '../../../lib/logger';
 
 // Mock dependencies
 jest.mock('../../../hooks/useGooglePlacesAutocomplete');
 jest.mock('../../../lib/logger');
 
 const mockUseGooglePlacesAutocomplete = useGooglePlacesAutocomplete as jest.MockedFunction<typeof useGooglePlacesAutocomplete>;
-const mockLogger = logger as jest.Mocked<typeof logger>;
 
 describe('RouteInputBar', () => {
   const mockOnRouteRequest = jest.fn();
@@ -45,28 +42,44 @@ describe('RouteInputBar', () => {
 
   const mockSuggestions = [
     {
+      placePrediction: {
+        place_id: 'ChIJw____96GhYAR4jAVhUvqL',
+        description: 'Golden Gate Bridge, San Francisco, CA, USA',
+        structured_formatting: {
+          main_text: 'Golden Gate Bridge',
+          secondary_text: 'San Francisco, CA, USA',
+        },
+      } as google.maps.places.AutocompletePrediction,
       suggestion: {
         mainText: 'Golden Gate Bridge',
         secondaryText: 'San Francisco, CA, USA',
+        placeId: 'ChIJw____96GhYAR4jAVhUvqL',
       },
-      placeId: 'ChIJw____96GhYAR4jAVhUvqL',
     },
     {
+      placePrediction: {
+        place_id: 'ChIJmV_HkHCBhYAR4jAVhUvqL',
+        description: 'Fisherman\'s Wharf, San Francisco, CA, USA',
+        structured_formatting: {
+          main_text: 'Fisherman\'s Wharf',
+          secondary_text: 'San Francisco, CA, USA',
+        },
+      } as google.maps.places.AutocompletePrediction,
       suggestion: {
         mainText: 'Fisherman\'s Wharf',
         secondaryText: 'San Francisco, CA, USA',
+        placeId: 'ChIJmV_HkHCBhYAR4jAVhUvqL',
       },
-      placeId: 'ChIJmV_HkHCBhYAR4jAVhUvqL',
     },
   ];
 
   const createMockAutocomplete = () => ({
     suggestions: [],
     selectPlace: jest.fn(),
+    isLoading: false,
+    clearSuggestions: jest.fn(),
   });
 
-  const mockOriginAutocomplete = createMockAutocomplete();
-  const mockDestinationAutocomplete = createMockAutocomplete();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -230,8 +243,8 @@ describe('RouteInputBar', () => {
 
     it('should work with suggestions when available', () => {
       // Verify that mocks can be set up for suggestions
-      const mockOriginWithSuggestions = { suggestions: mockSuggestions, selectPlace: jest.fn() };
-      const mockDestinationWithSuggestions = { suggestions: mockSuggestions, selectPlace: jest.fn() };
+      const mockOriginWithSuggestions = { suggestions: mockSuggestions, selectPlace: jest.fn(), isLoading: false, clearSuggestions: jest.fn() };
+      const mockDestinationWithSuggestions = { suggestions: mockSuggestions, selectPlace: jest.fn(), isLoading: false, clearSuggestions: jest.fn() };
       
       mockUseGooglePlacesAutocomplete
         .mockReturnValueOnce(mockOriginWithSuggestions)

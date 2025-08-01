@@ -5,7 +5,6 @@
  * Simple modal component with overlay, image display, and close functionality.
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GifModal } from '../GifModal';

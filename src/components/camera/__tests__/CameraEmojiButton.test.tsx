@@ -5,11 +5,9 @@
  * and camera app integration.
  */
 
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CameraEmojiButton } from '../CameraEmojiButton';
-import { AllTheProviders } from '../../../test-utils/AllTheProviders';
 
 // Mock the EmojiButton component
 jest.mock('../../common/EmojiButton', () => ({

@@ -1,4 +1,3 @@
-import type { Mock } from '@jest/globals';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { UserProfileAdapter } from '../UserProfileAdapter';
 import type { UserProfile } from '../../../hooks/useUserProfile';
@@ -22,7 +21,7 @@ jest.mock('../../TimeService', () => ({
 
 describe('UserProfileAdapter', () => {
   let adapter: UserProfileAdapter;
-  let mockSubscriber: Mock;
+  let mockSubscriber: jest.MockedFunction<any>;
 
   const mockProfile: UserProfile = {
     nickname: 'Johnny',
@@ -51,12 +50,9 @@ describe('UserProfileAdapter', () => {
       aud: 'authenticated',
       created_at: '2023-01-01T00:00:00Z',
     },
-    session: null,
     loading: false,
-    signIn: jest.fn(),
-    signUp: jest.fn(),
-    signOut: jest.fn(),
-    updateProfile: jest.fn(),
+    signOut: jest.fn(() => Promise.resolve({ error: undefined } as { error?: Error })),
+    refreshUser: jest.fn(() => Promise.resolve()),
   };
 
   beforeEach(() => {

@@ -11,8 +11,7 @@
  * - Traffic color coding
  */
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RouteInfoBar } from '../RouteInfoBar';
 
@@ -65,7 +64,7 @@ describe('RouteInfoBar', () => {
     copyrights: '',
     fare: undefined,
     overview_path: [],
-    overview_polyline: { points: '' },
+    overview_polyline: '',
     warnings: [],
     waypoint_order: [],
     bounds: { extend: jest.fn() } as any,

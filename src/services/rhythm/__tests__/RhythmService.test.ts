@@ -1,4 +1,3 @@
-import type { Mock } from '@jest/globals';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { logger } from '../../../lib/logger';
 import { timeService } from '../../TimeService';
@@ -19,7 +18,7 @@ jest.mock('../../TimeService', () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn() as Mock;
+global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
 
 // Create a test version of RhythmService that uses process.env
 class TestRhythmService {
@@ -159,7 +158,7 @@ class TestRhythmService {
 
 describe('RhythmService', () => {
   let rhythmService: TestRhythmService;
-  const mockFetch = global.fetch as Mock;
+  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
   const mockLogger = logger as jest.Mocked<typeof logger>;
   const mockTimeService = timeService as jest.Mocked<typeof timeService>;
 
@@ -216,7 +215,7 @@ describe('RhythmService', () => {
           success: true,
           data: mockSuccessResponse,
         }),
-      });
+      } as Response);
 
       const result = await rhythmService.generatePattern(mockOptions);
 
@@ -252,7 +251,7 @@ describe('RhythmService', () => {
           success: true,
           data: mockSuccessResponse,
         }),
-      });
+      } as Response);
 
       await rhythmService.generatePattern(minimalOptions);
 
@@ -273,7 +272,7 @@ describe('RhythmService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
+      } as Response);
 
       const result = await rhythmService.generatePattern(mockOptions);
 
@@ -299,7 +298,7 @@ describe('RhythmService', () => {
           success: false,
           error: 'Invalid pattern format',
         }),
-      });
+      } as Response);
 
       const result = await rhythmService.generatePattern(mockOptions);
 
@@ -336,7 +335,7 @@ describe('RhythmService', () => {
         json: async () => {
           throw new Error('Invalid JSON');
         },
-      });
+      } as unknown as Response);
 
       const result = await rhythmService.generatePattern(mockOptions);
 
@@ -453,7 +452,7 @@ describe('RhythmService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockStats,
-      });
+      } as Response);
 
       const result = await rhythmService.getStats();
 
@@ -467,7 +466,7 @@ describe('RhythmService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
+      } as Response);
 
       const result = await rhythmService.getStats();
 

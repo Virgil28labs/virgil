@@ -76,6 +76,11 @@ const mockUsePhotosReturn = {
   searchPhotos: jest.fn(() => []),
   sortPhotos: jest.fn(),
   clearError: jest.fn(),
+  updatePhoto: jest.fn(),
+  getStorageInfo: jest.fn(),
+  clearAllPhotos: jest.fn(),
+  downloadPhoto: jest.fn(),
+  sharePhoto: jest.fn(),
 };
 
 describe('usePhotoGallery', () => {
@@ -86,16 +91,16 @@ describe('usePhotoGallery', () => {
     mockUsePhotosReturn.getPhotoById.mockImplementation(id => 
       mockPhotos.find(photo => photo.id === id),
     );
-    mockUsePhotosReturn.searchPhotos.mockReturnValue([mockPhoto1]); // Return filtered results synchronously
+    mockUsePhotosReturn.searchPhotos.mockReturnValue([mockPhoto1] as any); // Return filtered results synchronously
     mockUsePhotosReturn.sortPhotos.mockImplementation((photos) => photos);
-    mockUsePhotosReturn.loadPhotos.mockResolvedValue();
+    mockUsePhotosReturn.loadPhotos.mockResolvedValue(undefined);
     mockUsePhotosReturn.savePhoto.mockResolvedValue(mockPhoto1);
     mockUsePhotosReturn.deletePhoto.mockResolvedValue(true);
     mockUsePhotosReturn.deletePhotos.mockResolvedValue(2);
     mockUsePhotosReturn.toggleFavorite.mockResolvedValue(true);
     mockUsePhotosReturn.clearError.mockImplementation(() => {});
     
-    mockUsePhotos.mockReturnValue(mockUsePhotosReturn);
+    mockUsePhotos.mockReturnValue(mockUsePhotosReturn as any);
     mockTimeService.getTimestamp.mockReturnValue(Date.now());
   });
 
@@ -760,7 +765,7 @@ describe('usePhotoGallery', () => {
         photos: newPhotos,
         favorites: newFavorites,
         loading: true,
-      });
+      } as any);
 
       rerender();
 

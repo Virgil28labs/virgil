@@ -10,7 +10,7 @@
  * - Memory optimization
  */
 
-import React from 'react';
+import { type ReactNode } from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { DateTime } from '../DateTime';
 import { timeService } from '../../services/TimeService';
@@ -26,7 +26,7 @@ jest.mock('../../services/TimeService', () => ({
 }));
 
 jest.mock('../timezone/TimezoneWidget', () => ({
-  TimezoneWidget: ({ children, className, hoverDelay, clickToOpen }: any) => (
+  TimezoneWidget: ({ children, className, hoverDelay, clickToOpen }: { children?: ReactNode; className?: string; hoverDelay?: number; clickToOpen?: boolean }) => (
     <div 
       data-testid="timezone-widget" 
       className={className}

@@ -1,9 +1,7 @@
 // Mock for RhythmService to handle import.meta.env
 export class RhythmService {
-  private baseUrl: string;
-
   constructor() {
-    this.baseUrl = process.env.VITE_API_URL || 'http://localhost:5002';
+    // baseUrl is not needed in the mock implementation
   }
 
   async generatePattern(options: any): Promise<any> {

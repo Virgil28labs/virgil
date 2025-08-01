@@ -6,8 +6,7 @@
  * Most complex audio component in the application.
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RhythmMachineViewer } from '../RhythmMachineViewer';
 
@@ -80,7 +79,7 @@ global.AudioContext = jest.fn().mockImplementation(() => ({
   close: jest.fn().mockResolvedValue(undefined),
 }));
 
-global.webkitAudioContext = global.AudioContext;
+(global as any).webkitAudioContext = (global as any).AudioContext;
 
 describe('RhythmMachineViewer', () => {
   const defaultProps = {
@@ -835,7 +834,7 @@ describe('RhythmMachineViewer', () => {
 
     it('prevents multiple concurrent generations', async () => {
       const user = userEvent.setup();
-      let resolveGeneration: (value: any) => void;
+      let resolveGeneration: (value: unknown) => void = () => {};
       const generationPromise = new Promise(resolve => {
         resolveGeneration = resolve;
       });
@@ -848,6 +847,9 @@ describe('RhythmMachineViewer', () => {
       await user.click(generateButton); // Second click
       
       expect(mockRhythmService.generatePattern).toHaveBeenCalledTimes(1);
+      
+      // Resolve the promise to cleanup
+      resolveGeneration({ id: 'test', patterns: [] });
     });
   });
 });

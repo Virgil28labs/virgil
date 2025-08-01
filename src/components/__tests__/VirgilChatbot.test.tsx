@@ -118,39 +118,44 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
     _dashboardContext, 
     _shouldFocus, 
     externalInputRef, 
-  }: any) => (
-    <div data-testid="chat-input">
-      <input 
-        data-testid="message-input"
-        value={input}
-        disabled={isTyping}
-        placeholder={isTyping ? 'Virgil is typing...' : 'Type a message...'}
-        aria-label="Type your message"
-        onChange={(e) => onInputChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && input) {
-            onSubmit(e);
-          }
-          onKeyDown && onKeyDown(e);
-        }}
-        ref={externalInputRef}
-      />
-      <button 
-        data-testid="send-button"
-        disabled={isTyping}
-        aria-label="Send message"
-        onClick={(e) => onSubmit(e)}
-      >
-        Send
-      </button>
-      {error && <div data-testid="chat-error">{error}</div>}
-      {showQuickActions && (
-        <div data-testid="quick-actions">
-          <button onClick={() => onQuickAction('help')}>Help</button>
-        </div>
-      )}
-    </div>
-  ),
+  }: any) => {
+    // Suppress unused variable warnings for mock parameters
+    void _dashboardContext;
+    void _shouldFocus;
+    return (
+      <div data-testid="chat-input">
+        <input 
+          data-testid="message-input"
+          value={input}
+          disabled={isTyping}
+          placeholder={isTyping ? 'Virgil is typing...' : 'Type a message...'}
+          aria-label="Type your message"
+          onChange={(e) => onInputChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && input) {
+              onSubmit(e);
+            }
+            onKeyDown && onKeyDown(e);
+          }}
+          ref={externalInputRef}
+        />
+        <button 
+          data-testid="send-button"
+          disabled={isTyping}
+          aria-label="Send message"
+          onClick={(e) => onSubmit(e)}
+        >
+          Send
+        </button>
+        {error && <div data-testid="chat-error">{error}</div>}
+        {showQuickActions && (
+          <div data-testid="quick-actions">
+            <button onClick={() => onQuickAction('help')}>Help</button>
+          </div>
+        )}
+      </div>
+    );
+  },
 }));
 
 jest.mock('../chat/ChatHeader/ChatHeader', () => ({
@@ -175,20 +180,34 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
     onClearMessages,
     onExportMessages,
     _createSystemPrompt,
-  }: any) => (
-    <div data-testid="chat-header">
-      <span data-testid="message-count">{messageCount} messages</span>
-      <button data-testid="clear-button" onClick={onClearMessages} tabIndex={0}>Clear</button>
-      <button data-testid="export-button" onClick={onExportMessages} tabIndex={0}>Export</button>
-      <button data-testid="minimize-button" onClick={onMinimize}>Minimize</button>
-      <button data-testid="size-toggle" onClick={onSizeToggle}>{windowSize}</button>
-      <select data-testid="model-select" value={selectedModel} onChange={(e) => onModelChange(e.target.value)}>
-        {models?.map((model: any) => (
-          <option key={model.id} value={model.id}>{model.name}</option>
-        ))}
-      </select>
-    </div>
-  ),
+  }: any) => {
+    // Suppress unused variable warnings for mock parameters
+    void _showMemoryIndicator;
+    void _markedMemories;
+    void _recentConversations;
+    void _onMemoryModalOpen;
+    void _isRealtimeConnected;
+    void _dashboardContext;
+    void _customSystemPrompt;
+    void _onSystemPromptChange;
+    void _onSystemPromptSave;
+    void _onNewChat;
+    void _createSystemPrompt;
+    return (
+      <div data-testid="chat-header">
+        <span data-testid="message-count">{messageCount} messages</span>
+        <button data-testid="clear-button" onClick={onClearMessages} tabIndex={0}>Clear</button>
+        <button data-testid="export-button" onClick={onExportMessages} tabIndex={0}>Export</button>
+        <button data-testid="minimize-button" onClick={onMinimize}>Minimize</button>
+        <button data-testid="size-toggle" onClick={onSizeToggle}>{windowSize}</button>
+        <select data-testid="model-select" value={selectedModel} onChange={(e) => onModelChange(e.target.value)}>
+          {models?.map((model: any) => (
+            <option key={model.id} value={model.id}>{model.name}</option>
+          ))}
+        </select>
+      </div>
+    );
+  },
 }));
 
 // Mock MemoryModal component
@@ -202,13 +221,21 @@ jest.mock('../chat/MemoryModal/MemoryModal', () => ({
     _onConversationsUpdate,
     _onMemoryContextUpdate,
     _onMemoryIndicatorUpdate,
-  }: any) => 
-    isOpen ? (
+  }: any) => {
+    // Suppress unused variable warnings for mock parameters
+    void _markedMemories;
+    void _recentConversations;
+    void _onMemoriesUpdate;
+    void _onConversationsUpdate;
+    void _onMemoryContextUpdate;
+    void _onMemoryIndicatorUpdate;
+    return isOpen ? (
       <div data-testid="memory-modal">
         <button data-testid="memory-modal-close" onClick={onClose}>×</button>
         <div>Memory Modal Content</div>
       </div>
-    ) : null,
+    ) : null;
+  },
 }));
 
 // Mock external components
@@ -563,7 +590,6 @@ describe('VirgilChatbot', () => {
           role: 'assistant' as const, 
           content: 'Failed message',
           timestamp: '2024-01-01T00:00:00.000Z',
-          error: 'Network error',
         },
       ];
       
@@ -586,7 +612,6 @@ describe('VirgilChatbot', () => {
         role: 'assistant' as const, 
         content: 'Failed message',
         timestamp: '2024-01-01T00:00:00.000Z',
-        error: 'Network error',
       };
       
       const messages = [retryMessage];

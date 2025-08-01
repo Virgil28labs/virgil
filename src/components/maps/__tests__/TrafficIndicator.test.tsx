@@ -10,7 +10,6 @@
  * - Accessibility features
  */
 
-import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TrafficIndicator } from '../TrafficIndicator';

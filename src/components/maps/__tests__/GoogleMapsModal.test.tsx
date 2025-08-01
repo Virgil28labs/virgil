@@ -11,8 +11,7 @@
  * - State management
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GoogleMapsModal } from '../GoogleMapsModal';
 import { loadGoogleMaps, createLocationMarker, getGoogleMapsApiKey } from '../../../utils/googleMaps';
@@ -163,6 +162,9 @@ describe('GoogleMapsModal', () => {
     setRouteInfoVisible: jest.fn(),
     clearRoute: jest.fn(),
     setRouteData: jest.fn(),
+    setCurrentRoute: jest.fn(),
+    setAlternativeRoutes: jest.fn(),
+    setHasActiveRoute: jest.fn(),
   };
 
   beforeEach(() => {
@@ -327,7 +329,7 @@ describe('GoogleMapsModal', () => {
         formatted_address: '456 Market St, San Francisco, CA',
       }];
 
-      mockGeocoder.geocode.mockImplementation((request: any, callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: any, callback: any) => {
         setTimeout(() => callback(mockGeocoderResult, 'OK'), 100);
       });
 
@@ -355,7 +357,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle geocoding timeout gracefully', async () => {
-      mockGeocoder.geocode.mockImplementation((request: any, callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: any, _callback: any) => {
         // Don't call callback to simulate timeout
       });
 
@@ -371,7 +373,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle geocoding errors gracefully', async () => {
-      mockGeocoder.geocode.mockImplementation((request: any, callback: any) => {
+      mockGeocoder.geocode.mockImplementation((_request: any, callback: any) => {
         setTimeout(() => callback(null, 'ERROR'), 100);
       });
 
@@ -404,7 +406,7 @@ describe('GoogleMapsModal', () => {
     };
 
     beforeEach(() => {
-      mockDirectionsService.route.mockImplementation((request: any, callback: any) => {
+      mockDirectionsService.route.mockImplementation((_request: any, callback: any) => {
         setTimeout(() => callback(mockDirectionsResult, 'OK'), 100);
       });
     });
@@ -448,7 +450,7 @@ describe('GoogleMapsModal', () => {
       await user.click(screen.getByText('Request Route'));
 
       act(() => {
-        jest.advanceTimers();
+        jest.advanceTimersByTime(1000);
       });
 
       await waitFor(() => {
@@ -467,7 +469,7 @@ describe('GoogleMapsModal', () => {
       await user.click(screen.getByText('Request Route'));
 
       act(() => {
-        jest.advanceTimers();
+        jest.advanceTimersByTime(1000);
       });
 
       await waitFor(() => {
@@ -477,7 +479,7 @@ describe('GoogleMapsModal', () => {
     });
 
     it('should handle route calculation errors', async () => {
-      mockDirectionsService.route.mockImplementation((request: any, callback: any) => {
+      mockDirectionsService.route.mockImplementation((_request: any, callback: any) => {
         setTimeout(() => callback(null, 'NOT_FOUND'), 100);
       });
 
@@ -491,7 +493,7 @@ describe('GoogleMapsModal', () => {
       await user.click(screen.getByText('Request Route'));
 
       act(() => {
-        jest.advanceTimers();
+        jest.advanceTimersByTime(1000);
       });
 
       await waitFor(() => {
@@ -795,7 +797,6 @@ describe('GoogleMapsModal', () => {
         routeInfoVisible: true,
       });
 
-      const _user = userEvent.setup();
       render(<GoogleMapsModal {...defaultProps} />);
 
       // Wait for initial load

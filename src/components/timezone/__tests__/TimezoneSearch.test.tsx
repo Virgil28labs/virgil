@@ -10,7 +10,6 @@
  * - Clear search functionality
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TimezoneSearch } from '../TimezoneSearch';
@@ -32,6 +31,7 @@ describe('TimezoneSearch', () => {
       country: 'United States',
       region: 'Eastern',
       popular: true,
+      searchTerms: ['new york', 'nyc', 'eastern', 'est'],
     },
     {
       timezone: 'America/Los_Angeles',
@@ -39,6 +39,7 @@ describe('TimezoneSearch', () => {
       country: 'United States',
       region: 'Pacific',
       popular: true,
+      searchTerms: ['los angeles', 'la', 'pacific', 'pst'],
     },
     {
       timezone: 'Europe/London',
@@ -46,6 +47,7 @@ describe('TimezoneSearch', () => {
       country: 'United Kingdom',
       region: 'GMT',
       popular: true,
+      searchTerms: ['london', 'uk', 'britain', 'gmt'],
     },
     {
       timezone: 'Asia/Tokyo',
@@ -53,6 +55,7 @@ describe('TimezoneSearch', () => {
       country: 'Japan',
       region: 'JST',
       popular: false,
+      searchTerms: ['tokyo', 'japan', 'jst'],
     },
   ];
 

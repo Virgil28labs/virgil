@@ -6,9 +6,7 @@
  * Most complex physics-based component in the application.
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { RaccoonMascot } from '../RaccoonMascot';
 import { AllTheProviders } from '../../../test-utils/AllTheProviders';
 import { timeService } from '../../../services/TimeService';

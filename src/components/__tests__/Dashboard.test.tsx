@@ -134,7 +134,7 @@ jest.mock('../maps/GoogleMapsModal', () => ({
 }));
 
 jest.mock('../common/SectionErrorBoundary', () => ({
-  SectionErrorBoundary: ({ children, sectionName, fallback: _fallback, ...props }: any) => (
+  SectionErrorBoundary: ({ children, sectionName, fallback: _fallback, ...props }: { children: React.ReactNode; sectionName: string; fallback?: React.ReactNode; [key: string]: unknown }) => (
     <div data-testid="section-error-boundary" data-section-name={sectionName} {...props}>
       {children}
     </div>

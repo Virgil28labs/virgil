@@ -10,7 +10,6 @@
  * - Date calculations
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DepartureTimeSelector } from '../DepartureTimeSelector';
@@ -71,7 +70,7 @@ describe('DepartureTimeSelector', () => {
       return newDate;
     });
     mockTimeService.startOfDay.mockImplementation((date) => {
-      const newDate = new Date(date);
+      const newDate = new Date(date || new Date());
       newDate.setHours(0, 0, 0, 0);
       return newDate;
     });

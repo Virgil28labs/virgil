@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { PositionedTimezoneHoverPanel } from '../TimezoneHoverPanel';
 import { useTimezones, useTimezoneFormatters } from '../useTimezones';
 
@@ -32,30 +32,42 @@ describe('TimezoneHoverPanel', () => {
       id: '1',
       timezone: 'America/New_York',
       label: 'New York',
+      order: 0,
       currentTime: {
-        time: new Date('2023-12-01T12:00:00-05:00'),
         offset: -5,
-      },
+        toFormat: jest.fn().mockReturnValue('12:00 PM'),
+        isValid: true,
+        diff: jest.fn().mockReturnValue({ hours: -5 }),
+        toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T12:00:00-05:00')),
+      } as any,
       isValid: true,
     },
     {
       id: '2',
       timezone: 'Europe/London',
       label: 'London',
+      order: 1,
       currentTime: {
-        time: new Date('2023-12-01T17:00:00Z'),
         offset: 0,
-      },
+        toFormat: jest.fn().mockReturnValue('5:00 PM'),
+        isValid: true,
+        diff: jest.fn().mockReturnValue({ hours: 0 }),
+        toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T17:00:00Z')),
+      } as any,
       isValid: true,
     },
     {
       id: '3',
       timezone: 'Asia/Tokyo',
       label: 'Tokyo',
+      order: 2,
       currentTime: {
-        time: new Date('2023-12-02T02:00:00+09:00'),
         offset: 9,
-      },
+        toFormat: jest.fn().mockReturnValue('2:00 AM'),
+        isValid: true,
+        diff: jest.fn().mockReturnValue({ hours: 9 }),
+        toJSDate: jest.fn().mockReturnValue(new Date('2023-12-02T02:00:00+09:00')),
+      } as any,
       isValid: true,
     },
   ];
@@ -70,9 +82,10 @@ describe('TimezoneHoverPanel', () => {
       addTimezone: jest.fn(),
       removeTimezone: jest.fn(),
       updateTimezoneLabel: jest.fn(),
+      reorderTimezones: jest.fn(),
       clearAllTimezones: jest.fn(),
       canAddMoreTimezones: true,
-      getTimezoneInfo: jest.fn(),
+      isUpdating: false,
     });
 
     mockUseTimezoneFormatters.mockReturnValue({
@@ -83,8 +96,7 @@ describe('TimezoneHoverPanel', () => {
         if (timeObj.offset === 9) return '2:00 AM';
         return '12:00 PM';
       }),
-      formatDate: jest.fn().mockReturnValue('Dec 1, 2023'),
-      formatDateTime: jest.fn().mockReturnValue('Dec 1, 2023 12:00 PM'),
+      formatRelativeTime: jest.fn().mockReturnValue('5 hours ahead'),
     });
   });
 
@@ -102,9 +114,10 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<PositionedTimezoneHoverPanel {...defaultProps} />);
@@ -119,9 +132,10 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<PositionedTimezoneHoverPanel {...defaultProps} />);
@@ -172,9 +186,10 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<PositionedTimezoneHoverPanel {...defaultProps} />);
@@ -294,7 +309,7 @@ describe('TimezoneHoverPanel', () => {
     });
 
     it('should handle triggerRef with null current', () => {
-      const nullRef = { current: null };
+      const nullRef = { current: null } as unknown as React.RefObject<HTMLElement>;
       
       const { container } = render(
         <PositionedTimezoneHoverPanel 
@@ -415,14 +430,28 @@ describe('TimezoneHoverPanel', () => {
           id: '1',
           timezone: 'America/New_York',
           label: 'New York',
-          currentTime: { time: new Date(), offset: -5 },
+          order: 0,
+          currentTime: {
+            offset: -5,
+            toFormat: jest.fn().mockReturnValue('12:00 PM'),
+            isValid: true,
+            diff: jest.fn().mockReturnValue({ hours: -5 }),
+            toJSDate: jest.fn().mockReturnValue(new Date()),
+          } as any,
           isValid: true,
         },
         {
           id: '2',
           timezone: 'America/Toronto',
           label: 'Toronto',
-          currentTime: { time: new Date(), offset: -5 },
+          order: 1,
+          currentTime: {
+            offset: -5,
+            toFormat: jest.fn().mockReturnValue('12:00 PM'),
+            isValid: true,
+            diff: jest.fn().mockReturnValue({ hours: -5 }),
+            toJSDate: jest.fn().mockReturnValue(new Date()),
+          } as any,
           isValid: true,
         },
       ];
@@ -433,9 +462,10 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<PositionedTimezoneHoverPanel {...defaultProps} />);
@@ -456,9 +486,10 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
-        getTimezoneInfo: jest.fn(),
+        isUpdating: false,
       });
 
       render(<PositionedTimezoneHoverPanel {...defaultProps} />);
@@ -475,6 +506,7 @@ describe('TimezoneHoverPanel', () => {
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
         updateTimezoneLabel: jest.fn(),
+        reorderTimezones: jest.fn(),
         clearAllTimezones: jest.fn(),
         canAddMoreTimezones: true,
         isUpdating: false,
@@ -484,8 +516,7 @@ describe('TimezoneHoverPanel', () => {
         formatTime: jest.fn().mockImplementation(() => {
           return '--:--'; // Return fallback instead of throwing
         }),
-        formatDate: jest.fn(),
-        formatDateTime: jest.fn(),
+        formatRelativeTime: jest.fn().mockReturnValue('--'),
       });
 
       // Should not throw error during render and show fallback

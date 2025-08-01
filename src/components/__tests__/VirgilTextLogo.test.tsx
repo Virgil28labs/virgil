@@ -10,7 +10,6 @@
  * - Memoization behavior
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VirgilTextLogo } from '../VirgilTextLogo';

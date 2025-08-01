@@ -203,8 +203,8 @@ describe('CameraUtils', () => {
         return originalDocument.createElement(tagName);
       });
       
-      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn());
-      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn());
+      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn() as any);
+      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn() as any);
 
       global.URL = {
         createObjectURL: jest.fn(() => 'blob:mock-url'),
@@ -296,6 +296,8 @@ describe('CameraUtils', () => {
         src: '',
         width: 0,
         height: 0,
+        naturalWidth: 0,
+        naturalHeight: 0,
         onload: null as any,
         onerror: null as any,
       };
