@@ -1,4 +1,6 @@
 /* Virgil Camera Module CSS */
+@import '../../styles/variables.css';
+@import '../../styles/animations.css';
 
 /* CSS Variables aligned with brand colors */
 :root {
@@ -1205,37 +1207,7 @@
   font-weight: 500;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUpFade {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px) scale(0.96); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+/* Animations imported from animations.css */
 
 @keyframes countdownPulse {
   0%, 100% { transform: scale(1); }

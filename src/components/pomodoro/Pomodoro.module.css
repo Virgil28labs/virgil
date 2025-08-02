@@ -1,0 +1,258 @@
+/* Pomodoro Timer - Virgil Design System */
+
+/* Import core variables */
+@import '../../styles/variables.css';
+
+/* Pomodoro Modal Styles */
+.pomodoroModal .modalContent {
+  padding: 1.5rem;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.pomodoroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1.5rem;
+  outline: none;
+  border: none;
+}
+
+/* Central Display Area */
+.pomodoroDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 320px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Session-specific themes */
+.pomodoroDisplay.pomodoroWork {
+  background: linear-gradient(135deg, rgba(108, 59, 170, 0.2) 0%, rgba(178, 165, 193, 0.2) 100%);
+  border: 1px solid rgba(108, 59, 170, 0.3);
+}
+
+.pomodoroDisplay.pomodoroShortBreak {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pomodoroDisplay.pomodoroLongBreak {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Pulse animation for active sessions */
+.pomodoroDisplay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.3; transform: scale(1.02); }
+}
+
+/* Session Badge */
+.sessionBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sessionBadge.sessionWork {
+  color: rgba(178, 165, 193, 0.9);
+  border: 1px solid rgba(178, 165, 193, 0.3);
+}
+
+.sessionBadge.sessionShortBreak {
+  color: rgba(52, 211, 153, 0.9);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.sessionBadge.sessionLongBreak {
+  color: rgba(96, 165, 250, 0.9);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+/* Large Timer Display */
+.timerLarge {
+  font-size: 4rem;
+  font-weight: 200;
+  color: #f5f5f5;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+/* Progress Bar */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet-purple) 0%, var(--lavender) 100%);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.pomodoroShortBreak .progressBarFill {
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+}
+
+.pomodoroLongBreak .progressBarFill {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+}
+
+/* Session Info */
+.sessionInfo {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+/* Daily Stats */
+.dailyStats {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+/* Task Input */
+.taskInput {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #f5f5f5;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.taskInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.taskInput:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.taskInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Preset Buttons */
+.presetButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+  flex-wrap: wrap;
+}
+
+/* Control Buttons */
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .pomodoroModal .modalContent {
+    padding: 1rem;
+  }
+  
+  .timerLarge {
+    font-size: 3rem;
+  }
+  
+  .pomodoroDisplay {
+    padding: 1.5rem;
+    max-width: 280px;
+  }
+  
+  .presetButtons {
+    gap: 0.5rem;
+  }
+  
+  .controls {
+    gap: 0.75rem;
+  }
+  
+  .sessionBadge {
+    font-size: 0.75rem;
+  }
+  
+  .sessionInfo {
+    font-size: 0.8125rem;
+  }
+  
+  .dailyStats {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Focus styles for accessibility */
+.pomodoroContent button:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+}
+
+.taskInput:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+}

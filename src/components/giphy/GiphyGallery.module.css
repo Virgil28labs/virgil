@@ -1,4 +1,5 @@
 /* Giphy Gallery - Sleek & Minimalist Design */
+@import '../../styles/animations.css';
 
 /* CSS Variables - Optimized for Compact Design */
 :root {
@@ -22,35 +23,6 @@
   --giphy-accent-light: #ff8fb3;
 }
 
-/* Animations */
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(30px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes heartPop {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.3) rotate(-10deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
 
 /* Base Styles */
 .giphyGalleryBackdrop {
@@ -317,6 +289,11 @@
   scrollbar-width: thin;
   position: relative;
   scrollbar-color: #ff6b9d transparent;
+  
+  /* CSS Containment for performance */
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 
 .giphyGalleryContent::-webkit-scrollbar {

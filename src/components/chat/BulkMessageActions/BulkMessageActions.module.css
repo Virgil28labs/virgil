@@ -145,17 +145,6 @@
   color: var(--soft-pink);
 }
 
-/* Animations */
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
 /* Accessibility */
 @media (prefers-contrast: high) {

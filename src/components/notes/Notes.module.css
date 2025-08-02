@@ -2,6 +2,8 @@
    VIRGIL NOTES APP STYLES - Minimalist Design
    Modern, clean note-taking interface
    ======================================== */
+@import '../../styles/variables.css';
+@import '../../styles/animations.css';
 
 /* Notes Modal Specific Styling */
 .notesModal .modalContent {
@@ -31,6 +33,11 @@
   padding-right: 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: rgba(179, 179, 179, 0.3) transparent;
+  
+  /* CSS Containment for performance */
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
 }
 
 /* Notes Input */
@@ -435,7 +442,7 @@
   left: 1px;
   color: var(--violet-purple);
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .notesEntryText {
@@ -465,10 +472,6 @@
   animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
 
 .notesEntryActions {
   display: flex;
@@ -825,7 +828,7 @@
   left: 2px;
   color: white;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .notesTaskText {
@@ -1023,9 +1026,6 @@
   margin-bottom: 1rem;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
 
 .notesError {
   text-align: center;

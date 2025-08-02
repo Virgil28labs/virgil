@@ -1,4 +1,261 @@
 /* Dashboard Styles */
+@import '../styles/variables.css';
+@import '../styles/animations.css';
+
+/* Virgil Logo */
+.virgilLogo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  text-align: left;
+  line-height: 1;
+  user-select: none;
+  cursor: default;
+  position: fixed;
+  top: 1.5rem;
+  left: 2rem;
+  z-index: 1000;
+  color: var(--brand-light-gray);
+}
+
+.virgilLogo::first-letter {
+  color: var(--brand-accent-purple);
+  font-weight: bold;
+}
+
+.virgilLogoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.virgilLogoButton:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.virgilLogoButton:focus {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* DateTime Display */
+.datetimeWidget {
+  cursor: pointer;
+  transition: background-color var(--transition-normal, 0.3s ease);
+  border-radius: var(--radius-medium, 8px);
+  padding: 0.25rem;
+  margin: -0.25rem;
+  position: relative;
+}
+
+.datetimeWidget:hover {
+  background: rgba(178, 165, 193, 0.1);
+}
+
+.datetimeWidget:focus-visible {
+  outline: 2px solid var(--violet-purple);
+  outline-offset: 2px;
+}
+
+.datetimeDisplay {
+  position: fixed;
+  top: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--brand-light-gray);
+  user-select: none;
+  line-height: 1.2;
+}
+
+.datetimeDisplay .time {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 500;
+  color: #b2a5c1;
+  margin-bottom: 0.1rem;
+}
+
+.datetimeDisplay .timeSeconds {
+  font-size: 30%;
+  font-weight: 300;
+  color: #b3b3b3;
+  vertical-align: super;
+  margin-left: 0.1em;
+}
+
+.datetimeDisplay .date {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  font-weight: 400;
+  color: #f5f5f5;
+  margin-bottom: 0.1rem;
+}
+
+.datetimeDisplay .day {
+  font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  font-weight: 300;
+  color: #b3b3b3;
+}
+
+/* Weather Widget */
+.weatherWidget {
+  position: fixed;
+  top: 20px;
+  right: 80px;
+  background: rgba(108, 59, 170, 0.08);
+  border: 1px solid rgba(108, 59, 170, 0.2);
+  border-radius: 14px;
+  padding: var(--weather-widget-padding, 10px 14px);
+  cursor: pointer;
+  transition: all var(--transition-normal, 0.3s ease), opacity 0.15s ease;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  text-align: center;
+  opacity: 1;
+  will-change: transform, box-shadow, background, border-color;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.weatherWidget:hover {
+  background: rgba(108, 59, 170, 0.15);
+  border-color: rgba(108, 59, 170, 0.5);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: fixed !important;
+  top: 20px !important;
+  right: 80px !important;
+}
+
+.weatherWidget.raccoonInteraction {
+  background: rgba(108, 59, 170, 0.15) !important;
+  border-color: rgba(108, 59, 170, 0.6) !important;
+  box-shadow: 0 0 25px rgba(108, 59, 170, 0.8), 0 0 35px rgba(139, 123, 161, 0.6) !important;
+  transform: scale(1.1) translateY(-3px) !important;
+  position: fixed !important;
+  top: 20px !important;
+  right: 80px !important;
+}
+
+/* Weather content styles */
+.weatherContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--weather-widget-gap, 12px);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--color-text-primary, #f5f5f5);
+  transition: opacity var(--transition-fast, 0.15s ease);
+}
+
+.weatherIconGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.weatherEmoji {
+  font-size: var(--weather-font-emoji, 22px);
+  line-height: 1;
+}
+
+.weatherTemp {
+  font-size: var(--weather-font-temp, 18px);
+  font-weight: 600;
+  color: var(--color-text-primary, #f5f5f5);
+  margin-left: 4px;
+}
+
+.weatherCondition {
+  font-size: var(--weather-font-condition, 11px);
+  opacity: 0.7;
+  text-transform: capitalize;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.weatherAqi {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.aqiText {
+  font-size: 10px;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.aqiDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Weather forecast container */
+.weatherForecastContainer {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(57, 41, 62, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(108, 59, 170, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 320px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 1px rgba(108, 59, 170, 0.5);
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weatherForecastContainer.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Mobile responsive weather */
+@media (max-width: 768px) {
+  .weatherWidget {
+    right: 60px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .weatherEmoji {
+    font-size: 18px;
+  }
+  
+  .weatherCondition {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .weatherWidget {
+    top: 60px;
+    right: 20px;
+    padding: 6px 12px;
+  }
+  
+  .weatherEmoji {
+    font-size: 16px;
+  }
+}
 
 .dashboard {
   height: 100vh;
@@ -60,13 +317,16 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
   text-align: inherit;
   
+  /* Match other text styling */
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--brand-light-gray);
+  line-height: 1.2;
+  font-weight: 400;
+  
   /* Styling */
-  opacity: 0.6;
   transition: opacity 0.3s ease;
   text-decoration: none;
   display: inline-block;
@@ -74,7 +334,7 @@
 }
 
 .userEmail:hover {
-  opacity: 0.8;
+  opacity: 0.9;
   text-decoration: underline;
 }
 
@@ -93,6 +353,64 @@
 .addressInfo {
   margin-bottom: 0.15rem;
 }
+
+.addressRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.locationAccuracy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.accuracyIndicator {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  user-select: none;
+}
+
+.retryGpsButton {
+  background: none;
+  border: 1px solid var(--brand-accent-purple);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--brand-accent-purple);
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.retryGpsButton:hover:not(:disabled) {
+  opacity: 1;
+  background: var(--brand-accent-purple);
+  color: white;
+  transform: scale(1.1);
+}
+
+.retryGpsButton:focus-visible {
+  outline: 2px solid var(--brand-accent-purple);
+  outline-offset: 2px;
+}
+
+.retryGpsButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.retryGpsButton.retrying {
+  animation: spin 1s linear infinite;
+}
+
 
 .ipInfo {
   margin-bottom: 0.15rem;
@@ -299,102 +617,8 @@
   transform: translateX(-50%);
 }
 
-/* Old sign-out styles for compatibility */
-.signOutIcon {
-  background: none;
-  border: none;
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-  color: var(--brand-accent-purple);
-  opacity: 0.4;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-  padding: clamp(0.5rem, 2vw, 1rem);
-  margin-top: clamp(1rem, 3vh, 2rem);
-}
 
-.signOutIcon:hover {
-  opacity: 0.8;
-}
 
-.signOutFixed {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
-  border: 2px solid #60a5fa;
-  border-radius: 50%;
-  font-size: clamp(0.7rem, 3vw, 1.3rem);
-  color: white;
-  opacity: 1;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0.15rem;
-  z-index: 1000;
-  box-shadow: 
-    0 0 15px rgba(59, 130, 246, 0.8),
-    0 0 25px rgba(99, 102, 241, 0.6),
-    0 0 35px rgba(139, 92, 246, 0.4);
-  animation: powerButtonGlow 3s ease-in-out infinite;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.signOutFixed:hover {
-  opacity: 1;
-  background: linear-gradient(135deg, var(--brand-accent-pink), #f472b6, #ec4899);
-  color: white;
-  transform: scale(1.15);
-  border: 2px solid var(--brand-accent-pink);
-  box-shadow: 
-    0 0 20px rgba(239, 176, 194, 1),
-    0 0 30px rgba(244, 114, 182, 0.8),
-    0 0 45px rgba(236, 72, 153, 0.6),
-    inset 0 1px 4px rgba(255, 255, 255, 0.5),
-    inset 0 -1px 4px rgba(244, 114, 182, 0.4);
-}
-
-/* Animations */
-@keyframes powerButtonGlow {
-  0% {
-    box-shadow: 
-      0 0 10px rgba(59, 130, 246, 0.7),
-      0 0 20px rgba(99, 102, 241, 0.5),
-      0 0 30px rgba(139, 92, 246, 0.3),
-      inset 0 1px 2px rgba(255, 255, 255, 0.4),
-      inset 0 -1px 2px rgba(99, 102, 241, 0.3);
-  }
-  50% {
-    box-shadow: 
-      0 0 15px rgba(59, 130, 246, 0.9),
-      0 0 25px rgba(99, 102, 241, 0.7),
-      0 0 35px rgba(139, 92, 246, 0.5),
-      inset 0 1px 3px rgba(255, 255, 255, 0.5),
-      inset 0 -1px 3px rgba(99, 102, 241, 0.4);
-  }
-  100% {
-    box-shadow: 
-      0 0 10px rgba(59, 130, 246, 0.7),
-      0 0 20px rgba(99, 102, 241, 0.5),
-      0 0 30px rgba(139, 92, 246, 0.3),
-      inset 0 1px 2px rgba(255, 255, 255, 0.4),
-      inset 0 -1px 2px rgba(99, 102, 241, 0.3);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0.6;
-  }
-}
 
 /* Mobile Styles */
 @media (max-width: 768px) {

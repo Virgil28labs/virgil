@@ -206,17 +206,6 @@
   justify-content: center;
 }
 
-/* Animations */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Mobile Responsiveness */
 @media (max-width: 480px) {

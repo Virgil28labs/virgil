@@ -495,26 +495,6 @@
   background: rgba(178, 165, 193, 0.5);
 }
 
-/* Animations */
-@keyframes modalEntry {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 /* Large Desktop Screens */
 @media (min-width: 1440px) {
