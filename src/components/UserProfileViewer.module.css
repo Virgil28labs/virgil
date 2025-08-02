@@ -768,7 +768,7 @@
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
+@media (--md-down) {
   .userProfileViewer {
     width: 90vw;
     height: 90vh;
@@ -885,7 +885,7 @@
 }
 
 /* Tablet Responsiveness */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (--lg-only) {
   .userProfileViewer {
     width: 85vw;
     height: 85vh;

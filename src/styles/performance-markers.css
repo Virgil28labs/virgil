@@ -1,0 +1,230 @@
+/**
+ * Performance Monitoring CSS Markers
+ * 
+ * These CSS markers help track render performance and paint timing.
+ * They work with browser DevTools and monitoring solutions.
+ */
+
+/* Critical rendering path markers */
+:root {
+  /* Paint timing markers */
+  --first-paint: 1;
+  --first-contentful-paint: 1;
+  --largest-contentful-paint: 1;
+  
+  /* Custom performance markers */
+  --app-interactive: 0;
+  --hero-rendered: 0;
+  --api-loaded: 0;
+  --animations-ready: 0;
+}
+
+/* Mark when app becomes interactive */
+.app-interactive {
+  --app-interactive: 1;
+  animation: markInteractive 0.001s;
+}
+
+/* Mark when hero content is rendered */
+.hero-rendered {
+  --hero-rendered: 1;
+  animation: markHeroRendered 0.001s;
+}
+
+/* Mark when API data is loaded */
+.api-loaded {
+  --api-loaded: 1;
+  animation: markApiLoaded 0.001s;
+}
+
+/* Mark when animations are ready */
+.animations-ready {
+  --animations-ready: 1;
+  animation: markAnimationsReady 0.001s;
+}
+
+/* Performance marker animations */
+@keyframes markInteractive {
+  to { opacity: 1; }
+}
+
+@keyframes markHeroRendered {
+  to { opacity: 1; }
+}
+
+@keyframes markApiLoaded {
+  to { opacity: 1; }
+}
+
+@keyframes markAnimationsReady {
+  to { opacity: 1; }
+}
+
+/* Visual performance indicators (dev mode only) */
+.perf-indicator {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #00ff00;
+  font-family: monospace;
+  font-size: 12px;
+  border-radius: 4px;
+  z-index: 10000;
+  pointer-events: none;
+  display: none;
+}
+
+/* Show indicators in development */
+body[data-env="development"] .perf-indicator {
+  display: block;
+}
+
+/* Layout shift indicators */
+.layout-shift-indicator::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px dashed red;
+  pointer-events: none;
+  opacity: 0;
+  animation: showLayoutShift 0.5s;
+}
+
+@keyframes showLayoutShift {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Render performance classes */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-auto {
+  will-change: auto;
+}
+
+/* GPU acceleration hints */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Composite layer promotion */
+.promote-layer {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Performance monitoring hooks for JavaScript */
+[data-perf-mark]::before {
+  content: attr(data-perf-mark);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* Intersection Observer targets */
+.perf-observe {
+  /* Triggers when element enters viewport */
+  --in-viewport: 0;
+}
+
+.perf-observe.in-viewport {
+  --in-viewport: 1;
+}
+
+/* Loading state indicators */
+.perf-loading {
+  --loading-state: 1;
+}
+
+.perf-loading.loaded {
+  --loading-state: 0;
+}
+
+/* Frame rate monitoring helper */
+@supports (animation-timeline: scroll()) {
+  .monitor-scroll-perf {
+    animation: monitorScroll linear;
+    animation-timeline: scroll();
+  }
+}
+
+@keyframes monitorScroll {
+  to { 
+    transform: translateY(0);
+  }
+}
+
+/* Debugging helpers */
+body[data-debug-perf="true"] {
+  /* Highlight expensive operations */
+  * {
+    outline: 1px solid rgba(255, 0, 0, 0.1);
+  }
+  
+  /* Show composite layers */
+  .promote-layer,
+  .gpu-accelerated {
+    outline: 2px solid rgba(0, 255, 0, 0.3);
+    outline-offset: -2px;
+  }
+  
+  /* Highlight will-change elements */
+  [class*="will-change"] {
+    outline: 2px solid rgba(0, 0, 255, 0.3);
+    outline-offset: -2px;
+  }
+}
+
+/* Performance budget indicators */
+.perf-heavy {
+  /* Elements that exceed performance budget */
+  --perf-warning: 1;
+}
+
+.perf-critical {
+  /* Critical performance issues */
+  --perf-error: 1;
+}
+
+/* Lazy loading markers */
+.lazy-load {
+  --lazy-loaded: 0;
+}
+
+.lazy-load.loaded {
+  --lazy-loaded: 1;
+}
+
+/* Network timing markers */
+.network-slow {
+  --network-quality: 'slow';
+}
+
+.network-fast {
+  --network-quality: 'fast';
+}
+
+/* Animation performance classes */
+.reduce-motion {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .respect-motion-preference {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

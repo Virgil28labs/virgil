@@ -1,0 +1,146 @@
+/**
+ * Standardized Responsive Breakpoints
+ * 
+ * A consistent breakpoint system for responsive design across the app.
+ * Uses mobile-first approach with min-width media queries.
+ */
+
+/* Breakpoint variables */
+:root {
+  /* Breakpoint values */
+  --breakpoint-xs: 320px;   /* Extra small devices (small phones) */
+  --breakpoint-sm: 480px;   /* Small devices (phones) */
+  --breakpoint-md: 768px;   /* Medium devices (tablets) */
+  --breakpoint-lg: 1024px;  /* Large devices (laptops) */
+  --breakpoint-xl: 1280px;  /* Extra large devices (desktops) */
+  --breakpoint-2xl: 1536px; /* 2X large devices (large screens) */
+  
+  /* Container max-widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+  
+  /* Spacing scale for responsive design */
+  --spacing-mobile: 1rem;
+  --spacing-tablet: 1.5rem;
+  --spacing-desktop: 2rem;
+}
+
+/* Custom media query definitions for postcss-preset-env */
+@custom-media --xs-up (min-width: 320px);
+@custom-media --sm-up (min-width: 480px);
+@custom-media --md-up (min-width: 768px);
+@custom-media --lg-up (min-width: 1024px);
+@custom-media --xl-up (min-width: 1280px);
+@custom-media --2xl-up (min-width: 1536px);
+
+/* Max-width queries for specific cases */
+@custom-media --xs-down (max-width: 479px);
+@custom-media --sm-down (max-width: 767px);
+@custom-media --md-down (max-width: 1023px);
+@custom-media --lg-down (max-width: 1279px);
+@custom-media --xl-down (max-width: 1535px);
+
+/* Range queries */
+@custom-media --sm-only (min-width: 480px) and (max-width: 767px);
+@custom-media --md-only (min-width: 768px) and (max-width: 1023px);
+@custom-media --lg-only (min-width: 1024px) and (max-width: 1279px);
+
+/* Feature queries */
+@custom-media --touch (hover: none) and (pointer: coarse);
+@custom-media --stylus (hover: none) and (pointer: fine);
+@custom-media --pointer (hover: hover) and (pointer: fine);
+@custom-media --motion-ok (prefers-reduced-motion: no-preference);
+@custom-media --motion-reduce (prefers-reduced-motion: reduce);
+
+/* Utility classes for responsive containers */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-mobile);
+  padding-right: var(--spacing-mobile);
+}
+
+@media (--sm-up) {
+  .container {
+    max-width: var(--container-sm);
+  }
+}
+
+@media (--md-up) {
+  .container {
+    max-width: var(--container-md);
+    padding-left: var(--spacing-tablet);
+    padding-right: var(--spacing-tablet);
+  }
+}
+
+@media (--lg-up) {
+  .container {
+    max-width: var(--container-lg);
+    padding-left: var(--spacing-desktop);
+    padding-right: var(--spacing-desktop);
+  }
+}
+
+@media (--xl-up) {
+  .container {
+    max-width: var(--container-xl);
+  }
+}
+
+@media (--2xl-up) {
+  .container {
+    max-width: var(--container-2xl);
+  }
+}
+
+/* Responsive visibility utilities */
+.show-xs { display: none !important; }
+.show-sm { display: none !important; }
+.show-md { display: none !important; }
+.show-lg { display: none !important; }
+.show-xl { display: none !important; }
+
+@media (--xs-down) { .hide-xs { display: none !important; } .show-xs { display: block !important; } }
+@media (--sm-down) { .hide-sm { display: none !important; } .show-sm { display: block !important; } }
+@media (--md-down) { .hide-md { display: none !important; } .show-md { display: block !important; } }
+@media (--lg-down) { .hide-lg { display: none !important; } .show-lg { display: block !important; } }
+@media (--xl-down) { .hide-xl { display: none !important; } .show-xl { display: block !important; } }
+
+/* Responsive text utilities */
+.text-responsive {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.5;
+}
+
+.heading-responsive {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.2;
+}
+
+/* Touch-friendly utilities */
+@media (--touch) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .touch-padding {
+    padding: 0.75rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}

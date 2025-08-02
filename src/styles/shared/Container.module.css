@@ -1,0 +1,386 @@
+/**
+ * Container & Layout Module
+ * 
+ * Shared container components for consistent layouts
+ * and performance optimizations
+ */
+
+/* Base Container - Flexible layout container */
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Container Variants */
+.containerRow {
+  composes: container;
+  flex-direction: row;
+}
+
+.containerCenter {
+  composes: container;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fixed Container - For modals and overlays */
+.fixedContainer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Backdrop */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  /* Performance optimizations */
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+.backdropDark {
+  composes: backdrop;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.backdropLight {
+  composes: backdrop;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Modal Panel */
+.panel {
+  background: var(--off-white);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+              0 10px 20px -5px rgba(57, 41, 62, 0.1);
+  overflow: hidden;
+  position: relative;
+  animation: slideUpFade 0.3s ease-out;
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+.panelSm {
+  composes: panel;
+  width: 90%;
+  max-width: 400px;
+}
+
+.panelMd {
+  composes: panel;
+  width: 90%;
+  max-width: 600px;
+}
+
+.panelLg {
+  composes: panel;
+  width: 90%;
+  max-width: 900px;
+}
+
+.panelXl {
+  composes: panel;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.panelFull {
+  composes: panel;
+  width: calc(100vw - 4rem);
+  height: calc(100vh - 4rem);
+  max-width: 1400px;
+  max-height: 900px;
+}
+
+/* Glass Panel - Glassmorphism effect */
+.glassPanel {
+  composes: panel;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Panel Header */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--silver-grey);
+  background: rgba(178, 165, 193, 0.05);
+}
+
+.panelTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--deep-plum);
+  margin: 0;
+}
+
+/* Panel Content */
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  /* Performance optimizations */
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+.panelContentNoPadding {
+  composes: panelContent;
+  padding: 0;
+}
+
+/* Panel Footer */
+.panelFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--silver-grey);
+  background: rgba(178, 165, 193, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* Grid Container */
+.grid {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.grid2 {
+  composes: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid3 {
+  composes: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid4 {
+  composes: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.gridAuto {
+  composes: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Flex Container */
+.flex {
+  display: flex;
+  gap: 1rem;
+}
+
+.flexColumn {
+  composes: flex;
+  flex-direction: column;
+}
+
+.flexCenter {
+  composes: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexBetween {
+  composes: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Card Container */
+.card {
+  background: var(--off-white);
+  border: 1px solid var(--silver-grey);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  /* Performance optimizations */
+  will-change: transform, box-shadow;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cardCompact {
+  composes: card;
+  padding: 1rem;
+}
+
+.cardFlush {
+  composes: card;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Section Container */
+.section {
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--silver-grey);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--deep-plum);
+  margin: 0 0 1rem 0;
+}
+
+/* Wrapper - For content width constraints */
+.wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.wrapperSm {
+  composes: wrapper;
+  max-width: 600px;
+}
+
+.wrapperMd {
+  composes: wrapper;
+  max-width: 900px;
+}
+
+.wrapperLg {
+  composes: wrapper;
+  max-width: 1400px;
+}
+
+/* Scrollable Container */
+.scrollable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Performance optimizations */
+  contain: layout style paint;
+  will-change: scroll-position;
+}
+
+/* Custom scrollbar styling */
+.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: rgba(178, 165, 193, 0.3);
+  border-radius: 3px;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(178, 165, 193, 0.5);
+}
+
+/* Overlay Container */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 10;
+  /* Performance optimizations */
+  contain: layout style paint;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .grid2,
+  .grid3,
+  .grid4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .panelSm,
+  .panelMd,
+  .panelLg,
+  .panelXl {
+    width: 95%;
+  }
+  
+  .panelFull {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    max-width: none;
+    max-height: none;
+  }
+  
+  .panelHeader,
+  .panelContent,
+  .panelFooter {
+    padding: 1rem;
+  }
+  
+  .wrapper {
+    padding: 0 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gridAuto {
+    grid-template-columns: 1fr;
+  }
+  
+  .flex {
+    gap: 0.5rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .section {
+    padding: 1.5rem 0;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .card,
+  .backdrop {
+    animation: none;
+  }
+  
+  .card:hover {
+    transform: none;
+  }
+}

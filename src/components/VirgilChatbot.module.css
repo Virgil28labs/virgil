@@ -25,8 +25,9 @@
   align-items: center;
   justify-content: center;
   z-index: 1001; /* Above page content */
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  will-change: transform;
 }
 
 .virgilChatbotBubble:hover {
@@ -244,7 +245,7 @@
 }
 
 /* Mobile styles */
-@media (max-width: 768px) {
+@media (--md-down) {
   .virgilChatbotContainer {
     width: 100%;
     height: 100%;
@@ -276,7 +277,7 @@
 }
 
 /* Tablet styles */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (--lg-only) {
   .virgilChatbotContainer {
     width: 450px;
     height: 600px;
@@ -394,13 +395,14 @@
   padding: 0;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   background: transparent;
   white-space: nowrap;
   font-family: 'Montserrat', sans-serif;
   letter-spacing: 0.3px;
   /* Fixed width ensures consistent sizing */
   flex-shrink: 0;
+  will-change: transform;
 }
 
 .memoryPill {
@@ -716,13 +718,14 @@
   font-family: 'Montserrat', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 0.25rem;
   flex-shrink: 0;
   line-height: 1;
+  will-change: transform;
 }
 
 .sendBtn:hover:not(:disabled) {

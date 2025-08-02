@@ -1,0 +1,215 @@
+/**
+ * Critical CSS for Above-the-Fold Content
+ * 
+ * These styles are essential for initial render and should be inlined
+ * or loaded with highest priority to prevent layout shifts.
+ */
+
+/* Reset and base styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--deep-plum);
+  color: var(--off-white);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Critical layout containers */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dashboard critical layout */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--deep-plum);
+  position: relative;
+  contain: layout style;
+}
+
+.dashboardHeader {
+  padding: 1.5rem 2rem;
+  background: rgba(45, 38, 48, 0.5);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(178, 165, 193, 0.1);
+  z-index: 100;
+  contain: layout style;
+}
+
+.dashboardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Loading states - critical for perceived performance */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--deep-plum);
+}
+
+.skeleton {
+  position: relative;
+  background: rgba(178, 165, 193, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(178, 165, 193, 0.2) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Critical animations - GPU optimized */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--violet-purple);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Weather widget critical styles */
+.weatherWidget {
+  position: relative;
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+.weatherCard {
+  background: rgba(30, 25, 40, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(178, 165, 193, 0.1);
+  contain: layout style paint;
+}
+
+/* Location widget critical styles */
+.locationWidget {
+  position: relative;
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+/* DateTime widget critical styles */
+.dateTimeWidget {
+  font-variant-numeric: tabular-nums;
+  contain: layout style paint;
+}
+
+/* Mascot container critical styles */
+.mascotContainer {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 10;
+  width: 300px;
+  height: 300px;
+  pointer-events: none;
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* Error boundary styles */
+.error-boundary {
+  padding: 2rem;
+  text-align: center;
+  color: var(--silver-grey);
+}
+
+.section-error {
+  padding: 1rem;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 8px;
+  color: var(--off-white);
+}
+
+/* Media queries for critical responsive layout */
+@media (--md-down) {
+  .dashboardHeader {
+    padding: 1rem;
+  }
+  
+  .mascotContainer {
+    width: 150px;
+    height: 150px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+/* Preload optimization hints */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

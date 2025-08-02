@@ -177,7 +177,7 @@
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 480px) {
+@media (--sm-down) {
   .quickActions {
     padding: 0 0.75rem 0.75rem;
   }

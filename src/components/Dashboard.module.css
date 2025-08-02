@@ -30,6 +30,7 @@
   margin: 0;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  will-change: transform, opacity;
 }
 
 .virgilLogoButton:hover {
@@ -45,12 +46,17 @@
 
 /* DateTime Display */
 .datetimeWidget {
+  position: fixed;
+  top: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
   cursor: pointer;
-  transition: background-color var(--transition-normal, 0.3s ease);
+  transition: transform 0.2s ease, background-color var(--transition-normal, 0.3s ease);
   border-radius: var(--radius-medium, 8px);
+  will-change: transform;
   padding: 0.25rem;
   margin: -0.25rem;
-  position: relative;
 }
 
 .datetimeWidget:hover {
@@ -63,11 +69,6 @@
 }
 
 .datetimeDisplay {
-  position: fixed;
-  top: 1.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
   text-align: center;
   font-family: 'Montserrat', sans-serif;
   color: var(--brand-light-gray);
@@ -229,7 +230,7 @@
 }
 
 /* Mobile responsive weather */
-@media (max-width: 768px) {
+@media (--md-down) {
   .weatherWidget {
     right: 60px;
     padding: 8px 12px;
@@ -245,7 +246,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--sm-down) {
   .weatherWidget {
     top: 60px;
     right: 20px;
@@ -621,7 +622,7 @@
 
 
 /* Mobile Styles */
-@media (max-width: 768px) {
+@media (--md-down) {
   .dashboard {
     padding: 1rem;
   }

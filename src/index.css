@@ -5,6 +5,8 @@
 @import "./styles/animations.css";
 @import "./styles/modal.css";
 @import "./styles/components.css";
+@import "./styles/breakpoints.css";
+@import "./styles/performance-markers.css";
 
 /* Theme configuration for Tailwind v4 */
 @theme {
@@ -127,7 +129,7 @@ html, body {
 }
 
 /* Mobile responsiveness */
-@media (max-width: 480px) {
+@media (--sm-down) {
   /* Increase touch targets */
   button, input, select, textarea, a {
     min-height: 44px;
@@ -164,7 +166,7 @@ html, body {
   }
 }
 
-@media (max-width: 768px) {
+@media (--md-down) {
   /* Tablet adjustments */
   .dashboard {
     padding: 1rem;

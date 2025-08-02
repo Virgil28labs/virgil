@@ -245,7 +245,7 @@
 }
 
 /* Mobile Styles */
-@media (max-width: 768px) {
+@media (--md-down) {
   .authPage {
     gap: 2rem;
     padding: 1rem;
@@ -301,7 +301,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--sm-down) {
   .authPage header h1 {
     font-size: 28px;
   }

@@ -65,7 +65,7 @@ Virgil is a React/TypeScript application with a physics-based raccoon mascot, we
 3. **Weather**: Location-based weather with caching
 4. **Notes**: Tag-based note system with AI integration
 5. **Camera**: Photo capture with IndexedDB storage
-6. **Maps**: Google Maps integration with route planning
+6. **Location**: OpenStreetMap-based location services with GPS fallback
 
 ## API Architecture
 

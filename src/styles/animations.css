@@ -1,7 +1,13 @@
 /* ========================================
    VIRGIL ANIMATIONS
-   Extracted from App.css for better organization
+   Core animations library with GPU optimizations
+   
+   NOTE: Many animations have been replaced with GPU-optimized
+   versions in gpu-animations.css. Use those for better performance.
    ======================================== */
+
+/* Import GPU-optimized animations */
+@import './gpu-animations.css';
 
 /* Loading & Spinner Animations */
 @keyframes spin {
@@ -103,14 +109,17 @@
   }
 }
 
+/* DEPRECATED: Use expandDown from gpu-animations.css instead */
 @keyframes slideDownEditor {
   from {
-    max-height: 0;
     opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top center;
   }
   to {
-    max-height: 800px;
     opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top center;
   }
 }
 
@@ -202,24 +211,30 @@
   }
 }
 
+/* DEPRECATED: Use expandDown from gpu-animations.css instead */
 @keyframes expandDown {
   from {
-    max-height: 0;
     opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top center;
   }
   to {
-    max-height: 1000px;
     opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top center;
   }
 }
 
 /* Progress Animations */
+/* DEPRECATED: Use progressFill from gpu-animations.css instead */
 @keyframes progressFill {
   from {
-    width: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
   }
   to {
-    width: 100%;
+    transform: scaleX(1);
+    transform-origin: left center;
   }
 }
 
@@ -244,12 +259,13 @@
   }
 }
 
+/* DEPRECATED: Use shimmer from gpu-animations.css instead */
 @keyframes shimmer {
   0% { 
-    background-position: -200% 0; 
+    transform: translateX(-100%);
   }
   100% { 
-    background-position: 200% 0; 
+    transform: translateX(100%);
   }
 }
 

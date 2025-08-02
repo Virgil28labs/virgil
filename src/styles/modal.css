@@ -2,6 +2,7 @@
    VIRGIL MODAL SYSTEM
    Shared modal styles for all app modals
    ======================================== */
+@import './animations.css';
 
 /* Base Modal Styles */
 .modal-backdrop {
@@ -19,14 +20,7 @@
   animation: fadeIn 200ms ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* Animation imported from animations.css */
 
 .modal-panel {
   background: rgba(57, 41, 62, 0.85);
@@ -42,16 +36,7 @@
   position: relative;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* Animation imported from animations.css */
 
 /* Size Variants */
 .modal-small {
@@ -136,7 +121,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (--md-down) {
   .modal-backdrop {
     align-items: flex-end;
   }
@@ -156,14 +141,7 @@
     min-height: 300px;
   }
   
-  @keyframes slideIn {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
+  /* Animation imported from animations.css */
 }
 
 /* Specific Modal Style Modifiers */

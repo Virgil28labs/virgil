@@ -39,6 +39,8 @@ out/
 *.swp
 *.swo
 *~
+*.bak
+*.bak[0-9]
 
 # OS generated files
 .DS_Store

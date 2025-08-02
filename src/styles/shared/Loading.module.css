@@ -1,0 +1,264 @@
+/**
+ * Loading States & Spinners Module
+ * 
+ * Shared loading components with consistent styling
+ * and performance optimizations
+ */
+
+/* Base Loading Container */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 2rem;
+}
+
+/* Primary Spinner - Default loading indicator */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(178, 165, 193, 0.2);
+  border-top-color: var(--violet-purple);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  will-change: transform; /* GPU acceleration */
+}
+
+/* Spinner Sizes */
+.spinnerSm {
+  composes: spinner;
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.spinnerMd {
+  composes: spinner;
+  /* Default size - 40px */
+}
+
+.spinnerLg {
+  composes: spinner;
+  width: 60px;
+  height: 60px;
+  border-width: 4px;
+}
+
+/* Spinner Colors */
+.spinnerPrimary {
+  border-top-color: var(--violet-purple);
+}
+
+.spinnerSecondary {
+  border-top-color: var(--lavender);
+}
+
+.spinnerAccent {
+  border-top-color: var(--soft-pink);
+}
+
+.spinnerWhite {
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+}
+
+/* Loading Text */
+.loadingText {
+  margin-top: 1rem;
+  color: var(--silver-grey);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Pulse Loading - Alternative style */
+.pulseDot {
+  width: 12px;
+  height: 12px;
+  background: var(--violet-purple);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.pulseContainer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulseContainer .pulseDot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pulseContainer .pulseDot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Skeleton Loading - For content placeholders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(178, 165, 193, 0.1) 0%,
+    rgba(178, 165, 193, 0.2) 50%,
+    rgba(178, 165, 193, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  will-change: background-position;
+}
+
+.skeletonText {
+  composes: skeleton;
+  height: 1em;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.skeletonTextShort {
+  composes: skeletonText;
+  width: 60%;
+}
+
+.skeletonTextLong {
+  composes: skeletonText;
+  width: 90%;
+}
+
+.skeletonImage {
+  composes: skeleton;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.skeletonAvatar {
+  composes: skeleton;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+/* Full Page Loading State */
+.fullPageLoader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  /* Performance optimizations */
+  contain: layout style paint;
+  will-change: opacity;
+}
+
+/* Inline Loading State */
+.inlineLoader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inlineLoader .spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+/* Button Loading State */
+.buttonLoader {
+  composes: inlineLoader;
+  opacity: 0.7;
+}
+
+/* Loading Overlay - For components */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: inherit;
+  /* Performance optimizations */
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
+/* Status Icons with Loading */
+.statusIcon {
+  font-size: 1.2rem;
+}
+
+.statusIcon.loading {
+  animation: spin 1s linear infinite;
+}
+
+/* Accessibility - Screen reader text */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .pulseDot,
+  .skeleton,
+  .statusIcon.loading {
+    animation: none;
+  }
+  
+  .spinner {
+    border-top-color: transparent;
+    background: conic-gradient(
+      from 0deg,
+      var(--violet-purple) 0deg,
+      transparent 90deg
+    );
+  }
+  
+  .pulseDot {
+    opacity: 0.6;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .loadingContainer {
+    padding: 1rem;
+    min-height: 80px;
+  }
+  
+  .spinner {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .spinnerLg {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .loadingText {
+    font-size: 0.85rem;
+  }
+}
