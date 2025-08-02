@@ -12,9 +12,33 @@
  * - Gallery opening and closing
  */
 
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { GiphyEmojiButton } from '../GiphyEmojiButton';
+
+// Type definitions for test mocks
+interface MockEmojiButtonProps {
+  emoji: string;
+  ariaLabel: string;
+  GalleryComponent?: React.ComponentType<{ onClose: () => void }>;
+  position?: { top?: number; bottom?: number; left?: number; right?: number };
+  hoverScale?: number;
+  hoverColor?: { background?: string; text?: string };
+  title?: string;
+  className?: string;
+  [key: string]: unknown;
+}
+
+interface MockErrorBoundaryProps {
+  children: React.ReactNode;
+  appName: string;
+}
+
+interface MockGalleryProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 // Mock the EmojiButton component
 jest.mock('../common/EmojiButton', () => ({
@@ -28,7 +52,7 @@ jest.mock('../common/EmojiButton', () => ({
     title, 
     className,
     ...props 
-  }: unknown) => (
+  }: MockEmojiButtonProps) => (
     <div data-testid="emoji-button">
       <button
         aria-label={ariaLabel}
@@ -55,7 +79,7 @@ jest.mock('../common/EmojiButton', () => ({
 
 // Mock the DashboardAppErrorBoundary
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
+  DashboardAppErrorBoundary: ({ children, appName }: MockErrorBoundaryProps) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>
@@ -63,7 +87,7 @@ jest.mock('../common/DashboardAppErrorBoundary', () => ({
 }));
 
 // Mock the lazy-loaded GiphyGallery
-const mockGiphyGallery = jest.fn(({ isOpen, onClose }: unknown) => (
+const mockGiphyGallery = jest.fn(({ isOpen, onClose }: MockGalleryProps) => (
   <div data-testid="giphy-gallery" data-is-open={isOpen}>
     <button onClick={onClose} data-testid="close-gallery">
       Close Gallery

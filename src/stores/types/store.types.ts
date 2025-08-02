@@ -5,9 +5,10 @@
  * with time as the single source of truth.
  */
 
-import type { LocationContextValue } from '../../types/location.types';
-import type { WeatherContextType } from '../../types/weather.types';
-import type { AuthContextValue } from '../../types/auth.types';
+// Unused imports removed to fix TypeScript warnings
+// import type { LocationContextValue } from '../../types/location.types';
+// import type { WeatherContextType } from '../../types/weather.types';
+// import type { AuthContextValue } from '../../types/auth.types';
 import type { UserProfile } from '../../hooks/useUserProfile';
 import type { DeviceInfo } from '../../hooks/useDeviceInfo';
 import type { DashboardAppData } from '../../services/DashboardAppService';
@@ -52,9 +53,9 @@ export interface LocationSliceState {
   } | null;
   ipLocation: {
     ip: string;
-    city: string;
-    region: string;
-    country: string;
+    city?: string;
+    region?: string;
+    country?: string;
     timezone?: string;
     isp?: string;
     org?: string;
@@ -64,7 +65,7 @@ export interface LocationSliceState {
   } | null;
   loading: boolean;
   error: string | null;
-  permissionStatus: 'unknown' | 'granted' | 'denied' | 'prompt';
+  permissionStatus: 'unknown' | 'granted' | 'denied' | 'prompt' | 'unavailable';
   lastUpdated: number | null;
   initialized: boolean;
   locationSource: 'gps' | 'ip' | null;
@@ -91,7 +92,7 @@ export interface WeatherSliceState {
     clouds: number;
     visibility: number;
     condition: {
-      id: number;
+      id?: number;
       main: string;
       description: string;
       icon: string;
@@ -111,7 +112,7 @@ export interface WeatherSliceState {
       tempMin: number;
       tempMax: number;
       condition: {
-        id: number;
+        id?: number;
         main: string;
         description: string;
         icon: string;

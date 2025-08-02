@@ -163,7 +163,7 @@ export const createTimeSlice: StateCreator<
           time: {
             ...state.time,
             isValid: false,
-            lastUpdated: Date.now(),
+            lastUpdated: timeService.getTimestamp(),
             // Use fallback values to prevent UI breaks
             timestamp: timeService.getTimestamp(),
             dateObject: timeService.getCurrentDateTime(),
@@ -211,13 +211,13 @@ export const createTimeSlice: StateCreator<
               time: {
                 ...state.time,
                 isValid: false,
-                lastUpdated: Date.now(),
+                lastUpdated: timeService.getTimestamp(),
               },
             }));
           }
         });
 
-        console.log('TimeSlice: Successfully subscribed to TimeService updates');
+        // Successfully subscribed to TimeService updates
       } catch (error) {
         console.error('TimeSlice: Failed to subscribe to TimeService:', error);
         
@@ -235,7 +235,7 @@ export const createTimeSlice: StateCreator<
         try {
           timeServiceUnsubscribe();
           timeServiceUnsubscribe = null;
-          console.log('TimeSlice: Successfully unsubscribed from TimeService');
+          // Successfully unsubscribed from TimeService
         } catch (error) {
           console.error('TimeSlice: Error unsubscribing from TimeService:', error);
         }
@@ -284,8 +284,7 @@ export const getRelativeTime = (date: Date): string => {
   } catch (error) {
     console.error('TimeSlice: Error getting relative time:', error);
     // Fallback to simple calculation
-    const now = timeService.getTimestamp();
-    const diff = Math.floor((now - date.getTime()) / 1000);
+    const diff = Math.floor((timeService.getTimestamp() - timeService.getTimeFromDate(date)) / 1000);
     
     if (diff < 60) return 'just now';
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
@@ -297,7 +296,7 @@ export const getRelativeTime = (date: Date): string => {
 /**
  * Initialize time slice on store creation
  */
-export const initializeTimeSlice = (store: any) => {
+export const initializeTimeSlice = (store: { getState: () => { time: TimeSlice } }) => {
   // Start TimeService subscription automatically
   store.getState().time.subscribeToTimeService();
   

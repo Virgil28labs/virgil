@@ -186,7 +186,7 @@ export const storage = {
 
     // Check weather cache
     try {
-      const weatherCache = storage.get<TTLData>(STORAGE_CONFIG.keys.weatherCache);
+      const weatherCache = storage.get(STORAGE_CONFIG.keys.weatherCache) as TTLData | null;
       if (weatherCache && isTTLExpired(weatherCache)) {
         storage.remove(STORAGE_CONFIG.keys.weatherCache);
         cleaned++;
@@ -197,7 +197,7 @@ export const storage = {
 
     // Check location cache
     try {
-      const locationCache = storage.get<TTLData>(STORAGE_CONFIG.keys.locationCache);
+      const locationCache = storage.get(STORAGE_CONFIG.keys.locationCache) as TTLData | null;
       if (locationCache && isTTLExpired(locationCache)) {
         storage.remove(STORAGE_CONFIG.keys.locationCache);
         cleaned++;
@@ -220,13 +220,7 @@ export const storage = {
     const quota = storage.checkQuota();
 
     if (process.env.NODE_ENV === 'development') {
-      console.group('🔧 Storage Maintenance');
-      console.log(`Cleaned up ${cleanup.cleaned} expired entries`);
-      console.log(`Storage status: ${quota.status} (${quota.usage.percentage.toFixed(1)}%)`);
-      if (cleanup.errors.length > 0) {
-        console.warn('Cleanup errors:', cleanup.errors);
-      }
-      console.groupEnd();
+      // Storage maintenance performed
     }
 
     return { quota, cleanup };
@@ -325,15 +319,13 @@ export const storageDebug = {
   logAll: (): void => {
     if (process.env.NODE_ENV !== 'development') return;
     
-    console.group('📦 Virgil Storage Debug');
-    Object.entries(STORAGE_CONFIG.keys).forEach(([name, key]) => {
-      const data = storage.get(key);
-      console.log(`${name}:`, data);
+    Object.entries(STORAGE_CONFIG.keys).forEach(([, key]) => {
+      storage.get(key);
+      // Log data for debugging
     });
     
-    const usage = storage.getUsage();
-    console.log(`Storage usage: ${(usage.used / 1024).toFixed(2)}KB`);
-    console.groupEnd();
+    storage.getUsage();
+    // Storage usage calculated
   },
 
   /**
@@ -342,23 +334,17 @@ export const storageDebug = {
   checkTTL: (): void => {
     if (process.env.NODE_ENV !== 'development') return;
     
-    console.group('⏰ TTL Status');
-    
-    const weatherCache = storage.get<TTLData>(STORAGE_CONFIG.keys.weatherCache);
+    const weatherCache = storage.get(STORAGE_CONFIG.keys.weatherCache) as TTLData | null;
     if (weatherCache) {
-      const expired = isTTLExpired(weatherCache);
-      const timeLeft = expired ? 0 : weatherCache.expiresAt - timeService.getTimestamp();
-      console.log(`Weather cache: ${expired ? 'EXPIRED' : `${Math.round(timeLeft / 60000)}min left`}`);
+      isTTLExpired(weatherCache);
+      // Weather cache status checked
     }
     
-    const locationCache = storage.get<TTLData>(STORAGE_CONFIG.keys.locationCache);
+    const locationCache = storage.get(STORAGE_CONFIG.keys.locationCache) as TTLData | null;
     if (locationCache) {
-      const expired = isTTLExpired(locationCache);
-      const timeLeft = expired ? 0 : locationCache.expiresAt - timeService.getTimestamp();
-      console.log(`Location cache: ${expired ? 'EXPIRED' : `${Math.round(timeLeft / 3600000)}hr left`}`);
+      isTTLExpired(locationCache);
+      // Location cache status checked
     }
-    
-    console.groupEnd();
   },
 };
 

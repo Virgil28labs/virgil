@@ -404,7 +404,7 @@ describe('DateTime', () => {
       const widget = screen.getByTestId('timezone-widget');
       const display = screen.getByText('14:30').closest('.datetime-display');
 
-      expect(widget).toContainElement(display);
+      expect(widget).toContainElement(display as HTMLElement);
     });
   });
 

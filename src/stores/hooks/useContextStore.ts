@@ -10,7 +10,6 @@ import { useStore } from 'zustand';
 import { useContextStore } from '../ContextStore';
 import { timeSelectors } from '../slices/timeSlice';
 import type { 
-  ContextStoreWithActions,
   ContextSelector, 
 } from '../types/store.types';
 import { timeService } from '../../services/TimeService';

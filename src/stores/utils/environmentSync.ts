@@ -56,7 +56,7 @@ export const syncEnvironmentContext = () => {
  * Selective sync for specific environment fields
  * Useful when you only want to update certain fields
  */
-export const useSyncEnvironmentField = (field: string, dependencies: unknown[]) => {
+export const useSyncEnvironmentField = (_field: string, dependencies: unknown[]) => {
   useEffect(() => {
     const unsubscribe = useContextStore.subscribe(
       () => dependencies,
