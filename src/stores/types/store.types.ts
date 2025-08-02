@@ -137,7 +137,7 @@ export interface UserSliceState {
     email?: string;
     name?: string;          // "Ben"
     dob?: string;           // "28-11-1982"
-    userId?: string;        // "Ben28"
+    username?: string;      // "Ben28" - Generated display username
     
     // Supabase User Fields (all optional except id)
     app_metadata?: Record<string, unknown>;
@@ -325,8 +325,8 @@ export interface UserActions {
   // New user field actions
   setUserName: (name: string) => void;
   setUserDob: (dob: string) => void;
-  setUserId: (userId: string) => void;
-  updateUserFields: (fields: { name?: string; dob?: string; userId?: string }) => void;
+  setUsername: (username: string) => void;
+  updateUserFields: (fields: { name?: string; dob?: string; username?: string }) => void;
   
   // Environment context actions
   updateEnvironmentContext: () => void;

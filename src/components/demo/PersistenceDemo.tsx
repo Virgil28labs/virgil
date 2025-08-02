@@ -31,7 +31,7 @@ export const PersistenceDemo: React.FC = () => {
       id: 'demo-user-123',
       name: 'Ben',
       dob: '28-11-1982',
-      userId: 'Ben28',
+      username: 'Ben28',
       email: 'ben@demo.com',
       app_metadata: {},
       user_metadata: { demo: true },
@@ -140,7 +140,7 @@ export const PersistenceDemo: React.FC = () => {
         <h3>User Data</h3>
         <p>Authenticated: {user.isAuthenticated ? '✅' : '❌'}</p>
         <p>Name: {user.user?.name || 'Not set'}</p>
-        <p>User ID: {user.user?.userId || 'Not set'}</p>
+        <p>Username: {user.user?.username || 'Not set'}</p>
         <button onClick={handleSetTestUser}>Set Test User</button>
       </div>
 

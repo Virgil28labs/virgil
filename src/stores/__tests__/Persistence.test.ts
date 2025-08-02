@@ -276,7 +276,7 @@ describe('Store Persistence', () => {
           id: 'user-123',
           name: 'Ben',
           dob: '28-11-1982',
-          userId: 'Ben28',
+          username: 'Ben28',
           email: 'ben@example.com',
           app_metadata: {},
           user_metadata: {},
@@ -292,7 +292,7 @@ describe('Store Persistence', () => {
       // Verify the data is set in the store
       expect(result.current.user?.name).toBe('Ben');
       expect(result.current.user?.dob).toBe('28-11-1982');
-      expect(result.current.user?.userId).toBe('Ben28');
+      expect(result.current.user?.username).toBe('Ben28');
       expect(result.current.isAuthenticated).toBe(true);
     });
   });

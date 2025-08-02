@@ -88,7 +88,7 @@ export {
   // New user field hooks
   useUserName,
   useUserDob,
-  useUserId,
+  useUsername,
   useUserFields,
   
   // Environment context hooks
@@ -316,7 +316,7 @@ export {
   syncProfileToUserFields,
   syncUserFieldsToProfile,
   updateUserFieldsFromSource,
-  generateUserId,
+  generateUsername,
   autoGenerateUserId,
   validateUserFields,
   setupUserFromProfile,

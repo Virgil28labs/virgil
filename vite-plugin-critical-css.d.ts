@@ -1,4 +1,4 @@
-declare module './vite-plugin-critical-css' {
+declare module 'vite-plugin-critical-css' {
   import { Plugin } from 'vite'
   
   interface CriticalCSSOptions {

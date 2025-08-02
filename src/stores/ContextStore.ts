@@ -278,7 +278,7 @@ export const useContextStore = create<ContextStoreWithActions>()(
               const enhancedUser = user ? {
                 name: user.name || '',
                 dob: user.dob || '',
-                userId: user.userId || '',
+                username: user.username || '',
                 ...user,
               } : null;
 
@@ -355,11 +355,11 @@ export const useContextStore = create<ContextStoreWithActions>()(
               }));
             },
 
-            setUserId: (userId) => {
+            setUsername: (username) => {
               set((state) => ({
                 user: {
                   ...state.user,
-                  user: state.user.user ? { ...state.user.user, userId } : null,
+                  user: state.user.user ? { ...state.user.user, username } : null,
                 },
               }));
             },
@@ -674,7 +674,7 @@ export const useContextStore = create<ContextStoreWithActions>()(
             user: state.user.user ? {
               name: state.user.user.name || '',
               dob: state.user.user.dob || '',
-              userId: state.user.user.userId || '',
+              username: state.user.user.username || '',
               id: state.user.user.id,
               email: state.user.user.email,
               // Keep minimal Supabase fields for auth

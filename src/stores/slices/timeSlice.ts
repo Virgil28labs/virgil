@@ -284,7 +284,7 @@ export const getRelativeTime = (date: Date): string => {
   } catch (error) {
     console.error('TimeSlice: Error getting relative time:', error);
     // Fallback to simple calculation
-    const diff = Math.floor((timeService.getTimestamp() - timeService.getTimeFromDate(date)) / 1000);
+    const diff = Math.floor((timeService.getTimestamp() - date.getTime()) / 1000);
     
     if (diff < 60) return 'just now';
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;

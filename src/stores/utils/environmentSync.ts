@@ -84,7 +84,7 @@ export const useProfileSync = () => {
           store.user.updateUserFields({
             name: profile.nickname || profile.fullName,
             dob: profile.dateOfBirth,
-            userId: profile.uniqueId,
+            username: profile.uniqueId,
           });
         }
       },
@@ -97,7 +97,7 @@ export const useProfileSync = () => {
       store.user.updateUserFields({
         name: currentProfile.nickname || currentProfile.fullName,
         dob: currentProfile.dateOfBirth,
-        userId: currentProfile.uniqueId,
+        username: currentProfile.uniqueId,
       });
     }
 
@@ -126,7 +126,7 @@ export const syncAll = () => {
     store.user.updateUserFields({
       name: profile.nickname || profile.fullName,
       dob: profile.dateOfBirth,
-      userId: profile.uniqueId,
+      username: profile.uniqueId,
     });
   }
   

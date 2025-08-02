@@ -383,7 +383,7 @@ describe('ContextStore', () => {
         ...userData,
         name: '',
         dob: '',
-        userId: '',
+        username: '',
       });
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.memberSince).toBeDefined();
@@ -611,7 +611,7 @@ describe('ContextStore', () => {
           id: 'user-123',
           name: '',
           dob: '',
-          userId: '',
+          username: '',
           email: 'test@example.com',
           app_metadata: {},
           user_metadata: {},
@@ -640,7 +640,7 @@ describe('ContextStore', () => {
           id: 'user-123',
           name: '',
           dob: '',
-          userId: '',
+          username: '',
           email: 'test@example.com',
           app_metadata: {},
           user_metadata: {},
@@ -669,7 +669,7 @@ describe('ContextStore', () => {
           id: 'user-123',
           name: '',
           dob: '',
-          userId: '',
+          username: '',
           email: 'test@example.com',
           app_metadata: {},
           user_metadata: {},
@@ -683,10 +683,10 @@ describe('ContextStore', () => {
       });
 
       act(() => {
-        result.current.setUserId('Ben28');
+        result.current.setUsername('Ben28');
       });
 
-      expect(result.current.user?.userId).toBe('Ben28');
+      expect(result.current.user?.username).toBe('Ben28');
     });
 
     it('should update multiple user fields at once', () => {
@@ -698,7 +698,7 @@ describe('ContextStore', () => {
           id: 'user-123',
           name: '',
           dob: '',
-          userId: '',
+          username: '',
           email: 'test@example.com',
           app_metadata: {},
           user_metadata: {},
@@ -715,13 +715,13 @@ describe('ContextStore', () => {
         result.current.updateUserFields({
           name: 'Ben',
           dob: '28-11-1982',
-          userId: 'Ben28',
+          username: 'Ben28',
         });
       });
 
       expect(result.current.user?.name).toBe('Ben');
       expect(result.current.user?.dob).toBe('28-11-1982');
-      expect(result.current.user?.userId).toBe('Ben28');
+      expect(result.current.user?.username).toBe('Ben28');
     });
 
     it('should handle setUser with new fields', () => {
@@ -731,7 +731,7 @@ describe('ContextStore', () => {
         id: 'user-123',
         name: 'Ben',
         dob: '28-11-1982',
-        userId: 'Ben28',
+        username: 'Ben28',
         email: 'test@example.com',
         app_metadata: {},
         user_metadata: {},
@@ -749,7 +749,7 @@ describe('ContextStore', () => {
 
       expect(result.current.user?.name).toBe('Ben');
       expect(result.current.user?.dob).toBe('28-11-1982');
-      expect(result.current.user?.userId).toBe('Ben28');
+      expect(result.current.user?.username).toBe('Ben28');
       expect(result.current.isAuthenticated).toBe(true);
     });
   });
@@ -952,7 +952,7 @@ describe('ContextStore', () => {
         result.current.updateUserFields({
           name: profile.nickname,
           dob: profile.dateOfBirth,
-          userId: profile.uniqueId,
+          username: profile.uniqueId,
         });
       });
 
@@ -969,7 +969,7 @@ describe('ContextStore', () => {
           id: 'user-123',
           name: 'Ben',
           dob: '28-11-1982',
-          userId: 'Ben28',
+          username: 'Ben28',
           email: 'ben@example.com',
           app_metadata: {},
           user_metadata: {},

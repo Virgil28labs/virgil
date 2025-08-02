@@ -20,7 +20,7 @@ export const syncProfileToUserFields = (profile: UserProfile | null) => {
   store.user.updateUserFields({
     name: profile.nickname || profile.fullName,
     dob: profile.dateOfBirth,
-    userId: profile.uniqueId,
+    username: profile.uniqueId,
   });
 };
 
@@ -32,13 +32,13 @@ export const syncProfileToUserFields = (profile: UserProfile | null) => {
 export const syncUserFieldsToProfile = (userFields: {
   name?: string;
   dob?: string;
-  userId?: string;
+  username?: string;
 }): Partial<UserProfile> => {
   return {
     nickname: userFields.name || '',
     fullName: userFields.name || '',
     dateOfBirth: userFields.dob || '',
-    uniqueId: userFields.userId || '',
+    uniqueId: userFields.username || '',
   };
 };
 
@@ -71,24 +71,24 @@ export const updateUserFieldsFromSource = (source: {
               source.dateOfBirth || 
               '';
 
-  // Extract user ID from various possible fields
-  const userId = source.userId || 
-                 source.uniqueId || 
-                 source.id || 
-                 '';
+  // Extract username from various possible fields
+  const username = source.userId || 
+                   source.uniqueId || 
+                   source.id || 
+                   '';
 
   store.user.updateUserFields({
     name,
     dob,
-    userId,
+    username,
   });
 };
 
 /**
- * Generate a unique user ID based on name and date of birth
+ * Generate a unique username based on name and date of birth
  * Follows the same logic as the UserProfile system
  */
-export const generateUserId = (name: string, dob: string): string => {
+export const generateUsername = (name: string, dob: string): string => {
   if (!name || !dob) return '';
 
   const firstName = name.split(' ')[0];
@@ -124,9 +124,9 @@ export const autoGenerateUserId = (name?: string, dob?: string) => {
   const finalDob = dob || currentUser?.dob || '';
   
   if (finalName && finalDob) {
-    const generatedUserId = generateUserId(finalName, finalDob);
-    if (generatedUserId) {
-      store.user.setUserId(generatedUserId);
+    const generatedUsername = generateUsername(finalName, finalDob);
+    if (generatedUsername) {
+      store.user.setUsername(generatedUsername);
     }
   }
 };
@@ -222,7 +222,7 @@ export const getConsolidatedUserData = () => {
     // Core fields
     name: state.user.user?.name || '',
     dob: state.user.user?.dob || '',
-    userId: state.user.user?.userId || '',
+    username: state.user.user?.username || '',
     
     // Auth info
     email: state.user.user?.email || '',

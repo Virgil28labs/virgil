@@ -259,7 +259,7 @@ export const useUserActions = () => {
     // New user field actions
     setUserName: state.user.setUserName,
     setUserDob: state.user.setUserDob,
-    setUserId: state.user.setUserId,
+    setUsername: state.user.setUsername,
     updateUserFields: state.user.updateUserFields,
     // Environment context actions
     updateEnvironmentContext: state.user.updateEnvironmentContext,
@@ -284,10 +284,10 @@ export const useUserDob = () => {
 };
 
 /**
- * Hook for user ID
+ * Hook for username
  */
-export const useUserId = () => {
-  return useContext((state) => state.user.user?.userId || '');
+export const useUsername = () => {
+  return useContext((state) => state.user.user?.username || '');
 };
 
 /**
@@ -297,7 +297,7 @@ export const useUserFields = () => {
   return useContext((state) => ({
     name: state.user.user?.name || '',
     dob: state.user.user?.dob || '',
-    userId: state.user.user?.userId || '',
+    username: state.user.user?.username || '',
   }));
 };
 

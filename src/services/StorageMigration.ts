@@ -18,7 +18,7 @@ interface MigrationResult {
 
 export class StorageMigration {
   private static MIGRATION_VERSION_KEY = 'virgil_storage_migration_version';
-  private static CURRENT_VERSION = '1.0.0';
+  private static CURRENT_VERSION = '1.1.0';
 
   /**
    * Run all necessary migrations
@@ -73,6 +73,10 @@ export class StorageMigration {
       const result = this.migrateBooleanValue(key);
       results.push(result);
     }
+
+    // Migrate userId to username in user data
+    const userDataResult = this.migrateUserIdToUsername();
+    results.push(userDataResult);
 
     // Update migration version
     StorageService.set(this.MIGRATION_VERSION_KEY, this.CURRENT_VERSION);
@@ -198,6 +202,48 @@ export class StorageMigration {
           newValue: newValue,
         };
       }
+    } catch (error) {
+      return {
+        key,
+        success: false,
+        oldValue: null,
+        newValue: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Migrate userId to username in user data
+   */
+  private static migrateUserIdToUsername(): MigrationResult {
+    const key = 'virgil-user-v1';
+    try {
+      const rawValue = localStorage.getItem(key);
+      if (rawValue === null) {
+        return { key, success: true, oldValue: null, newValue: null };
+      }
+
+      // Parse the existing data
+      let data = JSON.parse(rawValue);
+      
+      // Check if user object exists and has userId field
+      if (data && data.user && data.user.user && 'userId' in data.user.user) {
+        // Create a copy of the data
+        const newData = JSON.parse(JSON.stringify(data));
+        
+        // Rename userId to username
+        newData.user.user.username = data.user.user.userId;
+        delete newData.user.user.userId;
+        
+        // Save the updated data
+        localStorage.setItem(key, JSON.stringify(newData));
+        
+        logger.info(`Migrated userId to username in user data`);
+        return { key, success: true, oldValue: data, newValue: newData };
+      }
+
+      return { key, success: true, oldValue: data, newValue: data };
     } catch (error) {
       return {
         key,
