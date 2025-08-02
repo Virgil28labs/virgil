@@ -1,0 +1,243 @@
+.toggleButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--brand-dark-gray);
+  color: var(--brand-white);
+  border: 1px solid var(--brand-light-gray);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.toggleButton:hover {
+  background: var(--brand-gray);
+  transform: translateY(-2px);
+}
+
+.debugger {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 420px;
+  max-height: 600px;
+  background: var(--brand-dark-gray);
+  border: 1px solid var(--brand-light-gray);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--brand-light-gray);
+  background: var(--brand-black);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--brand-white);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--brand-light-gray);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: var(--brand-white);
+}
+
+.snapshots {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 480px;
+}
+
+.empty {
+  color: var(--brand-light-gray);
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+}
+
+.snapshot {
+  background: var(--brand-black);
+  border: 1px solid var(--brand-gray);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.snapshot:last-child {
+  margin-bottom: 0;
+}
+
+.snapshotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--brand-gray);
+}
+
+.relativeTime {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--brand-white);
+}
+
+.absoluteTime {
+  font-size: 0.75rem;
+  color: var(--brand-light-gray);
+}
+
+.snapshotBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contextRow,
+.stateRow,
+.activityRow,
+.idleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+}
+
+.username {
+  color: var(--brand-purple);
+  font-weight: 500;
+}
+
+.location {
+  color: var(--brand-light-blue);
+}
+
+.locationContext {
+  color: var(--brand-green);
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.weather {
+  color: var(--brand-yellow);
+  margin-left: 8px;
+}
+
+.partOfDay {
+  color: var(--brand-light-blue);
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.separator {
+  color: var(--brand-gray);
+}
+
+.device {
+  color: var(--brand-green);
+  text-transform: capitalize;
+}
+
+.platform {
+  color: var(--brand-light-gray);
+}
+
+.activityLevel {
+  color: var(--brand-white);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.visibilityState {
+  color: var(--brand-white);
+  background: rgba(0, 123, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.idleTime {
+  color: var(--brand-light-gray);
+  font-size: 0.75rem;
+}
+
+.footer {
+  padding: 8px 16px;
+  border-top: 1px solid var(--brand-light-gray);
+  background: var(--brand-black);
+  text-align: center;
+}
+
+.footer small {
+  color: var(--brand-light-gray);
+  font-size: 0.75rem;
+}
+
+.inputIndicators {
+  color: var(--brand-light-blue);
+  font-size: 0.875rem;
+  margin-left: 4px;
+}
+
+.battery {
+  color: var(--brand-green);
+  font-size: 0.75rem;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.networkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.offline {
+  color: var(--brand-red);
+  font-weight: 500;
+}
+
+.connection {
+  color: var(--brand-light-blue);
+}
+
+.ip {
+  color: var(--brand-gray);
+  font-size: 0.7rem;
+}
+
+.pageTitle {
+  color: var(--brand-light-gray);
+  font-size: 0.7rem;
+  margin-left: 8px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
