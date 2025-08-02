@@ -305,7 +305,7 @@ describe('PhotoGalleryTabs', () => {
       const { container } = render(
         <PhotoGalleryTabs
           activeTab="camera"
-          onTabChange={undefined as unknown}
+          onTabChange={undefined as any}
           photoCount={5}
           favoriteCount={2}
         />,

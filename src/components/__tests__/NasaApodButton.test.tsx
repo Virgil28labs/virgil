@@ -13,10 +13,33 @@
  * - Space-themed styling and colors
  */
 
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NasaApodButton } from '../NasaApodButton';
-import React from 'react';
+
+// Types for mocked components
+interface EmojiButtonProps {
+  emoji: string;
+  ariaLabel: string;
+  title: string;
+  className?: string;
+  position?: { x: number; y: number };
+  hoverScale?: number;
+  hoverColor?: string;
+  GalleryComponent?: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
+  [key: string]: unknown;
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  appName: string;
+}
+
+interface ViewerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 // Mock the EmojiButton component
 jest.mock('../common/EmojiButton', () => ({
@@ -30,7 +53,7 @@ jest.mock('../common/EmojiButton', () => ({
     title, 
     className,
     ...props 
-  }: any) => (
+  }: EmojiButtonProps) => (
     <div data-testid="emoji-button">
       <button
         aria-label={ariaLabel}
@@ -44,7 +67,7 @@ jest.mock('../common/EmojiButton', () => ({
           // Simulate opening gallery
           if (GalleryComponent) {
             const mockOnClose = jest.fn();
-            render(<GalleryComponent onClose={mockOnClose} />);
+            render(<GalleryComponent isOpen onClose={mockOnClose} />);
           }
         }}
         {...props}
@@ -57,7 +80,7 @@ jest.mock('../common/EmojiButton', () => ({
 
 // Mock the DashboardAppErrorBoundary
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
+  DashboardAppErrorBoundary: ({ children, appName }: ErrorBoundaryProps) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>
@@ -65,7 +88,7 @@ jest.mock('../common/DashboardAppErrorBoundary', () => ({
 }));
 
 // Mock the lazy-loaded NasaApodViewer
-const mockNasaApodViewer = jest.fn(({ isOpen, onClose }: unknown) => (
+const mockNasaApodViewer = jest.fn(({ isOpen, onClose }: ViewerProps) => (
   <div data-testid="nasa-apod-viewer" data-is-open={isOpen}>
     <button onClick={onClose} data-testid="close-viewer">
       Close Viewer

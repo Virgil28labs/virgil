@@ -8,11 +8,11 @@
 import { useCallback } from 'react';
 import { useStore } from 'zustand';
 import { useContextStore } from '../ContextStore';
+import { timeService } from '../../services/TimeService';
 import { timeSelectors } from '../slices/timeSlice';
 import type { 
   ContextSelector, 
 } from '../types/store.types';
-import { timeService } from '../../services/TimeService';
 
 // ========== Core Store Hook ==========
 
@@ -517,8 +517,8 @@ export const useTimeRelative = () => {
   return useCallback((date: Date): string => {
     if (!isTimeValid) {
       // Fallback calculation
-      const now = Date.now();
-      const diff = Math.floor((now - date.getTime()) / 1000);
+      const now = timeService.getTimestamp();
+      const diff = Math.floor((now - timeService.toTimestamp(date)) / 1000);
       
       if (diff < 60) return 'just now';
       if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;

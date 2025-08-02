@@ -6,7 +6,7 @@
  */
 
 import { DashboardContextService } from '../DashboardContextService';
-import { dashboardAppService } from '../DashboardAppService';
+import { dashboardAppService, type DashboardAppData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
 import { setupTimeTest } from '../../test-utils/timeTestUtils';
 import type { LocationContextValue } from '../../types/location.types';
@@ -164,15 +164,20 @@ describe('DashboardContextService Integration Tests', () => {
               ipLocation: { ip: '127.0.0.1', city: 'San Francisco', region: 'CA', country: 'US' },
               loading: false,
               error: null,
-              permissionStatus: 'granted',
+              permissionStatus: 'granted' as const,
               lastUpdated: Date.now(),
               initialized: true,
+              locationSource: 'gps' as const,
+              canRetryGPS: true,
+              gpsRetrying: false,
               fetchLocationData: jest.fn(),
               requestLocationPermission: jest.fn(),
+              retryGPSLocation: jest.fn(),
               clearError: jest.fn(),
               hasLocation: true,
               hasGPSLocation: true,
               hasIpLocation: true,
+              isPreciseLocation: true,
             });
             resolve();
           }, Math.random() * 10);
@@ -210,12 +215,17 @@ describe('DashboardContextService Integration Tests', () => {
           permissionStatus: 'granted',
           lastUpdated: Date.now(),
           initialized: true,
+          locationSource: 'gps' as const,
+          canRetryGPS: true,
+          gpsRetrying: false,
           fetchLocationData: jest.fn(),
           requestLocationPermission: jest.fn(),
+          retryGPSLocation: jest.fn(),
           clearError: jest.fn(),
           hasLocation: true,
           hasGPSLocation: true,
           hasIpLocation: true,
+          isPreciseLocation: true,
         });
       }
 
@@ -230,7 +240,7 @@ describe('DashboardContextService Integration Tests', () => {
 
   describe('Dashboard App Integration', () => {
     it('integrates with dashboard apps and updates context', async () => {
-      let appUpdateCallback: ((data: unknown) => void) | undefined;
+      let appUpdateCallback: ((data: DashboardAppData) => void) | undefined;
       
       mockDashboardAppService.subscribe.mockImplementation((callback) => {
         appUpdateCallback = callback;
@@ -243,9 +253,33 @@ describe('DashboardContextService Integration Tests', () => {
       // Simulate app data update
       const mockAppData = {
         apps: new Map([
-          ['notes', { count: 5, lastNote: 'Meeting at 3pm' }],
-          ['pomodoro', { isActive: true, remainingTime: 1200 }],
-          ['weather', { temperature: 24, condition: 'sunny' }],
+          ['notes', { 
+            appName: 'notes',
+            displayName: 'Notes',
+            isActive: true,
+            lastUsed: Date.now(),
+            data: { count: 5, lastNote: 'Meeting at 3pm' },
+            summary: '5 notes available',
+            capabilities: ['create', 'read', 'update'],
+          }],
+          ['pomodoro', { 
+            appName: 'pomodoro',
+            displayName: 'Pomodoro',
+            isActive: true,
+            lastUsed: Date.now(),
+            data: { isActive: true, remainingTime: 1200 },
+            summary: 'Timer active',
+            capabilities: ['start', 'stop', 'pause'],
+          }],
+          ['weather', { 
+            appName: 'weather',
+            displayName: 'Weather',
+            isActive: false,
+            lastUsed: Date.now() - 1000,
+            data: { temperature: 24, condition: 'sunny' },
+            summary: 'Sunny, 24°C',
+            capabilities: ['get_weather'],
+          }],
         ]),
         activeApps: ['notes', 'pomodoro'],
         lastUpdated: Date.now(),
@@ -271,7 +305,7 @@ describe('DashboardContextService Integration Tests', () => {
     });
 
     it('updates when dashboard apps change state', async () => {
-      let appUpdateCallback: ((data: unknown) => void) | undefined;
+      let appUpdateCallback: ((data: DashboardAppData) => void) | undefined;
       
       mockDashboardAppService.subscribe.mockImplementation((callback) => {
         appUpdateCallback = callback;
@@ -285,17 +319,63 @@ describe('DashboardContextService Integration Tests', () => {
       // Simulate multiple app state changes
       const updates = [
         {
-          apps: new Map([['notes', { count: 1 }]]),
+          apps: new Map([['notes', { 
+            appName: 'notes',
+            displayName: 'Notes',
+            isActive: true,
+            lastUsed: Date.now(),
+            data: { count: 1 },
+            summary: '1 note available',
+            capabilities: ['create', 'read'],
+          }]]),
           activeApps: ['notes'],
           lastUpdated: Date.now(),
         },
         {
-          apps: new Map([['notes', { count: 2 }], ['pomodoro', { isActive: true }]]),
+          apps: new Map([
+            ['notes', { 
+              appName: 'notes',
+              displayName: 'Notes',
+              isActive: true,
+              lastUsed: Date.now(),
+              data: { count: 2 },
+              summary: '2 notes available',
+              capabilities: ['create', 'read'],
+            }], 
+            ['pomodoro', { 
+              appName: 'pomodoro',
+              displayName: 'Pomodoro',
+              isActive: true,
+              lastUsed: Date.now(),
+              data: { isActive: true },
+              summary: 'Timer active',
+              capabilities: ['start', 'stop'],
+            }],
+          ]),
           activeApps: ['notes', 'pomodoro'],
           lastUpdated: Date.now(),
         },
         {
-          apps: new Map([['notes', { count: 3 }], ['pomodoro', { isActive: false }]]),
+          apps: new Map([
+            ['notes', { 
+              appName: 'notes',
+              displayName: 'Notes',
+              isActive: true,
+              lastUsed: Date.now(),
+              data: { count: 3 },
+              summary: '3 notes available',
+              capabilities: ['create', 'read'],
+            }], 
+            ['pomodoro', { 
+              appName: 'pomodoro',
+              displayName: 'Pomodoro',
+              isActive: false,
+              lastUsed: Date.now(),
+              data: { isActive: false },
+              summary: 'Timer stopped',
+              capabilities: ['start', 'stop'],
+            }],
+          ]),
           activeApps: ['notes'],
           lastUpdated: Date.now(),
         },

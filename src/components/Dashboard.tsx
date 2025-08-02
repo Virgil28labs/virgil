@@ -21,6 +21,7 @@ import { Skeleton } from './ui/skeleton';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';
 import { SectionErrorBoundary } from './common/SectionErrorBoundary';
+import { ContextDebugger } from './ContextDebugger';
 import { PositionedIPHoverCard } from './location/IPHoverCard';
 import { dashboardAppService } from '../services/DashboardAppService';
 import { dashboardContextService } from '../services/DashboardContextService';
@@ -345,6 +346,9 @@ export const Dashboard = memo(function Dashboard() {
         isOpen={showProfileViewer}
         onClose={handleHideProfileViewer}
       />
+
+      {/* Context Debugger (Development) */}
+      <ContextDebugger />
 
     </div>
   );

@@ -34,9 +34,31 @@ jest.mock('../../hooks/useDeviceInfo');
 jest.mock('../../hooks/useUserProfile');
 jest.mock('../../lib/logger');
 
+// Types for mocked components
+interface EditableDataPointProps {
+  icon: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+  readOnly?: boolean;
+  className?: string;
+}
+
+interface SelectDataPointProps {
+  icon: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ label: string; value: string }>;
+  allowCustom?: boolean;
+  className?: string;
+}
+
 // Mock child components
 jest.mock('../EditableDataPoint', () => ({
-  EditableDataPoint: ({ icon, label, value, onChange, placeholder, type, readOnly, className }: unknown) => (
+  EditableDataPoint: ({ icon, label, value, onChange, placeholder, type, readOnly, className }: EditableDataPointProps) => (
     <div className={`data-point ${className || ''}`}>
       <span>{icon}</span>
       <span>{label}</span>
@@ -53,7 +75,7 @@ jest.mock('../EditableDataPoint', () => ({
 }));
 
 jest.mock('../SelectDataPoint', () => ({
-  SelectDataPoint: ({ icon, label, value, onChange, options, allowCustom }: unknown) => (
+  SelectDataPoint: ({ icon, label, value, onChange, options, allowCustom }: SelectDataPointProps) => (
     <div className="data-point">
       <span>{icon}</span>
       <span>{label}</span>
@@ -63,7 +85,7 @@ jest.mock('../SelectDataPoint', () => ({
         aria-label={label}
       >
         <option value="">Select...</option>
-        {options.map((opt: unknown) => (
+        {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
@@ -441,7 +463,9 @@ describe('UserProfileViewer', () => {
       render(<UserProfileViewer isOpen onClose={mockOnClose} />);
       
       const addressHeader = screen.getByText('Address').parentElement;
-      await user.click(addressHeader!);
+      if (addressHeader) {
+        await user.click(addressHeader);
+      }
       
       expect(screen.getByLabelText('Street Address')).toBeInTheDocument();
       expect(screen.getByLabelText('City')).toBeInTheDocument();
@@ -457,11 +481,15 @@ describe('UserProfileViewer', () => {
       const addressHeader = screen.getByText('Address').parentElement;
       
       // Expand
-      await user.click(addressHeader!);
+      if (addressHeader) {
+        await user.click(addressHeader);
+      }
       expect(screen.getByLabelText('Hide address')).toBeInTheDocument();
       
       // Collapse
-      await user.click(addressHeader!);
+      if (addressHeader) {
+        await user.click(addressHeader);
+      }
       expect(screen.queryByLabelText('Street Address')).not.toBeInTheDocument();
       expect(screen.getByLabelText('Show address')).toBeInTheDocument();
     });
@@ -471,7 +499,10 @@ describe('UserProfileViewer', () => {
       render(<UserProfileViewer isOpen onClose={mockOnClose} />);
       
       // Expand address
-      await user.click(screen.getByText('Address').parentElement);
+      const addressSection = screen.getByText('Address').parentElement;
+      if (addressSection) {
+        await user.click(addressSection);
+      }
       
       const streetInput = screen.getByLabelText('Street Address');
       await user.type(streetInput, 'A');
@@ -490,7 +521,10 @@ describe('UserProfileViewer', () => {
       render(<UserProfileViewer isOpen onClose={mockOnClose} />);
       
       expect(screen.getByText('Saving changes...')).toBeInTheDocument();
-      expect(screen.getByText('Saving changes...').parentElement).toHaveClass('save-progress-container');
+      const savingElement = screen.getByText('Saving changes...').parentElement;
+      if (savingElement) {
+        expect(savingElement).toHaveClass('save-progress-container');
+      }
     });
 
     it('should show save success state', () => {
@@ -627,7 +661,7 @@ describe('UserProfileViewer', () => {
 
     it('should display storage and privacy settings', () => {
       // Find specific text by looking for multiple occurrences and being more specific
-      const cookieText = screen.getByText((content, element) => {
+      const cookieText = screen.getByText((_content, element) => {
         return element?.textContent === 'Enabled' && element?.previousElementSibling?.textContent === 'Cookies';
       });
       expect(cookieText).toBeInTheDocument();

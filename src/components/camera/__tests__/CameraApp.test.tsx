@@ -22,8 +22,13 @@ jest.mock('../../../hooks/useToast', () => ({
   useToast: jest.fn(),
 }));
 
+interface MockPhotoGalleryProps {
+  onPhotoSelect: (photo: unknown) => void;
+  onError: (error: string) => void;
+}
+
 jest.mock('../PhotoGallery', () => ({
-  PhotoGallery: ({ onPhotoSelect, onError }: unknown) => (
+  PhotoGallery: ({ onPhotoSelect, onError }: MockPhotoGalleryProps) => (
     <div data-testid="photo-gallery">
       <button onClick={() => onPhotoSelect(mockPhoto1)}>Select Photo 1</button>
       <button onClick={() => onPhotoSelect(mockPhoto2)}>Select Photo 2</button>
@@ -32,17 +37,28 @@ jest.mock('../PhotoGallery', () => ({
   ),
 }));
 
+interface MockPhotoModalProps {
+  photo?: { id: string; name: string };
+  isOpen: boolean;
+  onClose: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onFavoriteToggle: (id: string) => void;
+  onDelete: (id: string) => void;
+  onShare: (id: string) => void;
+}
+
 jest.mock('../PhotoModal', () => ({
-  PhotoModal: ({ photo, isOpen, onClose, onNext, onPrevious, onFavoriteToggle, onDelete, onShare }: unknown) => (
+  PhotoModal: ({ photo, isOpen, onClose, onNext, onPrevious, onFavoriteToggle, onDelete, onShare }: MockPhotoModalProps) => (
     isOpen ? (
       <div data-testid="photo-modal">
         <div>Photo: {photo?.name}</div>
         <button onClick={onClose}>Close Modal</button>
         {onNext && <button onClick={onNext}>Next</button>}
         {onPrevious && <button onClick={onPrevious}>Previous</button>}
-        <button onClick={() => onFavoriteToggle(photo?.id)}>Toggle Favorite</button>
-        <button onClick={() => onDelete(photo?.id)}>Delete</button>
-        <button onClick={() => onShare(photo?.id)}>Share</button>
+        <button onClick={() => photo?.id && onFavoriteToggle(photo.id)}>Toggle Favorite</button>
+        <button onClick={() => photo?.id && onDelete(photo.id)}>Delete</button>
+        <button onClick={() => photo?.id && onShare(photo.id)}>Share</button>
       </div>
     ) : null
   ),
@@ -89,30 +105,22 @@ const mockPhotoGalleryReturn = {
   getCurrentPhotos: jest.fn(() => [mockPhoto1, mockPhoto2]),
   setActiveTab: jest.fn(),
   setSelectedPhoto: jest.fn(),
-  setSelectedPhotos: jest.fn(),
+  togglePhotoSelection: jest.fn(),
+  selectAllPhotos: jest.fn(),
+  clearSelection: jest.fn(),
   setSearchQuery: jest.fn(),
   setSortBy: jest.fn(),
   setSortOrder: jest.fn(),
   setFilter: jest.fn(),
-  toggleSelectionMode: jest.fn(),
-  clearSelections: jest.fn(),
-  handleFavoriteToggle: jest.fn(),
-  handlePhotoDelete: jest.fn(),
-  updatePhoto: jest.fn(),
-  getStorageInfo: jest.fn(),
-  clearAllPhotos: jest.fn(),
-  downloadPhoto: jest.fn(),
-  sharePhoto: jest.fn(),
-  navigatePhoto: jest.fn(),
-  loadPhotos: jest.fn(),
-  togglePhotoSelection: jest.fn(),
-  selectAllPhotos: jest.fn(),
-  clearSelection: jest.fn(),
   handlePhotoCapture: jest.fn(),
-  savePhoto: jest.fn(),
-  deletePhoto: jest.fn(),
-  toggleFavorite: jest.fn(),
-  filterPhotos: jest.fn(),
+  handlePhotoDelete: jest.fn(),
+  handleBulkDelete: jest.fn(),
+  handleFavoriteToggle: jest.fn(),
+  handleBulkFavorite: jest.fn(),
+  navigatePhoto: jest.fn(),
+  getPhotoStats: jest.fn(),
+  clearError: jest.fn(),
+  loadPhotos: jest.fn(),
 };
 
 const mockAddToast = jest.fn();
@@ -126,7 +134,7 @@ const mockInfo = jest.fn();
 describe('CameraApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn as unknown);
+    mockUsePhotoGallery.mockReturnValue(mockPhotoGalleryReturn);
     mockUseToast.mockReturnValue({
       toasts: [],
       addToast: mockAddToast,
@@ -136,7 +144,7 @@ describe('CameraApp', () => {
       error: mockError,
       warning: mockWarning,
       info: mockInfo,
-    } as unknown);
+    });
   });
 
   const renderCameraApp = (props = {}) => {
@@ -178,7 +186,7 @@ describe('CameraApp', () => {
       mockUsePhotoGallery.mockReturnValue({
         ...mockPhotoGalleryReturn,
         galleryState: favoritesGalleryState,
-      } as unknown);
+      });
       renderCameraApp();
 
       expect(screen.getByText('1 favorite')).toBeInTheDocument();

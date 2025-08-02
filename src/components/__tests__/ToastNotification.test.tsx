@@ -397,7 +397,7 @@ describe('ToastContainer', () => {
     });
 
     it('should apply custom positioning', () => {
-      const positions: Array<{ position: Parameters<typeof ToastContainer>[0]['position'], styles: unknown }> = [
+      const positions: Array<{ position: Parameters<typeof ToastContainer>[0]['position'], styles: Record<string, string> }> = [
         { position: 'top-left', styles: { top: '20px', left: '20px' } },
         { position: 'bottom-right', styles: { bottom: '20px', right: '20px' } },
         { position: 'bottom-left', styles: { bottom: '20px', left: '20px' } },

@@ -225,7 +225,7 @@ export class StorageMigration {
       }
 
       // Parse the existing data
-      let data = JSON.parse(rawValue);
+      const data = JSON.parse(rawValue);
       
       // Check if user object exists and has userId field
       if (data && data.user && data.user.user && 'userId' in data.user.user) {
@@ -239,7 +239,7 @@ export class StorageMigration {
         // Save the updated data
         localStorage.setItem(key, JSON.stringify(newData));
         
-        logger.info(`Migrated userId to username in user data`);
+        logger.info('Migrated userId to username in user data');
         return { key, success: true, oldValue: data, newValue: newData };
       }
 

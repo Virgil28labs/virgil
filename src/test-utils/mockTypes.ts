@@ -429,12 +429,12 @@ export const createMockError = (message: string, code?: string | number): MockEr
 // ========== Location Mock Types ==========
 
 export interface MockLocationContextValue {
-  coordinates: unknown;
-  address: unknown;
-  ipLocation: unknown;
+  coordinates: { latitude: number; longitude: number; accuracy: number; timestamp: number } | null;
+  address: { street: string; house_number: string; city: string; postcode: string; country: string; formatted: string } | null;
+  ipLocation: { ip: string; city?: string; region?: string; country?: string } | null;
   loading: boolean;
   error: string | null;
-  permissionStatus: string;
+  permissionStatus: 'granted' | 'denied' | 'prompt' | 'unknown' | 'unavailable';
   lastUpdated: number | null;
   initialized: boolean;
   locationSource: 'gps' | 'ip' | null;
@@ -456,7 +456,7 @@ export const createMockLocationContextValue = (overrides: Partial<MockLocationCo
   ipLocation: null,
   loading: false,
   error: null,
-  permissionStatus: 'unknown',
+  permissionStatus: 'unknown' as const,
   lastUpdated: null,
   initialized: true,
   locationSource: null,

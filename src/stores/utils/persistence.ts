@@ -119,7 +119,23 @@ export const getTTLData = <T>(ttlData: TTLData<T> | null): T | null => {
 /**
  * Safe localStorage operations with error handling and performance tracking
  */
-export const storage = {
+export const storage: {
+  set: (key: string, value: unknown) => boolean;
+  get: <T = unknown>(key: string) => T | null;
+  remove: (key: string) => boolean;
+  clear: () => boolean;
+  exists: (key: string) => boolean;
+  size: () => number;
+  getAllKeys: () => string[];
+  clearAll: () => void;
+  cleanupExpired: () => { cleaned: number; errors: string[] };
+  checkQuota: () => { status: 'healthy' | 'warning' | 'critical'; message: string; usage: { used: number; total: number; percentage: number } };
+  getUsage: () => { used: number; total: number; percentage: number };
+  performMaintenance: () => { quota: ReturnType<typeof storage.checkQuota>; cleanup: ReturnType<typeof storage.cleanupExpired> };
+  monitorQuota: () => boolean;
+  getPerformanceMetrics: () => { read: { count: number; avgTime: number }; write: { count: number; avgTime: number }; remove: { count: number; avgTime: number } };
+  resetPerformanceMetrics: () => void;
+} = {
   /**
    * Set item in localStorage with error handling
    */
@@ -165,6 +181,60 @@ export const storage = {
       performanceMetrics.track('remove', startTime);
       console.warn(`Failed to remove from localStorage (${key}):`, error);
       return false;
+    }
+  },
+
+  /**
+   * Clear all localStorage
+   */
+  clear: (): boolean => {
+    try {
+      localStorage.clear();
+      return true;
+    } catch (error) {
+      console.warn('Failed to clear localStorage:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Check if key exists in localStorage
+   */
+  exists: (key: string): boolean => {
+    try {
+      return localStorage.getItem(key) !== null;
+    } catch (error) {
+      console.warn(`Failed to check if key exists (${key}):`, error);
+      return false;
+    }
+  },
+
+  /**
+   * Get number of items in localStorage
+   */
+  size: (): number => {
+    try {
+      return localStorage.length;
+    } catch (error) {
+      console.warn('Failed to get localStorage size:', error);
+      return 0;
+    }
+  },
+
+  /**
+   * Get all localStorage keys
+   */
+  getAllKeys: (): string[] => {
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) keys.push(key);
+      }
+      return keys;
+    } catch (error) {
+      console.warn('Failed to get localStorage keys:', error);
+      return [];
     }
   },
 

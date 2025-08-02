@@ -13,11 +13,24 @@
  * - Brain emoji theming
  */
 
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VectorMemoryButton } from '../VectorMemoryButton';
 
 // Mock the EmojiButton component
+interface MockEmojiButtonProps {
+  emoji: string;
+  ariaLabel: string;
+  GalleryComponent?: React.ComponentType<{ onClose: () => void }>;
+  position: { top: string; left: string };
+  hoverScale: number;
+  hoverColor: { background: string; border: string; glow: string };
+  title: string;
+  className: string;
+  [key: string]: unknown;
+}
+
 jest.mock('../common/EmojiButton', () => ({
   EmojiButton: ({ 
     emoji, 
@@ -29,7 +42,7 @@ jest.mock('../common/EmojiButton', () => ({
     title, 
     className,
     ...props 
-  }: unknown) => (
+  }: MockEmojiButtonProps) => (
     <div data-testid="emoji-button">
       <button
         aria-label={ariaLabel}
@@ -55,8 +68,13 @@ jest.mock('../common/EmojiButton', () => ({
 }));
 
 // Mock the DashboardAppErrorBoundary
+interface MockErrorBoundaryProps {
+  children: React.ReactNode;
+  appName: string;
+}
+
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
+  DashboardAppErrorBoundary: ({ children, appName }: MockErrorBoundaryProps) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>

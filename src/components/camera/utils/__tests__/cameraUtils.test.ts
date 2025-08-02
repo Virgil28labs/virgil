@@ -6,7 +6,7 @@ import { logger } from '../../../../lib/logger';
 // Mock dependencies
 jest.mock('../../../../services/TimeService', () => ({
   timeService: {
-    formatDateToLocal: jest.fn((date: Date, options: unknown) => {
+    formatDateToLocal: jest.fn((date: Date, options?: Intl.DateTimeFormatOptions) => {
       return new Intl.DateTimeFormat('en-US', options).format(date);
     }),
     fromTimestamp: jest.fn((timestamp: number) => new Date(timestamp)),
@@ -111,8 +111,8 @@ describe('CameraUtils', () => {
   });
 
   describe('compressImage', () => {
-    let mockCanvas: unknown;
-    let mockContext: unknown;
+    let mockCanvas: any;
+    let mockContext: any;
 
     beforeEach(() => {
       mockContext = {
@@ -126,9 +126,9 @@ describe('CameraUtils', () => {
       };
       
       const originalCreateElement = document.createElement;
-      jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      jest.spyOn(document, 'createElement').mockImplementation((tagName: string): HTMLElement => {
         if (tagName === 'canvas') {
-          return mockCanvas;
+          return mockCanvas as HTMLCanvasElement;
         }
         return originalCreateElement.call(document, tagName);
       });
@@ -139,10 +139,10 @@ describe('CameraUtils', () => {
         src: '',
         width: 1920,
         height: 1080,
-        onload: null as unknown,
+        onload: null as (() => void) | null,
       };
 
-      (global as unknown).Image = jest.fn().mockImplementation(() => {
+      (global as any).Image = jest.fn().mockImplementation(() => {
         Promise.resolve().then(() => {
           if (mockImage.onload) mockImage.onload();
         });
@@ -163,10 +163,10 @@ describe('CameraUtils', () => {
         src: '',
         width: 1920,
         height: 1080,
-        onload: null as unknown,
+        onload: null as (() => void) | null,
       };
 
-      (global as unknown).Image = jest.fn().mockImplementation(() => {
+      (global as any).Image = jest.fn().mockImplementation(() => {
         Promise.resolve().then(() => {
           if (mockImage.onload) mockImage.onload();
         });
@@ -182,8 +182,8 @@ describe('CameraUtils', () => {
   });
 
   describe('downloadPhoto', () => {
-    let mockAnchor: unknown;
-    let originalDocument: unknown;
+    let mockAnchor: any;
+    let originalDocument: any;
 
     beforeEach(() => {
       mockAnchor = {
@@ -203,13 +203,13 @@ describe('CameraUtils', () => {
         return originalDocument.createElement(tagName);
       });
       
-      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn() as unknown);
-      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn() as unknown);
+      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn() as any);
+      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn() as any);
 
       global.URL = {
         createObjectURL: jest.fn(() => 'blob:mock-url'),
         revokeObjectURL: jest.fn(),
-      } as unknown;
+      } as any;
     });
 
     afterEach(() => {
@@ -280,7 +280,7 @@ describe('CameraUtils', () => {
     });
 
     it('should handle undefined input', () => {
-      expect(CameraUtils.formatFileSize(undefined as unknown)).toBe('NaN undefined');
+      expect(CameraUtils.formatFileSize(undefined as unknown as number)).toBe('NaN undefined');
     });
 
     it('should handle negative values', () => {
@@ -298,7 +298,7 @@ describe('CameraUtils', () => {
         height: 0,
         naturalWidth: 0,
         naturalHeight: 0,
-        onload: null as unknown,
+        onload: null as (() => void) | null,
         onerror: null as unknown,
       };
 
@@ -311,7 +311,7 @@ describe('CameraUtils', () => {
           if (mockImage.onload) mockImage.onload();
         }, 0);
         return mockImage;
-      }) as unknown;
+      }) as any;
 
       const dataUrl = 'data:image/jpeg;base64,test';
       const dimensions = await CameraUtils.getImageDimensions(dataUrl);
@@ -322,16 +322,16 @@ describe('CameraUtils', () => {
     it('should handle dimension retrieval errors', async () => {
       const mockImage = {
         src: '',
-        onload: null as unknown,
+        onload: null as (() => void) | null,
         onerror: null as unknown,
       };
 
       global.Image = jest.fn().mockImplementation(() => {
         setTimeout(() => {
-          if (mockImage.onerror) mockImage.onerror(new Error('Failed to load'));
+          if (mockImage.onerror) (mockImage.onerror as any)(new Error('Failed to load'));
         }, 0);
         return mockImage;
-      }) as unknown;
+      }) as any;
 
       await expect(CameraUtils.getImageDimensions('invalid'))
         .rejects.toThrow('Failed to load');

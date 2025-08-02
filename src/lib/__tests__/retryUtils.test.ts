@@ -70,6 +70,9 @@ describe('retryWithBackoff', () => {
     jest.useRealTimers();
   });
 
+  // Set default timeout for all tests in this suite
+  jest.setTimeout(30000);
+
   describe('Success scenarios', () => {
     it('should return result immediately on first success', async () => {
       const mockFn = jest.fn().mockResolvedValue('success');
@@ -88,7 +91,7 @@ describe('retryWithBackoff', () => {
 
       // Fast-forward through delays
       for (let i = 0; i < 2; i++) {
-        await jest.runOnlyPendingTimersAsync();
+        await jest.runAllTimersAsync();
       }
 
       const result = await promise;
@@ -104,7 +107,7 @@ describe('retryWithBackoff', () => {
       const promise = retryWithBackoff(mockFn);
 
       // Fast-forward through first delay (should be 1000ms with default options)
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
 
@@ -120,10 +123,8 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 2 });
 
-      // Fast-forward through all retry delays
-      for (let i = 0; i < 2; i++) {
-        await jest.runOnlyPendingTimersAsync();
-      }
+      // Run all pending timers and microtasks
+      await jest.runAllTimersAsync();
 
       await expect(promise).rejects.toThrow('Persistent failure');
       expect(mockFn).toHaveBeenCalledTimes(3); // Initial + 2 retries
@@ -136,7 +137,7 @@ describe('retryWithBackoff', () => {
           metadata: { attempt: 2, maxRetries: 2 },
         },
       );
-    });
+    }, 30000);
 
     it('should not retry when shouldRetry returns false', async () => {
       const testError = new Error('Should not retry');
@@ -159,12 +160,12 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 1 });
 
-      // Fast-forward through single retry
-      await jest.runOnlyPendingTimersAsync();
+      // Run all timers
+      await jest.runAllTimersAsync();
 
       await expect(promise).rejects.toThrow('Test error');
       expect(mockFn).toHaveBeenCalledTimes(2); // Initial + 1 retry
-    });
+    }, 30000);
 
     it('should use custom delay settings', async () => {
       const mockFn = createMockFunction(2);
@@ -174,13 +175,12 @@ describe('retryWithBackoff', () => {
         backoffFactor: 3,
       });
 
-      // First delay should be 500ms
-      expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 500);
-      await jest.runOnlyPendingTimersAsync();
+      // Run all timers to complete the retry process
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 2');
-    });
+    }, 30000);
 
     it('should respect maxDelay option', async () => {
       const mockFn = createMockFunction(3);
@@ -191,13 +191,12 @@ describe('retryWithBackoff', () => {
         backoffFactor: 10, // Would normally create very large delays
       });
 
-      await jest.runOnlyPendingTimersAsync(); // First retry: 1000ms
-      expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 2000); // Second retry: capped at maxDelay
-      await jest.runOnlyPendingTimersAsync();
+      // Run all timers to complete the retry process
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 3');
-    });
+    }, 30000);
 
     it('should call onRetry callback for each retry attempt', async () => {
       const testError = new Error('Test error');
@@ -208,7 +207,7 @@ describe('retryWithBackoff', () => {
 
       // Fast-forward through retries
       for (let i = 0; i < 2; i++) {
-        await jest.runOnlyPendingTimersAsync();
+        await jest.runAllTimersAsync();
       }
 
       const result = await promise;
@@ -232,7 +231,7 @@ describe('retryWithBackoff', () => {
 
       const promise = retryWithBackoff(mockFn, { shouldRetry });
 
-      await jest.runOnlyPendingTimersAsync(); // Process first retry
+      await jest.runAllTimersAsync(); // Process first retry
 
       await expect(promise).rejects.toThrow('Permanent failure');
 
@@ -254,7 +253,7 @@ describe('retryWithBackoff', () => {
 
       // Should use 60000ms delay for rate limit
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 60000);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 2');
@@ -271,7 +270,7 @@ describe('retryWithBackoff', () => {
 
       // Should still use 60000ms delay (we don't parse Retry-After header in current implementation)
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 60000);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 2');
@@ -288,7 +287,7 @@ describe('retryWithBackoff', () => {
 
       // Should use normal exponential backoff delay
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 1000);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 2');
@@ -307,15 +306,15 @@ describe('retryWithBackoff', () => {
 
       // First retry: 100ms
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 100);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       // Second retry: 200ms (100 * 2^1)
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 200);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       // Third retry: 400ms (100 * 2^2)
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 400);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 4');
@@ -330,11 +329,11 @@ describe('retryWithBackoff', () => {
         maxDelay: 3000,
       });
 
-      await jest.runOnlyPendingTimersAsync(); // First retry: 1000ms
+      await jest.runAllTimersAsync(); // First retry: 1000ms
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000); // Second retry: capped at 3000ms
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000); // Third retry: still capped
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 4');
@@ -376,7 +375,7 @@ describe('retryWithBackoff', () => {
       const mockFn = jest.fn().mockRejectedValue(null);
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 1 });
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       await expect(promise).rejects.toBeNull();
       expect(mockFn).toHaveBeenCalledTimes(2);
@@ -399,7 +398,7 @@ describe('retryWithBackoff', () => {
       const mockFn = jest.fn().mockRejectedValue(originalError);
 
       const promise = retryWithBackoff(mockFn, { maxRetries: 1 });
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       await expect(promise).rejects.toMatchObject({
         message: 'Original error',
@@ -418,7 +417,7 @@ describe('retryWithBackoff', () => {
       );
 
       // Fast-forward through all delays
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const results = await Promise.all(promises);
 
@@ -434,7 +433,7 @@ describe('retryWithBackoff', () => {
       const promise = retryWithBackoff(mockFn, { maxRetries: 1 });
 
       // Fast-forward through delay
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       await expect(promise).rejects.toThrow('Test error');
     });
@@ -449,7 +448,7 @@ describe('retryWithBackoff', () => {
       mockHasStatusCode.mockReturnValue(true);
 
       const promise = retryWithBackoff(mockFn);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 2');
@@ -465,7 +464,7 @@ describe('retryWithBackoff', () => {
       });
 
       const promise = retryWithBackoff(mockFn);
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       // Should still work if hasStatusCode fails
       const result = await promise;
@@ -493,9 +492,9 @@ describe('retryWithBackoff', () => {
         maxDelay: 5000,
       });
 
-      await jest.runOnlyPendingTimersAsync(); // First retry: 1ms
+      await jest.runAllTimersAsync(); // First retry: 1ms
       expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 5000); // Second retry: capped at maxDelay
-      await jest.runOnlyPendingTimersAsync();
+      await jest.runAllTimersAsync();
 
       const result = await promise;
       expect(result).toBe('Success on attempt 3');

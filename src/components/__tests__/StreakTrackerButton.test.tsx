@@ -8,12 +8,35 @@
  * - Accessibility attributes
  */
 
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { StreakTrackerButton } from '../StreakTrackerButton';
 
+// Types for mocked components
+interface EmojiButtonProps {
+  emoji: string;
+  ariaLabel: string;
+  title: string;
+  className?: string;
+  position?: { x: number; y: number };
+  hoverScale?: number;
+  hoverColor?: string;
+  GalleryComponent?: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  appName: string;
+}
+
+interface HabitTrackerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 // Mock dependencies
 jest.mock('../common/EmojiButton', () => ({
-  EmojiButton: ({ emoji, ariaLabel, title, className, position, hoverScale, hoverColor, GalleryComponent }: unknown) => (
+  EmojiButton: ({ emoji, ariaLabel, title, className, position, hoverScale, hoverColor, GalleryComponent }: EmojiButtonProps) => (
     <div data-testid="emoji-button">
       <span data-testid="emoji">{emoji}</span>
       <span data-testid="aria-label">{ariaLabel}</span>
@@ -28,7 +51,7 @@ jest.mock('../common/EmojiButton', () => ({
 }));
 
 jest.mock('../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
+  DashboardAppErrorBoundary: ({ children, appName }: ErrorBoundaryProps) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>
@@ -36,7 +59,7 @@ jest.mock('../common/DashboardAppErrorBoundary', () => ({
 }));
 
 jest.mock('../streak/MinimalHabitTracker', () => ({
-  MinimalHabitTracker: ({ isOpen, onClose }: unknown) => (
+  MinimalHabitTracker: ({ isOpen, onClose }: HabitTrackerProps) => (
     <div data-testid="habit-tracker" data-is-open={isOpen}>
       <button onClick={onClose}>Close</button>
     </div>

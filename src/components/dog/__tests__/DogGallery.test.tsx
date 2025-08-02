@@ -205,7 +205,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={onClose} />);
 
       const backdrop = document?.querySelector('.doggo-sanctuary-backdrop');
-      if (backdrop) throw new Error('Backdrop not found');
+      if (!backdrop) throw new Error('Backdrop not found');
       await user.click(backdrop);
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -217,7 +217,7 @@ describe('DogGallery', () => {
       render(<DogGallery isOpen onClose={onClose} />);
 
       const panel = document?.querySelector('.doggo-sanctuary-panel');
-      if (panel) throw new Error('Panel not found');
+      if (!panel) throw new Error('Panel not found');
       await user.click(panel);
 
       expect(onClose).not.toHaveBeenCalled();

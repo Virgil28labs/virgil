@@ -1,10 +1,12 @@
 // Mock for RhythmService to handle import.meta.env
+import type { RhythmPattern, RhythmGenerationOptions } from '../RhythmService';
+
 export class RhythmService {
   constructor() {
     // baseUrl is not needed in the mock implementation
   }
 
-  async generatePattern(options: unknown): Promise<unknown> {
+  async generatePattern(options: RhythmGenerationOptions): Promise<RhythmPattern> {
     return {
       pattern: Array(5).fill(null).map(() => Array(options.barLength).fill(false)),
       description: options.description,

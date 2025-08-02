@@ -1,5 +1,4 @@
 import { indexedDBService } from './IndexedDBService';
-import { dashboardContextService } from './DashboardContextService';
 import { useContextStore } from '../stores/ContextStore';
 import { weatherService } from '../lib/weatherService';
 import { timeService } from './TimeService';
@@ -18,7 +17,7 @@ export class SimpleContextSnapshotService {
   private userInfo = {
     name: 'User',
     email: '',
-    username: 'user'
+    username: 'user',
   };
   
   // Activity tracking
@@ -27,7 +26,7 @@ export class SimpleContextSnapshotService {
     keyboard: 0,
     scroll: 0,
     click: 0,
-    any: 0
+    any: 0,
   };
   
   private activityListeners = new Map<string, (e: Event) => void>();
@@ -42,7 +41,6 @@ export class SimpleContextSnapshotService {
   async init() {
     if (this.initialized) return;
     
-    console.log('🚀 Starting context snapshot service...');
     
     // Register simple IndexedDB schema
     indexedDBService.registerDatabase({
@@ -52,9 +50,9 @@ export class SimpleContextSnapshotService {
         name: 'snapshots',
         keyPath: 'id',
         indexes: [
-          { name: 'timestamp', keyPath: 'timestamp' }
-        ]
-      }]
+          { name: 'timestamp', keyPath: 'timestamp' },
+        ],
+      }],
     });
     
     // Set up activity listeners
@@ -67,13 +65,12 @@ export class SimpleContextSnapshotService {
       keyboard: now,
       scroll: now,
       click: now,
-      any: now
+      any: now,
     };
     
     // Load recent snapshots from DB to memory
     const dbSnapshots = await this.loadSnapshotsFromDB(60);
     this.snapshots = dbSnapshots;
-    console.log(`📚 Loaded ${dbSnapshots.length} snapshots from IndexedDB`);
     
     this.initialized = true;
   }
@@ -126,7 +123,7 @@ export class SimpleContextSnapshotService {
     this.activityListeners.clear();
   }
   
-  startCapture(user?: any) {
+  startCapture(user?: { email?: string; user_metadata?: { name?: string; nickname?: string } }) {
     // Always stop any existing capture first
     this.stopCapture();
     
@@ -139,7 +136,7 @@ export class SimpleContextSnapshotService {
       this.userInfo = {
         name: user.user_metadata?.name || user.email || 'User',
         email: user.email || '',
-        username: contextUsername || user.user_metadata?.nickname || user.email?.split('@')[0] || 'user'
+        username: contextUsername || user.user_metadata?.nickname || user.email?.split('@')[0] || 'user',
       };
     }
     
@@ -148,19 +145,12 @@ export class SimpleContextSnapshotService {
     
     // Then capture every 60 seconds
     this.intervalId = window.setInterval(() => {
-      console.log('⏰ Interval triggered - capturing snapshot');
       this.captureSnapshot();
     }, 60000);
     
-    console.log('✅ Context capture started - capturing every minute');
-    console.log('Initial capture completed, interval ID:', this.intervalId);
   }
   
   stopCapture() {
-    console.log('🛑 Stopping context capture service', {
-      hasInterval: !!this.intervalId,
-      hasTimeout: !!this.timeoutId
-    });
     
     if (this.intervalId) {
       clearInterval(this.intervalId);
@@ -190,7 +180,7 @@ export class SimpleContextSnapshotService {
       const sevenDaysAgo = timeService.getTimestamp() - (7 * 24 * 60 * 60 * 1000);
       
       // Get all snapshots
-      const allSnapshotsResult = await indexedDBService.getAll('VirgilContextDB', 'snapshots');
+      const allSnapshotsResult = await indexedDBService.getAll<Context & { timestamp: number }>('VirgilContextDB', 'snapshots');
       
       if (!allSnapshotsResult.success || !allSnapshotsResult.data) {
         return;
@@ -199,27 +189,51 @@ export class SimpleContextSnapshotService {
       const allSnapshots = allSnapshotsResult.data;
       
       // Find and delete old ones
-      const toDelete = allSnapshots.filter((snap: any) => snap.timestamp < sevenDaysAgo);
+      const toDelete = allSnapshots.filter((snap: Context & { timestamp: number }) => snap.timestamp < sevenDaysAgo);
       
       for (const snap of toDelete) {
-        await indexedDBService.delete('VirgilContextDB', 'snapshots', (snap as any).id);
-      }
-      
-      if (toDelete.length > 0) {
-        console.log(`🧹 Cleaned up ${toDelete.length} old snapshots`);
+        const snapWithId = snap as Context & { timestamp: number; id: string };
+        if (snapWithId.id) {
+          await indexedDBService.delete('VirgilContextDB', 'snapshots', snapWithId.id);
+        }
       }
     } catch (error) {
       console.error('Failed to cleanup old snapshots:', error);
     }
   }
   
+  private parseUserAgent(): { browser: string; os: string } {
+    const ua = navigator.userAgent;
+    let os = 'Unknown OS';
+    let browser = 'Unknown Browser';
+
+    // Detect OS
+    if (ua.includes('Mac')) os = 'macOS';
+    else if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Linux')) os = 'Linux';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('iOS')) os = 'iOS';
+
+    // Detect Browser
+    if (ua.includes('Chrome/') && !ua.includes('Edg/')) {
+      browser = 'Chrome';
+    } else if (ua.includes('Safari/') && !ua.includes('Chrome')) {
+      browser = 'Safari';
+    } else if (ua.includes('Firefox/')) {
+      browser = 'Firefox';
+    } else if (ua.includes('Edg/')) {
+      browser = 'Edge';
+    }
+
+    return { browser, os };
+  }
+
   private async captureSnapshot() {
     try {
-      console.log('📸 Starting snapshot capture...');
       const context = await this.collectBasicContext();
       const snapshotWithTimestamp = {
         ...context,
-        timestamp: timeService.getTimestamp()
+        timestamp: timeService.getTimestamp(),
       };
       
       // Store in memory (last 60 snapshots)
@@ -231,7 +245,7 @@ export class SimpleContextSnapshotService {
       // Store in IndexedDB
       const dbResult = await indexedDBService.add('VirgilContextDB', 'snapshots', {
         id: `snap_${timeService.getTimestamp()}`,
-        ...snapshotWithTimestamp
+        ...snapshotWithTimestamp,
       });
       
       if (!dbResult.success) {
@@ -245,14 +259,6 @@ export class SimpleContextSnapshotService {
         this.cleanupOldSnapshots(); // Don't await, run in background
       }
       
-      console.log('📸 Context snapshot captured', {
-        time: context.time.local,
-        username: context.user.username,
-        city: context.env.city,
-        weather: context.env.weather,
-        memory: this.snapshots.length,
-        dbSaved: dbResult.success
-      });
     } catch (error) {
       console.error('❌ Failed to capture snapshot:', error);
       // Don't throw - continue capturing even if one fails
@@ -262,20 +268,21 @@ export class SimpleContextSnapshotService {
   private async collectBasicContext(): Promise<Context> {
     const store = useContextStore.getState();
     const currentDateTime = timeService.getCurrentDateTime();
-    const hour = currentDateTime.getHours();
+    const hour = timeService.getHours(currentDateTime);
+    const { browser, os } = this.parseUserAgent();
     
     return {
       time: {
-        iso: currentDateTime.toISOString(),
+        iso: timeService.toISOString(currentDateTime),
         local: timeService.formatDate(currentDateTime) + ', ' + timeService.getCurrentTime(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        partOfDay: hour < 6 ? 'night' : hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : hour < 21 ? 'evening' : 'night'
+        partOfDay: hour < 6 ? 'night' : hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : hour < 21 ? 'evening' : 'night',
       },
       
       user: {
         name: store.user.user?.name || this.userInfo.name,
         dob: store.user.user?.dob || '',
-        username: store.user.user?.username || this.userInfo.username
+        username: store.user.user?.username || this.userInfo.username,
       },
       
       env: {
@@ -285,8 +292,8 @@ export class SimpleContextSnapshotService {
         long: store.user?.env?.long || store.location?.coordinates?.longitude || 0,
         weather: this.formatWeatherFromStore(store.weather),
         deviceType: store.user?.env?.deviceType || store.environment?.deviceType || 'desktop',
-        browser: store.user?.env?.browser || store.device?.browser || 'Unknown',
-        os: store.user?.env?.os || store.device?.os || 'Unknown'
+        browser: browser,
+        os: os,
       },
       
       sensors: {
@@ -296,13 +303,13 @@ export class SimpleContextSnapshotService {
         inputActivity: {
           mouse: timeService.getTimestamp() - this.lastActivity.mouse < 5000,
           keyboard: timeService.getTimestamp() - this.lastActivity.keyboard < 5000,
-          lastInteraction: store.activity?.lastInteraction || this.lastActivity.any
+          lastInteraction: store.activity?.lastInteraction || this.lastActivity.any,
         },
         motion: this.calculateActivityLevel() as 'still' | 'moving' | 'unknown',
         battery: store.device?.batteryLevel !== null && store.device?.batteryLevel !== undefined ? {
           level: store.device.batteryLevel || 0,
-          charging: store.device?.batteryCharging || false
-        } : undefined
+          charging: store.device?.batteryCharging || false,
+        } : undefined,
       },
       
       system: {
@@ -315,17 +322,17 @@ export class SimpleContextSnapshotService {
         screen: {
           width: store.environment?.viewport?.width || window.innerWidth,
           height: store.environment?.viewport?.height || window.innerHeight,
-          pixelDepth: store.device?.pixelRatio || window.devicePixelRatio || 1
-        }
+          pixelDepth: store.device?.pixelRatio || window.devicePixelRatio || 1,
+        },
       },
       
       network: {
         online: store.environment?.isOnline ?? navigator.onLine,
         connectionType: store.device?.networkType,
-        effectiveType: store.device?.downlink
+        effectiveType: store.device?.downlink,
       },
       
-      locationContext: await this.determineLocationContext()
+      locationContext: await this.determineLocationContext(),
     };
   }
   
@@ -347,9 +354,10 @@ export class SimpleContextSnapshotService {
     probablePlace: 'Home' | 'Work' | 'Travel' | 'Unknown',
     confidence: number,
     basedOn: string[]
-  } {
-    const hour = new Date().getHours();
-    const isWeekend = [0, 6].includes(new Date().getDay());
+    } {
+    const now = timeService.getCurrentDateTime();
+    const hour = timeService.getHours(now);
+    const isWeekend = [0, 6].includes(timeService.getDay(now));
     
     if (hour >= 22 || hour < 6) {
       return { probablePlace: 'Home', confidence: 0.5, basedOn: ['nightTime'] };
@@ -372,11 +380,12 @@ export class SimpleContextSnapshotService {
     basedOn: string[]
   }> {
     try {
-      const currentHour = new Date().getHours();
-      const currentDay = new Date().getDay();
+      const now = timeService.getCurrentDateTime();
+      const currentHour = timeService.getHours(now);
+      const currentDay = timeService.getDay(now);
       
       // Get recent snapshots from IndexedDB
-      const recentSnapsResult = await indexedDBService.getAll('VirgilContextDB', 'snapshots');
+      const recentSnapsResult = await indexedDBService.getAll<Context & { timestamp: number }>('VirgilContextDB', 'snapshots');
       
       // Check if operation was successful
       if (!recentSnapsResult.success || !recentSnapsResult.data) {
@@ -387,10 +396,10 @@ export class SimpleContextSnapshotService {
       
       // Filter snapshots from same hour and similar day type (weekend vs weekday)
       const isWeekend = [0, 6].includes(currentDay);
-      const similarTimeSnaps = recentSnaps.filter((snap: any) => {
-        const snapDate = new Date(snap.timestamp);
-        const snapHour = snapDate.getHours();
-        const snapIsWeekend = [0, 6].includes(snapDate.getDay());
+      const similarTimeSnaps = recentSnaps.filter((snap) => {
+        const snapDate = timeService.fromTimestamp(snap.timestamp);
+        const snapHour = timeService.getHours(snapDate);
+        const snapIsWeekend = [0, 6].includes(timeService.getDay(snapDate));
         
         return snapHour === currentHour && snapIsWeekend === isWeekend;
       });
@@ -402,14 +411,14 @@ export class SimpleContextSnapshotService {
       
       // Count how many times each location appears
       const locationCounts: Record<string, number> = {};
-      similarTimeSnaps.forEach((snap: any) => {
+      similarTimeSnaps.forEach((snap) => {
         const key = snap.env?.ip || 'unknown';
         locationCounts[key] = (locationCounts[key] || 0) + 1;
       });
       
       // Most common location at this time = probable current location type
       const mostCommon = Object.keys(locationCounts).reduce((a, b) => 
-        locationCounts[a] > locationCounts[b] ? a : b
+        locationCounts[a] > locationCounts[b] ? a : b,
       );
       
       // Simple classification based on when we see this IP most
@@ -422,7 +431,7 @@ export class SimpleContextSnapshotService {
       }
       
       return { probablePlace: 'Unknown', confidence: 0.5, basedOn: ['history'] };
-    } catch (error) {
+    } catch (_error) {
       // If anything fails, fall back to simple rules
       return this.simpleTimeRules();
     }
@@ -435,21 +444,14 @@ export class SimpleContextSnapshotService {
   
   async loadSnapshotsFromDB(count = 28): Promise<Array<Context & { timestamp: number }>> {
     try {
-      const result = await indexedDBService.getAll('VirgilContextDB', 'snapshots');
+      const result = await indexedDBService.getAll<Context & { timestamp: number }>('VirgilContextDB', 'snapshots');
       if (!result.success || !result.data) return [];
       
       // Sort by timestamp ascending (oldest to newest) and take the most recent ones
       const sortedSnapshots = result.data
-        .sort((a: any, b: any) => a.timestamp - b.timestamp) // Sort ascending
+        .sort((a, b) => a.timestamp - b.timestamp) // Sort ascending
         .slice(-count); // Take last 'count' items (most recent)
       
-      console.log('Loaded from DB:', {
-        total: result.data.length,
-        requested: count,
-        returned: sortedSnapshots.length,
-        oldest: sortedSnapshots[0]?.time?.local,
-        newest: sortedSnapshots[sortedSnapshots.length - 1]?.time?.local
-      });
       
       return sortedSnapshots;
     } catch (error) {

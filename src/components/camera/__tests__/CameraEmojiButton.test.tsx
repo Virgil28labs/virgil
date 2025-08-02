@@ -5,13 +5,26 @@
  * and camera app integration.
  */
 
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CameraEmojiButton } from '../CameraEmojiButton';
 
 // Mock the EmojiButton component
+interface MockEmojiButtonProps {
+  emoji: string;
+  ariaLabel: string;
+  GalleryComponent?: React.ComponentType<{ onClose: () => void }>;
+  title: string;
+  className: string;
+  hoverScale?: string;
+  hoverColor?: string;
+  position?: string;
+  [key: string]: any;
+}
+
 jest.mock('../../common/EmojiButton', () => ({
-  EmojiButton: ({ emoji, ariaLabel, GalleryComponent, title, className, ...props }: unknown) => {
+  EmojiButton: ({ emoji, ariaLabel, GalleryComponent, title, className, ...props }: MockEmojiButtonProps) => {
     const { hoverScale: _hoverScale, hoverColor: _hoverColor, position: _position, ...cleanProps } = props;
     return (
       <div data-testid="emoji-button" className={className} {...cleanProps}>
@@ -31,8 +44,13 @@ jest.mock('../../common/EmojiButton', () => ({
 }));
 
 // Mock the CameraApp component
+interface MockCameraAppProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 jest.mock('../CameraApp', () => ({
-  CameraApp: ({ isOpen, onClose }: unknown) => (
+  CameraApp: ({ isOpen, onClose }: MockCameraAppProps) => (
     <div data-testid="camera-app">
       <span>Camera App Open: {isOpen.toString()}</span>
       <button onClick={onClose}>Close Camera</button>
@@ -41,8 +59,13 @@ jest.mock('../CameraApp', () => ({
 }));
 
 // Mock the DashboardAppErrorBoundary
+interface MockErrorBoundaryProps {
+  children: React.ReactNode;
+  appName: string;
+}
+
 jest.mock('../../common/DashboardAppErrorBoundary', () => ({
-  DashboardAppErrorBoundary: ({ children, appName }: unknown) => (
+  DashboardAppErrorBoundary: ({ children, appName }: MockErrorBoundaryProps) => (
     <div data-testid="error-boundary" data-app-name={appName}>
       {children}
     </div>

@@ -105,6 +105,20 @@ jest.mock('../chat/ChatMessages/ChatMessages', () => ({
   ),
 }));
 
+interface MockChatInputProps {
+  input: string;
+  onInputChange: (value: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  isTyping: boolean;
+  error?: string | null;
+  onQuickAction?: (action: string) => void;
+  showQuickActions?: boolean;
+  _dashboardContext?: unknown;
+  _shouldFocus?: boolean;
+  externalInputRef?: React.RefObject<HTMLInputElement>;
+}
+
 jest.mock('../chat/ChatInput/ChatInput', () => ({
   ChatInput: ({ 
     input, 
@@ -118,7 +132,7 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
     _dashboardContext, 
     _shouldFocus, 
     externalInputRef, 
-  }: unknown) => {
+  }: MockChatInputProps) => {
     // Suppress unused variable warnings for mock parameters
     void _dashboardContext;
     void _shouldFocus;
@@ -150,13 +164,36 @@ jest.mock('../chat/ChatInput/ChatInput', () => ({
         {error && <div data-testid="chat-error">{error}</div>}
         {showQuickActions && (
           <div data-testid="quick-actions">
-            <button onClick={() => onQuickAction('help')}>Help</button>
+            <button onClick={() => onQuickAction?.('help')}>Help</button>
           </div>
         )}
       </div>
     );
   },
 }));
+
+interface MockChatHeaderProps {
+  windowSize: string;
+  onSizeToggle: () => void;
+  onMinimize: () => void;
+  selectedModel: string;
+  onModelChange: (model: string) => void;
+  models: Array<{ id: string; name: string }>;
+  _showMemoryIndicator?: boolean;
+  _markedMemories?: unknown[];
+  _recentConversations?: unknown[];
+  _onMemoryModalOpen?: () => void;
+  _isRealtimeConnected?: boolean;
+  _dashboardContext?: unknown;
+  _customSystemPrompt?: string;
+  _onSystemPromptChange?: (prompt: string) => void;
+  _onSystemPromptSave?: () => void;
+  _onNewChat?: () => void;
+  messageCount: number;
+  onClearMessages: () => void;
+  onExportMessages: () => void;
+  _createSystemPrompt?: (context: unknown) => string;
+}
 
 jest.mock('../chat/ChatHeader/ChatHeader', () => ({
   ChatHeader: ({ 
@@ -180,7 +217,7 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
     onClearMessages,
     onExportMessages,
     _createSystemPrompt,
-  }: unknown) => {
+  }: MockChatHeaderProps) => {
     // Suppress unused variable warnings for mock parameters
     void _showMemoryIndicator;
     void _markedMemories;
@@ -201,8 +238,10 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
         <button data-testid="minimize-button" onClick={onMinimize}>Minimize</button>
         <button data-testid="size-toggle" onClick={onSizeToggle}>{windowSize}</button>
         <select data-testid="model-select" value={selectedModel} onChange={(e) => onModelChange(e.target.value)}>
-          {models?.map((model: unknown) => (
-            <option key={model.id} value={model.id}>{model.name}</option>
+          {models?.map((model) => (
+            <option key={(model as { id: string }).id} value={(model as { id: string }).id}>
+              {(model as { name: string }).name}
+            </option>
           ))}
         </select>
       </div>
@@ -211,6 +250,17 @@ jest.mock('../chat/ChatHeader/ChatHeader', () => ({
 }));
 
 // Mock MemoryModal component
+interface MockMemoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  _markedMemories?: unknown[];
+  _recentConversations?: unknown[];
+  _onMemoriesUpdate?: (memories: unknown[]) => void;
+  _onConversationsUpdate?: (conversations: unknown[]) => void;
+  _onMemoryContextUpdate?: (context: unknown) => void;
+  _onMemoryIndicatorUpdate?: (show: boolean) => void;
+}
+
 jest.mock('../chat/MemoryModal/MemoryModal', () => ({
   MemoryModal: ({ 
     isOpen, 
@@ -221,7 +271,7 @@ jest.mock('../chat/MemoryModal/MemoryModal', () => ({
     _onConversationsUpdate,
     _onMemoryContextUpdate,
     _onMemoryIndicatorUpdate,
-  }: unknown) => {
+  }: MockMemoryModalProps) => {
     // Suppress unused variable warnings for mock parameters
     void _markedMemories;
     void _recentConversations;

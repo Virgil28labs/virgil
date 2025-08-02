@@ -138,8 +138,8 @@ export const useUIElementDetection = ({
             element: element as HTMLElement,
             textBaseline: textBaseline,
             isText: textSelectors.has(selector),
-            isPowerButton: selector === '.power-button',
-            isWeatherWidget: selector === '.weather-widget',
+            isPowerButton: selector === '[data-raccoon-collision="power-button"]',
+            isWeatherWidget: selector === '[data-raccoon-collision="weather-widget"]',
           });
         }
       });

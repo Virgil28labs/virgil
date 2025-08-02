@@ -224,6 +224,19 @@ beforeEach(() => {
     if (typeof args[0] === 'string' && args[0].includes('[circleAdapter:loadData] Failed to fetch circle game data') && args[0].includes('invalid-json')) {
       return;
     }
+    // Suppress expected ErrorHandlerService failsafe console errors during testing
+    if (typeof args[0] === 'string' && (args[0].includes('Logger failed:') || args[0].includes('Original error:'))) {
+      return;
+    }
+    // Suppress React act warnings during testing
+    if (typeof args[0] === 'string' && (
+      args[0].includes('You called act(async () => ...) without await') ||
+      args[0].includes('An update to') ||
+      args[0].includes('inside a test was not wrapped in act') ||
+      args[0].includes('When testing, code that causes React state updates should be wrapped into act')
+    )) {
+      return;
+    }
     originalConsoleError.call(console, ...args);
   };
 });

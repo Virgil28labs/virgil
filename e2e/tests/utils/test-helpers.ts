@@ -11,14 +11,8 @@ export const test = base.extend<{
   authenticatedPage: async ({ page, context }, use) => {
     // Mock authentication by setting local storage
     await context.addInitScript(() => {
-      window.localStorage.setItem('virgil-user', JSON.stringify({
-        id: 'test-user-123',
-        name: 'Test User',
-        preferences: {
-          theme: 'light',
-          notifications: true,
-        }
-      }));
+      // Note: virgil-user key removed - using virgil-user-v1 from ContextStore instead
+      // If needed for tests, use: window.localStorage.setItem('virgil-user-v1', ...)
     });
     
     await use(page);

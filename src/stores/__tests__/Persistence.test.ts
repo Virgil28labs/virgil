@@ -155,7 +155,7 @@ describe('Persistence Utilities', () => {
 
     it('should handle localStorage errors gracefully', () => {
       // Create a temporary mock that throws an error
-      const throwingMock = jest.fn(() => {
+      const throwingMock = jest.fn((_key: string, _value: string) => {
         throw new Error('Storage quota exceeded');
       });
       

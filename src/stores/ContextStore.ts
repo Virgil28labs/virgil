@@ -8,6 +8,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { devtools, persist } from 'zustand/middleware';
+import { timeService } from '../services/TimeService';
 import { createTimeSlice, initializeTimeSlice } from './slices/timeSlice';
 import { formatWeatherString } from './utils/weatherFormatter';
 import { STORAGE_CONFIG } from './utils/persistence';
@@ -267,7 +268,7 @@ export const useContextStore = create<ContextStoreWithActions>()(
 
             setUser: (user) => {
               const memberSince = user?.created_at 
-                ? get().time.dateObject.toLocaleDateString('en-US', {
+                ? timeService.formatDateToLocal(get().time.dateObject, {
                   month: 'long',
                   day: 'numeric',
                   year: 'numeric',
@@ -468,8 +469,8 @@ export const useContextStore = create<ContextStoreWithActions>()(
             activeComponents: [],
             recentActions: [],
             timeSpentInSession: 0,
-            lastInteraction: Date.now(), // Use Date.now() for initialization
-            sessionStartTime: Date.now(), // Use Date.now() for initialization
+            lastInteraction: timeService.getTimestamp(), // Use timeService for initialization
+            sessionStartTime: timeService.getTimestamp(), // Use timeService for initialization
 
             // Activity actions
             logActivity: (action, component) => {

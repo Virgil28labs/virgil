@@ -17,7 +17,7 @@ import { render, screen } from '@testing-library/react';
 import { WeatherForecast } from '../WeatherForecast';
 import { weatherService } from '../../lib/weatherService';
 import { timeService } from '../../services/TimeService';
-import type { ForecastData } from '../../types/weather.types';
+import type { ForecastData, WeatherCondition } from '../../types/weather.types';
 
 // Mock the weatherService
 jest.mock('../../lib/weatherService', () => ({
@@ -452,7 +452,9 @@ describe('WeatherForecast', () => {
           ...mockForecastData.forecasts[0],
           condition: {
             main: 'Unknown',
-          } as unknown,
+            description: 'Unknown weather',
+            icon: '50d',
+          } as WeatherCondition,
         }],
       };
       

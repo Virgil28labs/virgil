@@ -8,6 +8,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useContextStore, cleanupContextStore } from './ContextStore';
 import { useEnvironmentActions, useActivityActions } from './hooks/useContextStore';
+import { timeService } from '../services/TimeService';
 import { useAutoSync } from './utils/environmentSync';
 
 interface ContextStoreProviderProps {
@@ -192,7 +193,7 @@ export const ContextStoreProvider = ({
     if (!options.enableActivityTracking) return;
 
     const handleUserInteraction = () => {
-      activityActions.setLastInteraction(Date.now());
+      activityActions.setLastInteraction(timeService.getTimestamp());
     };
 
     // Track various user interactions
@@ -267,11 +268,11 @@ export const useEnvironmentUtils = () => {
  * Component for debugging store state in development
  */
 export const ContextStoreDebugger = () => {
+  const state = useContextStore((state) => state);
+
   if (process.env.NODE_ENV !== 'development') {
     return null;
   }
-
-  const state = useContextStore((state) => state);
 
   return (
     <div style={{

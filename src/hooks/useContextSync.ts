@@ -30,9 +30,14 @@ export function useContextSync() {
       hasIpLocation: !!ipLocation,
       initialized: true,
       lastUpdated: dashboardContextService.getTimestamp(),
+      locationSource: coordinates ? 'gps' : ipLocation ? 'ip' : null,
+      canRetryGPS: true,
+      gpsRetrying: false,
       fetchLocationData: () => Promise.resolve(),
       requestLocationPermission: () => Promise.resolve(),
+      retryGPSLocation: () => Promise.resolve(),
       clearError: () => {},
+      isPreciseLocation: !!coordinates,
     });
   }, [address, ipLocation, hasGPSLocation, coordinates]);
 

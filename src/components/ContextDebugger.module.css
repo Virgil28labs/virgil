@@ -1,7 +1,13 @@
-.toggleButton {
+.buttonGroup {
   position: fixed;
   bottom: 20px;
   left: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.toggleButton {
   background: var(--brand-dark-gray);
   color: var(--brand-white);
   border: 1px solid var(--brand-light-gray);
@@ -10,7 +16,6 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 1000;
 }
 
 .toggleButton:hover {
@@ -47,6 +52,27 @@
   margin: 0;
   font-size: 1rem;
   color: var(--brand-white);
+}
+
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.switchButton {
+  background: var(--brand-gray);
+  color: var(--brand-white);
+  border: 1px solid var(--brand-light-gray);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switchButton:hover {
+  background: var(--brand-light-gray);
 }
 
 .closeButton {

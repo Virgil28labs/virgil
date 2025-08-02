@@ -5,7 +5,6 @@
  * monitoring and activity tracking for the store.
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ContextStoreProvider, useActivityLogger, useEnvironmentUtils } from '../ContextStoreProvider';
 import { useContextStore } from '../ContextStore';
@@ -195,7 +194,7 @@ describe('ContextStoreProvider', () => {
     });
 
     it('should handle dark mode preference changes', () => {
-      let darkModeListener: ((e: MediaQueryListEvent) => void) | null = null;
+      let darkModeListener: ((e: MediaQueryListEvent) => void) | undefined;
       
       const mockMatchMediaWithListener = (matches: boolean) => ({
         matches,

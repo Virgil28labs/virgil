@@ -17,6 +17,7 @@ import { ToastContainer } from './components/ToastNotification';
 import { StorageMigration } from './services/StorageMigration';
 import { intentInitializer } from './services/IntentInitializer';
 import { logger } from './lib/logger';
+import { SimpleContextSnapshotService } from './services/SimpleContextSnapshotService';
 // Import errorHandlerService to initialize global error handlers
 import './services/ErrorHandlerService';
 import './App.css';
@@ -54,6 +55,51 @@ function AppContent(): React.ReactElement {
       );
     });
   }, [user]); // Re-run if user changes
+
+  // Initialize context snapshot service
+  useEffect(() => {
+    if (!user) return;
+
+    const contextService = SimpleContextSnapshotService.getInstance();
+    
+    // Only initialize once if not already initialized
+    const initPromise = contextService.isInitialized() 
+      ? Promise.resolve() 
+      : contextService.init();
+      
+    initPromise.then(() => {
+      contextService.startCapture(user);
+      logger.info('Context snapshot service started', {
+        component: 'AppContent',
+        action: 'startContextSnapshots',
+        metadata: { userEmail: user?.email },
+      });
+    }).catch(error => {
+      logger.error(
+        'Context snapshot service failed to start',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'AppContent',
+          action: 'startContextSnapshots',
+        },
+      );
+    });
+    
+    // Don't stop capture on cleanup - let it persist
+    // Only stop when user logs out
+  }, [user]);
+
+  // Stop context snapshots when user logs out
+  useEffect(() => {
+    if (user) return; // Only run when user becomes null (logout)
+    
+    const contextService = SimpleContextSnapshotService.getInstance();
+    contextService.stopCapture();
+    logger.info('Context snapshot service stopped due to logout', {
+      component: 'AppContent',
+      action: 'stopContextSnapshots',
+    });
+  }, [user]);
 
   if (loading) {
     return (

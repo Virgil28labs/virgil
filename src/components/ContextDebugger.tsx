@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { SimpleContextSnapshotService } from '../services/SimpleContextSnapshotService';
+import { StorageAnalyzer } from './StorageAnalyzer';
 import type { Context } from '../types/context.types';
 import styles from './ContextDebugger.module.css';
 import { timeService } from '../services/TimeService';
@@ -11,7 +12,7 @@ interface SnapshotWithTimestamp extends Context {
 export function ContextDebugger() {
   const [snapshots, setSnapshots] = useState<SnapshotWithTimestamp[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const service = useRef<SimpleContextSnapshotService>();
+  const [showStorage, setShowStorage] = useState(false);
 
   useEffect(() => {
     const loadSnapshots = async () => {
@@ -29,7 +30,7 @@ export function ContextDebugger() {
       // Merge and deduplicate by timestamp
       const allSnapshots = [...memorySnapshots, ...dbSnapshots];
       const uniqueSnapshots = Array.from(
-        new Map(allSnapshots.map(snap => [snap.timestamp, snap])).values()
+        new Map(allSnapshots.map(snap => [snap.timestamp, snap])).values(),
       );
       
       // Sort by timestamp and take most recent 28
@@ -39,14 +40,6 @@ export function ContextDebugger() {
       
       setSnapshots(sortedSnapshots);
       
-      // Debug log
-      console.log('Context snapshots loaded:', {
-        memory: memorySnapshots.length,
-        db: dbSnapshots.length,
-        unique: uniqueSnapshots.length,
-        final: sortedSnapshots.length,
-        latest: sortedSnapshots[sortedSnapshots.length - 1]?.time?.local
-      });
     };
     
     // Load immediately
@@ -72,13 +65,55 @@ export function ContextDebugger() {
 
   if (!isVisible) {
     return (
-      <button 
-        onClick={() => setIsVisible(true)}
-        className={styles.toggleButton}
-        aria-label="Show context debugger"
-      >
-        🔍 Context
-      </button>
+      <div className={styles.buttonGroup}>
+        <button 
+          onClick={() => setIsVisible(true)}
+          className={styles.toggleButton}
+          aria-label="Show context debugger"
+        >
+          🔍 Context
+        </button>
+        <button 
+          onClick={() => {
+            setShowStorage(true);
+            setIsVisible(true);
+          }}
+          className={styles.toggleButton}
+          aria-label="Show storage analyzer"
+        >
+          🗄️ Storage
+        </button>
+      </div>
+    );
+  }
+
+  if (showStorage) {
+    return (
+      <div className={styles.debugger}>
+        <div className={styles.header}>
+          <h3>Storage Analysis</h3>
+          <div className={styles.headerButtons}>
+            <button 
+              onClick={() => setShowStorage(false)}
+              className={styles.switchButton}
+              aria-label="Show context history"
+            >
+              🔍 Context
+            </button>
+            <button 
+              onClick={() => {
+                setIsVisible(false);
+                setShowStorage(false);
+              }}
+              className={styles.closeButton}
+              aria-label="Hide debugger"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        <StorageAnalyzer />
+      </div>
     );
   }
 
@@ -86,13 +121,22 @@ export function ContextDebugger() {
     <div className={styles.debugger}>
       <div className={styles.header}>
         <h3>Context History (28 min)</h3>
-        <button 
-          onClick={() => setIsVisible(false)}
-          className={styles.closeButton}
-          aria-label="Hide debugger"
-        >
-          ✕
-        </button>
+        <div className={styles.headerButtons}>
+          <button 
+            onClick={() => setShowStorage(true)}
+            className={styles.switchButton}
+            aria-label="Show storage analysis"
+          >
+            🗄️ Storage
+          </button>
+          <button 
+            onClick={() => setIsVisible(false)}
+            className={styles.closeButton}
+            aria-label="Hide debugger"
+          >
+            ✕
+          </button>
+        </div>
       </div>
       
       <div className={styles.snapshots}>
@@ -133,9 +177,9 @@ export function ContextDebugger() {
                 
                 <div className={styles.activityRow}>
                   <span className={styles.activityLevel}>
-                    {snap.sensors?.motion === 'active' ? '🟢 Active' : 
-                      snap.sensors?.motion === 'idle' ? '🟡 Idle' : 
-                        '🔴 Away'}
+                    {snap.sensors?.motion === 'moving' ? '🟢 Moving' : 
+                      snap.sensors?.motion === 'still' ? '🟡 Still' : 
+                        '🔴 Unknown'}
                   </span>
                   <span className={styles.visibilityState}>
                     {snap.sensors?.visibility === 'visible' ? '👁️ Tab visible' : '🙈 Tab hidden'}

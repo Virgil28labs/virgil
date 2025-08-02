@@ -302,12 +302,12 @@ export class TimeService {
   // ==========================================
 
   formatWithLocale(date: Date, type: 'date' | 'time' | 'datetime', options?: Intl.DateTimeFormatOptions): string {
-    const defaults = {
-      date: { year: 'numeric', month: 'numeric', day: 'numeric' },
-      time: { hour: '2-digit', minute: '2-digit', second: '2-digit' },
+    const defaults: Record<string, Intl.DateTimeFormatOptions> = {
+      date: { year: 'numeric' as const, month: 'numeric' as const, day: 'numeric' as const },
+      time: { hour: '2-digit' as const, minute: '2-digit' as const, second: '2-digit' as const },
       datetime: { 
-        year: 'numeric', month: 'numeric', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        year: 'numeric' as const, month: 'numeric' as const, day: 'numeric' as const,
+        hour: '2-digit' as const, minute: '2-digit' as const, second: '2-digit' as const,
       },
     };
     return new Intl.DateTimeFormat('en-US', { ...defaults[type], ...options }).format(date);
@@ -328,6 +328,7 @@ export class TimeService {
   toISODateString = (date?: Date): string => this.formatDateToLocal(date || new Date());
   formatForDateInput = (date?: Date): string => this.formatDateToLocal(date || new Date());
   fromTimestamp = (timestamp: number): Date => new Date(timestamp);
+  toTimestamp = (date: Date): number => date.getTime();
   createDate = (year: number, month: number, day: number): Date => new Date(year, month, day);
 
   formatForDateTimeInput(date?: Date): string {

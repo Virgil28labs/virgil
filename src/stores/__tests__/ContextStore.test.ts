@@ -512,7 +512,7 @@ describe('ContextStore', () => {
 
     it('should handle store subscriptions', () => {
       const callback = jest.fn();
-      const { result } = renderHook(() => useContextStore((state) => state.time.currentTime));
+      renderHook(() => useContextStore((state) => state.time.currentTime));
       
       // Subscribe to time changes
       const unsubscribe = useContextStore.subscribe(
@@ -566,7 +566,7 @@ describe('ContextStore', () => {
     it('should not cause unnecessary re-renders', () => {
       let renderCount = 0;
       
-      const { result } = renderHook(() => {
+      renderHook(() => {
         renderCount++;
         return useContextStore((state) => state.time.currentTime);
       });

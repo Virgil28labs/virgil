@@ -19,7 +19,7 @@ import {
   useTimeActions,
 } from '../hooks/useContextStore';
 import { useContextStore } from '../ContextStore';
-import { timeService } from '../../services/TimeService';
+// timeService is mocked below
 
 // Mock TimeService
 jest.mock('../../services/TimeService', () => ({
@@ -31,11 +31,11 @@ jest.mock('../../services/TimeService', () => ({
     getTimestamp: jest.fn(() => 1640995200000),
     getCurrentDateTime: jest.fn(() => new Date('2024-01-20T12:00:00')),
     subscribeToTimeUpdates: jest.fn(() => jest.fn()),
-    getRelativeTime: jest.fn((date) => '2 hours ago'),
+    getRelativeTime: jest.fn((_date) => '2 hours ago'),
   },
 }));
 
-const mockTimeService = timeService as jest.Mocked<typeof timeService>;
+// const mockTimeService = timeService as jest.Mocked<typeof timeService>;
 
 describe('Context Store Hooks', () => {
   beforeEach(() => {
@@ -126,7 +126,7 @@ describe('Context Store Hooks', () => {
     it('should not re-render when unrelated location state changes', () => {
       let renderCount = 0;
       
-      const { result } = renderHook(() => {
+      renderHook(() => {
         renderCount++;
         return useCoordinates();
       });
@@ -254,12 +254,12 @@ describe('Context Store Hooks', () => {
       let timeRenderCount = 0;
       let locationRenderCount = 0;
 
-      const { result: timeResult } = renderHook(() => {
+      renderHook(() => {
         timeRenderCount++;
         return useCurrentTime();
       });
 
-      const { result: locationResult } = renderHook(() => {
+      renderHook(() => {
         locationRenderCount++;
         return useCoordinates();
       });
@@ -325,7 +325,7 @@ describe('Context Store Hooks', () => {
       act(() => {
         try {
           result.current.updateTime({ currentTime: 'invalid' });
-        } catch (error) {
+        } catch (_error) {
           // Should not crash the hook
         }
       });

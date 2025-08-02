@@ -42,7 +42,7 @@ jest.mock('../WeatherForecast', () => ({
 
 // Mock the Skeleton component
 jest.mock('../ui/skeleton', () => ({
-  Skeleton: ({ className }: unknown) => (
+  Skeleton: ({ className }: { className?: string }) => (
     <div data-testid="skeleton" className={className}>
       Loading...
     </div>
@@ -480,7 +480,7 @@ describe('Weather', () => {
           ...defaultWeatherData,
           condition: {
             ...defaultWeatherData.condition,
-            description: undefined as unknown,
+            description: undefined as unknown as string,
           },
         },
       });
@@ -498,7 +498,7 @@ describe('Weather', () => {
           ...defaultWeatherData,
           condition: {
             ...defaultWeatherData.condition,
-            id: undefined as unknown,
+            id: undefined as unknown as number,
           },
         },
       });
