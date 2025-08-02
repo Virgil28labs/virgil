@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { weatherService } from '../lib/weatherService';
 import type { ForecastData } from '../types/weather.types';
 import { timeService } from '../services/TimeService';
+import styles from './Dashboard.module.css';
 
 interface WeatherForecastProps {
   forecast: ForecastData;
@@ -34,28 +35,28 @@ export const WeatherForecast = memo(function WeatherForecast({
   };
 
   return (
-    <div className="weather-forecast">
-      <div className="forecast-header">
-        <span className="forecast-title">5-Day Forecast</span>
-        <span className="forecast-location">{forecast.cityName}</span>
+    <div className={styles.weatherForecast}>
+      <div className={styles.forecastHeader}>
+        <span className={styles.forecastTitle}>5-Day Forecast</span>
+        <span className={styles.forecastLocation}>{forecast.cityName}</span>
       </div>
 
-      <div className="forecast-days">
+      <div className={styles.forecastDays}>
         {forecast.forecasts.map((day) => (
-          <div key={day.date} className="forecast-day">
-            <div className="forecast-day-name">{formatDate(day.date)}</div>
-            <div className="forecast-icon">
+          <div key={day.date} className={styles.forecastDay}>
+            <div className={styles.forecastDayName}>{formatDate(day.date)}</div>
+            <div className={styles.forecastIcon}>
               {getWeatherEmoji(day.condition.id)}
             </div>
-            <div className="forecast-temps">
-              <span className="forecast-temp-high">
+            <div className={styles.forecastTemps}>
+              <span className={styles.forecastTempHigh}>
                 {day.tempMax}°{unit === 'fahrenheit' ? 'F' : 'C'}
               </span>
-              <span className="forecast-temp-low">
+              <span className={styles.forecastTempLow}>
                 {day.tempMin}°{unit === 'fahrenheit' ? 'F' : 'C'}
               </span>
             </div>
-            <div className="forecast-condition">
+            <div className={styles.forecastCondition}>
               {day.condition.main}
             </div>
           </div>

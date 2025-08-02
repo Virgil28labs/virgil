@@ -105,7 +105,7 @@ export const Weather = memo(function Weather() {
 
       {/* Forecast panel */}
       {showForecast && forecast && (
-        <div className="weather-forecast-container">
+        <div className={styles.weatherForecastContainer}>
           <WeatherForecast forecast={forecast} unit={unit} />
         </div>
       )}

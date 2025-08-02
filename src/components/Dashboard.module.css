@@ -223,10 +223,92 @@
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.weatherForecastContainer.visible {
+/* Show forecast on widget hover */
+.weatherWidget:hover .weatherForecastContainer {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+/* Weather forecast content - optimized for performance */
+.weatherForecast {
+  color: var(--pale-lavender);
+  font-size: 14px;
+  user-select: none;
+}
+
+.forecastHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(108, 59, 170, 0.2);
+}
+
+.forecastTitle {
+  font-weight: 600;
+  color: var(--soft-lilac);
+}
+
+.forecastLocation {
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+.forecastDays {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.forecastDay {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s ease;
+}
+
+.forecastDay:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.forecastDayName {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.forecastIcon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.forecastTemps {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.forecastTempHigh {
+  font-weight: 600;
+}
+
+.forecastTempLow {
+  opacity: 0.6;
+}
+
+.forecastCondition {
+  font-size: 11px;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Mobile responsive weather */

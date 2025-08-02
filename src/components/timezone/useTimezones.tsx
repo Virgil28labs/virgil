@@ -32,66 +32,57 @@ interface UseTimezonesReturn {
 const STORAGE_KEY = 'virgil_selected_timezones';
 const MAX_TIMEZONES = 5;
 
-/**
- * Load timezones from localStorage with error handling
- */
-function loadTimezonesFromStorage(): SelectedTimezone[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return getDefaultTimezones();
-
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return getDefaultTimezones();
-
-    // Validate structure
-    const valid = parsed.every(tz =>
-      tz &&
-      typeof tz.id === 'string' &&
-      typeof tz.timezone === 'string' &&
-      typeof tz.label === 'string' &&
-      typeof tz.order === 'number',
-    );
-
-    if (!valid) return getDefaultTimezones();
-
-    // Sort by order and return
-    return parsed.sort((a, b) => a.order - b.order);
-  } catch (error) {
-    logger.warn('Failed to load timezones from localStorage', {
-      component: 'useTimezones',
-      action: 'loadFromStorage',
-      metadata: { error },
-    });
-    return getDefaultTimezones();
-  }
-}
-
-/**
- * Save timezones to localStorage with error handling
- */
-function saveTimezonesToStorage(timezones: SelectedTimezone[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(timezones));
-  } catch (error) {
-    logger.warn('Failed to save timezones to localStorage', {
-      component: 'useTimezones',
-      action: 'saveToStorage',
-      metadata: { error },
-    });
-  }
-}
+// No longer need these functions - handled by useTimezones hook directly
 
 /**
  * Custom hook for managing timezone state and operations
  */
 export function useTimezones(): UseTimezonesReturn {
-  const [selectedTimezones, setSelectedTimezones] = useState<SelectedTimezone[]>(() =>
-    loadTimezonesFromStorage(),
-  );
+  const [selectedTimezones, setSelectedTimezones] = useState<SelectedTimezone[]>([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState<DateTime>(() =>
     DateTime.fromJSDate(dashboardContextService.getCurrentDateTime()),
   );
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Load timezones from localStorage on mount
+  useEffect(() => {
+    try {
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const parsed = JSON.parse(storedData);
+        if (Array.isArray(parsed)) {
+          // Validate structure
+          const valid = parsed.every(tz =>
+            tz &&
+            typeof tz.id === 'string' &&
+            typeof tz.timezone === 'string' &&
+            typeof tz.label === 'string' &&
+            typeof tz.order === 'number',
+          );
+
+          if (valid) {
+            setSelectedTimezones(parsed.sort((a, b) => a.order - b.order));
+          } else {
+            setSelectedTimezones(getDefaultTimezones());
+          }
+        } else {
+          setSelectedTimezones(getDefaultTimezones());
+        }
+      } else {
+        setSelectedTimezones(getDefaultTimezones());
+      }
+    } catch (error) {
+      logger.warn('Failed to load timezones from localStorage', {
+        component: 'useTimezones',
+        action: 'loadFromStorage',
+        metadata: { error },
+      });
+      setSelectedTimezones(getDefaultTimezones());
+    } finally {
+      setDataLoaded(true);
+    }
+  }, []);
 
   // Subscribe to TimeService for coordinated updates (1-second precision)
   useEffect(() => {
@@ -105,10 +96,20 @@ export function useTimezones(): UseTimezonesReturn {
     return unsubscribe;
   }, []);
 
-  // Save to localStorage whenever selectedTimezones changes
+  // Save to localStorage whenever selectedTimezones changes (after initial load)
   useEffect(() => {
-    saveTimezonesToStorage(selectedTimezones);
-  }, [selectedTimezones]);
+    if (dataLoaded) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedTimezones));
+      } catch (error) {
+        logger.warn('Failed to save timezones to localStorage', {
+          component: 'useTimezones',
+          action: 'saveToStorage',
+          metadata: { error },
+        });
+      }
+    }
+  }, [selectedTimezones, dataLoaded]);
 
   // Memoized timezone data with current times
   const timezonesWithTime = useMemo<TimezoneWithTime[]>(() => {
