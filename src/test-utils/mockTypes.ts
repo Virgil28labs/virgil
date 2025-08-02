@@ -212,63 +212,10 @@ export interface MockAdapter {
 export interface MockGlobal {
   advanceTime?: (ms: number) => void;
   __mockIDBStores?: Record<string, unknown>;
-  google?: {
-    maps?: {
-      Map?: new (element: Element, options?: unknown) => unknown;
-      [key: string]: unknown;
-    };
-  };
   [key: string]: unknown;
 }
 
-export interface MockGoogleMaps {
-  maps: {
-    DirectionsService: new () => {
-      route: MockedFunction<(request: unknown, callback: (response: unknown, status: string) => void) => void>;
-    };
-    Geocoder: new () => {
-      geocode: MockedFunction<(request: unknown, callback: (results: unknown[], status: string) => void) => void>;
-    };
-    DirectionsStatus: {
-      OK: string;
-      ZERO_RESULTS: string;
-      NOT_FOUND: string;
-      MAX_WAYPOINTS_EXCEEDED: string;
-      INVALID_REQUEST: string;
-      OVER_QUERY_LIMIT: string;
-      REQUEST_DENIED: string;
-      UNKNOWN_ERROR: string;
-    };
-    marker: {
-      AdvancedMarkerElement: MockedFunction<() => MockAdvancedMarkerElement>;
-    };
-    TravelMode?: {
-      DRIVING: string;
-      WALKING: string;
-      BICYCLING: string;
-      TRANSIT: string;
-    };
-  };
-}
 
-export interface MockAdvancedMarkerElement {
-  position: { lat: number; lng: number };
-  map: unknown;
-  content?: HTMLElement;
-  scale?: number;
-  anchor?: { x: number; y: number };
-}
-
-export interface MockGoogleMapsModule {
-  googleMapsPromise: Promise<typeof google.maps> | null;
-  [key: string]: unknown;
-}
-
-export interface MockMapServicePrivate {
-  instances?: WeakMap<google.maps.Map, MockMapServicePrivate>;
-  directionsService?: google.maps.DirectionsService | null;
-  geocoder?: google.maps.Geocoder | null;
-}
 
 export interface MockToastServicePrivate {
   listeners: Array<(toast: unknown) => void>;
@@ -477,5 +424,52 @@ export const createMockError = (message: string, code?: string | number): MockEr
   message,
   code,
   stack: new Error().stack,
+});
+
+// ========== Location Mock Types ==========
+
+export interface MockLocationContextValue {
+  coordinates: unknown;
+  address: unknown;
+  ipLocation: unknown;
+  loading: boolean;
+  error: string | null;
+  permissionStatus: string;
+  lastUpdated: number | null;
+  initialized: boolean;
+  locationSource: 'gps' | 'ip' | null;
+  canRetryGPS: boolean;
+  gpsRetrying: boolean;
+  fetchLocationData: MockedFunction<(forceRefresh?: boolean) => Promise<void>>;
+  requestLocationPermission: MockedFunction<() => Promise<void>>;
+  retryGPSLocation: MockedFunction<() => Promise<void>>;
+  clearError: MockedFunction<() => void>;
+  hasLocation: boolean;
+  hasGPSLocation: boolean;
+  hasIpLocation: boolean;
+  isPreciseLocation: boolean;
+}
+
+export const createMockLocationContextValue = (overrides: Partial<MockLocationContextValue> = {}): MockLocationContextValue => ({
+  coordinates: null,
+  address: null,
+  ipLocation: null,
+  loading: false,
+  error: null,
+  permissionStatus: 'unknown',
+  lastUpdated: null,
+  initialized: true,
+  locationSource: null,
+  canRetryGPS: false,
+  gpsRetrying: false,
+  fetchLocationData: fn<(forceRefresh?: boolean) => Promise<void>>(),
+  requestLocationPermission: fn<() => Promise<void>>(),
+  retryGPSLocation: fn<() => Promise<void>>(),
+  clearError: fn<() => void>(),
+  hasLocation: false,
+  hasGPSLocation: false,
+  hasIpLocation: false,
+  isPreciseLocation: false,
+  ...overrides,
 });
 

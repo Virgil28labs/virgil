@@ -56,6 +56,7 @@ const analyticsRoutes = require('./routes/analytics');
 const chatRoutes = require('./routes/chat');
 const weatherRoutes = require('./routes/weather');
 const elevationRoutes = require('./routes/elevation');
+const locationRoutes = require('./routes/location');
 const rhythmRoutes = require('./routes/rhythm');
 const vectorRoutes = require('./routes/vector');
 
@@ -66,6 +67,7 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/elevation', elevationRoutes);
+app.use('/api/v1/location', locationRoutes);
 app.use('/api/v1/rhythm', rhythmRoutes);
 app.use('/api/v1/vector', vectorRoutes);
 

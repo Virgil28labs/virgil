@@ -13,6 +13,7 @@ import type { LocationContextValue } from '../../types/location.types';
 import type { WeatherContextType } from '../../types/weather.types';
 import type { AuthContextValue } from '../../types/auth.types';
 import type { DeviceInfo } from '../../hooks/useDeviceInfo';
+import { createMockLocationContextValue } from '../../test-utils/mockTypes';
 
 // Mock all dependencies
 jest.mock('../TimeService');
@@ -56,7 +57,7 @@ describe('DashboardContextService Integration Tests', () => {
       service.subscribe(listener);
 
       // Simulate rapid updates from different sources
-      const locationData: LocationContextValue = {
+      const locationData = createMockLocationContextValue({
         coordinates: { latitude: 37.7749, longitude: -122.4194, accuracy: 10, timestamp: Date.now() },
         address: { street: '123 Main St', house_number: '123', city: 'San Francisco', postcode: '94102', country: 'US', formatted: '123 Main St, San Francisco, CA' },
         ipLocation: { ip: '127.0.0.1', city: 'San Francisco', region: 'CA', country: 'US' },
@@ -65,13 +66,10 @@ describe('DashboardContextService Integration Tests', () => {
         permissionStatus: 'granted',
         lastUpdated: Date.now(),
         initialized: true,
-        fetchLocationData: jest.fn(),
-        requestLocationPermission: jest.fn(),
-        clearError: jest.fn(),
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
-      };
+      });
 
       const weatherData: WeatherContextType = {
         data: {
@@ -353,6 +351,11 @@ describe('DashboardContextService Integration Tests', () => {
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
+        isPreciseLocation: true,
+        locationSource: 'gps',
+        canRetryGPS: false,
+        gpsRetrying: false,
+        retryGPSLocation: jest.fn(),
       });
 
       // Clean up half the listeners
@@ -526,6 +529,11 @@ describe('DashboardContextService Integration Tests', () => {
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
+        isPreciseLocation: true,
+        locationSource: 'gps',
+        canRetryGPS: false,
+        gpsRetrying: false,
+        retryGPSLocation: jest.fn(),
       });
 
       const context = service.getContext();
@@ -573,6 +581,11 @@ describe('DashboardContextService Integration Tests', () => {
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
+        isPreciseLocation: true,
+        locationSource: 'gps',
+        canRetryGPS: false,
+        gpsRetrying: false,
+        retryGPSLocation: jest.fn(),
       });
 
       // Create failing listener
@@ -645,6 +658,11 @@ describe('DashboardContextService Integration Tests', () => {
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
+        isPreciseLocation: true,
+        locationSource: 'gps',
+        canRetryGPS: false,
+        gpsRetrying: false,
+        retryGPSLocation: jest.fn(),
       });
 
       service.updateUserContext({

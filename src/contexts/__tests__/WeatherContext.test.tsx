@@ -23,6 +23,7 @@ import { timeService } from '../../services/TimeService';
 import { useLocation } from '../../hooks/useLocation';
 import { useContext } from 'react';
 import type { WeatherContextType, WeatherData } from '../../types/weather.types';
+import { createMockLocationContextValue } from '../../test-utils/mockTypes';
 
 // Mock dependencies
 jest.mock('../../lib/weatherService', () => ({
@@ -191,7 +192,7 @@ describe('WeatherContext', () => {
     );
     
     // Default location mock
-    mockUseLocation.mockReturnValue({
+    mockUseLocation.mockReturnValue(createMockLocationContextValue({
       coordinates: null,
       ipLocation: null,
       loading: false,
@@ -200,13 +201,10 @@ describe('WeatherContext', () => {
       hasGPSLocation: false,
       hasIpLocation: false,
       initialized: true,
-      fetchLocationData: jest.fn(),
-      requestLocationPermission: jest.fn(),
-      clearError: jest.fn(),
       permissionStatus: 'prompt',
       address: null,
       lastUpdated: null,
-    });
+    }));
   });
 
   afterEach(() => {
@@ -243,7 +241,7 @@ describe('WeatherContext', () => {
 
   describe('Weather fetching with GPS coordinates', () => {
     it('should fetch weather when GPS coordinates are available', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -258,7 +256,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -281,7 +279,7 @@ describe('WeatherContext', () => {
     });
 
     it('should fetch forecast data with GPS coordinates', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -296,7 +294,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -320,7 +318,7 @@ describe('WeatherContext', () => {
       const forecastError = new Error('Forecast service unavailable');
       mockWeatherService.getForecastByCoordinates.mockRejectedValue(forecastError);
       
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -335,7 +333,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -363,7 +361,7 @@ describe('WeatherContext', () => {
 
   describe('Weather fetching with IP location', () => {
     it('should fetch weather when IP location is available', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: mockIpLocation,
         loading: false,
@@ -378,7 +376,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -400,7 +398,7 @@ describe('WeatherContext', () => {
     });
 
     it('should fetch forecast data with IP location', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: mockIpLocation,
         loading: false,
@@ -415,7 +413,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -439,7 +437,7 @@ describe('WeatherContext', () => {
       const forecastError = new Error('Forecast API error');
       mockWeatherService.getForecastByCity.mockRejectedValue(forecastError);
       
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: mockIpLocation,
         loading: false,
@@ -454,7 +452,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -479,7 +477,7 @@ describe('WeatherContext', () => {
     });
 
     it('should prefer GPS coordinates over IP location', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: mockIpLocation,
         loading: false,
@@ -494,7 +492,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -516,7 +514,7 @@ describe('WeatherContext', () => {
 
   describe('Fallback weather handling', () => {
     it('should fetch fallback weather when no location is available', async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: null,
         loading: false,
@@ -531,7 +529,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -556,7 +554,7 @@ describe('WeatherContext', () => {
       const fallbackError = new Error('Fallback weather failed');
       mockWeatherService.getWeatherByCoordinates.mockRejectedValue(fallbackError);
       
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: null,
         loading: false,
@@ -571,7 +569,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -600,7 +598,7 @@ describe('WeatherContext', () => {
 
   describe('Temperature unit conversion', () => {
     beforeEach(async () => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -615,7 +613,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
     });
 
     it('should toggle temperature unit from Fahrenheit to Celsius', async () => {
@@ -686,7 +684,7 @@ describe('WeatherContext', () => {
 
   describe('Caching and auto-refresh', () => {
     beforeEach(() => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -701,7 +699,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
     });
 
     it('should respect cache validity', async () => {
@@ -822,7 +820,7 @@ describe('WeatherContext', () => {
 
   describe('Error handling', () => {
     beforeEach(() => {
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -837,7 +835,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
     });
 
     it('should handle weather fetch errors', async () => {
@@ -931,7 +929,7 @@ describe('WeatherContext', () => {
         return <div data-testid="render-count">{renderCount}</div>;
       };
 
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -946,7 +944,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       const { rerender } = render(
         <WeatherProvider>
@@ -981,7 +979,7 @@ describe('WeatherContext', () => {
         return <div data-testid="temperature">{context?.data?.temperature || 'no-temperature'}</div>;
       };
 
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -996,7 +994,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       render(
         <WeatherProvider>
@@ -1026,7 +1024,7 @@ describe('WeatherContext', () => {
       expect(mockWeatherService.getWeatherByCoordinates).not.toHaveBeenCalled();
 
       // Update to have GPS coordinates
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: null,
         loading: false,
@@ -1041,7 +1039,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       rerender(
         <WeatherProvider>
@@ -1059,7 +1057,7 @@ describe('WeatherContext', () => {
 
     it('should refetch weather when location changes from IP to GPS', async () => {
       // Start with IP location
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: null,
         ipLocation: mockIpLocation,
         loading: false,
@@ -1074,7 +1072,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'denied',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       const { rerender } = render(
         <WeatherProvider>
@@ -1090,7 +1088,7 @@ describe('WeatherContext', () => {
       });
 
       // Update to have GPS coordinates
-      mockUseLocation.mockReturnValue({
+      mockUseLocation.mockReturnValue(createMockLocationContextValue({
         coordinates: mockCoordinates,
         ipLocation: mockIpLocation,
         loading: false,
@@ -1105,7 +1103,7 @@ describe('WeatherContext', () => {
         permissionStatus: 'granted',
         address: null,
         lastUpdated: null,
-      });
+      }));
 
       rerender(
         <WeatherProvider>

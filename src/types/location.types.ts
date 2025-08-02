@@ -62,15 +62,20 @@ export interface LocationState {
   permissionStatus: PermissionStatus;
   lastUpdated: number | null;
   initialized: boolean;
+  locationSource: 'gps' | 'ip' | null;
+  canRetryGPS: boolean;
+  gpsRetrying: boolean;
 }
 
 export interface LocationContextValue extends LocationState {
   fetchLocationData: (forceRefresh?: boolean) => Promise<void>;
   requestLocationPermission: () => Promise<void>;
+  retryGPSLocation: () => Promise<void>;
   clearError: () => void;
   hasLocation: boolean;
   hasGPSLocation: boolean;
   hasIpLocation: boolean;
+  isPreciseLocation: boolean;
 }
 
 export type PermissionStatus = 'granted' | 'denied' | 'prompt' | 'unknown' | 'unavailable';
@@ -80,13 +85,17 @@ export type LocationActionType =
   | 'SET_LOCATION_DATA'
   | 'SET_ERROR'
   | 'SET_PERMISSION_STATUS'
+  | 'SET_LOCATION_SOURCE'
+  | 'SET_GPS_RETRY_STATUS'
   | 'CLEAR_ERROR';
 
 export type LocationAction =
-  | { type: 'SET_LOCATION_DATA'; payload: LocationData }
+  | { type: 'SET_LOCATION_DATA'; payload: LocationData & { source?: 'gps' | 'ip' } }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_PERMISSION_STATUS'; payload: PermissionStatus }
+  | { type: 'SET_LOCATION_SOURCE'; payload: 'gps' | 'ip' | null }
+  | { type: 'SET_GPS_RETRY_STATUS'; payload: { canRetry: boolean; retrying: boolean } }
   | { type: 'CLEAR_ERROR' };
 
 export interface GeolocationError {

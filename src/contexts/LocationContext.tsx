@@ -121,25 +121,6 @@ export function LocationProvider({ children }: LocationProviderProps) {
             if (fullLocationData.coordinates ||
                 (fullLocationData.address?.street && !state.address?.street)) {
               
-              // Fetch elevation if we have coordinates
-              if (fullLocationData.coordinates) {
-                try {
-                  const elevationData = await locationService.fetchElevationData(
-                    fullLocationData.coordinates.latitude,
-                    fullLocationData.coordinates.longitude,
-                  );
-                  if (elevationData) {
-                    fullLocationData.coordinates.elevation = elevationData.elevation;
-                  }
-                } catch (error) {
-                  logger.warn('Failed to fetch elevation', {
-                    component: 'LocationContext',
-                    action: 'fetchLocationData',
-                    metadata: { error: (error as Error).message },
-                  });
-                }
-              }
-              
               const source = fullLocationData.coordinates ? 'gps' : 'ip';
               dispatch({ type: 'SET_LOCATION_DATA', payload: { ...fullLocationData, source } });
             }
@@ -224,27 +205,20 @@ export function LocationProvider({ children }: LocationProviderProps) {
       });
 
       const coords = await locationService.retryGPSLocation();
-      const address = await locationService.getAddressFromCoordinates(coords.latitude, coords.longitude);
       
-      // Fetch elevation
-      try {
-        const elevationData = await locationService.fetchElevationData(coords.latitude, coords.longitude);
-        if (elevationData) {
-          coords.elevation = elevationData.elevation;
-        }
-      } catch (error) {
-        logger.warn('Failed to fetch elevation during GPS retry', {
-          component: 'LocationContext',
-          action: 'retryGPSLocation',
-          metadata: { error: (error as Error).message },
-        });
+      // Get enriched location data (address + elevation)
+      const enrichedData = await locationService.enrichLocationData(coords.latitude, coords.longitude);
+      
+      // Add elevation to coordinates if available
+      if (enrichedData.elevation) {
+        coords.elevation = enrichedData.elevation.elevation;
       }
       
       dispatch({ 
         type: 'SET_LOCATION_DATA', 
         payload: { 
           coordinates: coords, 
-          address, 
+          address: enrichedData.address, 
           timestamp: timeService.getTimestamp(),
           source: 'gps',
         }, 

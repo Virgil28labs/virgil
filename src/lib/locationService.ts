@@ -206,51 +206,39 @@ export const locationService = {
     return coords;
   },
 
-  async getAddressFromCoordinates(latitude: number, longitude: number): Promise<Address> {
+  async enrichLocationData(latitude: number, longitude: number): Promise<{ address: Address; elevation: { elevation: number } | null }> {
     return retryWithBackoff(
       async () => {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
-          {
-            headers: {
-              'User-Agent': 'Virgil-App/1.0', // OpenStreetMap requires User-Agent
-            },
-          },
-        );
+        const response = await fetch(`/api/v1/location/enrich/${latitude}/${longitude}`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch address: ${response.status}`);
+          throw new Error(`Failed to fetch location data: ${response.status}`);
         }
 
         const data = await response.json();
         
         // Check if we got a valid response
-        if (!data || data.error) {
-          throw new Error(data.error || 'No address found for coordinates');
+        if (!data) {
+          throw new Error('No location data found for coordinates');
         }
 
-        const address = data.address || {};
-
-        // Handle various street name fields from OpenStreetMap
-        const streetName = address.road ||
-                          address.pedestrian ||
-                          address.footway ||
-                          address.path ||
-                          address.cycleway ||
-                          address.residential ||
-                          address.avenue ||
-                          address.street ||
-                          address.way ||
-                          '';
-
-        return {
-          street: streetName,
-          house_number: address.house_number || '',
-          city: address.city || address.town || address.village || address.suburb || '',
-          postcode: address.postcode || '',
-          country: address.country || '',
-          formatted: data.display_name || `${streetName} ${address.house_number || ''}, ${address.city || address.town || address.village || ''}, ${address.country || ''}`.trim(),
+        // Extract address data
+        const addressData = data.address || {};
+        const address: Address = {
+          street: addressData.street || '',
+          house_number: addressData.house_number || '',
+          city: addressData.city || '',
+          postcode: addressData.postcode || '',
+          country: addressData.country || '',
+          formatted: addressData.formatted || '',
         };
+
+        // Extract elevation data
+        const elevation = data.elevation ? {
+          elevation: data.elevation.meters || 0,
+        } : null;
+
+        return { address, elevation };
       },
       {
         maxRetries: 2,
@@ -260,6 +248,11 @@ export const locationService = {
         },
       },
     );
+  },
+
+  async getAddressFromCoordinates(latitude: number, longitude: number): Promise<Address> {
+    const enrichedData = await this.enrichLocationData(latitude, longitude);
+    return enrichedData.address;
   },
 
   async getIpLocation(ip?: string): Promise<IpLocation> {
@@ -370,6 +363,10 @@ export const locationService = {
       const gpsResult = await this.fetchGPSLocationData();
       if (gpsResult.coordinates) {
         locationData.coordinates = gpsResult.coordinates;
+        // Add elevation to coordinates if available
+        if (gpsResult.elevation) {
+          locationData.coordinates.elevation = gpsResult.elevation.elevation;
+        }
       }
       if (gpsResult.address) {
         locationData.address = gpsResult.address;
@@ -403,18 +400,21 @@ export const locationService = {
     }
   },
 
-  async fetchGPSLocationData(): Promise<{ coordinates?: Coordinates; address?: Address }> {
+  async fetchGPSLocationData(): Promise<{ coordinates?: Coordinates; address?: Address; elevation?: { elevation: number } }> {
     try {
       const coords = await this.getCurrentPosition();
-      const result: { coordinates?: Coordinates; address?: Address } = { coordinates: coords };
+      const result: { coordinates?: Coordinates; address?: Address; elevation?: { elevation: number } } = { coordinates: coords };
 
-      // Fetch address for the coordinates
+      // Fetch enriched location data (address + elevation) for the coordinates
       try {
-        const address = await this.getAddressFromCoordinates(coords.latitude, coords.longitude);
-        result.address = address;
+        const enrichedData = await this.enrichLocationData(coords.latitude, coords.longitude);
+        result.address = enrichedData.address;
+        if (enrichedData.elevation) {
+          result.elevation = enrichedData.elevation;
+        }
       } catch (error) {
-        // Address lookup failed - non-critical, continue without address
-        logger.error('Address lookup failed', error as Error, {
+        // Location enrichment failed - non-critical, continue without address/elevation
+        logger.error('Location enrichment failed', error as Error, {
           component: 'locationService',
           action: 'fetchGPSLocationData',
           metadata: { coords },
@@ -433,16 +433,8 @@ export const locationService = {
 
   async fetchElevationData(latitude: number, longitude: number): Promise<{ elevation: number } | null> {
     try {
-      const response = await fetch(`/api/v1/elevation/coordinates/${latitude}/${longitude}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch elevation: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return {
-        elevation: data.elevation,
-      };
+      const enrichedData = await this.enrichLocationData(latitude, longitude);
+      return enrichedData.elevation;
     } catch (error) {
       logger.error('Failed to fetch elevation data', error as Error, {
         component: 'locationService',
