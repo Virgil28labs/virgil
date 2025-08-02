@@ -1,5 +1,5 @@
 import { memo, useEffect, useCallback, useState, useRef, useMemo } from 'react';
-import './RhythmMachineViewer.css';
+import styles from './RhythmMachineViewer.module.css';
 import { rhythmService } from '../../services/rhythm/RhythmService';
 import type { RhythmPattern } from '../../services/rhythm/RhythmService';
 import { timeService } from '../../services/TimeService';
@@ -510,26 +510,26 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
 
   return (
     <div
-      className="rhythm-machine-backdrop"
+      className={styles.rhythmMachineBackdrop}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Rhythm Machine - AI-powered drum sequencer"
     >
       <div
-        className="rhythm-machine-panel"
+        className={styles.rhythmMachinePanel}
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
-        <div className="rhythm-machine-header">
+        <div className={styles.rhythmMachineHeader}>
           <div>
-            <h2 className="rhythm-machine-title">
+            <h2 className={styles.rhythmMachineTitle}>
               Rhythm Machine
             </h2>
           </div>
           <button
-            className="rhythm-machine-close"
+            className={styles.rhythmMachineClose}
             onClick={onClose}
             aria-label="Close rhythm machine"
           >
@@ -538,9 +538,9 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
         </div>
 
         {/* Content */}
-        <div className="rhythm-machine-content">
+        <div className={styles.rhythmMachineContent}>
           {/* Genre Input */}
-          <div className="rhythm-machine-genre-section">
+          <div className={styles.rhythmMachineGenreSection}>
             <input
               type="text"
               value={genreInput}
@@ -552,15 +552,15 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
                 }
               }}
               onFocus={handleUserInteraction}
-              className="rhythm-machine-genre-input"
+              className={styles.rhythmMachineGenreInput}
               placeholder="Enter genre or style..."
             />
             <button
-              className={`rhythm-machine-generate ${audioInitialized ? 'ready' : 'pending'} ${isGenerating ? 'generating' : ''}`}
+              className={`${styles.rhythmMachineGenerate} ${audioInitialized ? styles.ready : styles.pending} ${isGenerating ? styles.generating : ''}`}
               onClick={handleGenerateClick}
               disabled={isGenerating}
             >
-              <span className="rhythm-machine-generate-icon">
+              <span className={styles.rhythmMachineGenerateIcon}>
                 {isGenerating ? '⏳' : '✨'}
               </span>
               {isGenerating ? 'Generating...' : 'Generate'}
@@ -568,12 +568,12 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           </div>
 
           {/* Genre Tags */}
-          <div className="rhythm-machine-genre-tags">
-            <span className="rhythm-machine-try-label">TRY THESE:</span>
+          <div className={styles.rhythmMachineGenreTags}>
+            <span className={styles.rhythmMachineTryLabel}>TRY THESE:</span>
             {GENRE_TAGS.map((tag) => (
               <button
                 key={tag}
-                className={`rhythm-machine-genre-tag ${selectedGenre === tag ? 'active' : ''}`}
+                className={`${styles.rhythmMachineGenreTag} ${selectedGenre === tag ? styles.active : ''}`}
                 onClick={genreTagHandlers[tag]}
               >
                 {tag}
@@ -582,9 +582,9 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           </div>
 
           {/* Transport Controls */}
-          <div className="rhythm-machine-transport">
+          <div className={styles.rhythmMachineTransport}>
             <button
-              className={`rhythm-machine-play ${isPlaying ? 'playing' : ''}`}
+              className={`${styles.rhythmMachinePlay} ${isPlaying ? styles.playing : ''}`}
               onClick={handlePlaybackClick}
               aria-label={isPlaying ? 'Stop playback' : 'Start playback'}
             >
@@ -592,7 +592,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               {isPlaying ? 'Stop' : 'Play'}
             </button>
             <button
-              className="rhythm-machine-stop"
+              className={styles.rhythmMachineStop}
               onClick={async () => {
                 await handleUserInteraction();
                 if (intervalRef.current) {
@@ -607,7 +607,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               Stop
             </button>
             <button
-              className="rhythm-machine-clear"
+              className={styles.rhythmMachineClear}
               onClick={async () => {
                 await handleUserInteraction();
                 clearPattern();
@@ -619,7 +619,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           </div>
 
           {/* Tempo Control */}
-          <div className="rhythm-machine-tempo">
+          <div className={styles.rhythmMachineTempo}>
             <label>TEMPO</label>
             <input
               type="range"
@@ -628,19 +628,19 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
               value={bpm}
               onChange={(e) => setBpm(Number(e.target.value))}
               onMouseDown={handleUserInteraction}
-              className="rhythm-machine-tempo-slider"
+              className={styles.rhythmMachineTempoSlider}
             />
-            <span className="rhythm-machine-bpm-display">{bpm} BPM</span>
+            <span className={styles.rhythmMachineBpmDisplay}>{bpm} BPM</span>
           </div>
 
           {/* Bar Length Selector */}
-          <div className="rhythm-machine-bar-length">
+          <div className={styles.rhythmMachineBarLength}>
             <label>BAR LENGTH</label>
-            <div className="rhythm-machine-bar-buttons">
+            <div className={styles.rhythmMachineBarButtons}>
               {BAR_LENGTHS.map((barLength, index) => (
                 <button
                   key={index}
-                  className={`rhythm-machine-bar-button ${selectedBarLength === index ? 'active' : ''}`}
+                  className={`${styles.rhythmMachineBarButton} ${selectedBarLength === index ? styles.active : ''}`}
                   onClick={barLengthHandlers[index]}
                 >
                   {barLength.label}
@@ -650,23 +650,23 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           </div>
 
           {/* Sequencer Grid */}
-          <div className="rhythm-machine-sequencer">
+          <div className={styles.rhythmMachineSequencer}>
             {DRUM_SOUNDS.map((drum, drumIndex) => (
-              <div key={drum.name} className="rhythm-machine-drum-row">
-                <div className="rhythm-machine-drum-label">
+              <div key={drum.name} className={styles.rhythmMachineDrumRow}>
+                <div className={styles.rhythmMachineDrumLabel}>
                   <button
-                    className="rhythm-machine-drum-name"
+                    className={styles.rhythmMachineDrumName}
                     onClick={drumSoundCallbacks[drumIndex]}
                     title={`Play ${drum.name}`}
                   >
                     {drum.name}
                   </button>
                 </div>
-                <div className="rhythm-machine-steps" data-steps={currentBarLength.steps}>
+                <div className={styles.rhythmMachineSteps} data-steps={currentBarLength.steps}>
                   {stepIndices.map((stepIndex) => (
                     <button
                       key={stepIndex}
-                      className={`rhythm-machine-step ${pattern[drumIndex][stepIndex] ? 'active' : ''} ${currentStep === stepIndex ? 'current' : ''}`}
+                      className={`${styles.rhythmMachineStep} ${pattern[drumIndex][stepIndex] ? styles.active : ''} ${currentStep === stepIndex ? styles.current : ''}`}
                       onClick={async () => {
                         await handleUserInteraction();
                         toggleStep(drumIndex, stepIndex);
@@ -680,24 +680,24 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
           </div>
 
           {/* Save Slots */}
-          <div className="rhythm-machine-save-slots">
-            <span className="rhythm-machine-save-label">SAVE SLOTS:</span>
-            <div className="rhythm-machine-save-buttons">
+          <div className={styles.rhythmMachineSaveSlots}>
+            <span className={styles.rhythmMachineSaveLabel}>SAVE SLOTS:</span>
+            <div className={styles.rhythmMachineSaveButtons}>
               {saveSlotIndices.map((index) => {
                 const slot = saveSlots[index];
                 return (
-                  <div key={index} className="rhythm-machine-save-slot-container">
-                    <div className={`rhythm-machine-save-slot ${slot ? 'occupied' : 'empty'}`}>
-                      <span className="slot-number">{index + 1}</span>
+                  <div key={index} className={styles.rhythmMachineSaveSlotContainer}>
+                    <div className={`${styles.rhythmMachineSaveSlot} ${slot ? styles.occupied : styles.empty}`}>
+                      <span className={styles.slotNumber}>{index + 1}</span>
                       {slot && (
-                        <span className="slot-abbreviation">
+                        <span className={styles.slotAbbreviation}>
                           {getCategoryAbbreviation(slot.category, slot.description)}
                         </span>
                       )}
                     </div>
-                    <div className="rhythm-machine-slot-actions">
+                    <div className={styles.rhythmMachineSlotActions}>
                       <button
-                        className="slot-action save"
+                        className={`${styles.slotAction} ${styles.save}`}
                         onClick={async () => {
                           await handleUserInteraction();
                           savePattern(index);
@@ -707,7 +707,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
                         💾
                       </button>
                       <button
-                        className="slot-action load"
+                        className={`${styles.slotAction} ${styles.load}`}
                         onClick={async () => {
                           await handleUserInteraction();
                           if (slot) loadPattern(index);
@@ -718,7 +718,7 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
                         ▶️
                       </button>
                       <button
-                        className="slot-action clear"
+                        className={`${styles.slotAction} ${styles.clear}`}
                         onClick={async () => {
                           await handleUserInteraction();
                           if (slot) clearSaveSlot(index);

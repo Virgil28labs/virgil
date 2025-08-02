@@ -4,6 +4,7 @@ import { weatherService } from '../lib/weatherService';
 import { Skeleton } from './ui/skeleton';
 import { WeatherForecast } from './WeatherForecast';
 import { HOVER_DELAY_MS } from '../constants/weather.constants';
+import styles from './Dashboard.module.css';
 
 /**
  * Weather Component
@@ -47,7 +48,7 @@ export const Weather = memo(function Weather() {
   return (
     <div
       ref={componentRef}
-      className="weather-widget"
+      className={styles.weatherWidget}
       data-raccoon-collision="weather-widget"
       style={showForecast ? { zIndex: 1000 } : undefined}
       role="region"
@@ -57,29 +58,29 @@ export const Weather = memo(function Weather() {
     >
       {loading && !hasWeather ? (
         // Initial loading state
-        <div className="weather-content">
+        <div className={styles.weatherContent}>
           <Skeleton className="w-32 h-6" />
         </div>
       ) : data ? (
         // Weather data available
         <div onClick={toggleUnit} title={`${data.condition.description} - Click to toggle unit`}>
-          <div className="weather-content">
-            <div className="weather-icon-group">
-              <span className="weather-emoji" aria-hidden="true">
+          <div className={styles.weatherContent}>
+            <div className={styles.weatherIconGroup}>
+              <span className={styles.weatherEmoji} aria-hidden="true">
                 {weatherService.getWeatherEmoji(data.condition.id || 0)}
               </span>
-              <span className="weather-condition">
+              <span className={styles.weatherCondition}>
                 {data.condition.main}
               </span>
             </div>
-            <span className="weather-temp">
+            <span className={styles.weatherTemp}>
               {data.temperature}{unit === 'fahrenheit' ? '°F' : '°C'}
             </span>
             {data.airQuality && (
-              <div className="weather-aqi">
-                <span className="aqi-text">AQI</span>
+              <div className={styles.weatherAqi}>
+                <span className={styles.aqiText}>AQI</span>
                 <span 
-                  className="aqi-dot" 
+                  className={styles.aqiDot} 
                   style={{ backgroundColor: weatherService.getAQIColor(data.airQuality.aqi) }}
                   aria-hidden="true"
                 />
@@ -90,14 +91,14 @@ export const Weather = memo(function Weather() {
       ) : error && !hasWeather ? (
         // Error state - show error message in development
         <div className="weather-content" title={`Weather error: ${error}`}>
-          <span className="weather-emoji" aria-hidden="true">🌡️</span>
+          <span className={styles.weatherEmoji} aria-hidden="true">🌡️</span>
           <span className="weather-temp" style={{ opacity: 0.5 }}>
             {process.env.NODE_ENV === 'development' ? 'ERR' : '--°'}
           </span>
         </div>
       ) : (
         // Default state - show loading skeleton
-        <div className="weather-content">
+        <div className={styles.weatherContent}>
           <Skeleton className="w-32 h-6" />
         </div>
       )}

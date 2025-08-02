@@ -3,6 +3,8 @@
  * Provides hooks for tracking render performance and user interactions
  */
 
+import { timeService } from '../services/TimeService';
+
 export class PerformanceMonitor {
   private markers: Map<string, number> = new Map();
   private observers: Map<string, IntersectionObserver> = new Map();
@@ -101,7 +103,7 @@ export class PerformanceMonitor {
    * Observe element visibility for lazy loading
    */
   observeElement(element: Element, callback: (isVisible: boolean) => void): void {
-    const observerId = `observer-${Date.now()}`;
+    const observerId = `observer-${timeService.getTimestamp()}`;
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -117,8 +119,8 @@ export class PerformanceMonitor {
       },
       {
         rootMargin: '50px',
-        threshold: 0.1
-      }
+        threshold: 0.1,
+      },
     );
     
     observer.observe(element);
@@ -186,7 +188,7 @@ export class PerformanceMonitor {
       interactive: this.markers.get('interactive'),
       heroRendered: this.markers.get('hero-rendered'),
       apiLoaded: this.markers.get('api-loaded'),
-      animationsReady: this.markers.get('animations-ready')
+      animationsReady: this.markers.get('animations-ready'),
     };
   }
   
@@ -202,7 +204,7 @@ export class PerformanceMonitor {
         if (value !== undefined && window.gtag) {
           window.gtag('event', 'timing_complete', {
             name: `virgil_${name}`,
-            value: Math.round(value)
+            value: Math.round(value),
           });
         }
       });

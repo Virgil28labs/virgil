@@ -30,7 +30,7 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL to use in actions
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
@@ -102,7 +102,7 @@ export default defineConfig({
   webServer: process.env.CI ? undefined : [
     {
       command: 'npm run dev',
-      port: 5173,
+      port: 3000,
       reuseExistingServer: true,
       timeout: 120 * 1000,
     },

@@ -188,7 +188,6 @@ check_env_files() {
         
         local optional_vars=(
             "VITE_OPENWEATHERMAP_API_KEY"
-            "VITE_GOOGLE_MAPS_API_KEY"
             "ANTHROPIC_API_KEY"
         )
         

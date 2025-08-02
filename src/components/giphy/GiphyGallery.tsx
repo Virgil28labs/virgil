@@ -85,7 +85,7 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
 
   return (
     <div
-      className="giphy-gallery-backdrop"
+      className={styles.giphyGalleryBackdrop}
       onClick={onClose}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -94,20 +94,20 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
       tabIndex={-1}
     >
       <div
-        className="giphy-gallery-panel"
+        className={styles.giphyGalleryPanel}
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
-        <div className="giphy-gallery-header">
+        <div className={styles.giphyGalleryHeader}>
           <div>
-            <h2 className="giphy-gallery-title">
+            <h2 className={styles.giphyGalleryTitle}>
               <span>🎬</span>
               GIPHY Gifs
             </h2>
           </div>
           <button
-            className="giphy-gallery-close"
+            className={styles.giphyGalleryClose}
             onClick={onClose}
             aria-label="Close gallery"
           >
@@ -139,11 +139,11 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
         {/* Content Area */}
         <div className={styles.giphyGalleryContent}>
           {error && (
-            <div className="giphy-error">
-              <div className="giphy-error-icon">⚠️</div>
-              <div className="giphy-error-message">{error}</div>
+            <div className={styles.giphyError}>
+              <div className={styles.giphyErrorIcon}>⚠️</div>
+              <div className={styles.giphyErrorMessage}>{error}</div>
               <button
-                className="giphy-error-retry"
+                className={styles.giphyErrorRetry}
                 onClick={clearError}
               >
                 Dismiss
@@ -162,12 +162,12 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
 
           {/* Empty state messages */}
           {loading !== 'loading' && !error && currentGifs.length === 0 && (
-            <div className="giphy-empty">
+            <div className={styles.giphyEmpty}>
               {currentTab === 'search' ? (
                 <>
-                  <div className="giphy-empty-icon">🔍</div>
-                  <div className="giphy-empty-title">No search results</div>
-                  <div className="giphy-empty-message">
+                  <div className={styles.giphyEmptyIcon}>🔍</div>
+                  <div className={styles.giphyEmptyTitle}>No search results</div>
+                  <div className={styles.giphyEmptyMessage}>
                     {searchQuery ?
                       `No GIFs found for "${searchQuery}". Try a different search term.` :
                       'Enter a search term to find GIFs'}
@@ -175,16 +175,16 @@ const GiphyGalleryInner = memo(function GiphyGalleryInner({ isOpen, onClose }: G
                 </>
               ) : currentTab === 'trending' ? (
                 <>
-                  <div className="giphy-empty-icon">🔥</div>
-                  <div className="giphy-empty-title">No trending GIFs</div>
+                  <div className={styles.giphyEmptyIcon}>🔥</div>
+                  <div className={styles.giphyEmptyTitle}>No trending GIFs</div>
                   <div className={styles.giphyEmptyMessage}>
                     Unable to load trending GIFs. Please try again later.
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="giphy-empty-icon">❤️</div>
-                  <div className="giphy-empty-title">No favorites yet</div>
+                  <div className={styles.giphyEmptyIcon}>❤️</div>
+                  <div className={styles.giphyEmptyTitle}>No favorites yet</div>
                   <div className={styles.giphyEmptyMessage}>
                     Save GIFs to your favorites by clicking the heart icon
                   </div>

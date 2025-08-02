@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import styles from './Dashboard.module.css';
 
 interface VirgilTextLogoProps {
   onClick?: () => void
@@ -15,7 +16,7 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
   if (onClick) {
     return (
       <button
-        className="virgil-logo virgil-logo-button"
+        className={`${styles.virgilLogo} ${styles.virgilLogoButton}`}
         data-raccoon-collision="virgil-logo"
         onClick={onClick}
         aria-label="Virgil - Open user profile"
@@ -28,7 +29,7 @@ export const VirgilTextLogo = memo(function VirgilTextLogo({ onClick }: VirgilTe
   }
 
   return (
-    <div className="virgil-logo" data-raccoon-collision="virgil-logo">
+    <div className={styles.virgilLogo} data-raccoon-collision="virgil-logo">
       Virgil
     </div>
   );

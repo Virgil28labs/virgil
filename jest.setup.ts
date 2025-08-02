@@ -11,7 +11,6 @@ Object.defineProperty(globalThis, 'import', {
         VITE_LLM_API_URL: 'http://localhost:5002/api/v1',
         VITE_DOG_API_URL: 'https://dog.ceo/api/breeds/image/random',
         VITE_DOG_DOCS_URL: 'https://dog.ceo/dog-api/',
-        VITE_GOOGLE_MAPS_API_KEY: 'test-google-maps-key',
         BASE_URL: '/',
         PROD: false,
       },

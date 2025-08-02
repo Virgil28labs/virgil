@@ -2,6 +2,7 @@ import React, { memo, useState, useCallback } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyCardProps } from '../../types';
 import { logger } from '../../lib/logger';
+import styles from './GiphyGallery.module.css';
 
 export const GiphyCard = memo(function GiphyCard({
   gif,
@@ -60,7 +61,7 @@ export const GiphyCard = memo(function GiphyCard({
 
   return (
     <div
-      className="giphy-grid-item"
+      className={styles.giphyGridItem}
       onClick={onImageClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -70,7 +71,7 @@ export const GiphyCard = memo(function GiphyCard({
     >
       {/* Loading skeleton */}
       {!imageLoaded && !imageError && (
-        <div className="giphy-image-skeleton">
+        <div className={styles.giphyImageSkeleton}>
           <div
             style={{
               position: 'absolute',
@@ -85,7 +86,7 @@ export const GiphyCard = memo(function GiphyCard({
 
       {/* Error state */}
       {imageError ? (
-        <div className="giphy-image-error">
+        <div className={styles.giphyImageError}>
           <div style={{ fontSize: '3rem', opacity: 0.5 }}>🖼️</div>
           <div style={{ fontSize: '0.8rem', color: 'var(--lavender)', opacity: 0.7, marginTop: '0.5rem' }}>
             Failed to load
@@ -95,7 +96,7 @@ export const GiphyCard = memo(function GiphyCard({
         <img
           src={isHovered ? gif.url : gif.previewUrl}
           alt={gif.title || 'GIF'}
-          className="giphy-grid-image"
+          className={styles.giphyGridImage}
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
@@ -105,7 +106,7 @@ export const GiphyCard = memo(function GiphyCard({
 
       {/* Favorite overlay */}
       <button
-        className={`giphy-favorite-overlay ${isFavorited ? 'favorited' : ''}`}
+        className={`${styles.giphyFavoriteOverlay} ${isFavorited ? styles.favorited : ''}`}
         onClick={handleFavoriteToggle}
         aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
@@ -114,9 +115,9 @@ export const GiphyCard = memo(function GiphyCard({
       </button>
 
       {/* Action buttons */}
-      <div className="giphy-action-buttons">
+      <div className={styles.giphyActionButtons}>
         <button
-          className="giphy-action-btn"
+          className={styles.giphyActionBtn}
           onClick={handleDownload}
           aria-label="Download GIF"
           title="Download GIF"
@@ -124,7 +125,7 @@ export const GiphyCard = memo(function GiphyCard({
           {showDownloaded ? '✓' : '⬇️'}
         </button>
         <button
-          className="giphy-action-btn"
+          className={styles.giphyActionBtn}
           onClick={handleCopy}
           aria-label="Copy GIF URL"
           title="Copy URL"
@@ -136,7 +137,7 @@ export const GiphyCard = memo(function GiphyCard({
       {/* GIF info overlay (shows on hover) */}
       {gif.title && imageLoaded && (
         <div
-          className="giphy-info-overlay"
+          className={styles.giphyInfoOverlay}
           style={{
             position: 'absolute',
             bottom: 0,

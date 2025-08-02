@@ -2,7 +2,7 @@ import { memo, useState, useCallback } from 'react';
 import { useHabits } from '../../hooks/useHabits';
 import { HabitCard } from './HabitCard';
 import { AddHabitForm } from './AddHabitForm';
-import './MinimalHabitTracker.css';
+import styles from './MinimalHabitTracker.module.css';
 import { timeService } from '../../services/TimeService';
 
 interface MinimalHabitTrackerProps {
@@ -36,25 +36,25 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
 
   return (
     <div
-      className="habit-tracker-backdrop"
+      className={styles.habitTrackerBackdrop}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Habit Tracker"
     >
       <div
-        className="habit-tracker-panel"
+        className={styles.habitTrackerPanel}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="habit-tracker-header">
+        <div className={styles.habitTrackerHeader}>
           <h2>
-            <span className="header-icon">🔥</span>
+            <span className={styles.headerIcon}>🔥</span>
             Habit Streaks
           </h2>
-          <div className="header-actions">
+          <div className={styles.headerActions}>
             <button
-              className="reset-button"
+              className={styles.resetButton}
               onClick={() => {
                 if (window.confirm('Reset all habits and start fresh? This cannot be undone.')) {
                   localStorage.removeItem('virgil_habits');
@@ -67,7 +67,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
               ↺
             </button>
             <button
-              className="close-button"
+              className={styles.closeButton}
               onClick={onClose}
               aria-label="Close habit tracker"
             >
@@ -77,17 +77,17 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
         </div>
 
         {/* Stats Summary */}
-        <div className="habit-stats">
-          <div className="stat">
-            <span className="stat-value">{habits.length}</span>
-            <span className="stat-label">Habits</span>
+        <div className={styles.habitStats}>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{habits.length}</span>
+            <span className={styles.statLabel}>Habits</span>
           </div>
-          <div className="stat">
-            <span className="stat-value">{stats.totalCheckIns}</span>
-            <span className="stat-label">Check-ins</span>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{stats.totalCheckIns}</span>
+            <span className={styles.statLabel}>Check-ins</span>
           </div>
           <div
-            className="stat best-streak-stat"
+            className={`${styles.stat} ${styles.bestStreakStat}`}
             data-start-date={
               stats.bestStreakStartDate
                 ? `Started ${timeService.formatDateToLocal(timeService.parseDate(stats.bestStreakStartDate) || timeService.getCurrentDateTime(), {
@@ -97,14 +97,14 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
                 : ''
             }
           >
-            <span className="stat-value">{stats.currentStreak}</span>
-            <span className="stat-label">Best Streak</span>
+            <span className={styles.statValue}>{stats.currentStreak}</span>
+            <span className={styles.statLabel}>Best Streak</span>
           </div>
         </div>
 
         {/* Add Habit Form */}
         {isAddingHabit && (
-          <div className="add-habit-section">
+          <div className={styles.addHabitSection}>
             <AddHabitForm
               onAdd={handleAddHabit}
               onCancel={() => setIsAddingHabit(false)}
@@ -113,7 +113,7 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
         )}
 
         {/* Habits Grid */}
-        <div className="habits-grid">
+        <div className={styles.habitsGrid}>
           {habits.map(habit => (
             <HabitCard
               key={habit.id}
@@ -129,12 +129,12 @@ export const MinimalHabitTracker = memo(function MinimalHabitTracker({
           {/* Add new habit */}
           {habits.length < 10 && !isAddingHabit && (
             <button
-              className="add-habit-button"
+              className={styles.addHabitButton}
               onClick={() => setIsAddingHabit(true)}
               aria-label="Add new habit"
             >
-              <span className="add-icon">+</span>
-              <span className="add-text">Add New Habit</span>
+              <span className={styles.addIcon}>+</span>
+              <span className={styles.addText}>Add New Habit</span>
             </button>
           )}
         </div>

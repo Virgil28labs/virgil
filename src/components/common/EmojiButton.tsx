@@ -103,6 +103,7 @@ export const EmojiButton: FC<EmojiButtonProps> = ({
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
           className,
         )}
+        data-raccoon-collision="emoji-button-interactive"
         style={buttonStyles}
         aria-label={ariaLabel}
         title={title}

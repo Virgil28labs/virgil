@@ -6,7 +6,7 @@ import { NasaApodTabs, type NasaTabType } from './NasaApodTabs';
 import { NasaApodGallery } from './NasaApodGallery';
 import { NasaApodImageView } from './NasaApodImageView';
 import { NasaApodModal } from './NasaApodModal';
-import './NasaApodViewer.css';
+import styles from './NasaApodViewer.module.css';
 import { logger } from '../../lib/logger';
 import { timeService } from '../../services/TimeService';
 
@@ -138,27 +138,27 @@ export const NasaApodViewer = memo(function NasaApodViewer({
 
   return (
     <div
-      className="nasa-apod-backdrop"
+      className={styles.nasaApodBackdrop}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="NASA Astronomy Picture of the Day"
     >
       <div
-        className="nasa-apod-panel"
+        className={styles.nasaApodPanel}
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
-        <div className="nasa-apod-header">
+        <div className={styles.nasaApodHeader}>
           <div>
-            <h2 className="nasa-apod-title">
+            <h2 className={styles.nasaApodTitle}>
               <span>🔭</span>
               Astronomy Picture of the Day
             </h2>
           </div>
           <button
-            className="nasa-apod-close"
+            className={styles.nasaApodClose}
             onClick={onClose}
             aria-label="Close APOD viewer"
           >
@@ -174,7 +174,7 @@ export const NasaApodViewer = memo(function NasaApodViewer({
         />
 
         {/* Content Area */}
-        <div className="nasa-apod-content">
+        <div className={styles.nasaApodContent}>
           {activeTab === 'gallery' ? (
             <NasaApodGallery
               favorites={favorites}
@@ -184,15 +184,15 @@ export const NasaApodViewer = memo(function NasaApodViewer({
           ) : (
             <>
               {/* Title and Date Picker Header */}
-              <div className="nasa-apod-controls">
-                <div className="nasa-apod-header-content">
+              <div className={styles.nasaApodControls}>
+                <div className={styles.nasaApodHeaderContent}>
                   {currentApod && (
-                    <h3 className="nasa-apod-control-title">{currentApod.title}</h3>
+                    <h3 className={styles.nasaApodControlTitle}>{currentApod.title}</h3>
                   )}
-                  <div className="nasa-apod-date-wrapper">
+                  <div className={styles.nasaApodDateWrapper}>
                     <input
                       type="date"
-                      className="nasa-apod-date-input"
+                      className={styles.nasaApodDateInput}
                       value={selectedDate}
                       onChange={handleDateChange}
                       min="1995-06-16"
@@ -205,11 +205,11 @@ export const NasaApodViewer = memo(function NasaApodViewer({
               </div>
 
               {error ? (
-                <div className="nasa-apod-error">
-                  <div className="nasa-apod-error-icon">⚠️</div>
-                  <div className="nasa-apod-error-message">{error}</div>
+                <div className={styles.nasaApodError}>
+                  <div className={styles.nasaApodErrorIcon}>⚠️</div>
+                  <div className={styles.nasaApodErrorMessage}>{error}</div>
                   <button
-                    className="nasa-apod-error-retry"
+                    className={styles.nasaApodErrorRetry}
                     onClick={loadTodaysApod}
                     disabled={loading}
                   >
@@ -217,9 +217,9 @@ export const NasaApodViewer = memo(function NasaApodViewer({
                   </button>
                 </div>
               ) : loading && !currentApod ? (
-                <div className="nasa-apod-loading">
-                  <div className="nasa-apod-loading-spinner" />
-                  <div className="nasa-apod-loading-text">Loading today's cosmic wonder...</div>
+                <div className={styles.nasaApodLoading}>
+                  <div className={styles.nasaApodLoadingSpinner} />
+                  <div className={styles.nasaApodLoadingText}>Loading today's cosmic wonder...</div>
                 </div>
               ) : currentApod ? (
                 <>
@@ -234,23 +234,23 @@ export const NasaApodViewer = memo(function NasaApodViewer({
 
                   {/* Expandable Description */}
                   {currentApod.explanation && (
-                    <div className="nasa-apod-description">
+                    <div className={styles.nasaApodDescription}>
                       {descriptionExpanded ? (
-                        <p className="nasa-apod-description-full">
+                        <p className={styles.nasaApodDescriptionFull}>
                           {currentApod.explanation}
                         </p>
                       ) : (
-                        <p className="nasa-apod-description-preview">
+                        <p className={styles.nasaApodDescriptionPreview}>
                           {currentApod.explanation}
                         </p>
                       )}
                       <button
-                        className={`nasa-apod-description-toggle ${descriptionExpanded ? 'expanded' : ''}`}
+                        className={`${styles.nasaApodDescriptionToggle} ${descriptionExpanded ? styles.expanded : ''}`}
                         onClick={toggleDescription}
                         aria-label={descriptionExpanded ? 'Show less description' : 'Show full description'}
                       >
                         <span>{descriptionExpanded ? 'Show less' : 'Read more'}</span>
-                        <span className="nasa-apod-description-toggle-icon">▼</span>
+                        <span className={styles.nasaApodDescriptionToggleIcon}>▼</span>
                       </button>
                     </div>
                   )}

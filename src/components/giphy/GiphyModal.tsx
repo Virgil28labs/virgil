@@ -2,6 +2,7 @@ import React, { memo, useEffect, useCallback, useState } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type { GiphyModalProps } from '../../types/giphy.types';
 import { logger } from '../../lib/logger';
+import styles from './GiphyGallery.module.css';
 
 export const GiphyModal = memo(function GiphyModal({
   gifs,
@@ -152,7 +153,7 @@ export const GiphyModal = memo(function GiphyModal({
 
   return (
     <div
-      className="giphy-image-modal"
+      className={styles.giphyImageModal}
       onClick={(e) => {
         e.stopPropagation();
         onClose();

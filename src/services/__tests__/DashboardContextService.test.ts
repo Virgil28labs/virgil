@@ -247,12 +247,17 @@ describe('DashboardContextService', () => {
         permissionStatus: 'granted',
         lastUpdated: Date.now(),
         initialized: true,
+        locationSource: 'gps',
+        canRetryGPS: false,
+        gpsRetrying: false,
         fetchLocationData: jest.fn(),
+        retryGPSLocation: jest.fn(),
         requestLocationPermission: jest.fn(),
         clearError: jest.fn(),
         hasLocation: true,
         hasGPSLocation: true,
         hasIpLocation: true,
+        isPreciseLocation: true,
       };
       
       service.updateLocationContext(locationData);

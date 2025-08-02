@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor, within, act } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Dashboard } from '../Dashboard';
 import { AllTheProviders } from '../../test-utils/AllTheProviders';
@@ -123,15 +123,6 @@ jest.mock('../VectorMemoryButton', () => ({
   VectorMemoryButton: () => <button data-testid="memory-button">🧠</button>,
 }));
 
-jest.mock('../maps/GoogleMapsModal', () => ({
-  GoogleMapsModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => 
-    isOpen ? (
-      <div data-testid="maps-modal">
-        Maps Modal
-        <button onClick={onClose}>Close</button>
-      </div>
-    ) : null,
-}));
 
 jest.mock('../common/SectionErrorBoundary', () => ({
   SectionErrorBoundary: ({ children, sectionName, fallback: _fallback, ...props }: { children: React.ReactNode; sectionName: string; fallback?: React.ReactNode; [key: string]: unknown }) => (
@@ -230,12 +221,17 @@ describe('Dashboard', () => {
     permissionStatus: 'granted' as const,
     lastUpdated: Date.now(),
     initialized: true,
+    locationSource: 'gps' as const,
+    canRetryGPS: false,
+    gpsRetrying: false,
     fetchLocationData: jest.fn(),
     requestLocationPermission: jest.fn(),
+    retryGPSLocation: jest.fn(),
     clearError: jest.fn(),
     hasLocation: true,
     hasGPSLocation: true,
     hasIpLocation: true,
+    isPreciseLocation: true,
   };
 
   const defaultDeviceInfo = {
@@ -431,24 +427,6 @@ describe('Dashboard', () => {
       expect(screen.getByTestId('profile-viewer')).toBeInTheDocument();
     });
 
-    it('opens and closes maps modal', async () => {
-      renderDashboard();
-      
-      // Find and click the location address element (it has class "street-address clickable")
-      const locationButton = screen.getByTitle('Click to view on map');
-      await userEvent.click(locationButton);
-      
-      expect(screen.getByTestId('maps-modal')).toBeInTheDocument();
-      
-      // Close modal - find the close button within the maps modal
-      const mapsModal = screen.getByTestId('maps-modal');
-      const closeButton = within(mapsModal).getByText('Close');
-      await userEvent.click(closeButton);
-      
-      await waitFor(() => {
-        expect(screen.queryByTestId('maps-modal')).not.toBeInTheDocument();
-      });
-    });
 
     it('toggles elevation unit preference', async () => {
       renderDashboard();
@@ -486,6 +464,111 @@ describe('Dashboard', () => {
           action: 'handleUnitChange',
         }),
       );
+    });
+
+    it('shows GPS retry button when location is imprecise and can retry', async () => {
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: false,
+        canRetryGPS: true,
+        locationSource: 'ip',
+      });
+      
+      renderDashboard();
+      
+      const retryButton = screen.getByLabelText('Retry GPS location');
+      expect(retryButton).toBeInTheDocument();
+      expect(retryButton).toHaveTextContent('🔄');
+    });
+
+    it('handles GPS retry correctly', async () => {
+      const mockRetryGPS = jest.fn().mockResolvedValue(undefined);
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: false,
+        canRetryGPS: true,
+        locationSource: 'ip',
+        retryGPSLocation: mockRetryGPS,
+      });
+      
+      renderDashboard();
+      
+      const retryButton = screen.getByLabelText('Retry GPS location');
+      await userEvent.click(retryButton);
+      
+      expect(mockRetryGPS).toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith('GPS retry successful from Dashboard', {
+        component: 'Dashboard',
+        action: 'handleRetryGPS',
+      });
+    });
+
+    it('handles GPS retry error', async () => {
+      const mockError = new Error('GPS retry failed');
+      const mockRetryGPS = jest.fn().mockRejectedValue(mockError);
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: false,
+        canRetryGPS: true,
+        locationSource: 'ip',
+        retryGPSLocation: mockRetryGPS,
+      });
+      
+      renderDashboard();
+      
+      const retryButton = screen.getByLabelText('Retry GPS location');
+      await userEvent.click(retryButton);
+      
+      expect(mockRetryGPS).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith('GPS retry failed from Dashboard', mockError, {
+        component: 'Dashboard',
+        action: 'handleRetryGPS',
+      });
+    });
+
+    it('shows retrying state during GPS retry', () => {
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: false,
+        canRetryGPS: true,
+        gpsRetrying: true,
+        locationSource: 'ip',
+      });
+      
+      renderDashboard();
+      
+      const retryButton = screen.getByLabelText('Getting precise location...');
+      expect(retryButton).toBeInTheDocument();
+      expect(retryButton).toHaveTextContent('⏳');
+      expect(retryButton).toBeDisabled();
+    });
+
+    it('shows precise location indicator for GPS location', () => {
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: true,
+        locationSource: 'gps',
+      });
+      
+      renderDashboard();
+      
+      const accuracyIndicator = screen.getByTitle('GPS location (precise)');
+      expect(accuracyIndicator).toBeInTheDocument();
+      expect(accuracyIndicator).toHaveTextContent('🎯');
+    });
+
+    it('shows approximate location indicator for IP location', () => {
+      mockUseLocation.mockReturnValue({
+        ...defaultLocationData,
+        isPreciseLocation: false,
+        locationSource: 'ip',
+      });
+      
+      renderDashboard();
+      
+      const accuracyIndicator = screen.getByTitle('IP location (approximate)');
+      expect(accuracyIndicator).toBeInTheDocument();
+      expect(accuracyIndicator).toHaveTextContent('📡');
     });
   });
 
@@ -544,7 +627,7 @@ describe('Dashboard', () => {
       
       // Should render appropriate mobile layout
       const dashboard = screen.getByTestId('dashboard-container');
-      expect(dashboard).toHaveClass('mobile-layout');
+      expect(dashboard).toHaveClass('mobileLayout');
     });
 
     it('handles missing location data gracefully', () => {
@@ -568,8 +651,8 @@ describe('Dashboard', () => {
       renderDashboard();
       
       // All major sections should be wrapped in SectionErrorBoundary
-      // Looking at Dashboard.tsx: Weather (line 158), Mascot (line 281), Maps (line 324)
-      expect(screen.getAllByTestId('section-error-boundary')).toHaveLength(3);
+      // Looking at Dashboard.tsx: Weather and Mascot sections
+      expect(screen.getAllByTestId('section-error-boundary')).toHaveLength(2);
     });
 
     it('handles component errors gracefully', () => {
@@ -580,7 +663,7 @@ describe('Dashboard', () => {
       // For now, just verify error boundaries are present
       renderDashboard();
       
-      expect(screen.getAllByTestId('section-error-boundary')).toHaveLength(3);
+      expect(screen.getAllByTestId('section-error-boundary')).toHaveLength(2);
     });
   });
 

@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import styles from './NasaApodViewer.module.css';
 
 export type NasaTabType = 'browse' | 'gallery'
 
@@ -14,27 +15,27 @@ export const NasaApodTabs = memo(function NasaApodTabs({
   onTabChange,
 }: NasaApodTabsProps) {
   return (
-    <div className="nasa-apod-tabs" role="tablist">
+    <div className={styles.nasaApodTabs} role="tablist">
       <button
-        className={`nasa-apod-tab ${activeTab === 'browse' ? 'active' : ''}`}
+        className={`${styles.nasaApodTab} ${activeTab === 'browse' ? styles.active : ''}`}
         onClick={() => onTabChange('browse')}
         role="tab"
         aria-selected={activeTab === 'browse'}
         aria-controls="browse-panel"
         title="Browse daily APOD images"
       >
-        <span className="nasa-apod-tab-icon">🔭</span>
+        <span className={styles.nasaApodTabIcon}>🔭</span>
         <span>Browse</span>
       </button>
       <button
-        className={`nasa-apod-tab ${activeTab === 'gallery' ? 'active' : ''}`}
+        className={`${styles.nasaApodTab} ${activeTab === 'gallery' ? styles.active : ''}`}
         onClick={() => onTabChange('gallery')}
         role="tab"
         aria-selected={activeTab === 'gallery'}
         aria-controls="gallery-panel"
         title="View your favorite APOD images"
       >
-        <span className="nasa-apod-tab-icon">❤️</span>
+        <span className={styles.nasaApodTabIcon}>❤️</span>
         <span>
           Favorites {favoritesCount > 0 && `(${favoritesCount})`}
         </span>

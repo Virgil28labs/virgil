@@ -11,6 +11,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Virgil</title>
+    <style>
+      /* Inline critical CSS for immediate render */
+      :root {
+        --deep-plum: #39293e;
+        --off-white: #f5f5f5;
+        --silver-grey: #b3b3b3;
+        --violet-purple: #6c3baa;
+        --soft-pink: #efb0c2;
+        --lavender: #b2a5c1;
+      }
+      body {
+        margin: 0;
+        background: #39293e;
+        color: #f5f5f5;
+        font-family: 'Montserrat', sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+      .loading-screen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

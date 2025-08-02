@@ -44,7 +44,7 @@ export function criticalCSSPlugin() {
     
     // Error boundaries
     '.error-boundary',
-    '.section-error'
+    '.section-error',
   ];
 
   return {
@@ -64,8 +64,8 @@ export function criticalCSSPlugin() {
           code,
           map: null,
           meta: {
-            critical: true
-          }
+            critical: true,
+          },
         };
       }
       
@@ -94,10 +94,10 @@ export function criticalCSSPlugin() {
         this.emitFile({
           type: 'asset',
           fileName: 'critical.css',
-          source: criticalCSS.join('\n')
+          source: criticalCSS.join('\n'),
         });
       }
-    }
+    },
   };
 }
 

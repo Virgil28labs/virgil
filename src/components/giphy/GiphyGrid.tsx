@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { GiphyCard } from './GiphyCard';
 import type { GiphyGridProps } from '../../types/giphy.types';
+import styles from './GiphyGallery.module.css';
 
 export const GiphyGrid = memo(function GiphyGrid({
   gifs,
@@ -13,9 +14,9 @@ export const GiphyGrid = memo(function GiphyGrid({
   // Show loading state
   if (loading && gifs.length === 0) {
     return (
-      <div className="giphy-loading">
-        <div className="giphy-loading-spinner" />
-        <div className="giphy-loading-text">Loading GIFs...</div>
+      <div className={styles.giphyLoading}>
+        <div className={styles.giphyLoadingSpinner} />
+        <div className={styles.giphyLoadingText}>Loading GIFs...</div>
       </div>
     );
   }
@@ -26,7 +27,7 @@ export const GiphyGrid = memo(function GiphyGrid({
   }
 
   return (
-    <div className="giphy-grid">
+    <div className={styles.giphyGrid}>
       {gifs.map((gif, index) => (
         <GiphyCard
           key={gif.id}
@@ -40,8 +41,8 @@ export const GiphyGrid = memo(function GiphyGrid({
 
       {/* Loading more indicator */}
       {loading && gifs.length > 0 && (
-        <div className="giphy-loading-more">
-          <div className="giphy-loading-spinner" />
+        <div className={styles.giphyLoadingMore}>
+          <div className={styles.giphyLoadingSpinner} />
         </div>
       )}
     </div>

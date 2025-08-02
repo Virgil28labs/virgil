@@ -17,7 +17,7 @@ async function globalSetup(config: FullConfig) {
     const page = await context.newPage();
     
     // Verify the application is running
-    const baseURL = config.webServer?.url || 'http://localhost:5173';
+    const baseURL = config.webServer?.url || 'http://localhost:3000';
     console.log(`📡 Checking application at ${baseURL}...`);
     
     try {

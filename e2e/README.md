@@ -161,7 +161,7 @@ test('accessibility', async ({ page }) => {
 See `playwright.config.ts` for all configuration options.
 
 ### Environment Variables
-- `PLAYWRIGHT_BASE_URL`: Base URL for tests (default: http://localhost:5173)
+- `PLAYWRIGHT_BASE_URL`: Base URL for tests (default: http://localhost:3000)
 - `CI`: Set to true for CI-specific behavior
 
 ## Reports

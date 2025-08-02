@@ -7,7 +7,6 @@ export * from './giphy.types';
 export * from './habit.types';
 export * from './location.types';
 export * from './llm.types';
-export * from './maps.types';
 export * from './nasa.types';
 export * from './physics.types';
 export * from './ui.types';

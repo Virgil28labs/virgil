@@ -161,6 +161,7 @@ function VirgilChatbotInner() {
     return (
       <button
         className={styles.virgilChatbotBubble}
+        data-raccoon-collision="virgil-chatbot-bubble"
         onClick={() => setOpen(true)}
         title="Chat with Virgil AI Assistant"
         aria-label="Open chat with Virgil AI Assistant"
@@ -210,7 +211,7 @@ function VirgilChatbotInner() {
         createSystemPrompt={createSystemPromptSync}
       />
 
-      <div aria-label="Chat conversation" role="log" aria-live="polite">
+      <div className={styles.chatConversation} aria-label="Chat conversation" role="log" aria-live="polite">
         <ChatMessages
           messages={state.messages}
           error={state.error}
@@ -228,7 +229,7 @@ function VirgilChatbotInner() {
         )}
       </div>
 
-      <div role="region" aria-label="Message input">
+      <div className={styles.inputArea} role="region" aria-label="Message input">
         <ChatInput
           input={state.input}
           onInputChange={setInput}

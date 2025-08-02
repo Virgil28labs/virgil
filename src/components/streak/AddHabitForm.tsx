@@ -2,6 +2,7 @@ import React, { memo, useState, useCallback, useRef, useEffect, useMemo } from '
 import { EmojiSuggestions } from './EmojiSuggestions';
 import { EmojiPicker } from './EmojiPicker';
 import { EMOJI_DATABASE } from '../../data/habitEmojis';
+import styles from './MinimalHabitTracker.module.css';
 
 interface AddHabitFormProps {
   onAdd: (name: string, emoji: string) => void
@@ -67,11 +68,11 @@ export const AddHabitForm = memo(function AddHabitForm({
 
   return (
     <form
-      className="add-habit-form"
+      className={styles.addHabitForm}
       onSubmit={handleSubmit}
       onKeyDown={handleKeyDown}
     >
-      <div className="form-inputs">
+      <div className={styles.formInputs}>
         <input
           ref={inputRef}
           type="text"
@@ -79,12 +80,12 @@ export const AddHabitForm = memo(function AddHabitForm({
           onChange={handleNameChange}
           placeholder="What habit do you want to build?"
           maxLength={30}
-          className="habit-name-input"
+          className={styles.habitNameInput}
         />
 
         <button
           type="button"
-          className={`emoji-picker-button ${displayEmoji ? 'has-emoji' : 'empty'}`}
+          className={`${styles.emojiPickerButton} ${displayEmoji ? styles.hasEmoji : styles.empty}`}
           onClick={() => setShowEmojiPicker(true)}
           aria-label="Choose emoji"
           title="Click to choose emoji"
@@ -93,25 +94,25 @@ export const AddHabitForm = memo(function AddHabitForm({
         </button>
       </div>
 
-      <div className="form-actions">
+      <div className={styles.formActions}>
         <button
           type="button"
           onClick={onCancel}
-          className="btn-cancel"
+          className={styles.btnCancel}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={!name.trim()}
-          className="btn-add"
+          className={styles.btnAdd}
         >
           Create Habit
         </button>
       </div>
 
       {showSuggestions && (
-        <div className="suggestions-wrapper">
+        <div className={styles.suggestionsWrapper}>
           <EmojiSuggestions
             searchTerm={name}
             onSelect={handleEmojiSelect}

@@ -13,137 +13,89 @@ export interface TimeUpdate {
   dateObject: Date;
 }
 
+// Time constants
+const TIME_CONSTANTS = {
+  MINUTE_MS: 60 * 1000,
+  HOUR_MS: 60 * 60 * 1000,
+  DAY_MS: 24 * 60 * 60 * 1000,
+  WEEK_MS: 7 * 24 * 60 * 60 * 1000,
+  CACHE_DURATION: 60 * 1000,
+} as const;
+
+// Relative time units for formatting
+const RELATIVE_TIME_UNITS = [
+  { threshold: 60, divisor: 1, unit: 'second' },
+  { threshold: 3600, divisor: 60, unit: 'minute' },
+  { threshold: 86400, divisor: 3600, unit: 'hour' },
+  { threshold: 604800, divisor: 86400, unit: 'day' },
+  { threshold: 2592000, divisor: 604800, unit: 'week' },
+  { threshold: 31536000, divisor: 2592000, unit: 'month' },
+  { threshold: Infinity, divisor: 31536000, unit: 'year' },
+] as const;
+
 export class TimeService {
   private timeListeners: ((time: TimeUpdate) => void)[] = [];
   private mainTimer?: NodeJS.Timeout;
-
-  // Memoized formatters for performance
-  private readonly timeFormatter: Intl.DateTimeFormat;
-  private readonly dateFormatter: Intl.DateTimeFormat;
-  private readonly dayFormatter: Intl.DateTimeFormat;
-
-  // Cache for frequently called methods (cleared every minute)
   private localDateCache: { date: string; timestamp: number } | null = null;
 
-  // Performance optimization: Pre-calculate constants
-  private static readonly MINUTE_MS = 60 * 1000;
-  private static readonly HOUR_MS = 60 * 60 * 1000;
-  private static readonly DAY_MS = 24 * 60 * 60 * 1000;
-
-  constructor() {
-    // Initialize memoized formatters
-    this.timeFormatter = new Intl.DateTimeFormat('en-US', {
+  // Memoized formatters for performance
+  private readonly formatters = {
+    time: new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-    });
-
-    this.dateFormatter = new Intl.DateTimeFormat('en-US', {
+    }),
+    date: new Intl.DateTimeFormat('en-US', {
       month: 'long',
       day: 'numeric',
       year: 'numeric',
-    });
-
-    this.dayFormatter = new Intl.DateTimeFormat('en-US', {
+    }),
+    day: new Intl.DateTimeFormat('en-US', {
       weekday: 'long',
-    });
+    }),
+  };
 
+  constructor() {
     this.startTimer();
   }
 
-  /**
-   * Get current date in local YYYY-MM-DD format
-   * @returns Local date string (e.g., "2024-01-15")
-   */
+  // ==========================================
+  // CORE METHODS
+  // ==========================================
+
   getLocalDate(): string {
     const now = Date.now();
-
-    // Check cache (valid for 60 seconds)
-    if (this.localDateCache && (now - this.localDateCache.timestamp) < TimeService.MINUTE_MS) {
+    if (this.localDateCache && (now - this.localDateCache.timestamp) < TIME_CONSTANTS.CACHE_DURATION) {
       return this.localDateCache.date;
     }
-
-    // Generate new date and cache it
     const date = this.formatDateToLocal(new Date(now));
     this.localDateCache = { date, timestamp: now };
     return date;
   }
 
-  /**
-   * Format any date to local YYYY-MM-DD format, or with custom options
-   * @param date Date object to format
-   * @param options Optional Intl.DateTimeFormat options for custom formatting
-   * @returns Local date string (e.g., "2024-01-15" or "Jan 15, 2024")
-   */
   formatDateToLocal(date: Date, options?: Intl.DateTimeFormatOptions): string {
     if (options) {
       return new Intl.DateTimeFormat('en-US', options).format(date);
     }
-    // Default YYYY-MM-DD format for backward compatibility
+    // Default YYYY-MM-DD format
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
-  /**
-   * Get current Date object (local timezone)
-   * @returns Current local Date object
-   */
-  getCurrentDateTime(): Date {
-    return new Date(); // Always return current time, not cached
-  }
+  getCurrentDateTime = (): Date => new Date();
+  getTimestamp = (): number => Date.now();
 
-  /**
-   * Get current timestamp
-   * @returns Current timestamp in milliseconds
-   */
-  getTimestamp(): number {
-    return Date.now(); // Always return current timestamp, not cached
-  }
-
-  /**
-   * Format a date for display purposes
-   * @param date Date to format (optional, defaults to current date)
-   * @returns Formatted date string
-   */
   formatDate(date?: Date): string {
     const dateObj = date || new Date();
-    // Handle invalid dates gracefully
-    if (!this.isValidDate(dateObj)) {
-      return 'Invalid Date';
-    }
-    return this.dateFormatter.format(dateObj);
+    return this.isValidDate(dateObj) ? this.formatters.date.format(dateObj) : 'Invalid Date';
   }
 
-  /**
-   * Get current time in HH:MM format
-   * @returns Time string (e.g., "14:30")
-   */
-  getCurrentTime(): string {
-    return this.timeFormatter.format(new Date());
-  }
+  getCurrentTime = (): string => this.formatters.time.format(new Date());
+  getCurrentDate = (): string => this.formatters.date.format(new Date());
+  getDayOfWeek = (): string => this.formatters.day.format(new Date()).toLowerCase();
 
-  /**
-   * Get current date for display
-   * @returns Date string (e.g., "January 20, 2024")
-   */
-  getCurrentDate(): string {
-    return this.dateFormatter.format(new Date());
-  }
-
-  /**
-   * Get current day of week
-   * @returns Day string (e.g., "monday")
-   */
-  getDayOfWeek(): string {
-    return this.dayFormatter.format(new Date()).toLowerCase();
-  }
-
-  /**
-   * Get time of day category
-   * @returns Time period
-   */
   getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return 'morning';
@@ -152,41 +104,32 @@ export class TimeService {
     return 'night';
   }
 
-  /**
-   * Subscribe to real-time time updates (1-second precision)
-   * @param callback Function called with time updates
-   * @returns Unsubscribe function
-   */
+  // ==========================================
+  // SUBSCRIPTION MANAGEMENT
+  // ==========================================
+
   subscribeToTimeUpdates(callback: (time: TimeUpdate) => void): () => void {
     this.timeListeners.push(callback);
-
-    // Return unsubscribe function
     return () => {
       this.timeListeners = this.timeListeners.filter(listener => listener !== callback);
     };
   }
 
-  /**
-   * Start the internal timer for time updates
-   */
   private startTimer(): void {
-    // Only run timer if there are listeners
     if (!this.mainTimer) {
       this.mainTimer = setInterval(() => {
         if (this.timeListeners.length > 0) {
           const now = new Date();
           const timeUpdate: TimeUpdate = {
-            currentTime: this.timeFormatter.format(now),
-            currentDate: this.dateFormatter.format(now),
+            currentTime: this.formatters.time.format(now),
+            currentDate: this.formatters.date.format(now),
             dateObject: now,
           };
-
-          // Use for...of for better performance
           for (const callback of this.timeListeners) {
             try {
               callback(timeUpdate);
             } catch (_error) {
-              // Silent fail for callback errors to prevent cascade failures
+              // Silent fail to prevent cascade failures
             }
           }
         }
@@ -195,253 +138,89 @@ export class TimeService {
   }
 
   // ==========================================
-  // DATE COMPONENT EXTRACTION METHODS
+  // DATE COMPONENT EXTRACTION
   // ==========================================
 
-  /**
-   * Get the year from a date
-   * @param date Date to extract year from (optional, defaults to now)
-   * @returns Full year (e.g., 2024)
-   */
-  getYear(date?: Date): number {
-    return (date || new Date()).getFullYear();
-  }
-
-  /**
-   * Get the month from a date (1-12, not 0-11 like native JS)
-   * @param date Date to extract month from (optional, defaults to now)
-   * @returns Month number 1-12
-   */
-  getMonth(date?: Date): number {
-    return (date || new Date()).getMonth() + 1;
-  }
-
-  /**
-   * Get the day of month from a date
-   * @param date Date to extract day from (optional, defaults to now)
-   * @returns Day of month 1-31
-   */
-  getDay(date?: Date): number {
-    return (date || new Date()).getDate();
-  }
-
-  /**
-   * Get the hours from a date
-   * @param date Date to extract hours from (optional, defaults to now)
-   * @returns Hours 0-23
-   */
-  getHours(date?: Date): number {
-    return (date || new Date()).getHours();
-  }
-
-  /**
-   * Get the minutes from a date
-   * @param date Date to extract minutes from (optional, defaults to now)
-   * @returns Minutes 0-59
-   */
-  getMinutes(date?: Date): number {
-    return (date || new Date()).getMinutes();
-  }
-
-  /**
-   * Get the seconds from a date
-   * @param date Date to extract seconds from (optional, defaults to now)
-   * @returns Seconds 0-59
-   */
-  getSeconds(date?: Date): number {
-    return (date || new Date()).getSeconds();
-  }
-
-  /**
-   * Clean up resources
-   */
-  destroy(): void {
-    if (this.mainTimer) {
-      clearInterval(this.mainTimer);
-      this.mainTimer = undefined;
+  getDatePart(date: Date | undefined, part: 'year' | 'month' | 'day' | 'hours' | 'minutes' | 'seconds'): number {
+    const d = date || new Date();
+    switch (part) {
+      case 'year': return d.getFullYear();
+      case 'month': return d.getMonth() + 1; // Return 1-12
+      case 'day': return d.getDate();
+      case 'hours': return d.getHours();
+      case 'minutes': return d.getMinutes();
+      case 'seconds': return d.getSeconds();
     }
-    this.timeListeners = [];
-    this.localDateCache = null;
   }
 
+  // Convenience methods for backward compatibility
+  getYear = (date?: Date): number => this.getDatePart(date, 'year');
+  getMonth = (date?: Date): number => this.getDatePart(date, 'month');
+  getDay = (date?: Date): number => this.getDatePart(date, 'day');
+  getHours = (date?: Date): number => this.getDatePart(date, 'hours');
+  getMinutes = (date?: Date): number => this.getDatePart(date, 'minutes');
+  getSeconds = (date?: Date): number => this.getDatePart(date, 'seconds');
+
   // ==========================================
-  // DATE ARITHMETIC METHODS
+  // DATE ARITHMETIC
   // ==========================================
 
-  /**
-   * Add days to a date
-   * @param date Source date
-   * @param days Number of days to add
-   * @returns New Date object
-   */
   addDays(date: Date, days: number): Date {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
   }
 
-  /**
-   * Subtract days from a date
-   * @param date Source date
-   * @param days Number of days to subtract
-   * @returns New Date object
-   */
-  subtractDays(date: Date, days: number): Date {
-    return this.addDays(date, -days);
-  }
-
-  /**
-   * Add months to a date
-   * @param date Source date
-   * @param months Number of months to add
-   * @returns New Date object
-   */
   addMonths(date: Date, months: number): Date {
     const result = new Date(date);
     result.setMonth(result.getMonth() + months);
     return result;
   }
 
-  /**
-   * Subtract months from a date
-   * @param date Source date
-   * @param months Number of months to subtract
-   * @returns New Date object
-   */
-  subtractMonths(date: Date, months: number): Date {
-    return this.addMonths(date, -months);
-  }
-
-  /**
-   * Add years to a date
-   * @param date Source date
-   * @param years Number of years to add
-   * @returns New Date object
-   */
   addYears(date: Date, years: number): Date {
     const result = new Date(date);
     result.setFullYear(result.getFullYear() + years);
     return result;
   }
 
-  /**
-   * Subtract years from a date
-   * @param date Source date
-   * @param years Number of years to subtract
-   * @returns New Date object
-   */
-  subtractYears(date: Date, years: number): Date {
-    return this.addYears(date, -years);
-  }
+  addHours = (date: Date, hours: number): Date => 
+    new Date(date.getTime() + hours * TIME_CONSTANTS.HOUR_MS);
 
-  /**
-   * Add hours to a date
-   * @param date Source date
-   * @param hours Number of hours to add
-   * @returns New Date object
-   */
-  addHours(date: Date, hours: number): Date {
-    return new Date(date.getTime() + hours * TimeService.HOUR_MS);
-  }
+  addMinutes = (date: Date, minutes: number): Date => 
+    new Date(date.getTime() + minutes * TIME_CONSTANTS.MINUTE_MS);
 
-  /**
-   * Subtract hours from a date
-   * @param date Source date
-   * @param hours Number of hours to subtract
-   * @returns New Date object
-   */
-  subtractHours(date: Date, hours: number): Date {
-    return this.addHours(date, -hours);
-  }
-
-  /**
-   * Add minutes to a date
-   * @param date Source date
-   * @param minutes Number of minutes to add
-   * @returns New Date object
-   */
-  addMinutes(date: Date, minutes: number): Date {
-    return new Date(date.getTime() + minutes * TimeService.MINUTE_MS);
-  }
-
-  /**
-   * Subtract minutes from a date
-   * @param date Source date
-   * @param minutes Number of minutes to subtract
-   * @returns New Date object
-   */
-  subtractMinutes(date: Date, minutes: number): Date {
-    return this.addMinutes(date, -minutes);
-  }
+  // Subtract methods just use add with negative values
+  subtractDays = (date: Date, days: number): Date => this.addDays(date, -days);
+  subtractMonths = (date: Date, months: number): Date => this.addMonths(date, -months);
+  subtractYears = (date: Date, years: number): Date => this.addYears(date, -years);
+  subtractHours = (date: Date, hours: number): Date => this.addHours(date, -hours);
+  subtractMinutes = (date: Date, minutes: number): Date => this.addMinutes(date, -minutes);
 
   // ==========================================
-  // ISO STRING HELPERS
+  // DATE BOUNDARIES
   // ==========================================
 
-  /**
-   * Convert date to ISO string (UTC)
-   * @param date Date to convert (optional, defaults to now)
-   * @returns ISO string (e.g., "2024-01-15T14:30:00.000Z")
-   */
-  toISOString(date?: Date): string {
-    return (date || new Date()).toISOString();
-  }
-
-  /**
-   * Get ISO date string (YYYY-MM-DD) in LOCAL timezone
-   * @param date Date to convert (optional, defaults to now)
-   * @returns ISO date string in local timezone (e.g., "2024-01-15")
-   */
-  toISODateString(date?: Date): string {
-    // Use formatDateToLocal to get local date instead of UTC
-    return this.formatDateToLocal(date || new Date());
-  }
-
-  // ==========================================
-  // DATE MANIPULATION METHODS
-  // ==========================================
-
-  /**
-   * Get start of day (00:00:00.000)
-   * @param date Source date (optional, defaults to today)
-   * @returns New Date at start of day
-   */
   startOfDay(date?: Date): Date {
     const result = new Date(date || new Date());
     result.setHours(0, 0, 0, 0);
     return result;
   }
 
-  /**
-   * Get end of day (23:59:59.999)
-   * @param date Source date (optional, defaults to today)
-   * @returns New Date at end of day
-   */
   endOfDay(date?: Date): Date {
     const result = new Date(date || new Date());
     result.setHours(23, 59, 59, 999);
     return result;
   }
 
-  /**
-   * Get start of week (Monday at 00:00:00.000)
-   * @param date Source date (optional, defaults to this week)
-   * @returns New Date at start of week
-   */
   startOfWeek(date?: Date): Date {
     const result = new Date(date || new Date());
     const day = result.getDay();
-    const diff = result.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
+    const diff = result.getDate() - day + (day === 0 ? -6 : 1);
     result.setDate(diff);
     result.setHours(0, 0, 0, 0);
     return result;
   }
 
-  /**
-   * Get end of week (Sunday at 23:59:59.999)
-   * @param date Source date (optional, defaults to this week)
-   * @returns New Date at end of week
-   */
   endOfWeek(date?: Date): Date {
     const result = this.startOfWeek(date);
     result.setDate(result.getDate() + 6);
@@ -449,11 +228,6 @@ export class TimeService {
     return result;
   }
 
-  /**
-   * Get start of month (1st at 00:00:00.000)
-   * @param date Source date (optional, defaults to this month)
-   * @returns New Date at start of month
-   */
   startOfMonth(date?: Date): Date {
     const result = new Date(date || new Date());
     result.setDate(1);
@@ -461,241 +235,116 @@ export class TimeService {
     return result;
   }
 
-  /**
-   * Get end of month (last day at 23:59:59.999)
-   * @param date Source date (optional, defaults to this month)
-   * @returns New Date at end of month
-   */
   endOfMonth(date?: Date): Date {
     const result = new Date(date || new Date());
-    result.setMonth(result.getMonth() + 1, 0); // 0th day of next month = last day of current
+    result.setMonth(result.getMonth() + 1, 0);
     result.setHours(23, 59, 59, 999);
     return result;
   }
 
   // ==========================================
-  // COMPARISON METHODS
+  // COMPARISON & VALIDATION
   // ==========================================
 
-  /**
-   * Check if date is today
-   * @param date Date to check
-   * @returns True if date is today
-   */
-  isToday(date: Date): boolean {
-    return this.formatDateToLocal(date) === this.getLocalDate();
-  }
+  isToday = (date: Date): boolean => 
+    this.formatDateToLocal(date) === this.getLocalDate();
 
-  /**
-   * Check if two dates are on the same day
-   * @param date1 First date
-   * @param date2 Second date
-   * @returns True if dates are on same day
-   */
-  isSameDay(date1: Date, date2: Date): boolean {
-    return this.formatDateToLocal(date1) === this.formatDateToLocal(date2);
-  }
+  isSameDay = (date1: Date, date2: Date): boolean => 
+    this.formatDateToLocal(date1) === this.formatDateToLocal(date2);
 
-  /**
-   * Get number of days between two dates
-   * @param date1 First date
-   * @param date2 Second date
-   * @returns Number of days (positive if date2 is after date1)
-   */
-  getDaysBetween(date1: Date, date2: Date): number {
-    return Math.floor((date2.getTime() - date1.getTime()) / TimeService.DAY_MS);
-  }
+  getDaysBetween = (date1: Date, date2: Date): number => 
+    Math.floor((date2.getTime() - date1.getTime()) / TIME_CONSTANTS.DAY_MS);
 
-  /**
-   * Get number of hours between two dates
-   * @param date1 First date
-   * @param date2 Second date
-   * @returns Number of hours (positive if date2 is after date1)
-   */
-  getHoursDifference(date1: Date, date2: Date): number {
-    return Math.floor((date2.getTime() - date1.getTime()) / TimeService.HOUR_MS);
+  getHoursDifference = (date1: Date, date2: Date): number => 
+    Math.floor((date2.getTime() - date1.getTime()) / TIME_CONSTANTS.HOUR_MS);
+
+  isValidDate = (date: unknown): date is Date => 
+    date instanceof Date && !isNaN(date.getTime());
+
+  parseDate(dateString: string): Date | null {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return this.isValidDate(date) ? date : null;
   }
 
   // ==========================================
   // RELATIVE TIME FORMATTING
   // ==========================================
 
-  /**
-   * Get human-readable time ago string
-   * @param date Date to compare to now
-   * @returns String like "2 hours ago", "3 days ago", etc.
-   */
-  getTimeAgo(date: Date): string {
-    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-
-    if (seconds < 60) return 'just now';
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes === 1) return '1 minute ago';
-    if (minutes < 60) return `${minutes} minutes ago`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours === 1) return '1 hour ago';
-    if (hours < 24) return `${hours} hours ago`;
-
-    const days = Math.floor(hours / 24);
-    if (days === 1) return '1 day ago';
-    if (days < 7) return `${days} days ago`;
-
-    const weeks = Math.floor(days / 7);
-    if (weeks === 1) return '1 week ago';
-    if (weeks < 4) return `${weeks} weeks ago`;
-
-    const months = Math.floor(days / 30);
-    if (months === 1) return '1 month ago';
-    if (months < 12) return `${months} months ago`;
-
-    const years = Math.floor(days / 365);
-    if (years === 1) return '1 year ago';
-    return `${years} years ago`;
+  private getRelativeTimeUnit(seconds: number): { value: number; unit: string; plural: boolean } {
+    const unit = RELATIVE_TIME_UNITS.find(u => seconds < u.threshold)!;
+    const value = Math.floor(seconds / unit.divisor);
+    return { value, unit: unit.unit, plural: value !== 1 };
   }
 
-  /**
-   * Get relative time string (can be past or future)
-   * @param date Date to compare to now
-   * @returns String like "in 2 hours", "3 days ago", etc.
-   */
+  getTimeAgo(date: Date): string {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'just now';
+    
+    const { value, unit, plural } = this.getRelativeTimeUnit(seconds);
+    return `${value} ${unit}${plural ? 's' : ''} ago`;
+  }
+
   getRelativeTime(date: Date): string {
     const ms = date.getTime() - Date.now();
     const seconds = Math.floor(Math.abs(ms) / 1000);
     const isPast = ms < 0;
-
+    
     if (seconds < 60) return isPast ? 'just now' : 'in a moment';
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes === 1) return isPast ? '1 minute ago' : 'in 1 minute';
-    if (minutes < 60) return isPast ? `${minutes} minutes ago` : `in ${minutes} minutes`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours === 1) return isPast ? '1 hour ago' : 'in 1 hour';
-    if (hours < 24) return isPast ? `${hours} hours ago` : `in ${hours} hours`;
-
-    const days = Math.floor(hours / 24);
-    if (days === 1) return isPast ? '1 day ago' : 'in 1 day';
-    if (days < 7) return isPast ? `${days} days ago` : `in ${days} days`;
-
-    const weeks = Math.floor(days / 7);
-    if (weeks === 1) return isPast ? '1 week ago' : 'in 1 week';
-    if (weeks < 4) return isPast ? `${weeks} weeks ago` : `in ${weeks} weeks`;
-
-    const months = Math.floor(days / 30);
-    if (months === 1) return isPast ? '1 month ago' : 'in 1 month';
-    if (months < 12) return isPast ? `${months} months ago` : `in ${months} months`;
-
-    const years = Math.floor(days / 365);
-    if (years === 1) return isPast ? '1 year ago' : 'in 1 year';
-    return isPast ? `${years} years ago` : `in ${years} years`;
+    
+    const { value, unit, plural } = this.getRelativeTimeUnit(seconds);
+    const unitStr = `${value} ${unit}${plural ? 's' : ''}`;
+    return isPast ? `${unitStr} ago` : `in ${unitStr}`;
   }
 
   // ==========================================
-  // VALIDATION HELPERS
+  // FORMATTING HELPERS
   // ==========================================
 
-  /**
-   * Check if a value is a valid date
-   * @param date Value to check
-   * @returns True if valid date
-   */
-  isValidDate(date: unknown): date is Date {
-    return date instanceof Date && !isNaN(date.getTime());
+  formatWithLocale(date: Date, type: 'date' | 'time' | 'datetime', options?: Intl.DateTimeFormatOptions): string {
+    const defaults = {
+      date: { year: 'numeric', month: 'numeric', day: 'numeric' },
+      time: { hour: '2-digit', minute: '2-digit', second: '2-digit' },
+      datetime: { 
+        year: 'numeric', month: 'numeric', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      },
+    };
+    return new Intl.DateTimeFormat('en-US', { ...defaults[type], ...options }).format(date);
   }
 
-  /**
-   * Parse a date string safely
-   * @param dateString String to parse
-   * @returns Date object or null if invalid
-   */
-  parseDate(dateString: string): Date | null {
-    // Handle null/undefined inputs
-    if (dateString == null || dateString === '') {
-      return null;
-    }
-    const date = new Date(dateString);
-    return this.isValidDate(date) ? date : null;
-  }
+  // Backward compatibility methods
+  formatDateTimeToLocal = (date: Date, options?: Intl.DateTimeFormatOptions): string => 
+    this.formatWithLocale(date, 'datetime', options);
 
-  /**
-   * Format date for HTML datetime-local input
-   * @param date Date to format (optional, defaults to now)
-   * @returns String in format "YYYY-MM-DDTHH:mm"
-   */
+  formatTimeToLocal = (date: Date, options?: Intl.DateTimeFormatOptions): string => 
+    this.formatWithLocale(date, 'time', options);
+
+  // ==========================================
+  // UTILITY METHODS
+  // ==========================================
+
+  toISOString = (date?: Date): string => (date || new Date()).toISOString();
+  toISODateString = (date?: Date): string => this.formatDateToLocal(date || new Date());
+  formatForDateInput = (date?: Date): string => this.formatDateToLocal(date || new Date());
+  fromTimestamp = (timestamp: number): Date => new Date(timestamp);
+  createDate = (year: number, month: number, day: number): Date => new Date(year, month, day);
+
   formatForDateTimeInput(date?: Date): string {
     const d = date || new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = this.formatDateToLocal(d);
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${dateStr}T${hours}:${minutes}`;
   }
 
-  /**
-   * Format date for HTML date input
-   * @param date Date to format (optional, defaults to now)
-   * @returns String in format "YYYY-MM-DD"
-   */
-  formatForDateInput(date?: Date): string {
-    return this.formatDateToLocal(date || new Date());
-  }
-
-  /**
-   * Create a Date object from a timestamp
-   * @param timestamp Timestamp in milliseconds
-   * @returns Date object
-   */
-  fromTimestamp(timestamp: number): Date {
-    return new Date(timestamp);
-  }
-
-  /**
-   * Create a Date object from year, month, and day
-   * @param year Full year (e.g., 2024)
-   * @param month Month (0-indexed, so January = 0)
-   * @param day Day of month (1-31)
-   * @returns Date object
-   */
-  createDate(year: number, month: number, day: number): Date {
-    return new Date(year, month, day);
-  }
-
-  /**
-   * Format date and time with locale support
-   * @param date Date to format
-   * @param options Intl.DateTimeFormatOptions
-   * @returns Formatted date and time string
-   */
-  formatDateTimeToLocal(date: Date, options?: Intl.DateTimeFormatOptions): string {
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      ...options,
-    };
-    return new Intl.DateTimeFormat('en-US', defaultOptions).format(date);
-  }
-
-  /**
-   * Format time with locale support
-   * @param date Date to format
-   * @param options Intl.DateTimeFormatOptions
-   * @returns Formatted time string
-   */
-  formatTimeToLocal(date: Date, options?: Intl.DateTimeFormatOptions): string {
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      ...options,
-    };
-    return new Intl.DateTimeFormat('en-US', defaultOptions).format(date);
+  destroy(): void {
+    if (this.mainTimer) {
+      clearInterval(this.mainTimer);
+      this.mainTimer = undefined;
+    }
+    this.timeListeners = [];
+    this.localDateCache = null;
   }
 }
 

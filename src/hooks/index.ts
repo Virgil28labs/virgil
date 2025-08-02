@@ -4,7 +4,6 @@ export { useUserProfile } from './useUserProfile';
 
 // Location & Navigation
 export { useLocation } from './useLocation';
-export { useRouteState } from './useRouteState';
 
 // UI & Interactions
 export { useToast } from './useToast';
@@ -20,7 +19,6 @@ export { useDataExport } from './useDataExport';
 export { useHabits } from './useHabits';
 export { useDeviceInfo } from './useDeviceInfo';
 export { useContextSync } from './useContextSync';
-export { useGooglePlacesAutocomplete } from './useGooglePlacesAutocomplete';
 
 // Dashboard & Context
 export { useDashboardContext } from './useDashboardContext';
@@ -29,3 +27,15 @@ export { useDashboardContext } from './useDashboardContext';
 export { useMemoryService } from './useMemoryService';
 export { useSystemPrompt } from './useSystemPrompt';
 export { useMessageHandling } from './useMessageHandling';
+
+// Time & Date
+export { 
+  useCurrentTime,
+  useTimeAgo,
+  useRelativeTime,
+  useDateFormatter,
+  useDateMath,
+  useDateBoundaries,
+  useDateValidation,
+  useTimeHelpers,
+} from './useTime';

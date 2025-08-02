@@ -1,5 +1,6 @@
 import { memo, useMemo } from 'react';
 import { EMOJI_DATABASE, POPULAR_EMOJIS } from '../../data/habitEmojis';
+import styles from './MinimalHabitTracker.module.css';
 
 interface EmojiSuggestionsProps {
   searchTerm: string
@@ -30,16 +31,16 @@ export const EmojiSuggestions = memo(function EmojiSuggestions({
   }, [searchTerm]);
 
   return (
-    <div className="emoji-suggestions">
-      <div className="suggestions-header">
+    <div className={styles.emojiSuggestions}>
+      <div className={styles.suggestionsHeader}>
         {searchTerm.trim() ? 'Suggested emojis:' : 'Popular emojis:'}
       </div>
-      <div className="emoji-grid">
+      <div className={styles.emojiGrid}>
         {suggestions.map(emoji => (
           <button
             key={emoji}
             type="button"
-            className={`emoji-option ${emoji === currentEmoji ? 'selected' : ''}`}
+            className={`${styles.emojiOption} ${emoji === currentEmoji ? styles.selected : ''}`}
             onClick={() => onSelect(emoji)}
             aria-label={`Select ${emoji}`}
           >

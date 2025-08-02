@@ -1,5 +1,6 @@
 import React, { memo, useState, useEffect } from 'react';
 import type { GiphySearchControlsProps } from '../../types/giphy.types';
+import styles from './GiphyGallery.module.css';
 
 export const GiphySearchControls = memo(function GiphySearchControls({
   searchQuery,
@@ -36,10 +37,10 @@ export const GiphySearchControls = memo(function GiphySearchControls({
   };
 
   return (
-    <form className="giphy-search-controls" onSubmit={handleSubmit}>
+    <form className={styles.giphySearchControls} onSubmit={handleSubmit}>
       <input
         type="text"
-        className="giphy-search-input"
+        className={styles.giphySearchInput}
         placeholder="Search for GIFs..."
         value={inputValue}
         onChange={handleInputChange}
@@ -52,7 +53,7 @@ export const GiphySearchControls = memo(function GiphySearchControls({
       />
 
       <select
-        className="giphy-rating-select"
+        className={styles.giphyRatingSelect}
         value={rating}
         onChange={(e) => onRatingChange(e.target.value as 'g' | 'pg' | 'pg-13' | 'r')}
         disabled={isLoading}
@@ -66,7 +67,7 @@ export const GiphySearchControls = memo(function GiphySearchControls({
 
       <button
         type="submit"
-        className="giphy-search-btn"
+        className={styles.giphySearchBtn}
         disabled={isLoading || !inputValue.trim()}
         aria-label="Search for GIFs"
       >

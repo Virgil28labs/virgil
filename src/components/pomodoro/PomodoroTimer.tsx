@@ -3,7 +3,7 @@ import { Modal } from '../common/Modal';
 import { Button } from '../ui/button';
 import { usePomodoro } from './usePomodoro';
 import { pomodoroAdapter } from '../../services/adapters/PomodoroAdapter';
-import './Pomodoro.css';
+import styles from './Pomodoro.module.css';
 
 interface PomodoroTimerProps {
   isOpen: boolean
@@ -82,7 +82,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
     };
     
     return (
-      <div className={`session-badge session-${state.sessionType}`}>
+      <div className={`${styles.sessionBadge} ${styles[`session${state.sessionType.charAt(0).toUpperCase() + state.sessionType.slice(1)}`]}`}>
         {sessionLabels[state.sessionType]}
       </div>
     );
@@ -90,7 +90,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
 
   // Daily stats component
   const DailyStats = () => (
-    <div className="daily-stats">
+    <div className={styles.dailyStats}>
       {state.dailyStats.totalMinutes} min today • {state.dailyStats.completedSessions} sessions done
     </div>
   );
@@ -99,7 +99,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
   const TaskInput = () => (
     <input
       type="text"
-      className="task-input"
+      className={styles.taskInput}
       placeholder="What are you working on?"
       value={state.currentTask}
       onChange={(e) => setTask(e.target.value)}
@@ -112,27 +112,27 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
       isOpen={isOpen}
       onClose={onClose}
       title="🍅 Pomodoro Timer"
-      className="pomodoro-modal"
+      className={styles.pomodoroModal}
       size="small"
     >
-      <div className="pomodoro-content">
+      <div className={styles.pomodoroContent}>
         {/* Central display area */}
-        <div className={`pomodoro-display pomodoro-${state.sessionType}`}>
+        <div className={`${styles.pomodoroDisplay} ${styles[`pomodoro${state.sessionType.charAt(0).toUpperCase() + state.sessionType.slice(1)}`]}`}>
           <SessionBadge />
           
           {/* Large timer display */}
-          <div className="timer-large">{formatTime(state.timeRemaining)}</div>
+          <div className={styles.timerLarge}>{formatTime(state.timeRemaining)}</div>
           
           {/* Progress bar */}
-          <div className="progress-bar">
+          <div className={styles.progressBar}>
             <div 
-              className="progress-bar-fill" 
+              className={styles.progressBarFill} 
               style={{ width: `${progress}%` }}
             />
           </div>
           
           {/* Session info */}
-          <div className="session-info">
+          <div className={styles.sessionInfo}>
             Session {state.sessionCount} of 4
           </div>
           
@@ -144,7 +144,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
 
         {/* Preset Buttons */}
         {!state.isRunning && (
-          <div className="preset-buttons">
+          <div className={styles.presetButtons}>
             {PRESET_TIMES.map(minutes => (
               <Button
                 key={minutes}
@@ -169,7 +169,7 @@ export const PomodoroTimer = memo(function PomodoroTimer({ isOpen, onClose }: Po
         )}
 
         {/* Controls */}
-        <div className="controls">
+        <div className={styles.controls}>
           {!state.isRunning ? (
             <Button
               onClick={start}

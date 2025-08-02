@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from 'react';
 import type { Habit } from '../../types/habit.types';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { timeService } from '../../services/TimeService';
+import styles from './MinimalHabitTracker.module.css';
 
 interface HabitCardProps {
   habit: Habit
@@ -65,25 +66,25 @@ export const HabitCard = memo(function HabitCard({
   return (
     <div
       className={`
-        habit-card
-        ${checkedToday ? 'checked' : ''}
-        ${canCheckIn && !checkedToday ? 'can-check' : ''}
-        ${isEditing ? 'editing' : ''}
+        ${styles.habitCard}
+        ${checkedToday ? styles.checked : ''}
+        ${canCheckIn && !checkedToday ? styles.canCheck : ''}
+        ${isEditing ? styles.editing : ''}
       `}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {showActions && !isEditing && (
-        <div className="habit-actions">
+        <div className={styles.habitActions}>
           <button
-            className="edit-button"
+            className={styles.editButton}
             onClick={handleEdit}
             aria-label={`Edit ${habit.name}`}
           >
             ✏️
           </button>
           <button
-            className="delete-button"
+            className={styles.deleteButton}
             onClick={handleDelete}
             aria-label={`Delete ${habit.name}`}
           >
@@ -93,12 +94,12 @@ export const HabitCard = memo(function HabitCard({
       )}
 
       {isEditing ? (
-        <div className="habit-edit-form">
+        <div className={styles.habitEditForm}>
           <input
             type="text"
             value={editEmoji}
             onChange={(e) => setEditEmoji(e.target.value)}
-            className="edit-emoji-input"
+            className={styles.editEmojiInput}
             maxLength={2}
           />
           <input
@@ -109,33 +110,33 @@ export const HabitCard = memo(function HabitCard({
               if (e.key === 'Enter') handleSave();
               if (e.key === 'Escape') handleCancel();
             }}
-            className="edit-name-input"
+            className={styles.editNameInput}
             placeholder="Habit name"
             autoFocus
           />
-          <div className="edit-actions">
-            <button onClick={handleSave} className="save-button">✓</button>
-            <button onClick={handleCancel} className="cancel-button">×</button>
+          <div className={styles.editActions}>
+            <button onClick={handleSave} className={styles.saveButton}>✓</button>
+            <button onClick={handleCancel} className={styles.cancelButton}>×</button>
           </div>
         </div>
       ) : (
         <button
-          className="habit-content"
+          className={styles.habitContent}
           onClick={handleCheckIn}
           disabled={!canCheckIn && !checkedToday}
           aria-label={checkedToday ? `Undo check-in for ${habit.name}` : `Check in for ${habit.name}`}
         >
-          <div className="habit-emoji">{habit.emoji}</div>
-          <div className="habit-name">{habit.name}</div>
+          <div className={styles.habitEmoji}>{habit.emoji}</div>
+          <div className={styles.habitName}>{habit.name}</div>
 
-          <div className={`habit-streak ${habit.streak > 0 ? 'has-streak' : ''}`}>
-            <span className={`streak-icon ${checkedToday ? 'active' : 'inactive'}`}>
+          <div className={`${styles.habitStreak} ${habit.streak > 0 ? styles.hasStreak : ''}`}>
+            <span className={`${styles.streakIcon} ${checkedToday ? styles.active : styles.inactive}`}>
               🔥
             </span>
-            <span className="streak-count">{habit.streak}</span>
+            <span className={styles.streakCount}>{habit.streak}</span>
           </div>
 
-          <div className="streak-dots habit-streak-dots">
+          <div className={`${styles.streakDots} ${styles.habitStreakDots}`}>
             {Array.from({ length: 7 }, (_, i) => {
               const date = timeService.subtractDays(timeService.getCurrentDateTime(), 6 - i);
               const dateStr = dashboardContextService.formatDateToLocal(date);
@@ -145,14 +146,14 @@ export const HabitCard = memo(function HabitCard({
               return (
                 <div
                   key={dateStr}
-                  className="streak-dot-wrapper"
+                  className={styles.streakDotWrapper}
                   title={`${new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date)} - ${isChecked ? 'Completed' : 'Missed'}`}
                 >
                   <div
                     className={`
-                    streak-dot
-                    ${isChecked ? 'checked' : 'missed'}
-                    ${isToday ? 'today' : ''}
+                    ${styles.streakDot}
+                    ${isChecked ? styles.checked : styles.missed}
+                    ${isToday ? styles.today : ''}
                   `}
                   />
                 </div>

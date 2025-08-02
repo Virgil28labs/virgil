@@ -371,6 +371,7 @@
   gap: var(--giphy-spacing-md);
 }
 
+/* Loading spinner - large size */
 .giphyLoading-spinner {
   width: 60px;
   height: 60px;
@@ -396,6 +397,7 @@
   margin-top: var(--giphy-spacing-md);
 }
 
+/* Loading more spinner - smaller size */
 .giphyLoading-more .giphyLoading-spinner {
   width: 40px;
   height: 40px;

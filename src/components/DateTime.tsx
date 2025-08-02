@@ -1,6 +1,7 @@
 import { useState, useEffect, memo, useMemo } from 'react';
 import { TimezoneWidget } from './timezone/TimezoneWidget';
 import { timeService } from '../services/TimeService';
+import styles from './Dashboard.module.css';
 
 /**
  * DateTime Component
@@ -37,24 +38,24 @@ export const DateTime = memo(function DateTime() {
 
   return (
     <TimezoneWidget
-      className="datetime-widget"
+      className={styles.datetimeWidget}
       hoverDelay={150}
       clickToOpen
     >
-      <div className="datetime-display">
-        <div className="time" data-raccoon-collision="time">
+      <div className={styles.datetimeDisplay}>
+        <div className={styles.time} data-raccoon-collision="time">
           {(() => {
             const timeParts = formatters.time(currentTime).split(':');
             return (
               <>
                 {timeParts[0]}:{timeParts[1]}
-                <sup className="time-seconds">{timeParts[2]}</sup>
+                <sup className={styles.timeSeconds}>{timeParts[2]}</sup>
               </>
             );
           })()}
         </div>
-        <div className="date" data-raccoon-collision="date">{formatters.date(currentTime)}</div>
-        <div className="day" data-raccoon-collision="day">{formatters.day()}</div>
+        <div className={styles.date} data-raccoon-collision="date">{formatters.date(currentTime)}</div>
+        <div className={styles.day} data-raccoon-collision="day">{formatters.day()}</div>
       </div>
     </TimezoneWidget>
   );

@@ -1,4 +1,5 @@
 import React, { memo, useState, useCallback } from 'react';
+import styles from './MinimalHabitTracker.module.css';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void
@@ -97,12 +98,12 @@ export const EmojiPicker = memo(function EmojiPicker({
   }, [onClose]);
 
   return (
-    <div className="emoji-picker-backdrop" onClick={handleBackdropClick}>
-      <div className="emoji-picker-panel">
-        <div className="emoji-picker-header">
+    <div className={styles.emojiPickerBackdrop} onClick={handleBackdropClick}>
+      <div className={styles.emojiPickerPanel}>
+        <div className={styles.emojiPickerHeader}>
           <h3>Choose an emoji</h3>
           <button
-            className="emoji-picker-close"
+            className={styles.emojiPickerClose}
             onClick={onClose}
             aria-label="Close emoji picker"
           >
@@ -110,11 +111,11 @@ export const EmojiPicker = memo(function EmojiPicker({
           </button>
         </div>
 
-        <div className="emoji-picker-categories">
+        <div className={styles.emojiPickerCategories}>
           {EMOJI_CATEGORIES.map((category, index) => (
             <button
               key={category.name}
-              className={`category-tab ${activeCategory === index ? 'active' : ''}`}
+              className={`${styles.categoryTab} ${activeCategory === index ? styles.active : ''}`}
               onClick={() => setActiveCategory(index)}
               aria-label={`${category.name} category`}
             >
@@ -123,11 +124,11 @@ export const EmojiPicker = memo(function EmojiPicker({
           ))}
         </div>
 
-        <div className="emoji-picker-grid">
+        <div className={styles.emojiPickerGrid}>
           {EMOJI_CATEGORIES[activeCategory].emojis.map(emoji => (
             <button
               key={emoji}
-              className={`emoji-item ${emoji === currentEmoji ? 'selected' : ''}`}
+              className={`${styles.emojiItem} ${emoji === currentEmoji ? styles.selected : ''}`}
               onClick={() => handleEmojiClick(emoji)}
               aria-label={emoji}
             >
