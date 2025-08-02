@@ -34,15 +34,21 @@ const locationReducer = (state: LocationState, action: LocationAction): Location
         coordinates: action.payload.coordinates ?? state.coordinates,
         address: action.payload.address ?? state.address,
         ipLocation: action.payload.ipLocation ?? state.ipLocation,
+        locationSource: action.payload.source ?? (action.payload.coordinates ? 'gps' : 'ip'),
         loading: false,
         error: null,
         lastUpdated: timeService.getTimestamp(),
         initialized: true,
+        gpsRetrying: false,
       };
     case 'SET_ERROR':
-      return { ...state, error: action.payload, loading: false };
+      return { ...state, error: action.payload, loading: false, gpsRetrying: false };
     case 'SET_PERMISSION_STATUS':
       return { ...state, permissionStatus: action.payload };
+    case 'SET_LOCATION_SOURCE':
+      return { ...state, locationSource: action.payload };
+    case 'SET_GPS_RETRY_STATUS':
+      return { ...state, canRetryGPS: action.payload.canRetry, gpsRetrying: action.payload.retrying };
     case 'CLEAR_ERROR':
       return { ...state, error: null };
     default:
@@ -59,6 +65,9 @@ const initialState: LocationState = {
   permissionStatus: 'unknown',
   lastUpdated: null,
   initialized: false,
+  locationSource: null,
+  canRetryGPS: false,
+  gpsRetrying: false,
 };
 
 interface LocationProviderProps {
@@ -100,18 +109,51 @@ export function LocationProvider({ children }: LocationProviderProps) {
       if (!gpsRequestInProgressRef.current) {
         gpsRequestInProgressRef.current = true;
 
+        // Check GPS permission status first
+        const permissionInfo = await locationService.checkLocationPermission();
+        dispatch({ type: 'SET_GPS_RETRY_STATUS', payload: { canRetry: permissionInfo.canRetry, retrying: false } });
+
         // Add warm-up delay to let location services initialize
         setTimeout(() => {
           // Pass the existing IP location to avoid duplicate fetching
-          locationService.getFullLocationData(quickLocation.ipLocation).then(fullLocationData => {
+          locationService.getFullLocationData(quickLocation.ipLocation).then(async (fullLocationData) => {
             // Only update if we got GPS coordinates or better address
             if (fullLocationData.coordinates ||
                 (fullLocationData.address?.street && !state.address?.street)) {
-              dispatch({ type: 'SET_LOCATION_DATA', payload: fullLocationData });
+              
+              // Fetch elevation if we have coordinates
+              if (fullLocationData.coordinates) {
+                try {
+                  const elevationData = await locationService.fetchElevationData(
+                    fullLocationData.coordinates.latitude,
+                    fullLocationData.coordinates.longitude,
+                  );
+                  if (elevationData) {
+                    fullLocationData.coordinates.elevation = elevationData.elevation;
+                  }
+                } catch (error) {
+                  logger.warn('Failed to fetch elevation', {
+                    component: 'LocationContext',
+                    action: 'fetchLocationData',
+                    metadata: { error: (error as Error).message },
+                  });
+                }
+              }
+              
+              const source = fullLocationData.coordinates ? 'gps' : 'ip';
+              dispatch({ type: 'SET_LOCATION_DATA', payload: { ...fullLocationData, source } });
             }
-          }).catch(() => {
-            // Silently ignore GPS errors since we already have IP location
-            // This is expected behavior when location services are unavailable
+          }).catch((error) => {
+            // Log GPS errors but don't show to user since we have IP location
+            logger.warn('GPS location failed, using IP fallback', {
+              component: 'LocationContext',
+              action: 'fetchLocationData',
+              metadata: { error: (error as Error).message },
+            });
+            
+            // Update retry status based on error type
+            const canRetry = !(error as Error).message.includes('denied');
+            dispatch({ type: 'SET_GPS_RETRY_STATUS', payload: { canRetry, retrying: false } });
           }).finally(() => {
             gpsRequestInProgressRef.current = false;
           });
@@ -167,6 +209,68 @@ export function LocationProvider({ children }: LocationProviderProps) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
+  const retryGPSLocation = useCallback(async (): Promise<void> => {
+    if (state.gpsRetrying || !state.canRetryGPS) {
+      return;
+    }
+
+    dispatch({ type: 'SET_GPS_RETRY_STATUS', payload: { canRetry: state.canRetryGPS, retrying: true } });
+    dispatch({ type: 'CLEAR_ERROR' });
+
+    try {
+      logger.info('Manual GPS retry initiated', {
+        component: 'LocationContext',
+        action: 'retryGPSLocation',
+      });
+
+      const coords = await locationService.retryGPSLocation();
+      const address = await locationService.getAddressFromCoordinates(coords.latitude, coords.longitude);
+      
+      // Fetch elevation
+      try {
+        const elevationData = await locationService.fetchElevationData(coords.latitude, coords.longitude);
+        if (elevationData) {
+          coords.elevation = elevationData.elevation;
+        }
+      } catch (error) {
+        logger.warn('Failed to fetch elevation during GPS retry', {
+          component: 'LocationContext',
+          action: 'retryGPSLocation',
+          metadata: { error: (error as Error).message },
+        });
+      }
+      
+      dispatch({ 
+        type: 'SET_LOCATION_DATA', 
+        payload: { 
+          coordinates: coords, 
+          address, 
+          timestamp: timeService.getTimestamp(),
+          source: 'gps',
+        }, 
+      });
+
+      logger.info('Manual GPS retry successful', {
+        component: 'LocationContext',
+        action: 'retryGPSLocation',
+        metadata: { accuracy: coords.accuracy },
+      });
+
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      logger.error('Manual GPS retry failed', error as Error, {
+        component: 'LocationContext',
+        action: 'retryGPSLocation',
+      });
+
+      dispatch({ type: 'SET_ERROR', payload: `GPS retry failed: ${errorMessage}` });
+      
+      // Update retry status based on error
+      const canRetry = !errorMessage.includes('denied');
+      dispatch({ type: 'SET_GPS_RETRY_STATUS', payload: { canRetry, retrying: false } });
+    }
+  }, [state.gpsRetrying, state.canRetryGPS]);
+
   useEffect(() => {
     // Check location permission on mount
     const cleanup = checkLocationPermission();
@@ -196,15 +300,18 @@ export function LocationProvider({ children }: LocationProviderProps) {
     ...state,
     fetchLocationData,
     requestLocationPermission,
+    retryGPSLocation,
     clearError,
     hasLocation: !!(state.coordinates || state.ipLocation),
     hasGPSLocation: !!state.coordinates,
     hasIpLocation: !!state.ipLocation,
+    isPreciseLocation: state.locationSource === 'gps',
     initialized: true,  // Always initialized after mount
   }), [
     state,
     fetchLocationData,
     requestLocationPermission,
+    retryGPSLocation,
     clearError,
   ]);
 

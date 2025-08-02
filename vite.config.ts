@@ -20,6 +20,13 @@ export default defineConfig({
       usePolling: false,
       interval: 100,
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5002',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     rollupOptions: {

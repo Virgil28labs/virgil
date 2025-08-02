@@ -20,7 +20,6 @@ import { LoadingFallback } from './LoadingFallback';
 import { Skeleton } from './ui/skeleton';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 import { useDeviceInfo } from '../hooks/useDeviceInfo';
-import { GoogleMapsModal } from './maps/GoogleMapsModal';
 import { SectionErrorBoundary } from './common/SectionErrorBoundary';
 import { PositionedIPHoverCard } from './location/IPHoverCard';
 import { dashboardAppService } from '../services/DashboardAppService';
@@ -39,11 +38,10 @@ import styles from './Dashboard.module.css';
 
 export const Dashboard = memo(function Dashboard() {
   const { user, signOut } = useAuth();
-  const { address, ipLocation, coordinates, loading: locationLoading } = useLocation();
+  const { address, ipLocation, coordinates, loading: locationLoading, isPreciseLocation, canRetryGPS, gpsRetrying, retryGPSLocation } = useLocation();
   const { deviceInfo } = useDeviceInfo(ipLocation || undefined);
   const [showProfileViewer, setShowProfileViewer] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const [showMapsModal, setShowMapsModal] = useState(false);
   const [showIPHover, setShowIPHover] = useState(false);
   const ipRef = useRef<HTMLDivElement | null>(null);
   const [elevationUnit, setElevationUnit] = useState<'meters' | 'feet'>(() => {
@@ -58,8 +56,6 @@ export const Dashboard = memo(function Dashboard() {
   // Memoized callbacks
   const handleShowProfileViewer = useCallback(() => setShowProfileViewer(true), []);
   const handleHideProfileViewer = useCallback(() => setShowProfileViewer(false), []);
-  const handleShowMapsModal = useCallback(() => setShowMapsModal(true), []);
-  const handleHideMapsModal = useCallback(() => setShowMapsModal(false), []);
   const handleShowIPHover = useCallback(() => setShowIPHover(true), []);
   const handleHideIPHover = useCallback(() => setShowIPHover(false), []);
 
@@ -92,6 +88,21 @@ export const Dashboard = memo(function Dashboard() {
     }
     setIsSigningOut(false);
   }, [signOut, isSigningOut]);
+
+  const handleRetryGPS = useCallback(async () => {
+    try {
+      await retryGPSLocation();
+      logger.info('GPS retry successful from Dashboard', {
+        component: 'Dashboard',
+        action: 'handleRetryGPS',
+      });
+    } catch (error) {
+      logger.error('GPS retry failed from Dashboard', error as Error, {
+        component: 'Dashboard',
+        action: 'handleRetryGPS',
+      });
+    }
+  }, [retryGPSLocation]);
 
   // Removed system prompt functionality - moved to VirgilChatbot
 
@@ -191,44 +202,58 @@ export const Dashboard = memo(function Dashboard() {
 
         <div className={styles.locationInfo}>
           <div className={styles.addressInfo}>
-            {address ? (
-              address.street ? (
+            <div className={styles.addressRow}>
+              {address ? (
+                address.street ? (
+                  <p
+                    className={styles.streetAddress}
+                    data-raccoon-collision="street-address"
+                    title="Your current address"
+                  >
+                    {address.house_number && `${address.house_number} `}{address.street}
+                  </p>
+                ) : address.formatted ? (
+                  <p
+                    className={styles.streetAddress}
+                    data-raccoon-collision="street-address"
+                    title="Your current address"
+                  >
+                    {address.formatted.split(',').slice(0, 2).join(',').trim()}
+                  </p>
+                ) : (
+                  <Skeleton className="w-48 h-4" />
+                )
+              ) : locationLoading ? (
+                <div data-testid="location-loading">
+                  <Skeleton className="w-48 h-4" />
+                </div>
+              ) : ipLocation?.city ? (
                 <p
-                  className={`${styles.streetAddress} ${styles.clickable}`}
+                  className="street-address"
                   data-raccoon-collision="street-address"
-                  onClick={handleShowMapsModal}
-                  title="Click to view on map"
+                  title="IP-based location (approximate)"
                 >
-                  {address.house_number && `${address.house_number} `}{address.street}
-                </p>
-              ) : address.formatted ? (
-                <p
-                  className={`${styles.streetAddress} ${styles.clickable}`}
-                  data-raccoon-collision="street-address"
-                  onClick={handleShowMapsModal}
-                  title="Click to view on map"
-                >
-                  {address.formatted.split(',').slice(0, 2).join(',').trim()}
+                  📍 {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}{ipLocation.country ? `, ${ipLocation.country}` : ''}
                 </p>
               ) : (
-                <Skeleton className="w-48 h-4" />
-              )
-            ) : locationLoading ? (
-              <div data-testid="location-loading">
-                <Skeleton className="w-48 h-4" />
-              </div>
-            ) : ipLocation?.city ? (
-              <p
-                className="street-address clickable"
-                data-raccoon-collision="street-address"
-                onClick={handleShowMapsModal}
-                title="Click to view on map (IP-based location)"
-              >
-                📍 {ipLocation.city}{ipLocation.region ? `, ${ipLocation.region}` : ''}{ipLocation.country ? `, ${ipLocation.country}` : ''}
-              </p>
-            ) : (
-              <p className={styles.addressError}>Location unavailable</p>
-            )}
+                <p className={styles.addressError}>Location unavailable</p>
+              )}
+              
+              {/* GPS retry button (only show when needed) */}
+              {!locationLoading && canRetryGPS && !isPreciseLocation && (
+                <div className={styles.locationAccuracy}>
+                  <button
+                    className={`${styles.retryGpsButton} ${gpsRetrying ? styles.retrying : ''}`}
+                    onClick={handleRetryGPS}
+                    disabled={gpsRetrying}
+                    title={gpsRetrying ? 'Getting precise location...' : 'Try to get precise GPS location'}
+                    aria-label={gpsRetrying ? 'Getting precise location...' : 'Retry GPS location'}
+                  >
+                    {gpsRetrying ? '⏳' : '🔄'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className={styles.ipInfo}>
@@ -262,14 +287,8 @@ export const Dashboard = memo(function Dashboard() {
                 title="Click to toggle unit"
               >
                 Elevation: {elevationUnit === 'meters'
-                  ? `${Math.round(coordinates.elevation)}`
-                  : `${Math.round(coordinates.elevation * 3.28084)}`}
-                <button 
-                  className={styles.elevationUnitToggle}
-                  onClick={toggleElevationUnit}
-                >
-                  {elevationUnit === 'meters' ? 'm' : 'ft'}
-                </button>
+                  ? `${Math.round(coordinates.elevation)}m`
+                  : `${Math.round(coordinates.elevation * 3.28084)}ft`}
               </p>
             ) : coordinates && !locationLoading ? (
               <p className={styles.elevation} style={{ opacity: 0.6 }}>
@@ -327,15 +346,6 @@ export const Dashboard = memo(function Dashboard() {
         onClose={handleHideProfileViewer}
       />
 
-      {/* Google Maps Modal */}
-      <SectionErrorBoundary sectionName="Maps" data-testid="section-error-boundary">
-        <GoogleMapsModal
-          isOpen={showMapsModal}
-          onClose={handleHideMapsModal}
-          coordinates={coordinates}
-          address={address}
-        />
-      </SectionErrorBoundary>
     </div>
   );
 });

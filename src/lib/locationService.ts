@@ -49,48 +49,97 @@ interface IpWhoResponse {
   };
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002';
 
 export const locationService = {
   async getCurrentPosition(): Promise<Coordinates> {
-    return new Promise<Coordinates>((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by this browser.'));
-        return;
+    if (!navigator.geolocation) {
+      throw new Error('Geolocation is not supported by this browser.');
+    }
+
+    // Progressive GPS acquisition strategy
+    const strategies = [
+      {
+        name: 'quick-lowaccuracy',
+        options: {
+          enableHighAccuracy: false,
+          timeout: 3000,
+          maximumAge: 60000, // 1 minute
+        },
+      },
+      {
+        name: 'precise-highaccuracy',
+        options: {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 300000, // 5 minutes
+        },
+      },
+      {
+        name: 'fallback-mediumaccuracy',
+        options: {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 600000, // 10 minutes
+        },
+      },
+    ];
+
+    let lastError: Error | null = null;
+
+    for (const strategy of strategies) {
+      try {
+        logger.info(`Attempting GPS acquisition: ${strategy.name}`, {
+          component: 'locationService',
+          action: 'getCurrentPosition',
+          metadata: { strategy: strategy.name },
+        });
+
+        const coords = await this.getPositionWithOptions(strategy.options);
+        
+        logger.info(`GPS acquisition successful: ${strategy.name}`, {
+          component: 'locationService',
+          action: 'getCurrentPosition',
+          metadata: { 
+            strategy: strategy.name,
+            accuracy: coords.accuracy,
+            timestamp: coords.timestamp,
+          },
+        });
+
+        return coords;
+      } catch (error) {
+        lastError = error as Error;
+        logger.warn(`GPS acquisition failed: ${strategy.name}`, {
+          component: 'locationService',
+          action: 'getCurrentPosition',
+          metadata: { 
+            strategy: strategy.name,
+            error: (error as Error).message,
+          },
+        });
+
+        // If permission denied, don't try other strategies
+        if (error instanceof Error && error.message.includes('denied')) {
+          break;
+        }
       }
+    }
 
-      // First attempt with low accuracy for faster response
-      const lowAccuracyOptions: PositionOptions = {
-        enableHighAccuracy: false,
-        timeout: 5000, // Shorter timeout for first attempt
-        maximumAge: 300000,
-      };
+    // All strategies failed
+    throw lastError || new Error('All GPS acquisition strategies failed');
+  },
 
+  async getPositionWithOptions(options: PositionOptions): Promise<Coordinates> {
+    return new Promise<Coordinates>((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        (position) => {
           const coords: Coordinates = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
             timestamp: position.timestamp,
           };
-
-          // If accuracy is poor (> 100m), try once more with high accuracy
-          if (position.coords.accuracy > 100) {
-            try {
-              const highAccuracyCoords = await this.getHighAccuracyPosition();
-              resolve(highAccuracyCoords);
-            } catch (error) {
-              // If high accuracy fails, use the low accuracy result
-              logger.error('Failed to get high accuracy position, using low accuracy', error as Error, {
-                component: 'locationService',
-                action: 'getCurrentPosition',
-              });
-              resolve(coords);
-            }
-          } else {
-            resolve(coords);
-          }
+          resolve(coords);
         },
         (error: GeolocationPositionError) => {
           let errorMessage = 'Unable to retrieve your location';
@@ -107,41 +156,61 @@ export const locationService = {
           }
           reject(new Error(errorMessage));
         },
-        lowAccuracyOptions,
+        options,
       );
     });
   },
 
-  async getHighAccuracyPosition(): Promise<Coordinates> {
-    return new Promise<Coordinates>((resolve, reject) => {
-      const highAccuracyOptions: PositionOptions = {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000,
-      };
+  async checkLocationPermission(): Promise<{ 
+    status: 'granted' | 'denied' | 'prompt' | 'unsupported';
+    canRetry: boolean;
+  }> {
+    if (!navigator.geolocation) {
+      return { status: 'unsupported', canRetry: false };
+    }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            timestamp: position.timestamp,
-          });
-        },
-        (error) => {
-          reject(error);
-        },
-        highAccuracyOptions,
-      );
+    // Check if Permissions API is available
+    if ('permissions' in navigator) {
+      try {
+        const permission = await navigator.permissions.query({ name: 'geolocation' });
+        return {
+          status: permission.state as 'granted' | 'denied' | 'prompt',
+          canRetry: permission.state !== 'denied',
+        };
+      } catch (error) {
+        logger.warn('Permissions API not available', {
+          component: 'locationService',
+          action: 'checkLocationPermission',
+          metadata: { error: (error as Error).message },
+        });
+      }
+    }
+
+    // Fallback: assume we can try (user will be prompted)
+    return { status: 'prompt', canRetry: true };
+  },
+
+  async retryGPSLocation(): Promise<Coordinates> {
+    logger.info('Manual GPS retry requested', {
+      component: 'locationService',
+      action: 'retryGPSLocation',
     });
+    
+    // Force fresh GPS acquisition (no cache)
+    const coords = await this.getPositionWithOptions({
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 0, // Force fresh position
+    });
+    
+    return coords;
   },
 
   async getAddressFromCoordinates(latitude: number, longitude: number): Promise<Address> {
     return retryWithBackoff(
       async () => {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
           {
             headers: {
               'User-Agent': 'Virgil-App/1.0', // OpenStreetMap requires User-Agent
@@ -154,6 +223,12 @@ export const locationService = {
         }
 
         const data = await response.json();
+        
+        // Check if we got a valid response
+        if (!data || data.error) {
+          throw new Error(data.error || 'No address found for coordinates');
+        }
+
         const address = data.address || {};
 
         // Handle various street name fields from OpenStreetMap
@@ -171,15 +246,15 @@ export const locationService = {
         return {
           street: streetName,
           house_number: address.house_number || '',
-          city: address.city || address.town || address.village || '',
+          city: address.city || address.town || address.village || address.suburb || '',
           postcode: address.postcode || '',
           country: address.country || '',
-          formatted: data.display_name || '',
+          formatted: data.display_name || `${streetName} ${address.house_number || ''}, ${address.city || address.town || address.village || ''}, ${address.country || ''}`.trim(),
         };
       },
       {
-        maxRetries: 3,
-        initialDelay: 1000,
+        maxRetries: 2,
+        initialDelay: 500,
         onRetry: (_attempt, _error) => {
           // Retry logic handled by retryWithBackoff
         },
@@ -248,53 +323,6 @@ export const locationService = {
     );
   },
 
-  async getElevation(latitude: number, longitude: number): Promise<{ elevation: number; elevationFeet: number } | null> {
-    try {
-      return await retryWithBackoff(
-        async () => {
-          const response = await fetch(
-            `${API_BASE_URL}/api/v1/elevation/coordinates/${latitude}/${longitude}`,
-            {
-              signal: AbortSignal.timeout(8000), // Increased to 8 second timeout
-            },
-          );
-
-          if (!response.ok) {
-            if (response.status === 404) {
-              throw new Error('Elevation data not available for this location');
-            }
-            throw new Error(`Failed to fetch elevation data: ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          // Validate response data
-          if (typeof data.elevation !== 'number' || typeof data.elevationFeet !== 'number') {
-            throw new Error('Invalid elevation data format');
-          }
-
-          return {
-            elevation: data.elevation,
-            elevationFeet: data.elevationFeet,
-          };
-        },
-        {
-          maxRetries: 3, // Increased retries
-          initialDelay: 1000, // Increased initial delay
-          onRetry: (_attempt, _error) => {
-          },
-        },
-      );
-    } catch (error) {
-      // Return null instead of throwing to allow graceful degradation
-      logger.error('Failed to get elevation data', error as Error, {
-        component: 'locationService',
-        action: 'getElevation',
-        metadata: { latitude, longitude },
-      });
-      return null;
-    }
-  },
 
   async getQuickLocation(): Promise<LocationData> {
     // Fast IP-only location for immediate weather display
@@ -380,32 +408,17 @@ export const locationService = {
       const coords = await this.getCurrentPosition();
       const result: { coordinates?: Coordinates; address?: Address } = { coordinates: coords };
 
-      // Fetch address and elevation in parallel
-      const [addressResult, elevationResult] = await Promise.allSettled([
-        this.getAddressFromCoordinates(coords.latitude, coords.longitude),
-        this.getElevation(coords.latitude, coords.longitude),
-      ]);
-
-      if (addressResult.status === 'fulfilled') {
-        result.address = addressResult.value;
-      } else {
+      // Fetch address for the coordinates
+      try {
+        const address = await this.getAddressFromCoordinates(coords.latitude, coords.longitude);
+        result.address = address;
+      } catch (error) {
         // Address lookup failed - non-critical, continue without address
-        logger.error('Address lookup failed', addressResult.reason as Error, {
+        logger.error('Address lookup failed', error as Error, {
           component: 'locationService',
           action: 'fetchGPSLocationData',
           metadata: { coords },
         });
-      }
-
-      if (elevationResult.status === 'fulfilled' && elevationResult.value) {
-        result.coordinates = {
-          ...coords,
-          elevation: elevationResult.value.elevation,
-          elevationUnit: 'meters',
-        };
-      } else {
-        // Still return coordinates without elevation
-        result.coordinates = coords;
       }
 
       return result;
@@ -415,6 +428,28 @@ export const locationService = {
         action: 'fetchGPSLocationData',
       });
       return {};
+    }
+  },
+
+  async fetchElevationData(latitude: number, longitude: number): Promise<{ elevation: number } | null> {
+    try {
+      const response = await fetch(`/api/v1/elevation/coordinates/${latitude}/${longitude}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch elevation: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return {
+        elevation: data.elevation,
+      };
+    } catch (error) {
+      logger.error('Failed to fetch elevation data', error as Error, {
+        component: 'locationService',
+        action: 'fetchElevationData',
+        metadata: { latitude, longitude },
+      });
+      return null;
     }
   },
 
