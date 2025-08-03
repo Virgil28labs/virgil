@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 interface SavedPattern {
   pattern: boolean[][];
   description: string;
@@ -48,19 +49,21 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
-  protected loadData(): void {
+  protected async loadData(): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const stored = await appDataService.get<(SavedPattern | null)[]>(this.STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
         // Handle legacy format (just patterns)
-        if (parsed.length > 0 && Array.isArray(parsed[0])) {
+        if (stored.length > 0 && Array.isArray(stored[0])) {
           this.saveSlots = [null, null, null, null, null];
         } else {
-          this.saveSlots = parsed;
+          this.saveSlots = stored;
         }
       } else {
         this.saveSlots = [null, null, null, null, null];
@@ -73,13 +76,8 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
       this.saveSlots = [null, null, null, null, null];
     }
 
-    // Set up storage listener for real-time updates
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.loadData();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
+    // Note: IndexedDB doesn't have storage events like localStorage
+    // Updates will happen through the adapter's own methods
   }
 
   private getCategoryFromDescription(description: string, category?: string): string {
@@ -110,12 +108,12 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
     let activeSteps = 0;
     let totalSteps = 0;
 
-    pattern.forEach(track => {
-      track.forEach(step => {
+    for (const track of pattern) {
+      for (const step of track) {
         if (step) activeSteps++;
         totalSteps++;
-      });
-    });
+      }
+    }
 
     return totalSteps > 0 ? (activeSteps / totalSteps) : 0;
   }
@@ -150,11 +148,11 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
         totalComplexity += complexity;
 
         // Count total beats
-        pattern.pattern.forEach(track => {
-          track.forEach(step => {
+        for (const track of pattern.pattern) {
+          for (const step of track) {
             if (step) totalBeats++;
-          });
-        });
+          }
+        }
 
         return {
           description: pattern.description,
@@ -346,7 +344,7 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
 
     const recent = data.patterns.recent[0];
     const date = timeService.fromTimestamp(recent.timestamp);
-    const timeAgo = this.getTimeAgo(date);
+    const timeAgo = this.getRelativeTime(date);
 
     let response = `Your most recent pattern is a ${recent.bars}-bar ${recent.category} beat: "${recent.description}", created ${timeAgo}`;
 
@@ -448,9 +446,6 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
     return response;
   }
 
-  private getTimeAgo(date: Date): string {
-    return this.getRelativeTime(date);
-  }
 
   override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
@@ -461,7 +456,8 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
     const savedPatterns = this.saveSlots.filter((slot): slot is SavedPattern => slot !== null);
 
     // Search in descriptions and categories
-    savedPatterns.forEach((pattern, index) => {
+    for (let i = 0; i < savedPatterns.length; i++) {
+      const pattern = savedPatterns[i];
       let relevance = 0;
 
       if (pattern.description.toLowerCase().includes(lowerQuery)) {
@@ -478,11 +474,11 @@ export class RhythmMachineAdapter extends BaseAdapter<RhythmMachineData> {
           type: 'drum-pattern',
           label: `${pattern.description} (${category})`,
           value: pattern.description,
-          field: `rhythm.slot-${index + 1}`,
+          field: `rhythm.slot-${i + 1}`,
           relevance,
         });
       }
-    });
+    }
 
     return results
       .sort((a, b) => (b.relevance || 0) - (a.relevance || 0))

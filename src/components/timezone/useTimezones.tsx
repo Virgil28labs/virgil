@@ -11,6 +11,7 @@ import type { SelectedTimezone } from './timezoneData';
 import { getDefaultTimezones, generateTimezoneId, getTimezoneInfo } from './timezoneData';
 import { dashboardContextService } from '../../services/DashboardContextService';
 import { logger } from '../../lib/logger';
+import { appDataService } from '../../services/AppDataService';
 
 export interface TimezoneWithTime extends SelectedTimezone {
   currentTime: DateTime
@@ -32,8 +33,6 @@ interface UseTimezonesReturn {
 const STORAGE_KEY = 'virgil_selected_timezones';
 const MAX_TIMEZONES = 5;
 
-// No longer need these functions - handled by useTimezones hook directly
-
 /**
  * Custom hook for managing timezone state and operations
  */
@@ -45,15 +44,14 @@ export function useTimezones(): UseTimezonesReturn {
   );
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Load timezones from localStorage on mount
+  // Load timezones from IndexedDB on mount
   useEffect(() => {
-    try {
-      const storedData = localStorage.getItem(STORAGE_KEY);
-      if (storedData) {
-        const parsed = JSON.parse(storedData);
-        if (Array.isArray(parsed)) {
+    const loadTimezones = async () => {
+      try {
+        const storedData = await appDataService.get<SelectedTimezone[]>(STORAGE_KEY);
+        if (storedData && Array.isArray(storedData)) {
           // Validate structure
-          const valid = parsed.every(tz =>
+          const valid = storedData.every(tz =>
             tz &&
             typeof tz.id === 'string' &&
             typeof tz.timezone === 'string' &&
@@ -62,26 +60,25 @@ export function useTimezones(): UseTimezonesReturn {
           );
 
           if (valid) {
-            setSelectedTimezones(parsed.sort((a, b) => a.order - b.order));
+            setSelectedTimezones(storedData.sort((a, b) => a.order - b.order));
           } else {
             setSelectedTimezones(getDefaultTimezones());
           }
         } else {
           setSelectedTimezones(getDefaultTimezones());
         }
-      } else {
+      } catch (error) {
+        logger.warn('Failed to load timezones from storage', {
+          component: 'useTimezones',
+          action: 'loadFromStorage',
+          metadata: { error },
+        });
         setSelectedTimezones(getDefaultTimezones());
+      } finally {
+        setDataLoaded(true);
       }
-    } catch (error) {
-      logger.warn('Failed to load timezones from localStorage', {
-        component: 'useTimezones',
-        action: 'loadFromStorage',
-        metadata: { error },
-      });
-      setSelectedTimezones(getDefaultTimezones());
-    } finally {
-      setDataLoaded(true);
-    }
+    };
+    loadTimezones();
   }, []);
 
   // Subscribe to TimeService for coordinated updates (1-second precision)
@@ -96,18 +93,16 @@ export function useTimezones(): UseTimezonesReturn {
     return unsubscribe;
   }, []);
 
-  // Save to localStorage whenever selectedTimezones changes (after initial load)
+  // Save to IndexedDB whenever selectedTimezones changes (after initial load)
   useEffect(() => {
     if (dataLoaded) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedTimezones));
-      } catch (error) {
-        logger.warn('Failed to save timezones to localStorage', {
+      appDataService.set(STORAGE_KEY, selectedTimezones).catch(error => {
+        logger.warn('Failed to save timezones to storage', {
           component: 'useTimezones',
           action: 'saveToStorage',
           metadata: { error },
         });
-      }
+      });
     }
   }, [selectedTimezones, dataLoaded]);
 

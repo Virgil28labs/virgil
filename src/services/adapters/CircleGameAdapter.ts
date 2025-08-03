@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 
 interface CircleGameData {
   scores: {
@@ -53,26 +54,29 @@ export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
   protected async loadData(): Promise<void> {
     try {
       // Load best score
-      const savedBest = localStorage.getItem('perfectCircleBestScore');
-      this.bestScore = savedBest ? parseInt(savedBest, 10) : 0;
+      const savedBest = await appDataService.get<number>('perfectCircleBestScore');
+      this.bestScore = savedBest || 0;
 
       // Load attempts
-      const savedAttempts = localStorage.getItem('perfectCircleAttempts');
-      this.attempts = savedAttempts ? parseInt(savedAttempts, 10) : 0;
+      const savedAttempts = await appDataService.get<number>('perfectCircleAttempts');
+      this.attempts = savedAttempts || 0;
 
       // Load score history (if available)
-      const savedHistory = localStorage.getItem(this.SCORE_HISTORY_KEY);
-      this.scoreHistory = savedHistory ? JSON.parse(savedHistory) : [];
+      const savedHistory = await appDataService.get<number[]>(this.SCORE_HISTORY_KEY);
+      this.scoreHistory = savedHistory || [];
 
       // Load last play time
-      const savedLastPlay = localStorage.getItem(this.LAST_PLAY_KEY);
-      this.lastPlayTime = savedLastPlay ? parseInt(savedLastPlay, 10) : 0;
+      const savedLastPlay = await appDataService.get<number>(this.LAST_PLAY_KEY);
+      this.lastPlayTime = savedLastPlay || 0;
 
       this.lastFetchTime = timeService.getTimestamp();
       const data = this.transformData();
@@ -94,12 +98,24 @@ export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
   }
 
   private calculateImprovementRate(): number {
-    if (this.scoreHistory.length < 2) return 0;
+    const len = this.scoreHistory.length;
+    if (len < 2) return 0;
 
     // Compare recent average to older average
-    const midPoint = Math.floor(this.scoreHistory.length / 2);
-    const oldAvg = this.scoreHistory.slice(0, midPoint).reduce((a, b) => a + b, 0) / midPoint;
-    const newAvg = this.scoreHistory.slice(midPoint).reduce((a, b) => a + b, 0) / (this.scoreHistory.length - midPoint);
+    const midPoint = Math.floor(len / 2);
+    let oldSum = 0;
+    let newSum = 0;
+    
+    for (let i = 0; i < len; i++) {
+      if (i < midPoint) {
+        oldSum += this.scoreHistory[i];
+      } else {
+        newSum += this.scoreHistory[i];
+      }
+    }
+    
+    const oldAvg = oldSum / midPoint;
+    const newAvg = newSum / (len - midPoint);
 
     return newAvg > oldAvg ? (newAvg - oldAvg) / oldAvg : 0;
   }
@@ -283,7 +299,7 @@ export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
     let response = `You've attempted to draw perfect circles ${this.attempts} time${this.attempts !== 1 ? 's' : ''}`;
 
     if (this.lastPlayTime) {
-      const timeAgo = this.getTimeAgo(timeService.fromTimestamp(this.lastPlayTime));
+      const timeAgo = timeService.getTimeAgo(timeService.fromTimestamp(this.lastPlayTime));
       response += `, last played ${timeAgo}`;
     }
 
@@ -393,9 +409,6 @@ export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
     return response;
   }
 
-  private getTimeAgo(date: Date): string {
-    return timeService.getTimeAgo(date);
-  }
 
   override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     await this.ensureFreshData();
@@ -429,12 +442,4 @@ export class CircleGameAdapter extends BaseAdapter<CircleGameData> {
     return results;
   }
 
-  protected override getCapabilities(): string[] {
-    return [
-      'game-scores',
-      'skill-tracking',
-      'achievement-system',
-      'performance-analysis',
-    ];
-  }
 }

@@ -74,6 +74,7 @@ describe('DogGallery', () => {
     favorites: mockFavorites,
     isFavorited: jest.fn((url: string) => url.includes('fav')),
     toggleFavorite: jest.fn(),
+    isLoading: false,
   };
 
   beforeEach(() => {

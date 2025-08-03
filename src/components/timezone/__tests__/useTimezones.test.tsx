@@ -23,12 +23,19 @@ import { logger } from '../../../lib/logger';
 jest.mock('../timezoneData');
 jest.mock('../../../services/DashboardContextService');
 jest.mock('../../../lib/logger');
+jest.mock('../../../services/AppDataService', () => ({
+  appDataService: {
+    get: jest.fn(),
+    set: jest.fn(),
+  },
+}));
 
 const mockGetDefaultTimezones = getDefaultTimezones as jest.MockedFunction<typeof getDefaultTimezones>;
 const mockGenerateTimezoneId = generateTimezoneId as jest.MockedFunction<typeof generateTimezoneId>;
 const mockGetTimezoneInfo = getTimezoneInfo as jest.MockedFunction<typeof getTimezoneInfo>;
 const mockDashboardContextService = dashboardContextService as jest.Mocked<typeof dashboardContextService>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
+const mockAppDataService = jest.requireMock('../../../services/AppDataService').appDataService;
 
 // Mock localStorage
 const localStorageMock = {
@@ -98,6 +105,10 @@ describe('useTimezones', () => {
       popular: true,
       searchTerms: ['london', 'uk', 'britain', 'gmt'],
     });
+
+    // Mock appDataService
+    mockAppDataService.get.mockResolvedValue(null);
+    mockAppDataService.set.mockResolvedValue(true);
     
     mockDashboardContextService.getCurrentDateTime.mockReturnValue(mockCurrentDateTime);
     mockDashboardContextService.subscribeToTimeUpdates.mockReturnValue(jest.fn());

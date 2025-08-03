@@ -7,8 +7,9 @@
 
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { TimezoneSearch } from './TimezoneSearch';
-import { useTimezones, useTimezoneFormatters } from './useTimezones';
-import { logger } from '../../lib/logger';
+import { useTimezones } from './TimezoneContext';
+import { useTimezoneFormatters } from './useTimezones';
+import styles from './TimezoneWidget.module.css';
 
 interface TimezoneModalProps {
   isOpen: boolean
@@ -95,11 +96,7 @@ const TimezoneModal = memo(function TimezoneModal({
     const success = addTimezone(timezone);
     if (!success) {
       // Could show error message here
-      logger.warn('Failed to add timezone', {
-        component: 'TimezoneModal',
-        action: 'handleAddTimezone',
-        metadata: { timezone },
-      });
+      console.warn('Failed to add timezone:', timezone);
     }
   }, [addTimezone]);
 
@@ -141,7 +138,7 @@ const TimezoneModal = memo(function TimezoneModal({
 
   return (
     <div
-      className={`timezone-modal-overlay ${className}`}
+      className={`${styles.modalOverlay} ${className || ''}`}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -149,17 +146,17 @@ const TimezoneModal = memo(function TimezoneModal({
     >
       <div
         ref={modalRef}
-        className="timezone-modal"
+        className={styles.modal}
         role="document"
       >
         {/* Header */}
-        <div className="modal-header">
+        <div className={styles.modalHeader}>
           <h2 id="timezone-modal-title">Manage Timezones</h2>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="modal-close"
+            className={styles.modalClose}
             aria-label="Close timezone settings"
           >
             ✕
@@ -167,26 +164,25 @@ const TimezoneModal = memo(function TimezoneModal({
         </div>
 
         {/* Content */}
-        <div className="modal-content">
+        <div className={styles.modalContent}>
           {/* Search Section */}
           {canAddMoreTimezones && (
             <TimezoneSearch
               onSelect={handleTimezoneSelect}
               excludeTimezones={selectedTimezones.map(tz => tz.timezone)}
               autoFocus
-              className="modal-search"
             />
           )}
 
           {/* Selected Timezones Section */}
-          <div className="selected-section">
-            <div className="section-header">
+          <div className={styles.selectedSection}>
+            <div className={styles.sectionHeader}>
               <h3>Selected Timezones ({selectedTimezones.length}/5)</h3>
               {selectedTimezones.length > 0 && (
                 <button
                   type="button"
                   onClick={clearAllTimezones}
-                  className="clear-all-link"
+                  className={styles.clearAllLink}
                   aria-label="Remove all timezones"
                 >
                   Clear all
@@ -195,23 +191,23 @@ const TimezoneModal = memo(function TimezoneModal({
             </div>
 
             {selectedTimezones.length === 0 ? (
-              <div className="empty-state">
+              <div className={styles.emptyState}>
                 <p>No timezones selected yet.</p>
                 <p>Search above to add your first timezone.</p>
               </div>
             ) : (
-              <ul className="timezone-list" role="list">
+              <ul className={styles.timezoneList} role="list">
                 {timezonesWithTime.map((timezone) => {
                   const isEditing = editingId === timezone.id;
 
                   return (
                     <li
                       key={timezone.id}
-                      className={`timezone-item ${!timezone.isValid ? 'invalid' : ''}`}
+                      className={`${styles.timezoneItem} ${!timezone.isValid ? styles.invalid : ''}`}
                       role="listitem"
                     >
-                      <div className="timezone-info">
-                        <div className="timezone-label">
+                      <div className={styles.timezoneInfo}>
+                        <div className={styles.timezoneLabel}>
                           {isEditing ? (
                             <input
                               type="text"
@@ -219,7 +215,7 @@ const TimezoneModal = memo(function TimezoneModal({
                               onChange={(e) => setEditingLabel(e.target.value)}
                               onKeyDown={handleLabelKeyDown}
                               onBlur={handleSaveLabel}
-                              className="label-edit-input"
+                              className={styles.labelEditInput}
                               aria-label="Edit timezone label"
                               autoFocus
                             />
@@ -227,7 +223,7 @@ const TimezoneModal = memo(function TimezoneModal({
                             <button
                               type="button"
                               onClick={() => handleStartEditing(timezone.id, timezone.label)}
-                              className="label-edit-button"
+                              className={styles.labelEditButton}
                               aria-label={`Edit label for ${timezone.label}`}
                             >
                               {timezone.label}
@@ -235,8 +231,8 @@ const TimezoneModal = memo(function TimezoneModal({
                           )}
                         </div>
 
-                        <div className="timezone-details">
-                          <span className="timezone-time">
+                        <div className={styles.timezoneDetails}>
+                          <span className={styles.timezoneTime}>
                             {timezone.isValid ? formatTime(timezone.currentTime) : 'Invalid'}
                           </span>
                         </div>
@@ -246,7 +242,7 @@ const TimezoneModal = memo(function TimezoneModal({
                       <button
                         type="button"
                         onClick={() => handleRemoveTimezone(timezone.id)}
-                        className="remove-btn"
+                        className={styles.removeBtn}
                         aria-label={`Remove ${timezone.label}`}
                         title="Remove timezone"
                       >
@@ -261,15 +257,15 @@ const TimezoneModal = memo(function TimezoneModal({
 
           {/* Limit Notice */}
           {!canAddMoreTimezones && (
-            <div className="limit-notice">
+            <div className={styles.limitNotice}>
               <p>Maximum of 5 timezones reached. Remove a timezone to add another.</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="modal-footer">
-          <p className="footer-info">
+        <div className={styles.modalFooter}>
+          <p className={styles.footerInfo}>
             Click labels to edit
           </p>
         </div>

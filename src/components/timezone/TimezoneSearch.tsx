@@ -8,6 +8,7 @@
 import React, { memo, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { TimezoneInfo } from './timezoneData';
 import { searchTimezones, getPopularTimezones } from './timezoneData';
+import styles from './TimezoneWidget.module.css';
 
 interface TimezoneSearchProps {
   onSelect: (timezone: string) => void
@@ -28,7 +29,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const suggestionRefs = useRef<Map<number, HTMLLIElement | null>>(new Map());
 
   // Search results with popular timezones when empty query
   const searchResults = useMemo(() => {
@@ -91,7 +92,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
           const next = prev < searchResults.length - 1 ? prev + 1 : 0;
           // Scroll to selected item
           setTimeout(() => {
-            suggestionRefs.current[next]?.scrollIntoView({
+            suggestionRefs.current.get(next)?.scrollIntoView({
               block: 'nearest',
               behavior: 'smooth',
             });
@@ -106,7 +107,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
           const next = prev > 0 ? prev - 1 : searchResults.length - 1;
           // Scroll to selected item
           setTimeout(() => {
-            suggestionRefs.current[next]?.scrollIntoView({
+            suggestionRefs.current.get(next)?.scrollIntoView({
               block: 'nearest',
               behavior: 'smooth',
             });
@@ -145,8 +146,8 @@ const TimezoneSearch = memo(function TimezoneSearch({
   }, []);
 
   return (
-    <div className={`timezone-search ${className}`}>
-      <div className="search-input-container">
+    <div className={`${styles.search} ${className || ''}`}>
+      <div className={styles.searchInputContainer}>
         <input
           ref={inputRef}
           type="text"
@@ -156,7 +157,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
           onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="search-input"
+          className={styles.searchInput}
           aria-label="Search for timezone by city or country"
           aria-autocomplete="list"
           aria-expanded={showSuggestions && searchResults.length > 0}
@@ -170,7 +171,7 @@ const TimezoneSearch = memo(function TimezoneSearch({
           <button
             type="button"
             onClick={handleClearSearch}
-            className="clear-search"
+            className={styles.clearSearch}
             aria-label="Clear search"
             tabIndex={-1}
           >
@@ -178,43 +179,49 @@ const TimezoneSearch = memo(function TimezoneSearch({
           </button>
         )}
 
-        <div className="search-icon" aria-hidden="true">
+        <div className={styles.searchIcon} aria-hidden="true">
           🔍
         </div>
       </div>
 
       {showSuggestions && (
         <ul
-          className="suggestions-list"
+          className={styles.suggestionsList}
           role="listbox"
           aria-label="Timezone suggestions"
         >
           {searchResults.length === 0 ? (
-            <li className="no-results" role="option" aria-selected={false}>
+            <li className={styles.noResults} role="option" aria-selected={false}>
               No timezones found
             </li>
           ) : (
             searchResults.map((timezone, index) => (
               <li
                 key={timezone.timezone}
-                ref={el => { suggestionRefs.current[index] = el; }}
+                ref={el => { 
+                  if (el) {
+                    suggestionRefs.current.set(index, el);
+                  } else {
+                    suggestionRefs.current.delete(index);
+                  }
+                }}
                 id={`timezone-suggestion-${index}`}
-                className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+                className={`${styles.suggestionItem} ${index === selectedIndex ? styles.selected : ''}`}
                 role="option"
                 aria-selected={index === selectedIndex}
                 onClick={() => handleTimezoneSelect(timezone)}
                 onMouseEnter={() => setSelectedIndex(index)}
               >
-                <div className="suggestion-main">
-                  <span className="suggestion-city">{timezone.city}</span>
-                  <span className="suggestion-country">{timezone.country}</span>
+                <div className={styles.suggestionMain}>
+                  <span className={styles.suggestionCity}>{timezone.city}</span>
+                  <span className={styles.suggestionCountry}>{timezone.country}</span>
                 </div>
-                <div className="suggestion-meta">
+                <div className={styles.suggestionMeta}>
                   {timezone.region && (
-                    <span className="suggestion-region">{timezone.region}</span>
+                    <span className={styles.suggestionRegion}>{timezone.region}</span>
                   )}
                   {timezone.popular && (
-                    <span className="suggestion-badge">Popular</span>
+                    <span className={styles.suggestionBadge}>Popular</span>
                   )}
                 </div>
               </li>

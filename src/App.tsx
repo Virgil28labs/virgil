@@ -18,6 +18,7 @@ import { StorageMigration } from './services/StorageMigration';
 import { intentInitializer } from './services/IntentInitializer';
 import { logger } from './lib/logger';
 import { SimpleContextSnapshotService } from './services/SimpleContextSnapshotService';
+import { appDataService } from './services/AppDataService';
 // Import errorHandlerService to initialize global error handlers
 import './services/ErrorHandlerService';
 import './App.css';
@@ -59,6 +60,18 @@ function AppContent(): React.ReactElement {
   // Initialize context snapshot service
   useEffect(() => {
     if (!user) return;
+
+    // Initialize AppDataService after user authentication
+    appDataService.init().catch(error => {
+      logger.error(
+        'AppDataService initialization failed',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          component: 'AppContent',
+          action: 'initAppDataService',
+        },
+      );
+    });
 
     const contextService = SimpleContextSnapshotService.getInstance();
     

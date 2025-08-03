@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
-import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
+import { STORAGE_KEYS } from '../../../services/StorageService';
 import { timeService } from '../../../services/TimeService';
+import { appDataService } from '../../../services/AppDataService';
 
 // Simplified APOD for storage (reduce localStorage usage)
 interface StoredApod {
@@ -38,17 +39,37 @@ const storedToApod = (stored: StoredApod): ApodImage => ({
 });
 
 export const useNasaFavorites = () => {
-  // Initialize state with StorageService value
-  const [favorites, setFavorites] = useState<StoredApod[]>(() => {
-    const storedFavorites = StorageService.get<StoredApod[]>(STORAGE_KEYS.NASA_FAVORITES, []);
-    // Sort by savedAt timestamp (newest first)
-    return storedFavorites.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
-  });
+  // Initialize state empty, will load from IndexedDB
+  const [favorites, setFavorites] = useState<StoredApod[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Save to localStorage whenever favorites change
+  // Load favorites from IndexedDB on mount
   useEffect(() => {
-    StorageService.set(STORAGE_KEYS.NASA_FAVORITES, favorites);
-  }, [favorites]);
+    const loadFavorites = async () => {
+      try {
+        const stored = await appDataService.get<StoredApod[]>(STORAGE_KEYS.NASA_FAVORITES);
+        if (stored) {
+          // Sort by savedAt timestamp (newest first)
+          const sortedFavorites = stored.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
+          setFavorites(sortedFavorites);
+        }
+      } catch (error) {
+        console.error('Failed to load NASA favorites:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadFavorites();
+  }, []);
+
+  // Save to IndexedDB whenever favorites change (after initial load)
+  useEffect(() => {
+    if (!isLoading) {
+      appDataService.set(STORAGE_KEYS.NASA_FAVORITES, favorites).catch(error => {
+        console.error('Failed to save NASA favorites:', error);
+      });
+    }
+  }, [favorites, isLoading]);
 
   // Check if APOD is favorited
   const isFavorited = useCallback((apodId: string): boolean => {
@@ -102,5 +123,6 @@ export const useNasaFavorites = () => {
     removeFavorite,
     clearFavorites,
     getFavoriteById,
+    isLoading,
   };
 };

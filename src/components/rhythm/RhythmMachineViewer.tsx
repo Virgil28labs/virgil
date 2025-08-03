@@ -4,6 +4,8 @@ import { rhythmService } from '../../services/rhythm/RhythmService';
 import type { RhythmPattern } from '../../services/rhythm/RhythmService';
 import { timeService } from '../../services/TimeService';
 import { logger } from '../../lib/logger';
+import { appDataService } from '../../services/AppDataService';
+import { STORAGE_KEYS } from '../../services/StorageService';
 import {
   DRUM_SOUNDS,
   GENRE_TAGS,
@@ -70,18 +72,30 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     return 'MIX';
   };
 
-  const [saveSlots, setSaveSlots] = useState<(SavedPattern | null)[]>(() => {
-    const saved = localStorage.getItem('rhythmMachineSaveSlots');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // Handle legacy format (just patterns)
-      if (parsed.length > 0 && Array.isArray(parsed[0])) {
-        return [null, null, null, null, null];
+  const [saveSlots, setSaveSlots] = useState<(SavedPattern | null)[]>([null, null, null, null, null]);
+
+  // Load save slots from IndexedDB on mount
+  useEffect(() => {
+    const loadSaveSlots = async () => {
+      try {
+        const saved = await appDataService.get<(SavedPattern | null)[]>(STORAGE_KEYS.RHYTHM_SAVE_SLOTS);
+        if (saved) {
+          // Handle legacy format (just patterns)
+          if (saved.length > 0 && Array.isArray(saved[0])) {
+            setSaveSlots([null, null, null, null, null]);
+          } else {
+            setSaveSlots(saved);
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to load rhythm save slots', error as Error, {
+          component: 'RhythmMachineViewer',
+          action: 'loadSaveSlots',
+        });
       }
-      return parsed;
-    }
-    return [null, null, null, null, null];
-  });
+    };
+    loadSaveSlots();
+  }, []);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const intervalRef = useRef<number | null>(null);
@@ -400,7 +414,12 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
       timestamp: timeService.getTimestamp(),
     };
     setSaveSlots(newSlots);
-    localStorage.setItem('rhythmMachineSaveSlots', JSON.stringify(newSlots));
+    appDataService.set(STORAGE_KEYS.RHYTHM_SAVE_SLOTS, newSlots).catch(error => {
+      logger.error('Failed to save rhythm slots', error as Error, {
+        component: 'RhythmMachineViewer',
+        action: 'savePattern',
+      });
+    });
   }, [pattern, saveSlots, genreInput]);
 
   // Load pattern from slot
@@ -417,7 +436,12 @@ export const RhythmMachineViewer = memo(function RhythmMachineViewer({
     const newSlots = [...saveSlots];
     newSlots[slotIndex] = null;
     setSaveSlots(newSlots);
-    localStorage.setItem('rhythmMachineSaveSlots', JSON.stringify(newSlots));
+    appDataService.set(STORAGE_KEYS.RHYTHM_SAVE_SLOTS, newSlots).catch(error => {
+      logger.error('Failed to clear rhythm slot', error as Error, {
+        component: 'RhythmMachineViewer',
+        action: 'clearSaveSlot',
+      });
+    });
   }, [saveSlots]);
 
   // Keyboard shortcuts

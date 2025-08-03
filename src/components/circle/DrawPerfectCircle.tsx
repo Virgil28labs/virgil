@@ -9,6 +9,7 @@ import type {
   DrawingConfig,
 } from './types';
 import { logger } from '../../lib/logger';
+import { appDataService } from '../../services/AppDataService';
 
 // Game configuration constants
 const EVALUATION_CONFIG: CircleEvaluationParams = {
@@ -44,30 +45,28 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
   const [points, setPoints] = useState<Point[]>([]);
   const [result, setResult] = useState<EvaluationResult | null>(null);
   const [showGrid, setShowGrid] = useState(true);
-  const [bestScore, setBestScore] = useState(() => {
-    try {
-      const saved = localStorage.getItem('perfectCircleBestScore');
-      return saved ? parseInt(saved, 10) : 0;
-    } catch (error) {
-      logger.error('Failed to load best score from localStorage', error as Error, {
-        component: 'DrawPerfectCircle',
-        action: 'loadBestScore',
-      });
-      return 0;
-    }
-  });
-  const [attempts, setAttempts] = useState(() => {
-    try {
-      const saved = localStorage.getItem('perfectCircleAttempts');
-      return saved ? parseInt(saved, 10) : 0;
-    } catch (error) {
-      logger.error('Failed to load attempts from localStorage', error as Error, {
-        component: 'DrawPerfectCircle',
-        action: 'loadAttempts',
-      });
-      return 0;
-    }
-  });
+  const [bestScore, setBestScore] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+
+  // Load scores from IndexedDB on mount
+  useEffect(() => {
+    const loadScores = async () => {
+      try {
+        const [savedBestScore, savedAttempts] = await Promise.all([
+          appDataService.get<number>('perfectCircleBestScore'),
+          appDataService.get<number>('perfectCircleAttempts'),
+        ]);
+        if (savedBestScore !== null) setBestScore(savedBestScore);
+        if (savedAttempts !== null) setAttempts(savedAttempts);
+      } catch (error) {
+        logger.error('Failed to load scores from IndexedDB', error as Error, {
+          component: 'DrawPerfectCircle',
+          action: 'loadScores',
+        });
+      }
+    };
+    loadScores();
+  }, []);
 
   /**
    * Evaluates the quality of a drawn circle based on points
@@ -329,25 +328,25 @@ export const DrawPerfectCircle = memo(function DrawPerfectCircle({
 
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
-    try {
-      localStorage.setItem('perfectCircleAttempts', newAttempts.toString());
-    } catch (error) {
-      logger.error('Failed to save attempts to localStorage', error as Error, {
+    
+    // Save to IndexedDB async (don't block UI)
+    appDataService.set('perfectCircleAttempts', newAttempts).catch(error => {
+      logger.error('Failed to save attempts to IndexedDB', error as Error, {
         component: 'DrawPerfectCircle',
         action: 'saveAttempts',
       });
-    }
+    });
 
     if (evaluation.score > bestScore) {
       setBestScore(evaluation.score);
-      try {
-        localStorage.setItem('perfectCircleBestScore', evaluation.score.toString());
-      } catch (error) {
-        logger.error('Failed to save best score to localStorage', error as Error, {
+      
+      // Save to IndexedDB async (don't block UI)
+      appDataService.set('perfectCircleBestScore', evaluation.score).catch(error => {
+        logger.error('Failed to save best score to IndexedDB', error as Error, {
           component: 'DrawPerfectCircle',
           action: 'saveBestScore',
         });
-      }
+      });
     }
   }, [isDrawing, result, points, evaluateCircle, attempts, bestScore]);
 

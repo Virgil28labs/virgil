@@ -10,9 +10,10 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData } from '../DashboardAppService';
 import type { UserHabitsData } from '../../types/habit.types';
-import { StorageService, STORAGE_KEYS } from '../StorageService';
+import { STORAGE_KEYS } from '../StorageService';
 import { dashboardContextService } from '../DashboardContextService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 
 interface StreakData {
   habits: {
@@ -50,10 +51,13 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
-  protected loadData(): void {
+  protected async loadData(): Promise<void> {
     try {
       const defaultData: UserHabitsData = {
         habits: [],
@@ -65,10 +69,13 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
           perfectDays: [],
         },
       };
-      this.userData = StorageService.get<UserHabitsData>(this.STORAGE_KEY, defaultData);
+      const stored = await appDataService.get<UserHabitsData>(this.STORAGE_KEY);
+      this.userData = stored || defaultData;
       if (this.userData && this.userData.habits.length > 0) {
         this.lastFetchTime = timeService.getTimestamp();
       }
+      const data = this.transformData();
+      this.notifySubscribers(data);
     } catch (error) {
       this.logError('Failed to load habit data', error, 'loadData');
     }
@@ -287,17 +294,17 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
     if (!this.userData) return [];
 
     const activity: Record<string, Set<string>> = {};
-    const last7Days = Array.from({ length: 7 }, (_, i) => 
-      timeService.formatDateToLocal(timeService.subtractDays(timeService.getCurrentDateTime(), i)),
-    );
-
+    const today = timeService.getCurrentDateTime();
+    const sevenDaysAgo = timeService.subtractDays(today, 7);
+    
     // Count check-ins per day
     for (const habit of this.userData.habits) {
       if (!habit.checkIns || !Array.isArray(habit.checkIns)) {
         continue;
       }
       for (const checkIn of habit.checkIns) {
-        if (last7Days.includes(checkIn)) {
+        const checkInDate = timeService.parseDate(checkIn);
+        if (checkInDate && checkInDate >= sevenDaysAgo) {
           if (!activity[checkIn]) {
             activity[checkIn] = new Set();
           }
@@ -426,5 +433,6 @@ export class StreakAdapterRefactored extends BaseAdapter<StreakData> {
   }
 }
 
-// Singleton instance
+// Export singleton instance
 export const streakAdapterRefactored = new StreakAdapterRefactored();
+

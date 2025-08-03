@@ -4,9 +4,10 @@ import type {
   UserHabitsData,
   Achievement,
 } from '../types/habit.types';
-import { StorageService, STORAGE_KEYS } from '../services/StorageService';
+import { STORAGE_KEYS } from '../services/StorageService';
 import { dashboardContextService } from '../services/DashboardContextService';
 import { timeService } from '../services/TimeService';
+import { appDataService } from '../services/AppDataService';
 
 const STORAGE_KEY = STORAGE_KEYS.VIRGIL_HABITS;
 const MAX_HABITS = 10;
@@ -99,37 +100,54 @@ const calculateStreak = (checkIns: string[]): number => {
 };
 
 export const useHabits = () => {
-  const [userData, setUserData] = useState<UserHabitsData>(() => {
-    const defaultData: UserHabitsData = {
-      habits: [],
-      achievements: DEFAULT_ACHIEVEMENTS,
-      settings: {
-        soundEnabled: true,
-      },
-      stats: {
-        totalCheckIns: 0,
-        currentStreak: 0,
-        perfectDays: [],
-      },
-    };
+  const defaultData: UserHabitsData = {
+    habits: [],
+    achievements: DEFAULT_ACHIEVEMENTS,
+    settings: {
+      soundEnabled: true,
+    },
+    stats: {
+      totalCheckIns: 0,
+      currentStreak: 0,
+      perfectDays: [],
+    },
+  };
 
-    const data = StorageService.get<UserHabitsData>(STORAGE_KEY, defaultData);
+  const [userData, setUserData] = useState<UserHabitsData>(defaultData);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-    // Update streak values based on current time
-    if (data.habits) {
-      data.habits = data.habits.map(habit => ({
-        ...habit,
-        streak: calculateStreak(habit.checkIns),
-      }));
-    }
-
-    return data;
-  });
-
-  // Save to localStorage whenever data changes
+  // Load habits from IndexedDB on mount
   useEffect(() => {
-    StorageService.set(STORAGE_KEY, userData);
-  }, [userData]);
+    const loadHabits = async () => {
+      try {
+        const stored = await appDataService.get<UserHabitsData>(STORAGE_KEY);
+        if (stored) {
+          // Update streak values based on current time
+          if (stored.habits) {
+            stored.habits = stored.habits.map(habit => ({
+              ...habit,
+              streak: calculateStreak(habit.checkIns),
+            }));
+          }
+          setUserData(stored);
+        }
+      } catch (error) {
+        console.error('Failed to load habits from IndexedDB:', error);
+      } finally {
+        setDataLoaded(true);
+      }
+    };
+    loadHabits();
+  }, []);
+
+  // Save to IndexedDB whenever data changes (after initial load)
+  useEffect(() => {
+    if (dataLoaded) {
+      appDataService.set(STORAGE_KEY, userData).catch(error => {
+        console.error('Failed to save habits to IndexedDB:', error);
+      });
+    }
+  }, [userData, dataLoaded]);
 
   // Add a new habit
   const addHabit = useCallback((name: string, emoji: string) => {

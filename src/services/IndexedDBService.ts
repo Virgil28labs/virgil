@@ -447,6 +447,20 @@ indexedDBService.registerDatabase({
 });
 
 indexedDBService.registerDatabase({
+  name: 'VirgilAppDataDB',
+  version: 1,
+  stores: [
+    {
+      name: 'appData',
+      keyPath: 'id',
+      indexes: [
+        { name: 'timestamp', keyPath: 'timestamp' },
+      ],
+    },
+  ],
+});
+
+indexedDBService.registerDatabase({
   name: 'NotesDB',
   version: 1,
   stores: [

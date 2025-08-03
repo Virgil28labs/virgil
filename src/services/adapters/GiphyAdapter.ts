@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 interface GiphyImage {
   id: string;
   url: string;
@@ -37,7 +38,6 @@ interface GiphyData {
       id: string;
       title: string;
       rating: string;
-      savedAt?: number;
     }[];
   };
   stats: {
@@ -58,14 +58,17 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
-  protected loadData(): void {
+  protected async loadData(): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const stored = await appDataService.get<GiphyImage[]>(this.STORAGE_KEY);
       if (stored) {
-        this.favorites = JSON.parse(stored) as GiphyImage[];
+        this.favorites = stored;
       } else {
         this.favorites = [];
       }
@@ -77,13 +80,8 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
       this.favorites = [];
     }
 
-    // Set up storage listener for real-time updates
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.loadData();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
+    // Note: IndexedDB doesn't have storage events like localStorage
+    // Updates will happen through the adapter's own methods
   }
 
   protected transformData(): GiphyData {
@@ -99,12 +97,11 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
     };
 
     let totalSize = 0;
-    this.favorites.forEach(gif => {
+    for (const gif of this.favorites) {
       ratings[gif.rating]++;
-      // Estimate size based on dimensions
-      const estimatedSize = (gif.width * gif.height * 4) / 1024; // KB estimate
-      totalSize += estimatedSize;
-    });
+      // Estimate size based on dimensions (simplified)
+      totalSize += (gif.width * gif.height) / 250; // KB estimate
+    }
 
     // Find most used rating
     const mostUsedRating = Object.entries(ratings)
@@ -116,12 +113,11 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
       .slice(0, 5)
       .map(([cat]) => cat);
 
-    // Get recent favorites (estimate saved time)
-    const recentFavorites = this.favorites.slice(0, 10).map((gif, index) => ({
+    // Get recent favorites
+    const recentFavorites = this.favorites.slice(0, 10).map(gif => ({
       id: gif.id,
       title: gif.title || 'Untitled GIF',
       rating: gif.rating,
-      savedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
     return {
@@ -179,21 +175,22 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
       'wow': ['wow', 'amazing', 'awesome', 'incredible'],
     };
 
-    this.favorites.forEach(gif => {
+    for (const gif of this.favorites) {
       const title = (gif.title || '').toLowerCase();
       let categorized = false;
 
-      Object.entries(categoryKeywords).forEach(([category, keywords]) => {
+      for (const [category, keywords] of Object.entries(categoryKeywords)) {
         if (keywords.some(keyword => title.includes(keyword))) {
           categories[category] = (categories[category] || 0) + 1;
           categorized = true;
+          break; // Only count each GIF in one category
         }
-      });
+      }
 
       if (!categorized) {
         categories['other'] = (categories['other'] || 0) + 1;
       }
-    });
+    }
 
     return categories;
   }
@@ -380,7 +377,7 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
       if (title.includes(lowerQuery)) {
         results.push({
           type: 'gif',
-          label: `${gif.title} (${gif.rating})`  ,
+          label: `${gif.title} (${gif.rating})`,
           value: gif.title || 'Untitled GIF',
           field: `giphy.gif-${gif.id}`,
         });

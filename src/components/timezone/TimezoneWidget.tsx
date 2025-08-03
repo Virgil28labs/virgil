@@ -8,7 +8,8 @@
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { TimezoneModal } from './TimezoneModal';
 import { PositionedTimezoneHoverPanel } from './TimezoneHoverPanel';
-import { useTimezones } from './useTimezones';
+import { TimezoneProvider, useTimezones } from './TimezoneContext';
+import styles from './TimezoneWidget.module.css';
 
 interface TimezoneWidgetProps {
   children: React.ReactNode
@@ -18,7 +19,8 @@ interface TimezoneWidgetProps {
   clickToOpen?: boolean
 }
 
-export const TimezoneWidget = memo(function TimezoneWidget({
+// Inner component that uses the timezone context
+const TimezoneWidgetInner = memo(function TimezoneWidgetInner({
   children,
   className = '',
   disabled = false,
@@ -153,13 +155,13 @@ export const TimezoneWidget = memo(function TimezoneWidget({
   return (
     <div
       ref={containerRef}
-      className="timezone-widget-container"
+      className={styles.widgetContainer}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div
         ref={triggerRef}
-        className={`timezone-widget-trigger ${className} ${disabled ? 'disabled' : ''}`}
+        className={`${styles.widgetTrigger} ${className} ${disabled ? styles.disabled : ''}`}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
@@ -185,7 +187,6 @@ export const TimezoneWidget = memo(function TimezoneWidget({
         <PositionedTimezoneHoverPanel
           isVisible={isHoverPanelVisible && !isModalOpen}
           triggerRef={triggerRef as React.RefObject<HTMLDivElement>}
-          className="timezone-widget-panel"
         />
       )}
 
@@ -193,8 +194,16 @@ export const TimezoneWidget = memo(function TimezoneWidget({
       <TimezoneModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        className="timezone-widget-modal"
       />
     </div>
+  );
+});
+
+// Export the widget wrapped with the provider
+export const TimezoneWidget = memo(function TimezoneWidget(props: TimezoneWidgetProps) {
+  return (
+    <TimezoneProvider>
+      <TimezoneWidgetInner {...props} />
+    </TimezoneProvider>
   );
 });

@@ -33,12 +33,20 @@ jest.mock('../../../lib/logger', () => ({
   },
 }));
 
+jest.mock('../../../services/AppDataService', () => ({
+  appDataService: {
+    get: jest.fn(),
+    set: jest.fn(),
+  },
+}));
+
 // Mock CSS import
 jest.mock('../RhythmMachineViewer.css', () => ({}));
 
 const mockRhythmService = jest.requireMock('../../../services/rhythm/RhythmService').rhythmService;
 const mockTimeService = jest.requireMock('../../../services/TimeService').timeService;
 const mockLogger = jest.requireMock('../../../lib/logger').logger;
+const mockAppDataService = jest.requireMock('../../../services/AppDataService').appDataService;
 
 // Mock Web Audio API
 global.AudioContext = jest.fn().mockImplementation(() => ({
@@ -109,6 +117,10 @@ describe('RhythmMachineViewer', () => {
       removeItem: jest.fn(),
     };
     Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+    // Setup appDataService mock
+    mockAppDataService.get.mockResolvedValue(null);
+    mockAppDataService.set.mockResolvedValue(true);
 
     // Mock timers
     jest.spyOn(window, 'setInterval').mockImplementation((callback, delay) => {

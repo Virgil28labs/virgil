@@ -4,8 +4,8 @@
  * Provides shared timezone state across all timezone components
  */
 
+import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import React, { createContext, useContext } from 'react';
 import { useTimezones as useTimezonesHook } from './useTimezones';
 import type { SelectedTimezone } from './timezoneData';
 import type { TimezoneWithTime } from './useTimezones';
@@ -34,10 +34,12 @@ export function TimezoneProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useTimezones() {
+function useTimezones() {
   const context = useContext(TimezoneContext);
   if (!context) {
     throw new Error('useTimezones must be used within a TimezoneProvider');
   }
   return context;
 }
+
+export { useTimezones };

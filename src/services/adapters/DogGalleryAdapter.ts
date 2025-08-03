@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 
 interface DogImage {
   url: string;
@@ -25,7 +26,6 @@ interface DogGalleryData {
       url: string;
       breed: string;
       id: string;
-      addedAt?: number;
     }[];
   };
   stats: {
@@ -45,14 +45,17 @@ export class DogGalleryAdapter extends BaseAdapter<DogGalleryData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
-  protected loadData(): void {
+  protected async loadData(): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const stored = await appDataService.get<DogImage[]>(this.STORAGE_KEY);
       if (stored) {
-        this.favorites = JSON.parse(stored) as DogImage[];
+        this.favorites = stored;
       } else {
         this.favorites = [];
       }
@@ -64,13 +67,8 @@ export class DogGalleryAdapter extends BaseAdapter<DogGalleryData> {
       this.favorites = [];
     }
 
-    // Set up storage listener for real-time updates
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.loadData();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
+    // Note: IndexedDB doesn't have storage events like localStorage
+    // Updates will happen through the adapter's own methods
   }
 
   protected transformData(): DogGalleryData {
@@ -82,25 +80,17 @@ export class DogGalleryAdapter extends BaseAdapter<DogGalleryData> {
     });
 
     // Find most favorited breed
-    let mostFavoritedBreed: string | undefined;
-    let maxCount = 0;
-    Object.entries(breedCounts).forEach(([breed, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        mostFavoritedBreed = breed;
-      }
-    });
+    const [mostFavoritedBreed] = Object.entries(breedCounts)
+      .sort(([, a], [, b]) => b - a)[0] || [undefined, 0];
 
     // Get unique breeds
     const uniqueBreeds = Object.keys(breedCounts);
 
-    // Get recent favorites (with timestamps if available)
-    const recentFavorites = this.favorites.slice(0, 10).map((dog, index) => ({
+    // Get recent favorites
+    const recentFavorites = this.favorites.slice(0, 10).map(dog => ({
       url: dog.url,
       breed: dog.breed,
       id: dog.id,
-      // Estimate added time based on position (newer items first)
-      addedAt: timeService.getTimestamp() - (index * 24 * 60 * 60 * 1000), // Each older by 1 day
     }));
 
     return {

@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { appDataService } from '../AppDataService';
 interface StoredApod {
   id: string;
   date: string;
@@ -52,16 +53,18 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
 
   constructor() {
     super();
-    this.loadData();
+    // Load data asynchronously without blocking constructor
+    this.loadData().catch(error => {
+      this.logError('Failed to load initial data', error, 'constructor');
+    });
   }
 
-  protected loadData(): void {
+  protected async loadData(): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const stored = await appDataService.get<StoredApod[]>(this.STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored) as StoredApod[];
         // Sort by savedAt timestamp (newest first)
-        this.favorites = parsed.sort((a, b) => b.savedAt - a.savedAt);
+        this.favorites = stored.sort((a, b) => b.savedAt - a.savedAt);
       } else {
         this.favorites = [];
       }
@@ -73,13 +76,8 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
       this.favorites = [];
     }
 
-    // Set up storage listener for real-time updates
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === this.STORAGE_KEY) {
-        this.loadData();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
+    // Note: IndexedDB doesn't have storage events like localStorage
+    // Updates will happen through the adapter's own methods
   }
 
   protected transformData(): NasaApodData {
@@ -168,14 +166,14 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
       'iss', 'spacecraft', 'meteor',
     ];
 
-    this.favorites.forEach(fav => {
+    for (const fav of this.favorites) {
       const text = (fav.title + ' ' + fav.explanation).toLowerCase();
-      keywords.forEach(keyword => {
+      for (const keyword of keywords) {
         if (text.includes(keyword)) {
           topicCounts[keyword] = (topicCounts[keyword] || 0) + 1;
         }
-      });
-    });
+      }
+    }
 
     // Return top 5 topics
     return Object.entries(topicCounts)
@@ -286,7 +284,7 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
 
     const recent = data.favorites.recent[0];
     const date = timeService.parseDate(recent.date) || timeService.getCurrentDateTime();
-    const timeAgo = this.getTimeAgo(timeService.fromTimestamp(recent.savedAt));
+    const timeAgo = this.getRelativeTime(timeService.fromTimestamp(recent.savedAt));
 
     let response = `Your most recent space favorite is "${recent.title}" from ${timeService.formatDateToLocal(date)}, saved ${timeAgo}.`;
 
@@ -393,9 +391,6 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
     return response;
   }
 
-  private getTimeAgo(date: Date): string {
-    return this.getRelativeTime(date);
-  }
 
   override async search(query: string): Promise<Array<{ type: string; label: string; value: string; field: string }>> {
     this.ensureFreshData();
@@ -404,11 +399,9 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
     const results: Array<{ type: string; label: string; value: string; field: string }> = [];
 
     // Search in titles and explanations
-    this.favorites.forEach(fav => {
-      const titleMatch = fav.title.toLowerCase().includes(lowerQuery);
-      const explanationMatch = fav.explanation.toLowerCase().includes(lowerQuery);
-
-      if (titleMatch || explanationMatch) {
+    for (const fav of this.favorites) {
+      if (fav.title.toLowerCase().includes(lowerQuery) || 
+          fav.explanation.toLowerCase().includes(lowerQuery)) {
         results.push({
           type: 'nasa-apod',
           label: `${fav.title} (${fav.date})`,
@@ -416,7 +409,7 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
           field: `nasa.apod-${fav.id}`,
         });
       }
-    });
+    }
 
     return results;
   }
