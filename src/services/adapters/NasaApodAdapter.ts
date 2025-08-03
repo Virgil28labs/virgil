@@ -8,7 +8,6 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
-import { appDataService } from '../AppDataService';
 interface StoredApod {
   id: string;
   date: string;
@@ -61,10 +60,10 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
 
   protected async loadData(): Promise<void> {
     try {
-      const stored = await appDataService.get<StoredApod[]>(this.STORAGE_KEY);
-      if (stored) {
+      const storedData = localStorage.getItem(this.STORAGE_KEY);
+      if (storedData) {
         // Sort by savedAt timestamp (newest first)
-        this.favorites = stored.sort((a, b) => b.savedAt - a.savedAt);
+        this.favorites = JSON.parse(storedData).sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
       } else {
         this.favorites = [];
       }
@@ -76,9 +75,15 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
       this.favorites = [];
     }
 
-    // Note: IndexedDB doesn't have storage events like localStorage
-    // Updates will happen through the adapter's own methods
+    // Listen for localStorage changes from other tabs/windows
+    window.addEventListener('storage', this.handleStorageChange);
   }
+
+  private handleStorageChange = (event: StorageEvent) => {
+    if (event.key === this.STORAGE_KEY) {
+      this.loadData();
+    }
+  };
 
   protected transformData(): NasaApodData {
     // Count media types

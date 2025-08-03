@@ -8,7 +8,6 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
-import { appDataService } from '../AppDataService';
 interface GiphyImage {
   id: string;
   url: string;
@@ -66,9 +65,9 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
 
   protected async loadData(): Promise<void> {
     try {
-      const stored = await appDataService.get<GiphyImage[]>(this.STORAGE_KEY);
-      if (stored) {
-        this.favorites = stored;
+      const storedData = localStorage.getItem(this.STORAGE_KEY);
+      if (storedData) {
+        this.favorites = JSON.parse(storedData);
       } else {
         this.favorites = [];
       }
@@ -80,9 +79,15 @@ export class GiphyAdapter extends BaseAdapter<GiphyData> {
       this.favorites = [];
     }
 
-    // Note: IndexedDB doesn't have storage events like localStorage
-    // Updates will happen through the adapter's own methods
+    // Listen for localStorage changes from other tabs/windows
+    window.addEventListener('storage', this.handleStorageChange);
   }
+
+  private handleStorageChange = (event: StorageEvent) => {
+    if (event.key === this.STORAGE_KEY) {
+      this.loadData();
+    }
+  };
 
   protected transformData(): GiphyData {
     // Categorize GIFs based on titles
