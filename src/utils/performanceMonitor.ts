@@ -4,6 +4,7 @@
  */
 
 import { timeService } from '../services/TimeService';
+import { logger } from '../lib/logger';
 
 export class PerformanceMonitor {
   private markers: Map<string, number> = new Map();
@@ -48,7 +49,11 @@ export class PerformanceMonitor {
     
     // Log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Performance] ${name}: ${timestamp.toFixed(2)}ms`);
+      logger.debug(`${name}: ${timestamp.toFixed(2)}ms`, {
+        component: 'PerformanceMonitor',
+        action: 'mark',
+        metadata: { name, timestamp: timestamp.toFixed(2) },
+      });
     }
   }
   

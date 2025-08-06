@@ -1,66 +1,85 @@
 import { lazy } from 'react';
 
+// Module imports for prefetching
+const moduleImports = {
+  NotesApp: () => import(/* webpackChunkName: "notes-app", webpackPrefetch: true */ './notes/NotesApp'),
+  CameraApp: () => import(/* webpackChunkName: "camera-app" */ './camera/CameraApp'),
+  NasaApodViewer: () => import(/* webpackChunkName: "nasa-apod" */ './nasa/NasaApodViewer'),
+  MinimalHabitTracker: () => import(/* webpackChunkName: "habit-tracker", webpackPrefetch: true */ './streak/MinimalHabitTracker'),
+  GiphyGallery: () => import(/* webpackChunkName: "giphy-gallery" */ './giphy/GiphyGallery'),
+  DogGallery: () => import(/* webpackChunkName: "dog-gallery" */ './dog/DogGallery'),
+  RhythmMachineViewer: () => import(/* webpackChunkName: "rhythm-machine" */ './rhythm/RhythmMachineViewer'),
+  DrawPerfectCircle: () => import(/* webpackChunkName: "circle-game" */ './circle/DrawPerfectCircle'),
+  VectorMemory: () => import(/* webpackChunkName: "vector-memory" */ './VectorMemory'),
+};
+
 // Lazy load all dashboard app components for optimal bundle splitting
 export const LazyDashboardApps = {
-  // Notes App
+  // Notes App - prefetched as commonly used
   NotesApp: lazy(() =>
-    import(/* webpackChunkName: "notes-app" */ './notes/NotesApp')
-      .then(module => ({ default: module.NotesApp })),
+    moduleImports.NotesApp().then(module => ({ default: module.NotesApp }))
   ),
   
   // Camera App
   CameraApp: lazy(() =>
-    import(/* webpackChunkName: "camera-app" */ './camera/CameraApp')
-      .then(module => ({ default: module.CameraApp })),
+    moduleImports.CameraApp().then(module => ({ default: module.CameraApp }))
   ),
   
   // NASA APOD Viewer
   NasaApodViewer: lazy(() =>
-    import(/* webpackChunkName: "nasa-apod" */ './nasa/NasaApodViewer')
-      .then(module => ({ default: module.NasaApodViewer })),
+    moduleImports.NasaApodViewer().then(module => ({ default: module.NasaApodViewer }))
   ),
   
-  // Habit Tracker
+  // Habit Tracker - prefetched as commonly used
   MinimalHabitTracker: lazy(() =>
-    import(/* webpackChunkName: "habit-tracker" */ './streak/MinimalHabitTracker')
-      .then(module => ({ default: module.MinimalHabitTracker })),
+    moduleImports.MinimalHabitTracker().then(module => ({ default: module.MinimalHabitTracker }))
   ),
   
   // Giphy Gallery
   GiphyGallery: lazy(() =>
-    import(/* webpackChunkName: "giphy-gallery" */ './giphy/GiphyGallery')
-      .then(module => ({ default: module.GiphyGallery })),
+    moduleImports.GiphyGallery().then(module => ({ default: module.GiphyGallery }))
   ),
   
   // Dog Gallery  
   DogGallery: lazy(() =>
-    import(/* webpackChunkName: "dog-gallery" */ './dog/DogGallery')
-      .then(module => ({ default: module.DogGallery })),
+    moduleImports.DogGallery().then(module => ({ default: module.DogGallery }))
   ),
   
   // Rhythm Machine
   RhythmMachineViewer: lazy(() =>
-    import(/* webpackChunkName: "rhythm-machine" */ './rhythm/RhythmMachineViewer')
-      .then(module => ({ default: module.RhythmMachineViewer })),
+    moduleImports.RhythmMachineViewer().then(module => ({ default: module.RhythmMachineViewer }))
   ),
   
   // Perfect Circle Game
   DrawPerfectCircle: lazy(() =>
-    import(/* webpackChunkName: "circle-game" */ './circle/DrawPerfectCircle')
-      .then(module => ({ default: module.DrawPerfectCircle })),
+    moduleImports.DrawPerfectCircle().then(module => ({ default: module.DrawPerfectCircle }))
   ),
   
   // Vector Memory
   VectorMemory: lazy(() =>
-    import(/* webpackChunkName: "vector-memory" */ './VectorMemory')
-      .then(module => ({ default: module.VectorMemory })),
+    moduleImports.VectorMemory().then(module => ({ default: module.VectorMemory }))
   ),
 };
 
 // Preload function for critical apps
 export const preloadDashboardApp = (appName: keyof typeof LazyDashboardApps) => {
-  const app = LazyDashboardApps[appName];
-  if (app && '_payload' in app && typeof app._payload === 'function') {
-    app._payload();
+  // Use the module imports directly for preloading
+  if (appName in moduleImports) {
+    moduleImports[appName as keyof typeof moduleImports]();
   }
 };
+
+// Preload high-priority apps on idle
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => {
+    // Preload commonly used apps
+    preloadDashboardApp('NotesApp');
+    preloadDashboardApp('MinimalHabitTracker');
+  }, { timeout: 2000 });
+} else {
+  // Fallback for browsers without requestIdleCallback
+  setTimeout(() => {
+    preloadDashboardApp('NotesApp');
+    preloadDashboardApp('MinimalHabitTracker');
+  }, 2000);
+}

@@ -310,35 +310,47 @@ export const Dashboard = memo(function Dashboard() {
             <LazyRaccoonMascot />
           </Suspense>
         </SectionErrorBoundary>
-        {/* Dog Emoji Button */}
-        <DogEmojiButton />
+        
+        {/* App Buttons - Each with its own Suspense boundary for better UX */}
+        <Suspense fallback={null}>
+          <DogEmojiButton />
+        </Suspense>
 
-        {/* Giphy Emoji Button */}
-        <GiphyEmojiButton />
+        <Suspense fallback={null}>
+          <GiphyEmojiButton />
+        </Suspense>
 
-        {/* NASA APOD Button */}
-        <NasaApodButton />
+        <Suspense fallback={null}>
+          <NasaApodButton />
+        </Suspense>
 
-        {/* Rhythm Machine Button */}
-        <RhythmMachineButton />
+        <Suspense fallback={null}>
+          <RhythmMachineButton />
+        </Suspense>
 
-        {/* Circle Game Button */}
-        <CircleGameButton />
+        <Suspense fallback={null}>
+          <CircleGameButton />
+        </Suspense>
 
-        {/* Streak Tracker Button */}
-        <StreakTrackerButton />
+        <Suspense fallback={null}>
+          <StreakTrackerButton />
+        </Suspense>
 
-        {/* Camera Button */}
-        <CameraEmojiButton />
+        <Suspense fallback={null}>
+          <CameraEmojiButton />
+        </Suspense>
 
-        {/* Pomodoro Timer Button */}
-        <PomodoroEmojiButton />
+        <Suspense fallback={null}>
+          <PomodoroEmojiButton />
+        </Suspense>
 
-        {/* Notes Button */}
-        <NotesEmojiButton />
+        <Suspense fallback={null}>
+          <NotesEmojiButton />
+        </Suspense>
 
-        {/* Vector Test Button */}
-        <VectorMemoryButton />
+        <Suspense fallback={null}>
+          <VectorMemoryButton />
+        </Suspense>
       </div>
 
       {/* User Profile Viewer */}

@@ -10,6 +10,7 @@ import { useStore } from 'zustand';
 import { useContextStore } from '../ContextStore';
 import { timeService } from '../../services/TimeService';
 import { timeSelectors } from '../slices/timeSlice';
+import { logger } from '../../lib/logger';
 import type { 
   ContextSelector, 
 } from '../types/store.types';
@@ -511,7 +512,6 @@ export const useStoreSubscription = <T>(
  * Hook for getting time-relative information
  */
 export const useTimeRelative = () => {
-  const timeActions = useTimeActions();
   const isTimeValid = useIsTimeValid();
   
   return useCallback((date: Date): string => {
@@ -530,10 +530,13 @@ export const useTimeRelative = () => {
     try {
       return timeService.getRelativeTime(date);
     } catch (error) {
-      console.error('Error getting relative time:', error);
+      logger.error('Failed to get relative time', error instanceof Error ? error : new Error(String(error)), {
+        component: 'useTimeRelative',
+        action: 'getRelativeTime',
+      });
       return 'unknown time';
     }
-  }, [isTimeValid, timeActions]);
+  }, [isTimeValid]);
 };
 
 // ========== Development Hooks ==========
@@ -544,10 +547,26 @@ export const useTimeRelative = () => {
 export const useStoreDebug = () => {
   if (process.env.NODE_ENV === 'development') {
     return {
-      logState: () => console.log('Context Store State:', useContextStore.getState()),
-      logTimeState: () => console.log('Time State:', useContextStore.getState().time),
-      logLocationState: () => console.log('Location State:', useContextStore.getState().location),
-      logWeatherState: () => console.log('Weather State:', useContextStore.getState().weather),
+      logState: () => logger.debug('Context Store State', {
+        component: 'useStoreDebug',
+        action: 'logState',
+        metadata: { state: useContextStore.getState() as unknown as Record<string, unknown> },
+      }),
+      logTimeState: () => logger.debug('Time State', {
+        component: 'useStoreDebug',
+        action: 'logTimeState',
+        metadata: { timeState: useContextStore.getState().time as unknown as Record<string, unknown> },
+      }),
+      logLocationState: () => logger.debug('Location State', {
+        component: 'useStoreDebug',
+        action: 'logLocationState',
+        metadata: { locationState: useContextStore.getState().location as unknown as Record<string, unknown> },
+      }),
+      logWeatherState: () => logger.debug('Weather State', {
+        component: 'useStoreDebug',
+        action: 'logWeatherState',
+        metadata: { weatherState: useContextStore.getState().weather as unknown as Record<string, unknown> },
+      }),
     };
   }
   return {

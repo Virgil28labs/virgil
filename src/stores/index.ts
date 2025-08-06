@@ -6,6 +6,7 @@
  */
 
 import type { ContextStoreWithActions } from './types/store.types';
+import { logger } from '../lib/logger';
 
 // ========== Core Store ==========
 export { 
@@ -274,7 +275,11 @@ export const dev = {
   logState: () => {
     if (process.env.NODE_ENV === 'development') {
       const { getStoreState: getState } = require('./ContextStore');
-      console.log('Context Store State:', getState());
+      logger.debug('Store state logged', {
+        component: 'ContextStore',
+        action: 'logState',
+        metadata: { state: getState() as unknown as Record<string, unknown> },
+      });
     }
   },
   

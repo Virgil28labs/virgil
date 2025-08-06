@@ -1,6 +1,4 @@
 import React, { Suspense, useEffect } from 'react';
-import { StyleSheetManager } from 'styled-components';
-import isPropValid from '@emotion/is-prop-valid';
 
 import { AuthProvider } from './contexts/AuthContext';
 import { LocationProvider } from './contexts/LocationContext';
@@ -23,17 +21,6 @@ import { appDataService } from './services/AppDataService';
 import './services/ErrorHandlerService';
 import './App.css';
 
-// Configure styled-components to filter out problematic props
-const shouldForwardProp = (propName: string) => {
-  // Filter out known problematic props from react-camera-pro
-  const excludedProps = ['aspectRatio', 'mirrored', 'facingMode'];
-  if (excludedProps.includes(propName)) {
-    return false;
-  }
-
-  // Use emotion's isPropValid for standard HTML attribute validation
-  return isPropValid(propName);
-};
 
 function AppContent(): React.ReactElement {
   const { user, loading } = useAuth();
@@ -180,32 +167,30 @@ function App(): React.ReactElement {
   }, []);
 
   return (
-    <StyleSheetManager shouldForwardProp={shouldForwardProp}>
-      <ErrorBoundary>
-        <AuthProvider>
-          <LocationProvider>
-            <WeatherProvider>
-              <div className="app">
-                <a href="#main-content" className="skip-link">Skip to main content</a>
-                <ErrorBoundary fallback={(
-                  <div style={{ padding: '1rem', color: 'var(--brand-light-gray)' }}>
-                    Dashboard temporarily unavailable. Please try refreshing.
-                  </div>
-                )}
-                >
-                  <AppContent />
-                </ErrorBoundary>
-                <ToastContainer
-                  toasts={toasts}
-                  onDismiss={removeToast}
-                  position="top-right"
-                />
-              </div>
-            </WeatherProvider>
-          </LocationProvider>
-        </AuthProvider>
-      </ErrorBoundary>
-    </StyleSheetManager>
+    <ErrorBoundary>
+      <AuthProvider>
+        <LocationProvider>
+          <WeatherProvider>
+            <div className="app">
+              <a href="#main-content" className="skip-link">Skip to main content</a>
+              <ErrorBoundary fallback={(
+                <div style={{ padding: '1rem', color: 'var(--brand-light-gray)' }}>
+                  Dashboard temporarily unavailable. Please try refreshing.
+                </div>
+              )}
+              >
+                <AppContent />
+              </ErrorBoundary>
+              <ToastContainer
+                toasts={toasts}
+                onDismiss={removeToast}
+                position="top-right"
+              />
+            </div>
+          </WeatherProvider>
+        </LocationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
