@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { StorageService } from '../StorageService';
 
 interface DogImage {
   url: string;
@@ -52,12 +53,8 @@ export class DogGalleryAdapter extends BaseAdapter<DogGalleryData> {
 
   protected async loadData(): Promise<void> {
     try {
-      const storedData = localStorage.getItem(this.STORAGE_KEY);
-      if (storedData) {
-        this.favorites = JSON.parse(storedData);
-      } else {
-        this.favorites = [];
-      }
+      // Load from localStorage
+      this.favorites = StorageService.get<DogImage[]>(this.STORAGE_KEY, []);
       this.lastFetchTime = timeService.getTimestamp();
       const data = this.transformData();
       this.notifySubscribers(data);

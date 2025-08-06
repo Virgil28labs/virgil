@@ -1,17 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DogImage } from './useDogApi';
-import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
+import { STORAGE_KEYS, StorageService } from '../../../services/StorageService';
 
 export const useDogFavorites = () => {
-  // Initialize with data from localStorage
-  const [favorites, setFavorites] = useState<DogImage[]>(() => {
-    return StorageService.get<DogImage[]>(STORAGE_KEYS.DOG_FAVORITES, []);
-  });
+  const [favorites, setFavorites] = useState<DogImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Save to localStorage whenever favorites change
+  // Load favorites from localStorage on mount
   useEffect(() => {
-    StorageService.set(STORAGE_KEYS.DOG_FAVORITES, favorites);
-  }, [favorites]);
+    try {
+      const stored = StorageService.get<DogImage[]>(STORAGE_KEYS.DOG_FAVORITES, []);
+      setFavorites(stored);
+    } catch (error) {
+      console.error('Failed to load dog favorites:', error);
+      setFavorites([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Save to localStorage whenever favorites change (after initial load)
+  useEffect(() => {
+    if (!isLoading) {
+      StorageService.set(STORAGE_KEYS.DOG_FAVORITES, favorites);
+    }
+  }, [favorites, isLoading]);
 
   // Check if image is favorited
   const isFavorited = useCallback((imageUrl: string): boolean => {
@@ -35,5 +48,6 @@ export const useDogFavorites = () => {
     favorites,
     isFavorited,
     toggleFavorite,
+    isLoading,
   };
 };

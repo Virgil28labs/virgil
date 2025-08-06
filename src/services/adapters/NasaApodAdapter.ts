@@ -8,6 +8,7 @@
 import { BaseAdapter } from './BaseAdapter';
 import type { AppContextData, AggregateableData } from '../DashboardAppService';
 import { timeService } from '../TimeService';
+import { StorageService } from '../StorageService';
 interface StoredApod {
   id: string;
   date: string;
@@ -60,10 +61,11 @@ export class NasaApodAdapter extends BaseAdapter<NasaApodData> {
 
   protected async loadData(): Promise<void> {
     try {
-      const storedData = localStorage.getItem(this.STORAGE_KEY);
-      if (storedData) {
+      // Load from localStorage
+      const storedData = StorageService.get<StoredApod[]>(this.STORAGE_KEY, []);
+      if (Array.isArray(storedData)) {
         // Sort by savedAt timestamp (newest first)
-        this.favorites = JSON.parse(storedData).sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
+        this.favorites = storedData.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
       } else {
         this.favorites = [];
       }

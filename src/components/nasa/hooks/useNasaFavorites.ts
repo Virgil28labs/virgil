@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ApodImage } from '../../../types/nasa.types';
-import { StorageService, STORAGE_KEYS } from '../../../services/StorageService';
+import { STORAGE_KEYS, StorageService } from '../../../services/StorageService';
 import { timeService } from '../../../services/TimeService';
 
 // Simplified APOD for storage (reduce localStorage usage)
@@ -38,17 +38,32 @@ const storedToApod = (stored: StoredApod): ApodImage => ({
 });
 
 export const useNasaFavorites = () => {
-  // Initialize with data from localStorage
-  const [favorites, setFavorites] = useState<StoredApod[]>(() => {
-    const stored = StorageService.get<StoredApod[]>(STORAGE_KEYS.NASA_FAVORITES, []);
-    // Sort by savedAt timestamp (newest first)
-    return stored.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt);
-  });
+  const [favorites, setFavorites] = useState<StoredApod[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Save to localStorage whenever favorites change
+  // Load favorites from localStorage on mount
   useEffect(() => {
-    StorageService.set(STORAGE_KEYS.NASA_FAVORITES, favorites);
-  }, [favorites]);
+    try {
+      const stored = StorageService.get<StoredApod[]>(STORAGE_KEYS.NASA_FAVORITES, []);
+      if (Array.isArray(stored)) {
+        setFavorites(stored.sort((a: StoredApod, b: StoredApod) => b.savedAt - a.savedAt));
+      } else {
+        setFavorites([]);
+      }
+    } catch (error) {
+      console.error('Failed to load NASA favorites:', error);
+      setFavorites([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Save to localStorage whenever favorites change (after initial load)
+  useEffect(() => {
+    if (!isLoading) {
+      StorageService.set(STORAGE_KEYS.NASA_FAVORITES, favorites);
+    }
+  }, [favorites, isLoading]);
 
   // Check if APOD is favorited
   const isFavorited = useCallback((apodId: string): boolean => {
@@ -102,5 +117,6 @@ export const useNasaFavorites = () => {
     removeFavorite,
     clearFavorites,
     getFavoriteById,
+    isLoading,
   };
 };

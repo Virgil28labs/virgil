@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useReducer, useCallback, useEffect, memo } from 'react';
+import { createContext, useReducer, useCallback, useEffect, memo, useState } from 'react';
 import { giphyService } from '../../lib/giphyService';
 import type {
   GiphyContextType,
@@ -7,7 +7,7 @@ import type {
   GiphyAction,
   GiphyImage,
 } from '../../types';
-import { StorageService, STORAGE_KEYS } from '../../services/StorageService';
+import { STORAGE_KEYS, StorageService } from '../../services/StorageService';
 
 // Initial state
 const initialState: GiphyState = {
@@ -92,14 +92,23 @@ function giphyGalleryReducer(state: GiphyState, action: GiphyAction): GiphyState
   }
 }
 
-// Helper function to load favorites from StorageService
+// Helper function to load favorites from localStorage
 function loadFavoritesFromStorage(): GiphyImage[] {
-  return StorageService.get<GiphyImage[]>(STORAGE_KEYS.GIPHY_FAVORITES, []);
+  try {
+    return StorageService.get<GiphyImage[]>(STORAGE_KEYS.GIPHY_FAVORITES, []);
+  } catch (error) {
+    console.error('Failed to load Giphy favorites from localStorage:', error);
+    return [];
+  }
 }
 
-// Helper function to save favorites to StorageService
+// Helper function to save favorites to localStorage
 function saveFavoritesToStorage(favorites: GiphyImage[]): void {
-  StorageService.set(STORAGE_KEYS.GIPHY_FAVORITES, favorites);
+  try {
+    StorageService.set(STORAGE_KEYS.GIPHY_FAVORITES, favorites);
+  } catch (error) {
+    console.error('Failed to save Giphy favorites to localStorage:', error);
+  }
 }
 
 // Create the context
@@ -113,10 +122,20 @@ interface GiphyGalleryProviderProps {
 
 // Provider component
 export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ children, isOpen = false }: GiphyGalleryProviderProps) {
-  const [state, dispatch] = useReducer(giphyGalleryReducer, {
-    ...initialState,
-    favorites: loadFavoritesFromStorage(),
-  });
+  const [state, dispatch] = useReducer(giphyGalleryReducer, initialState);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    try {
+      const favorites = loadFavoritesFromStorage();
+      dispatch({ type: 'SET_FAVORITES', payload: favorites });
+      setHasInitialized(true);
+    } catch (error) {
+      console.error('Failed to load Giphy favorites:', error);
+      setHasInitialized(true);
+    }
+  }, []);
 
   // Load trending GIFs
   const loadTrending = useCallback(async () => {
@@ -143,10 +162,12 @@ export const GiphyGalleryProvider = memo(function GiphyGalleryProvider({ childre
     }
   }, [isOpen, loadTrending, state.trendingGifs.length]);
 
-  // Save favorites to localStorage whenever they change
+  // Save favorites to localStorage whenever they change (but only after initial load)
   useEffect(() => {
-    saveFavoritesToStorage(state.favorites);
-  }, [state.favorites]);
+    if (hasInitialized) {
+      saveFavoritesToStorage(state.favorites);
+    }
+  }, [state.favorites, hasInitialized]);
 
   // Search for GIFs
   const search = useCallback(async (query: string, loadMore = false) => {
