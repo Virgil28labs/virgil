@@ -30,7 +30,7 @@ class ToastService {
         listener(toast);
       } catch (error) {
         // Silently ignore listener errors to prevent cascade failures
-        logger.error('Toast listener error', { component: 'ToastService', action: 'emit' }, error as Error);
+        logger.error('Toast listener error', error as Error, { component: 'ToastService', action: 'emit' });
       }
     });
   }

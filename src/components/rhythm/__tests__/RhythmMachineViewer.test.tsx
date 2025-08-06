@@ -250,7 +250,7 @@ describe('RhythmMachineViewer', () => {
 
     it('shows generating state during pattern generation', async () => {
       const user = userEvent.setup();
-      let resolveGeneration: (value: unknown) => void;
+      let resolveGeneration: ((value: unknown) => void) | undefined;
       const generationPromise = new Promise(resolve => {
         resolveGeneration = resolve;
       });
@@ -266,11 +266,13 @@ describe('RhythmMachineViewer', () => {
       expect(generateButton).toBeDisabled();
       
       // Complete generation
-      resolveGeneration!({
-        pattern: [[true, false], [false, true]],
-        category: 'test',
-        fallback: false,
-      });
+      if (resolveGeneration) {
+        resolveGeneration({
+          pattern: [[true, false], [false, true]],
+          category: 'test',
+          fallback: false,
+        });
+      }
       
       await waitFor(() => {
         expect(screen.getByText('Generate')).toBeInTheDocument();
@@ -483,11 +485,13 @@ describe('RhythmMachineViewer', () => {
       const firstStep = document.querySelector('.rhythm-machine-step');
       expect(firstStep).not.toHaveClass('active');
       
-      await user.click(firstStep!);
-      
-      expect(firstStep).toHaveClass('active');
-      
-      await user.click(firstStep!);
+      if (firstStep) {
+        await user.click(firstStep);
+        
+        expect(firstStep).toHaveClass('active');
+        
+        await user.click(firstStep);
+      }
       
       expect(firstStep).not.toHaveClass('active');
     });

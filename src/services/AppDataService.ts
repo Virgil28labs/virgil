@@ -1,8 +1,9 @@
 /**
- * AppDataService - Handles app data storage in IndexedDB
+ * AppDataService - Handles large app data storage in IndexedDB
  * 
- * Migrates app data from localStorage to IndexedDB for better performance
- * and storage capacity. Provides simple get/set interface.
+ * Migrates selected app data from localStorage to IndexedDB for better performance
+ * and storage capacity. Favorites remain in localStorage for simplicity.
+ * Provides simple get/set interface for IndexedDB operations.
  */
 
 import { indexedDBService } from './IndexedDBService';
@@ -22,12 +23,10 @@ class AppDataService {
   private initPromise: Promise<void> | null = null;
 
   // Keys to migrate from localStorage to IndexedDB
+  // NOTE: Favorites remain in localStorage for simplicity and reliability
   private readonly MIGRATION_KEYS = [
-    'virgil_dog_favorites',
-    'virgil_nasa_favorites',
-    'giphy-favorites',
     'virgil_habits',
-    'rhythmMachineSaveSlots',
+    'rhythmMachineSaveSlots', 
     'virgil_selected_timezones',
     'perfectCircleBestScore',
     'perfectCircleAttempts',
@@ -114,10 +113,14 @@ class AppDataService {
     
     try {
       const result = await indexedDBService.get<AppDataItem<T>>(this.DB_NAME, this.STORE_NAME, key);
-      logger.info(`IndexedDB GET ${key}:`, {
-        success: result.success,
-        hasData: !!result.data,
-        dataPreview: result.data ? JSON.stringify(result.data).substring(0, 100) : null,
+      logger.info(`IndexedDB GET ${key}`, { 
+        component: 'AppDataService', 
+        action: 'get',
+        metadata: {
+          success: result.success,
+          hasData: !!result.data,
+          dataPreview: result.data ? JSON.stringify(result.data).substring(0, 100) : null,
+        },
       });
       
       if (result.success && result.data) {
@@ -163,9 +166,13 @@ class AppDataService {
       };
       
       const result = await indexedDBService.put(this.DB_NAME, this.STORE_NAME, item);
-      logger.info(`IndexedDB PUT ${key}:`, {
-        success: result.success,
-        dataPreview: JSON.stringify(data).substring(0, 100),
+      logger.info(`IndexedDB PUT ${key}`, {
+        component: 'AppDataService',
+        action: 'set', 
+        metadata: {
+          success: result.success,
+          dataPreview: JSON.stringify(data).substring(0, 100),
+        },
       });
       return result.success;
     } catch (error) {

@@ -444,7 +444,7 @@ describe('validateBatchRequest', () => {
         .expect(400);
 
       expect(response.body).toEqual({
-        error: 'Maximum 10 requests allowed in a batch',
+        error: 'Batch size cannot exceed 10 requests',
       });
     });
 

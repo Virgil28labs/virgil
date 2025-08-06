@@ -352,7 +352,9 @@ describe('TimezoneSearch', () => {
       await userEvent.type(input, 'test');
 
       const option = screen.getByText('Los Angeles').closest('li');
-      fireEvent.mouseEnter(option);
+      if (option) {
+        fireEvent.mouseEnter(option);
+      }
 
       expect(option).toHaveClass('selected');
       expect(option).toHaveAttribute('aria-selected', 'true');

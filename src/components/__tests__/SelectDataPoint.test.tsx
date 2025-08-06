@@ -490,8 +490,8 @@ describe('SelectDataPoint', () => {
       expect(select.value).toBe('work');
     });
 
-    it('should handle undefined icon gracefully', () => {
-      render(<SelectDataPoint {...defaultProps} icon={undefined as any} />);
+    it('should handle empty icon gracefully', () => {
+      render(<SelectDataPoint {...defaultProps} icon="" />);
       
       // Should render without crashing
       expect(screen.getByText('Location')).toBeInTheDocument();

@@ -34,8 +34,8 @@ export const useEnvironmentUtils = () => {
     isMobile: environmentState.deviceType === 'mobile',
     isDesktop: environmentState.deviceType === 'desktop',
     isTablet: environmentState.deviceType === 'tablet',
-    isDarkMode: environmentState.colorScheme === 'dark',
-    isOnline: environmentState.networkStatus === 'online',
-    isOffline: environmentState.networkStatus === 'offline',
+    isDarkMode: environmentState.prefersDarkMode,
+    isOnline: environmentState.isOnline,
+    isOffline: !environmentState.isOnline,
   };
 };

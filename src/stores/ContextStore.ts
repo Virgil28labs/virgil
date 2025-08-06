@@ -43,9 +43,9 @@ export const useContextStore = create<ContextStoreWithActions>()(
   subscribeWithSelector(
     persist(
       devtools(
-        (set, get) => ({
+        (set, get, api) => ({
         // ========== Time Slice (Primary) ==========
-          ...createTimeSlice(set, get),
+          ...createTimeSlice(set, get, api),
 
           // ========== Location Slice ==========
           location: {

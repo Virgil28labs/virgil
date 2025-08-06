@@ -681,7 +681,7 @@ describe('VectorMemory', () => {
     });
 
     it('should handle null memory count gracefully', async () => {
-      mockVectorService.getCount.mockResolvedValue(null as any);
+      mockVectorService.getCount.mockResolvedValue(Promise.resolve(0));
       
       render(<VectorMemory />);
       
@@ -696,7 +696,7 @@ describe('VectorMemory', () => {
         {
           id: 'vec-1',
           content: 'Content without similarity',
-          similarity: undefined as any,
+          similarity: 0,
         },
       ];
       

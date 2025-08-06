@@ -6,7 +6,8 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ContextStoreProvider, useActivityLogger, useEnvironmentUtils } from '../ContextStoreProvider';
+import { ContextStoreProvider } from '../ContextStoreProvider';
+import { useActivityLogger, useEnvironmentUtils } from '../hooks/useStoreUtils';
 import { useContextStore } from '../ContextStore';
 
 // Mock dependencies
@@ -70,8 +71,8 @@ const EnvironmentUtilsTest = () => {
     <div>
       <div data-testid="is-mobile">{utils.isMobile ? 'mobile' : 'not-mobile'}</div>
       <div data-testid="is-online">{utils.isOnline ? 'online' : 'offline'}</div>
-      <div data-testid="has-geolocation">{utils.hasGeolocation ? 'has-geo' : 'no-geo'}</div>
-      <div data-testid="viewport-width">{utils.viewportWidth}</div>
+      <div data-testid="is-dark-mode">{utils.isDarkMode ? 'dark' : 'light'}</div>
+      <div data-testid="is-desktop">{utils.isDesktop ? 'desktop' : 'not-desktop'}</div>
     </div>
   );
 };

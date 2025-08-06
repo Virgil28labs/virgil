@@ -773,7 +773,7 @@ describe('useTimezones', () => {
         timeUpdateCallback({ 
           currentTime: '12:00:00',
           currentDate: '2023-12-01',
-          dateObject: new Date(), 
+          dateObject: new Date('2023-12-01T12:00:00'), 
         });
       });
       

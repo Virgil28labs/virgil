@@ -175,7 +175,7 @@ export class DashboardContextService {
     try {
       return timeService.getCurrentTime();
     } catch (error) {
-      logger.error('Error getting current time', { component: 'DashboardContextService', action: 'getCurrentTime' }, error as Error);
+      logger.error('Error getting current time', error as Error, { component: 'DashboardContextService', action: 'getCurrentTime' });
       // Safe fallback: return default time format to maintain interface compliance
       return '12:00';
     }
@@ -185,7 +185,7 @@ export class DashboardContextService {
     try {
       return timeService.getCurrentDate();
     } catch (error) {
-      logger.error('Error getting current date', { component: 'DashboardContextService', action: 'getCurrentDate' }, error as Error);
+      logger.error('Error getting current date', error as Error, { component: 'DashboardContextService', action: 'getCurrentDate' });
       // Safe fallback: return default date format to maintain interface compliance
       return 'January 1, 2024';
     }
@@ -195,7 +195,7 @@ export class DashboardContextService {
     try {
       return timeService.getDayOfWeek();
     } catch (error) {
-      logger.error('Error getting day of week', { component: 'DashboardContextService', action: 'getDayOfWeek' }, error as Error);
+      logger.error('Error getting day of week', error as Error, { component: 'DashboardContextService', action: 'getDayOfWeek' });
       // Safe fallback: return default day to maintain interface compliance
       return 'monday';
     }
@@ -205,7 +205,7 @@ export class DashboardContextService {
     try {
       return timeService.getTimeOfDay();
     } catch (error) {
-      logger.error('Error getting time of day', { component: 'DashboardContextService', action: 'getTimeOfDay' }, error as Error);
+      logger.error('Error getting time of day', error as Error, { component: 'DashboardContextService', action: 'getTimeOfDay' });
       // Safe fallback: return default time period to maintain interface compliance
       return 'morning';
     }
@@ -248,7 +248,7 @@ export class DashboardContextService {
     try {
       return timeService.getTimestamp();
     } catch (error) {
-      logger.error('Error getting timestamp', { component: 'DashboardContextService', action: 'getTimestamp' }, error as Error);
+      logger.error('Error getting timestamp', error as Error, { component: 'DashboardContextService', action: 'getTimestamp' });
       // Safe fallback: use performance API which doesn't violate TimeService rules
       return performance.now() + performance.timeOrigin;
     }
@@ -665,7 +665,7 @@ export class DashboardContextService {
         listener(this.context);
       } catch (error) {
         // Log the error but don't let it break other listeners
-        logger.error('Listener error', { component: 'DashboardContextService', action: 'notifyListeners' }, error as Error);
+        logger.error('Listener error', error as Error, { component: 'DashboardContextService', action: 'notifyListeners' });
       }
     });
   }

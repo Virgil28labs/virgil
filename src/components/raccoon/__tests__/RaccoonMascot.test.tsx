@@ -233,7 +233,9 @@ describe('RaccoonMascot', () => {
       };
 
       await act(async () => {
-        fireEvent.mouseDown(mascotContainer, mouseDownEvent);
+        if (mascotContainer) {
+          fireEvent.mouseDown(mascotContainer, mouseDownEvent);
+        }
       });
 
       // Should set up drag state (verified by subsequent mouse events)
@@ -246,13 +248,15 @@ describe('RaccoonMascot', () => {
       
       // Start dragging
       await act(async () => {
-        fireEvent.mouseDown(mascotContainer, {
-          clientX: 150,
-          clientY: 150,
-          currentTarget: {
-            getBoundingClientRect: () => ({ left: 100, top: 100 }),
-          },
-        });
+        if (mascotContainer) {
+          fireEvent.mouseDown(mascotContainer, {
+            clientX: 150,
+            clientY: 150,
+            currentTarget: {
+              getBoundingClientRect: () => ({ left: 100, top: 100 }),
+            },
+          });
+        }
       });
 
       // Move mouse
@@ -274,13 +278,15 @@ describe('RaccoonMascot', () => {
       
       // Start dragging
       await act(async () => {
-        fireEvent.mouseDown(mascotContainer, {
-          clientX: 150,
-          clientY: 150,
-          currentTarget: {
-            getBoundingClientRect: () => ({ left: 100, top: 100 }),
-          },
-        });
+        if (mascotContainer) {
+          fireEvent.mouseDown(mascotContainer, {
+            clientX: 150,
+            clientY: 150,
+            currentTarget: {
+              getBoundingClientRect: () => ({ left: 100, top: 100 }),
+            },
+          });
+        }
       });
 
       // Stop dragging
@@ -623,7 +629,7 @@ describe('RaccoonMascot', () => {
   describe('Error Boundary Integration', () => {
     it('handles missing DOM elements gracefully', () => {
       // Mock empty querySelectorAll result
-      jest.spyOn(document, 'querySelectorAll').mockReturnValue([] as NodeListOf<Element>);
+      jest.spyOn(document, 'querySelectorAll').mockReturnValue([] as unknown as NodeListOf<Element>);
       
       expect(() => renderComponent()).not.toThrow();
     });
@@ -644,8 +650,8 @@ describe('RaccoonMascot', () => {
       const originalInnerHeight = window.innerHeight;
       const originalInnerWidth = window.innerWidth;
       
-      delete (window as Record<string, unknown>).innerHeight;
-      delete (window as Record<string, unknown>).innerWidth;
+      delete (window as unknown as Record<string, unknown>).innerHeight;
+      delete (window as unknown as Record<string, unknown>).innerWidth;
       
       expect(() => renderComponent()).not.toThrow();
       

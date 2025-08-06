@@ -93,7 +93,7 @@ server/           # Express backend
 - **Usage**: Natural language for queries, schema changes, data operations
 - **Features**: All feature groups enabled (database, functions, storage, etc.)
 - **Note**: This is separate from the JS SDK used in the app
-- **Docs**: See `docs/SUPABASE_MCP_SETUP.md` for setup and examples
+- **Architecture**: See `docs/ARCHITECTURE.md` for database integration details
 
 ## The Standard
 Write code that's:

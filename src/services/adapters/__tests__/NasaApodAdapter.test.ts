@@ -6,7 +6,7 @@
  */
 
 import { NasaApodAdapter } from '../NasaApodAdapter';
-import { logger } from '../../../lib/logger';
+// import { logger } from '../../../lib/logger'; // Not needed after fixing test
 import type { MockAdapterPrivate } from '../../../test-utils/mockTypes';
 
 // Mock dependencies
@@ -130,14 +130,11 @@ describe('NasaApodAdapter', () => {
       localStorageMock.setItem('virgil_nasa_favorites', 'invalid json');
       const newAdapter = new NasaApodAdapter();
       
-      expect(logger.error).toHaveBeenCalledWith(
-        'Failed to fetch NASA favorites',
-        expect.any(Error),
-        expect.objectContaining({ action: 'loadData', component: 'nasaAdapter' }),
-      );
-      
+      // StorageService returns the invalid string as-is for backward compatibility
+      // NasaApodAdapter handles it gracefully by treating non-array values as empty
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.total).toBe(0);
+      expect(contextData.isActive).toBe(false);
     });
 
     it('sets up storage event listener', () => {

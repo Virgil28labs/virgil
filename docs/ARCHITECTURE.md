@@ -20,16 +20,23 @@ Virgil is a React/TypeScript application with a physics-based raccoon mascot, we
 
 ## Storage Architecture
 
-### Client-Side Storage
-1. **IndexedDB**: Primary storage for large data (photos, messages)
-2. **LocalStorage**: User preferences, settings, small data
+### Client-Side Storage Strategy
+1. **LocalStorage**: User preferences, favorites, settings, and small data
+   - All favorites (Dog, NASA, Giphy) use localStorage for simplicity and reliability
+   - User preferences and application settings
+   - Quick access data that doesn't require complex querying
+2. **IndexedDB**: Large structured data requiring advanced queries
+   - Chat messages and conversation history
+   - Photo gallery with metadata
+   - Rhythm machine save slots and game data
+   - Performance analytics and logging
 3. **Service Worker Cache**: PWA assets and offline support
 
 ### Storage Service Architecture
-- Unified `StorageService` with adapter pattern
-- Automatic migration between storage types
-- Size-aware storage selection
-- Graceful fallback mechanisms
+- `StorageService`: Unified localStorage interface with type safety
+- `AppDataService`: IndexedDB interface for large/complex data
+- Selective migration: Only specific data types moved to IndexedDB
+- Graceful fallback mechanisms with error recovery
 
 ### Performance Optimizations
 - Lazy loading for all modals and heavy components

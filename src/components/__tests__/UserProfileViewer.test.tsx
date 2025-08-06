@@ -790,7 +790,9 @@ describe('UserProfileViewer', () => {
       const backdrop = document.querySelector('.profile-backdrop');
       expect(backdrop).toBeInTheDocument();
       
-      await user.click(backdrop!);
+      if (backdrop) {
+        await user.click(backdrop);
+      }
       
       expect(mockOnClose).toHaveBeenCalled();
     });

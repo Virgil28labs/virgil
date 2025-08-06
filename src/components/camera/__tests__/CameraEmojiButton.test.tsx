@@ -20,7 +20,7 @@ interface MockEmojiButtonProps {
   hoverScale?: string;
   hoverColor?: string;
   position?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 jest.mock('../../common/EmojiButton', () => ({

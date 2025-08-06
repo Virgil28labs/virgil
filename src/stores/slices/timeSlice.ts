@@ -70,7 +70,7 @@ export const createTimeSlice: StateCreator<
   [],
   [],
   { time: TimeSlice }
-> = (set, get) => ({
+> = (set, get, _api) => ({
   time: {
     // Initialize with TimeService data
     ...initializeTimeState(),

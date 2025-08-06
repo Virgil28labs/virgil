@@ -27,9 +27,24 @@ const mockUseTimezones = useTimezones as jest.MockedFunction<typeof useTimezones
 const mockUseTimezoneFormatters = useTimezoneFormatters as jest.MockedFunction<typeof useTimezoneFormatters>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
 
+// Helper to create proper SelectedTimezone mock data
+const createMockSelectedTimezone = (timezone: string, index = 0) => ({
+  id: `mock-${index}`,
+  timezone,
+  label: timezone.split('/')[1] || timezone,
+  order: index,
+});
+
 // Mock TimezoneSearch component
+interface MockTimezoneSearchProps {
+  onSelect: (timezone: string) => void;
+  excludeTimezones: string[];
+  autoFocus: boolean;
+  className: string;
+}
+
 jest.mock('../TimezoneSearch', () => ({
-  TimezoneSearch: ({ onSelect, excludeTimezones, autoFocus, className }: unknown) => (
+  TimezoneSearch: ({ onSelect, excludeTimezones, autoFocus, className }: MockTimezoneSearchProps) => (
     <div data-testid="timezone-search" className={className}>
       <input
         data-testid="search-input"
@@ -164,7 +179,7 @@ describe('TimezoneModal', () => {
 
     it('should pass excluded timezones to search', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as unknown,
+        selectedTimezones: [{ id: '1', timezone: 'America/New_York', label: 'New York', order: 0 }, { id: '2', timezone: 'Europe/London', label: 'London', order: 1 }],
         timezonesWithTime: [],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -234,7 +249,7 @@ describe('TimezoneModal', () => {
   describe('timezone list display', () => {
     beforeEach(() => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -267,7 +282,7 @@ describe('TimezoneModal', () => {
       };
       
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: invalidTimezone.timezone }] as unknown,
+        selectedTimezones: [createMockSelectedTimezone(invalidTimezone.timezone)],
         timezonesWithTime: [invalidTimezone],
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -331,7 +346,7 @@ describe('TimezoneModal', () => {
   describe('timezone management', () => {
     beforeEach(() => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -346,7 +361,7 @@ describe('TimezoneModal', () => {
     it('should remove timezone when remove button clicked', async () => {
       const mockRemoveTimezone = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: mockRemoveTimezone,
@@ -369,7 +384,7 @@ describe('TimezoneModal', () => {
     it('should clear all timezones when clear all clicked', async () => {
       const mockClearAllTimezones = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -393,7 +408,7 @@ describe('TimezoneModal', () => {
   describe('label editing', () => {
     beforeEach(() => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -419,7 +434,7 @@ describe('TimezoneModal', () => {
     it('should save label on input blur', async () => {
       const mockUpdateTimezoneLabel = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -451,7 +466,7 @@ describe('TimezoneModal', () => {
     it('should save label on Enter key', async () => {
       const mockUpdateTimezoneLabel = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -483,7 +498,7 @@ describe('TimezoneModal', () => {
     it('should cancel editing on Escape key', async () => {
       const mockUpdateTimezoneLabel = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -518,7 +533,7 @@ describe('TimezoneModal', () => {
     it('should not save empty label', async () => {
       const mockUpdateTimezoneLabel = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -549,7 +564,7 @@ describe('TimezoneModal', () => {
     it('should trim whitespace from label', async () => {
       const mockUpdateTimezoneLabel = jest.fn();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -591,7 +606,7 @@ describe('TimezoneModal', () => {
 
     it('should trap focus within modal', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),
@@ -616,7 +631,7 @@ describe('TimezoneModal', () => {
 
     it('should trap focus in reverse direction', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: mockTimezones.map(tz => ({ timezone: tz.timezone })) as unknown,
+        selectedTimezones: mockTimezones.map((tz, index) => createMockSelectedTimezone(tz.timezone, index)),
         timezonesWithTime: mockTimezones,
         addTimezone: jest.fn(),
         removeTimezone: jest.fn(),

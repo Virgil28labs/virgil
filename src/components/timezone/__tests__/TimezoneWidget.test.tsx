@@ -13,7 +13,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { DateTime } from 'luxon';
-import type { SelectedTimezone } from '../timezoneData';
 import { TimezoneWidget } from '../TimezoneWidget';
 import { useTimezones } from '../useTimezones';
 
@@ -24,9 +23,31 @@ jest.mock('../useTimezones');
 
 const mockUseTimezones = useTimezones as jest.MockedFunction<typeof useTimezones>;
 
+// Helper to create proper SelectedTimezone mock data
+const createMockSelectedTimezone = (timezone: string, index = 0) => ({
+  id: `mock-${index}`,
+  timezone,
+  label: timezone.split('/')[1] || timezone,
+  order: index,
+});
+
 // Mock components
+interface MockTimezoneModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  className: string;
+}
+
+import type React from 'react';
+
+interface MockTimezoneHoverPanelProps {
+  isVisible: boolean;
+  triggerRef: React.RefObject<HTMLElement>;
+  className: string;
+}
+
 jest.mock('../TimezoneModal', () => ({
-  TimezoneModal: ({ isOpen, onClose, className }: unknown) => (
+  TimezoneModal: ({ isOpen, onClose, className }: MockTimezoneModalProps) => (
     isOpen ? (
       <div data-testid="timezone-modal" className={className}>
         <button onClick={onClose}>Close Modal</button>
@@ -36,7 +57,7 @@ jest.mock('../TimezoneModal', () => ({
 }));
 
 jest.mock('../TimezoneHoverPanel', () => ({
-  PositionedTimezoneHoverPanel: ({ isVisible, triggerRef, className }: unknown) => (
+  PositionedTimezoneHoverPanel: ({ isVisible, triggerRef, className }: MockTimezoneHoverPanelProps) => (
     isVisible ? (
       <div data-testid="timezone-hover-panel" className={className}>
         <span data-testid="trigger-ref-exists">{!!triggerRef?.current}</span>
@@ -102,7 +123,7 @@ describe('TimezoneWidget', () => {
 
     it('should update aria-label based on selected timezones', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as SelectedTimezone[],
+        selectedTimezones: [createMockSelectedTimezone('America/New_York', 0), createMockSelectedTimezone('Europe/London', 1)],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as DateTime, isValid: true },
@@ -197,7 +218,7 @@ describe('TimezoneWidget', () => {
       jest.useFakeTimers();
       // Mock multiple selected timezones to enable hover panel
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as SelectedTimezone[],
+        selectedTimezones: [createMockSelectedTimezone('America/New_York', 0), createMockSelectedTimezone('Europe/London', 1)],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as DateTime, isValid: true },
@@ -237,7 +258,8 @@ describe('TimezoneWidget', () => {
     it('should hide hover panel on mouse leave after delay', async () => {
       render(<TimezoneWidget {...defaultProps} hoverDelay={100} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       
       // Show panel
       fireEvent.mouseEnter(container);
@@ -263,7 +285,8 @@ describe('TimezoneWidget', () => {
     it('should not show hover panel when disabled', () => {
       render(<TimezoneWidget {...defaultProps} disabled />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       fireEvent.mouseEnter(container);
 
       act(() => {
@@ -275,7 +298,7 @@ describe('TimezoneWidget', () => {
 
     it('should not show hover panel with only one timezone', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }] as unknown,
+        selectedTimezones: [createMockSelectedTimezone('America/New_York')],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
         ],
@@ -290,7 +313,8 @@ describe('TimezoneWidget', () => {
 
       render(<TimezoneWidget {...defaultProps} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       fireEvent.mouseEnter(container);
 
       act(() => {
@@ -327,7 +351,8 @@ describe('TimezoneWidget', () => {
     it('should hide hover panel when modal opens', async () => {
       render(<TimezoneWidget {...defaultProps} hoverDelay={50} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       
       // Show hover panel
       fireEvent.mouseEnter(container);
@@ -412,7 +437,7 @@ describe('TimezoneWidget', () => {
     beforeEach(() => {
       jest.useFakeTimers();
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as SelectedTimezone[],
+        selectedTimezones: [createMockSelectedTimezone('America/New_York', 0), createMockSelectedTimezone('Europe/London', 1)],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as DateTime, isValid: true },
@@ -436,7 +461,8 @@ describe('TimezoneWidget', () => {
       
       const { unmount } = render(<TimezoneWidget {...defaultProps} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       fireEvent.mouseEnter(container);
 
       unmount();
@@ -448,7 +474,8 @@ describe('TimezoneWidget', () => {
     it('should cancel hover timeout on mouse leave', () => {
       render(<TimezoneWidget {...defaultProps} hoverDelay={1000} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       
       fireEvent.mouseEnter(container);
       fireEvent.mouseLeave(container);
@@ -465,7 +492,8 @@ describe('TimezoneWidget', () => {
     it('should clear hover timeouts when opening modal', async () => {
       render(<TimezoneWidget {...defaultProps} hoverDelay={1000} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       const trigger = screen.getByRole('button');
       
       // Start hover
@@ -496,7 +524,7 @@ describe('TimezoneWidget', () => {
 
     it('should handle rapid mouse enter/leave', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as SelectedTimezone[],
+        selectedTimezones: [createMockSelectedTimezone('America/New_York', 0), createMockSelectedTimezone('Europe/London', 1)],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as DateTime, isValid: true },
@@ -512,7 +540,8 @@ describe('TimezoneWidget', () => {
 
       render(<TimezoneWidget {...defaultProps} hoverDelay={100} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       
       // Rapid mouse movements
       fireEvent.mouseEnter(container);
@@ -541,7 +570,7 @@ describe('TimezoneWidget', () => {
 
     it('should use default hover delay when not specified', () => {
       mockUseTimezones.mockReturnValue({
-        selectedTimezones: [{ timezone: 'America/New_York' }, { timezone: 'Europe/London' }] as SelectedTimezone[],
+        selectedTimezones: [createMockSelectedTimezone('America/New_York', 0), createMockSelectedTimezone('Europe/London', 1)],
         timezonesWithTime: [
           { id: '1', timezone: 'America/New_York', label: 'New York', order: 0, currentTime: {} as DateTime, isValid: true },
           { id: '2', timezone: 'Europe/London', label: 'London', order: 1, currentTime: {} as DateTime, isValid: true },
@@ -557,7 +586,8 @@ describe('TimezoneWidget', () => {
 
       render(<TimezoneWidget {...defaultProps} />);
 
-      const container = screen.getByRole('button').closest('.timezone-widget-container')!;
+      const container = screen.getByRole('button').closest('.timezone-widget-container');
+      if (!container) throw new Error('Container not found');
       fireEvent.mouseEnter(container);
 
       // Should use default delay of 150ms
