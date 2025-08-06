@@ -90,6 +90,12 @@ Virgil is a React/TypeScript application with a physics-based raccoon mascot, we
 - Vector embeddings with pgvector
 - Automatic backups
 
+### Supabase MCP Server
+- Direct database access via Claude
+- Natural language queries and migrations
+- Separate from JS SDK used in app
+- Full development mode access enabled
+
 ### Schema Design
 - Users table with profiles
 - Messages with user associations
