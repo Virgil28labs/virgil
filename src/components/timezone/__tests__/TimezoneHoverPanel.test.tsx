@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import type { DateTime } from 'luxon';
 import { PositionedTimezoneHoverPanel } from '../TimezoneHoverPanel';
 import { useTimezones, useTimezoneFormatters } from '../useTimezones';
 
@@ -39,7 +40,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: -5 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T12:00:00-05:00')),
-      } as unknown,
+      } as unknown as DateTime,
       isValid: true,
     },
     {
@@ -53,7 +54,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: 0 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-01T17:00:00Z')),
-      } as unknown,
+      } as unknown as DateTime,
       isValid: true,
     },
     {
@@ -67,7 +68,7 @@ describe('TimezoneHoverPanel', () => {
         isValid: true,
         diff: jest.fn().mockReturnValue({ hours: 9 }),
         toJSDate: jest.fn().mockReturnValue(new Date('2023-12-02T02:00:00+09:00')),
-      } as unknown,
+      } as unknown as DateTime,
       isValid: true,
     },
   ];
@@ -437,7 +438,7 @@ describe('TimezoneHoverPanel', () => {
             isValid: true,
             diff: jest.fn().mockReturnValue({ hours: -5 }),
             toJSDate: jest.fn().mockReturnValue(new Date()),
-          } as unknown,
+          } as unknown as DateTime,
           isValid: true,
         },
         {
@@ -451,7 +452,7 @@ describe('TimezoneHoverPanel', () => {
             isValid: true,
             diff: jest.fn().mockReturnValue({ hours: -5 }),
             toJSDate: jest.fn().mockReturnValue(new Date()),
-          } as unknown,
+          } as unknown as DateTime,
           isValid: true,
         },
       ];

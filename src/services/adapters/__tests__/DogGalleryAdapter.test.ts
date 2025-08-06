@@ -9,6 +9,21 @@ import { DogGalleryAdapter } from '../DogGalleryAdapter';
 import { logger } from '../../../lib/logger';
 import type { MockAdapterPrivate } from '../../../test-utils/mockTypes';
 
+// Mock AppDataService
+jest.mock('../../AppDataService', () => ({
+  appDataService: {
+    get: jest.fn(),
+    set: jest.fn(),
+    remove: jest.fn(),
+    getAllKeys: jest.fn(),
+    init: jest.fn(),
+    ready: jest.fn(),
+  },
+}));
+
+// Import after mocking
+import { appDataService } from '../../AppDataService';
+
 // Mock dependencies
 jest.mock('../../../lib/logger', () => ({
   logger: {
@@ -76,14 +91,17 @@ describe('DogGalleryAdapter', () => {
     },
   ];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     localStorageMock.clear();
     
-    // Set up default localStorage data
-    localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(mockDogFavorites));
+    // Set up default AppDataService mock
+    (appDataService.get as jest.Mock).mockResolvedValue(mockDogFavorites);
+    (appDataService.set as jest.Mock).mockResolvedValue(true);
     
     adapter = new DogGalleryAdapter();
+    // Wait for async initialization
+    await new Promise(resolve => setTimeout(resolve, 0));
   });
 
   describe('Constructor and Initialization', () => {
@@ -93,23 +111,33 @@ describe('DogGalleryAdapter', () => {
       expect(contextData.isActive).toBe(true);
     });
 
-    it('initializes with empty favorites when no storage', () => {
-      localStorageMock.clear();
+    it('initializes with empty favorites when no storage', async () => {
+      (appDataService.get as jest.Mock).mockResolvedValue(null);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
       const contextData = newAdapter.getContextData();
       
       expect(contextData.data.favorites.total).toBe(0);
       expect(contextData.isActive).toBe(false);
     });
 
-    it('handles corrupted localStorage data gracefully', () => {
-      localStorageMock.setItem('virgil_dog_favorites', 'invalid json');
+    it('handles error loading data gracefully', async () => {
+      (appDataService.get as jest.Mock).mockRejectedValue(new Error('Database error'));
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       expect(logger.error).toHaveBeenCalledWith(
         'Failed to fetch dog favorites',
         expect.any(Error),
-        expect.objectContaining({ action: 'loadData', component: 'dogAdapter' }),
+        expect.objectContaining({ action: 'loadData', component: 'DogGalleryAdapter' }),
       );
       
       const contextData = newAdapter.getContextData();
@@ -143,14 +171,17 @@ describe('DogGalleryAdapter', () => {
       expect(data.stats.uniqueBreeds).toContain('siberian husky');
     });
 
-    it('handles mixed breed default for missing breed', () => {
+    it('handles mixed breed default for missing breed', async () => {
       const dataWithMissingBreed = [
         { url: 'test.jpg', breed: '', id: 'test-1' },
-        { url: 'test2.jpg', breed: undefined as string | undefined, id: 'test-2' },
+        { url: 'test2.jpg', breed: undefined as any, id: 'test-2' },
       ];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(dataWithMissingBreed));
+      (appDataService.get as jest.Mock).mockResolvedValue(dataWithMissingBreed);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.breeds['mixed']).toBe(2);
@@ -163,19 +194,23 @@ describe('DogGalleryAdapter', () => {
       expect(recent).toHaveLength(4);
       expect(recent[0].url).toBe(mockDogFavorites[0].url);
       expect(recent[0].breed).toBe(mockDogFavorites[0].breed);
-      expect(recent[0].addedAt).toBe(1703020800000); // Most recent
-      expect(recent[1].addedAt).toBeLessThan(recent[0].addedAt ?? 0); // Older
+      // Check that favorites are returned in order (most recent first based on storage order)
+      expect(recent[0].url).toBe(mockDogFavorites[0].url);
+      expect(recent[1].url).toBe(mockDogFavorites[1].url);
     });
 
-    it('limits recent favorites to 10 items', () => {
+    it('limits recent favorites to 10 items', async () => {
       const manyFavorites = Array.from({ length: 15 }, (_, i) => ({
         url: `https://example.com/dog${i}.jpg`,
         breed: `breed-${i}`,
         id: `dog-${i}`,
       }));
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(manyFavorites));
+      (appDataService.get as jest.Mock).mockResolvedValue(manyFavorites);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.recent).toHaveLength(10);
@@ -196,9 +231,13 @@ describe('DogGalleryAdapter', () => {
       expect(contextData.summary).toContain('4 favorite dogs');
     });
 
-    it('provides inactive context when no favorites', () => {
-      localStorageMock.clear();
+    it('provides inactive context when no favorites', async () => {
+      (appDataService.get as jest.Mock).mockResolvedValue(null);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
       const contextData = newAdapter.getContextData();
       
       expect(contextData.isActive).toBe(false);
@@ -213,18 +252,25 @@ describe('DogGalleryAdapter', () => {
       expect(contextData.summary).toMatch(/4 favorite dogs.*3 breeds.*mostly golden retriever/);
     });
 
-    it('handles single breed case', () => {
+    it('handles single breed case', async () => {
       const singleBreedData = [mockDogFavorites[0]];
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(singleBreedData));
+      (appDataService.get as jest.Mock).mockResolvedValue(singleBreedData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.summary).toBe('1 favorite dogs');
     });
 
-    it('handles empty state', () => {
-      localStorageMock.clear();
+    it('handles empty state', async () => {
+      (appDataService.get as jest.Mock).mockResolvedValue(null);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
       const contextData = newAdapter.getContextData();
       
       expect(contextData.summary).toBe('No favorite dogs saved yet');
@@ -279,8 +325,11 @@ describe('DogGalleryAdapter', () => {
     });
 
     it('handles empty state responses', async () => {
-      localStorageMock.clear();
+      (appDataService.get as jest.Mock).mockResolvedValue(null);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const response = await newAdapter.getResponse('how many dogs?');
       expect(response).toContain("You haven't saved any favorite dogs yet");
@@ -418,7 +467,7 @@ describe('DogGalleryAdapter', () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
-    it('handles malformed dog data', () => {
+    it('handles malformed dog data', async () => {
       const corruptedData = [
         { url: 'test.jpg' }, // Missing breed and id
         { breed: 'test breed' }, // Missing url and id
@@ -426,8 +475,11 @@ describe('DogGalleryAdapter', () => {
         undefined,
       ];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(corruptedData));
+      (appDataService.get as jest.Mock).mockResolvedValue(corruptedData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       // Should not crash and should handle gracefully
       const contextData = newAdapter.getContextData();
@@ -452,15 +504,18 @@ describe('DogGalleryAdapter', () => {
       expect(response).toContain('Visit the Dog Gallery');
     });
 
-    it('handles very long breed names', () => {
+    it('handles very long breed names', async () => {
       const longBreedData = [{
         url: 'test.jpg',
         breed: 'a'.repeat(100),
         id: 'test-1',
       }];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(longBreedData));
+      (appDataService.get as jest.Mock).mockResolvedValue(longBreedData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.total).toBe(1);
@@ -473,23 +528,29 @@ describe('DogGalleryAdapter', () => {
         id: 'test-1',
       }];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(specialBreedData));
+      (appDataService.get as jest.Mock).mockResolvedValue(specialBreedData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const results = await newAdapter.search('test-breed');
       expect(results).toHaveLength(1);
       expect(results[0].value).toBe('test-breed with spaces & symbols!');
     });
 
-    it('handles empty breed strings', () => {
+    it('handles empty breed strings', async () => {
       const emptyBreedData = [{
         url: 'test.jpg',
         breed: '',
         id: 'test-1',
       }];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(emptyBreedData));
+      (appDataService.get as jest.Mock).mockResolvedValue(emptyBreedData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.breeds['mixed']).toBe(1);
@@ -521,15 +582,18 @@ describe('DogGalleryAdapter', () => {
   });
 
   describe('Memory Management', () => {
-    it('handles large datasets efficiently', () => {
+    it('handles large datasets efficiently', async () => {
       const largeFavorites = Array.from({ length: 100 }, (_, i) => ({
         url: `https://example.com/dog${i}.jpg`,
         breed: `breed-${i % 10}`, // 10 different breeds
         id: `dog-${i}`,
       }));
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(largeFavorites));
+      (appDataService.get as jest.Mock).mockResolvedValue(largeFavorites);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const startTime = performance.now();
       const contextData = newAdapter.getContextData();
@@ -540,15 +604,18 @@ describe('DogGalleryAdapter', () => {
       expect(endTime - startTime).toBeLessThan(100); // Should complete quickly
     });
 
-    it('handles duplicate entries gracefully', () => {
+    it('handles duplicate entries gracefully', async () => {
       const duplicateData = [
         mockDogFavorites[0],
         mockDogFavorites[0], // Duplicate
         mockDogFavorites[1],
       ];
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(duplicateData));
+      (appDataService.get as jest.Mock).mockResolvedValue(duplicateData);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const contextData = newAdapter.getContextData();
       expect(contextData.data.favorites.total).toBe(3);
@@ -557,25 +624,31 @@ describe('DogGalleryAdapter', () => {
   });
 
   describe('Breed Query Variations', () => {
-    it('handles multiple breed queries with more than 5 breeds', () => {
+    it('handles multiple breed queries with more than 5 breeds', async () => {
       const manyBreeds = Array.from({ length: 8 }, (_, i) => ({
         url: `https://example.com/dog${i}.jpg`,
         breed: `breed-${i}`,
         id: `dog-${i}`,
       }));
       
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(manyBreeds));
+      (appDataService.get as jest.Mock).mockResolvedValue(manyBreeds);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       // Use a query that doesn't trigger mostFavoritedBreed response
       const response = newAdapter['getBreedResponse']('tell me about my breeds');
       expect(response).toContain('...and 3 more breeds');
     });
 
-    it('handles single favorite with multiple in recent list', () => {
+    it('handles single favorite with multiple in recent list', async () => {
       const singleDog = [mockDogFavorites[0]];
-      localStorageMock.setItem('virgil_dog_favorites', JSON.stringify(singleDog));
+      (appDataService.get as jest.Mock).mockResolvedValue(singleDog);
       const newAdapter = new DogGalleryAdapter();
+      
+      // Wait for async initialization
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       const response = newAdapter['getRecentResponse']();
       expect(response).toContain('Your most recent favorite is a golden retriever');

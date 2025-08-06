@@ -7,7 +7,7 @@
 
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { TimezoneSearch } from './TimezoneSearch';
-import { useTimezones } from './TimezoneContext';
+import { useTimezones } from './useTimezoneContext';
 import { useTimezoneFormatters } from './useTimezones';
 import styles from './TimezoneWidget.module.css';
 

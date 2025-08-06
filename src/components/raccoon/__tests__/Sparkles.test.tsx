@@ -27,7 +27,7 @@ jest.mock('../raccoonStyles', () => ({
       pointerEvents: 'none',
       zIndex: 10,
     },
-    sparklePosition: (pos: unknown) => ({
+    sparklePosition: (pos: { x: number; y: number }) => ({
       position: 'absolute',
       left: `${pos.x}px`,
       top: `${pos.y}px`,
@@ -47,10 +47,10 @@ describe('Sparkles', () => {
       const container = document?.querySelector('[style*="absolute"]');
       expect(container).toBeInTheDocument();
       
-      // Should render all sparkle emojis
-      expect(screen.getByText('✨')).toBeInTheDocument();
-      expect(screen.getByText('💫')).toBeInTheDocument();
-      expect(screen.getByText('⭐')).toBeInTheDocument();
+      // Should render all sparkle emojis (there may be multiple of each type)
+      expect(screen.getAllByText('✨')).toHaveLength(2); // There are 2 ✨ emojis
+      expect(screen.getAllByText('💫')).toHaveLength(2); // There are 2 💫 emojis  
+      expect(screen.getByText('⭐')).toBeInTheDocument(); // There is 1 ⭐ emoji
     });
 
     it('renders nothing when show is false', () => {
@@ -178,7 +178,7 @@ describe('Sparkles', () => {
       
       // Show sparkles
       rerender(<Sparkles show />);
-      expect(screen.getByText('✨')).toBeInTheDocument();
+      expect(screen.getAllByText('✨').length).toBeGreaterThan(0);
       
       // Hide sparkles again
       rerender(<Sparkles show={false} />);
@@ -190,7 +190,7 @@ describe('Sparkles', () => {
     it('handles boolean show prop correctly', () => {
       // Test true
       const { rerender } = render(<Sparkles show />);
-      expect(screen.getByText('✨')).toBeInTheDocument();
+      expect(screen.getAllByText('✨').length).toBeGreaterThan(0);
       
       // Test false
       rerender(<Sparkles show={false} />);
@@ -199,7 +199,7 @@ describe('Sparkles', () => {
 
     it('handles undefined show prop gracefully', () => {
       // TypeScript would catch this, but test runtime behavior
-      expect(() => render(<Sparkles show={undefined as unknown} />)).not.toThrow();
+      expect(() => render(<Sparkles show={undefined as unknown as boolean} />)).not.toThrow();
     });
   });
 });

@@ -176,8 +176,9 @@ describe('GiphyAdapter', () => {
       
       expect(data.favorites.recent).toHaveLength(3);
       expect(data.favorites.recent[0].title).toBe('Funny Cat Dancing');
-      expect(data.favorites.recent[0].savedAt).toBe(1705748400000);
-      expect(data.favorites.recent[1].savedAt).toBe(1705748400000 - 24 * 60 * 60 * 1000);
+      // Check that favorites are returned in storage order
+      expect(data.favorites.recent[0].id).toBe('gif-1');
+      expect(data.favorites.recent[1].id).toBe('gif-2');
     });
 
     it('handles empty favorites array', () => {

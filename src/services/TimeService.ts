@@ -272,7 +272,12 @@ export class TimeService {
   // ==========================================
 
   private getRelativeTimeUnit(seconds: number): { value: number; unit: string; plural: boolean } {
-    const unit = RELATIVE_TIME_UNITS.find(u => seconds < u.threshold)!;
+    const unit = RELATIVE_TIME_UNITS.find(u => seconds < u.threshold);
+    if (!unit) {
+      // Fallback to years if no unit found (should never happen due to Infinity threshold)
+      const years = Math.floor(seconds / 31536000);
+      return { value: years, unit: 'year', plural: years !== 1 };
+    }
     const value = Math.floor(seconds / unit.divisor);
     return { value, unit: unit.unit, plural: value !== 1 };
   }

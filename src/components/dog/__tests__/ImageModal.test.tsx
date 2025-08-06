@@ -116,7 +116,7 @@ describe('ImageModal', () => {
       render(<ImageModal {...defaultProps} />);
 
       const modal = document?.querySelector('.doggo-image-modal');
-      if (modal) throw new Error('Modal not found');
+      if (!modal) throw new Error('Modal not found');
       await user.click(modal);
 
       expect(defaultProps.onClose).toHaveBeenCalledTimes(1);

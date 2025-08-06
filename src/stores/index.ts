@@ -5,6 +5,8 @@
  * types, and utilities.
  */
 
+import type { ContextStoreWithActions } from './types/store.types';
+
 // ========== Core Store ==========
 export { 
   useContextStore as default,
@@ -43,9 +45,12 @@ export {
 export {
   ContextStoreProvider,
   ContextStoreDebugger,
+} from './ContextStoreProvider';
+
+export {
   useActivityLogger,
   useEnvironmentUtils,
-} from './ContextStoreProvider';
+} from './hooks/useStoreUtils';
 
 // ========== Hooks ==========
 export {
@@ -173,52 +178,52 @@ export {
 export const selectors = {
   // Time selectors
   time: {
-    current: (state: any) => state.time.currentTime,
-    date: (state: any) => state.time.currentDate,
-    timeOfDay: (state: any) => state.time.timeOfDay,
-    dayOfWeek: (state: any) => state.time.dayOfWeek,
-    timestamp: (state: any) => state.time.timestamp,
-    isValid: (state: any) => state.time.isValid,
+    current: (state: ContextStoreWithActions) => state.time.currentTime,
+    date: (state: ContextStoreWithActions) => state.time.currentDate,
+    timeOfDay: (state: ContextStoreWithActions) => state.time.timeOfDay,
+    dayOfWeek: (state: ContextStoreWithActions) => state.time.dayOfWeek,
+    timestamp: (state: ContextStoreWithActions) => state.time.timestamp,
+    isValid: (state: ContextStoreWithActions) => state.time.isValid,
   },
   
   // Location selectors
   location: {
-    coordinates: (state: any) => state.location.coordinates,
-    hasGPS: (state: any) => state.location.hasGPSLocation,
-    city: (state: any) => state.location.address?.city || state.location.ipLocation?.city,
-    loading: (state: any) => state.location.loading,
-    error: (state: any) => state.location.error,
+    coordinates: (state: ContextStoreWithActions) => state.location.coordinates,
+    hasGPS: (state: ContextStoreWithActions) => state.location.hasGPSLocation,
+    city: (state: ContextStoreWithActions) => state.location.address?.city || state.location.ipLocation?.city,
+    loading: (state: ContextStoreWithActions) => state.location.loading,
+    error: (state: ContextStoreWithActions) => state.location.error,
   },
   
   // Weather selectors
   weather: {
-    temperature: (state: any) => state.weather.data?.temperature,
-    condition: (state: any) => state.weather.data?.condition?.main,
-    hasData: (state: any) => state.weather.hasWeather,
-    loading: (state: any) => state.weather.loading,
-    unit: (state: any) => state.weather.unit,
+    temperature: (state: ContextStoreWithActions) => state.weather.data?.temperature,
+    condition: (state: ContextStoreWithActions) => state.weather.data?.condition?.main,
+    hasData: (state: ContextStoreWithActions) => state.weather.hasWeather,
+    loading: (state: ContextStoreWithActions) => state.weather.loading,
+    unit: (state: ContextStoreWithActions) => state.weather.unit,
   },
   
   // User selectors
   user: {
-    isAuthenticated: (state: any) => state.user.isAuthenticated,
-    email: (state: any) => state.user.user?.email,
-    name: (state: any) => state.user.profile?.nickname || state.user.profile?.fullName,
-    loading: (state: any) => state.user.loading,
+    isAuthenticated: (state: ContextStoreWithActions) => state.user.isAuthenticated,
+    email: (state: ContextStoreWithActions) => state.user.user?.email,
+    name: (state: ContextStoreWithActions) => state.user.profile?.nickname || state.user.profile?.fullName,
+    loading: (state: ContextStoreWithActions) => state.user.loading,
   },
   
   // Environment selectors
   environment: {
-    isOnline: (state: any) => state.environment.isOnline,
-    deviceType: (state: any) => state.environment.deviceType,
-    isDarkMode: (state: any) => state.environment.prefersDarkMode,
+    isOnline: (state: ContextStoreWithActions) => state.environment.isOnline,
+    deviceType: (state: ContextStoreWithActions) => state.environment.deviceType,
+    isDarkMode: (state: ContextStoreWithActions) => state.environment.prefersDarkMode,
   },
   
   // Activity selectors
   activity: {
-    recentActions: (state: any) => state.activity.recentActions,
-    activeComponents: (state: any) => state.activity.activeComponents,
-    sessionTime: (state: any) => state.activity.timeSpentInSession,
+    recentActions: (state: ContextStoreWithActions) => state.activity.recentActions,
+    activeComponents: (state: ContextStoreWithActions) => state.activity.activeComponents,
+    sessionTime: (state: ContextStoreWithActions) => state.activity.timeSpentInSession,
   },
 } as const;
 
@@ -233,7 +238,7 @@ export const storeMigration = {
    */
   createMigrationWrapper: <T,>(
     legacyHook: () => T,
-    storeSelector: (state: any) => T,
+    storeSelector: (state: ContextStoreWithActions) => T,
     fallbackToLegacy = true,
   ) => {
     return () => {

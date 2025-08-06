@@ -6,6 +6,7 @@
  */
 
 import { useEffect } from 'react';
+import type React from 'react';
 import { useContextStore } from '../ContextStore';
 
 /**
@@ -56,7 +57,7 @@ export const syncEnvironmentContext = () => {
  * Selective sync for specific environment fields
  * Useful when you only want to update certain fields
  */
-export const useSyncEnvironmentField = (_field: string, dependencies: unknown[]) => {
+export const useSyncEnvironmentField = (_field: string, dependencies: React.DependencyList) => {
   useEffect(() => {
     const unsubscribe = useContextStore.subscribe(
       () => dependencies,
@@ -67,6 +68,7 @@ export const useSyncEnvironmentField = (_field: string, dependencies: unknown[])
     );
 
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
 };
 

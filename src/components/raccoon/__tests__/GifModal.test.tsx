@@ -172,6 +172,7 @@ describe('GifModal', () => {
       render(<GifModal {...defaultProps} show onClose={onClose} />);
       
       const overlay = document?.querySelector('[style*="fixed"]');
+      if (!overlay) throw new Error('Overlay not found');
       await user.click(overlay);
       
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -184,6 +185,7 @@ describe('GifModal', () => {
       render(<GifModal {...defaultProps} show onClose={onClose} />);
       
       const gifContainer = document?.querySelector('[style*="relative"]');
+      if (!gifContainer) throw new Error('Gif container not found');
       await user.click(gifContainer);
       
       expect(onClose).not.toHaveBeenCalled();
@@ -332,7 +334,7 @@ describe('GifModal', () => {
 
     it('handles missing onClose prop gracefully', () => {
       expect(() => 
-        render(<GifModal show onClose={undefined as unknown} />),
+        render(<GifModal show onClose={undefined as unknown as () => void} />),
       ).not.toThrow();
     });
   });

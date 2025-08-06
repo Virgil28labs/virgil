@@ -14,6 +14,7 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
+import type { DateTime } from 'luxon';
 import { useTimezones, useTimezoneFormatters } from '../useTimezones';
 import { getDefaultTimezones, generateTimezoneId, getTimezoneInfo } from '../timezoneData';
 import { dashboardContextService } from '../../../services/DashboardContextService';
@@ -800,7 +801,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatTime(mockDateTimeWithFormat as unknown);
+      const formatted = result.current.formatTime(mockDateTimeWithFormat as unknown as DateTime as DateTime);
       expect(formatted).toBe('12:00');
       expect(mockDateTimeWithFormat.toFormat).toHaveBeenCalledWith('HH:mm');
     });
@@ -816,7 +817,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT as unknown, mockDT as unknown);
+      const formatted = result.current.formatRelativeTime(mockDT as unknown as DateTime, mockDT as unknown as DateTime);
       expect(formatted).toBe('Same time');
       expect(mockDT.diff).toHaveBeenCalledWith(mockDT, 'hours');
     });
@@ -834,7 +835,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown as DateTime, mockDT2 as unknown as DateTime);
       expect(formatted).toBe('3h ahead');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -852,7 +853,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown as DateTime, mockDT2 as unknown as DateTime);
       expect(formatted).toBe('3h behind');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -870,7 +871,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown as DateTime, mockDT2 as unknown as DateTime);
       expect(formatted).toBe('0h ahead'); // Should floor to 0
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });
@@ -888,7 +889,7 @@ describe('useTimezoneFormatters', () => {
       
       const { result } = renderHook(() => useTimezoneFormatters());
       
-      const formatted = result.current.formatRelativeTime(mockDT1 as unknown, mockDT2 as unknown);
+      const formatted = result.current.formatRelativeTime(mockDT1 as unknown as DateTime, mockDT2 as unknown as DateTime);
       expect(formatted).toBe('12h ahead');
       expect(mockDT1.diff).toHaveBeenCalledWith(mockDT2, 'hours');
     });

@@ -105,6 +105,7 @@ class AppDataService {
   async get<T>(key: string): Promise<T | null> {
     // Auto-initialize if not already initialized
     if (!this.initPromise) {
+      logger.info(`AppDataService auto-initializing for key: ${key}`);
       await this.init();
     }
     
@@ -113,6 +114,12 @@ class AppDataService {
     
     try {
       const result = await indexedDBService.get<AppDataItem<T>>(this.DB_NAME, this.STORE_NAME, key);
+      logger.info(`IndexedDB GET ${key}:`, {
+        success: result.success,
+        hasData: !!result.data,
+        dataPreview: result.data ? JSON.stringify(result.data).substring(0, 100) : null,
+      });
+      
       if (result.success && result.data) {
         return result.data.data;
       }
@@ -120,6 +127,7 @@ class AppDataService {
       // If no data in IndexedDB, check localStorage as fallback during migration
       const localData = localStorage.getItem(key);
       if (localData) {
+        logger.info(`Migrating ${key} from localStorage to IndexedDB`);
         try {
           const parsed = JSON.parse(localData);
           // Save to IndexedDB for next time
@@ -132,6 +140,7 @@ class AppDataService {
         }
       }
       
+      logger.info(`No data found for key: ${key}`);
       return null;
     } catch (error) {
       logger.error(`Failed to get app data for key: ${key}`, error as Error, {
@@ -154,6 +163,10 @@ class AppDataService {
       };
       
       const result = await indexedDBService.put(this.DB_NAME, this.STORE_NAME, item);
+      logger.info(`IndexedDB PUT ${key}:`, {
+        success: result.success,
+        dataPreview: JSON.stringify(data).substring(0, 100),
+      });
       return result.success;
     } catch (error) {
       logger.error(`Failed to set app data for key: ${key}`, error as Error, {

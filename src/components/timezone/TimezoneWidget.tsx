@@ -8,7 +8,8 @@
 import React, { memo, useState, useCallback, useRef, useEffect } from 'react';
 import { TimezoneModal } from './TimezoneModal';
 import { PositionedTimezoneHoverPanel } from './TimezoneHoverPanel';
-import { TimezoneProvider, useTimezones } from './TimezoneContext';
+import { TimezoneProvider } from './TimezoneContext';
+import { useTimezones } from './useTimezoneContext';
 import styles from './TimezoneWidget.module.css';
 
 interface TimezoneWidgetProps {

@@ -36,7 +36,7 @@ jest.mock('../Sparkles', () => ({
 }));
 
 jest.mock('../Indicators', () => ({
-  Indicators: ({ isOnWall, isOnUIElement, currentRaccoonEmoji }: unknown) => (
+  Indicators: ({ isOnWall, isOnUIElement, currentRaccoonEmoji }: { isOnWall: boolean; isOnUIElement: boolean; currentRaccoonEmoji: string }) => (
     <div data-testid="indicators">
       {isOnWall && <span data-testid="wall-indicator">🧲</span>}
       {isOnUIElement && <span data-testid="ui-indicator">{currentRaccoonEmoji}</span>}
@@ -87,11 +87,11 @@ describe('RaccoonMascot', () => {
       },
     ];
     
-    jest.spyOn(document, 'querySelectorAll').mockReturnValue(mockElements as unknown);
+    jest.spyOn(document, 'querySelectorAll').mockReturnValue(mockElements as unknown as NodeListOf<Element>);
     jest.spyOn(window, 'getComputedStyle').mockReturnValue({
       textAlign: 'left',
       fontSize: '16px',
-    } as unknown);
+    } as CSSStyleDeclaration);
   });
 
   afterEach(() => {
@@ -149,8 +149,10 @@ describe('RaccoonMascot', () => {
     it('handles click to pick up raccoon', async () => {
       renderComponent();
       const mascotContainer = screen.getByTestId('raccoon-mascot')?.querySelector('div[title*="Click to pick up"]');
+      if (!mascotContainer) throw new Error('Mascot container not found');
       
       await act(async () => {
+        if (!mascotContainer) throw new Error('Mascot container not found'); 
         fireEvent.click(mascotContainer);
       });
 
@@ -166,8 +168,10 @@ describe('RaccoonMascot', () => {
       renderComponent();
       
       const mascotContainer = screen.getByTestId('raccoon-mascot')?.querySelector('div[title*="Click to pick up"]');
+      if (!mascotContainer) throw new Error('Mascot container not found');
       
       await act(async () => {
+        if (!mascotContainer) throw new Error('Mascot container not found'); 
         fireEvent.click(mascotContainer);
       });
 
@@ -190,8 +194,10 @@ describe('RaccoonMascot', () => {
       renderComponent();
       
       const mascotContainer = screen.getByTestId('raccoon-mascot')?.querySelector('div[title*="Click to pick up"]');
+      if (!mascotContainer) throw new Error('Mascot container not found');
       
       await act(async () => {
+        if (!mascotContainer) throw new Error('Mascot container not found'); 
         fireEvent.click(mascotContainer);
       });
 
@@ -342,6 +348,7 @@ describe('RaccoonMascot', () => {
       
       // Pick up raccoon
       await act(async () => {
+        if (!mascotContainer) throw new Error('Mascot container not found'); 
         fireEvent.click(mascotContainer);
       });
 
@@ -489,6 +496,7 @@ describe('RaccoonMascot', () => {
       
       // Open gif modal
       await act(async () => {
+        if (!mascotContainer) throw new Error('Mascot container not found'); 
         fireEvent.click(mascotContainer);
       });
 
@@ -615,7 +623,7 @@ describe('RaccoonMascot', () => {
   describe('Error Boundary Integration', () => {
     it('handles missing DOM elements gracefully', () => {
       // Mock empty querySelectorAll result
-      jest.spyOn(document, 'querySelectorAll').mockReturnValue([] as unknown);
+      jest.spyOn(document, 'querySelectorAll').mockReturnValue([] as NodeListOf<Element>);
       
       expect(() => renderComponent()).not.toThrow();
     });
@@ -636,8 +644,8 @@ describe('RaccoonMascot', () => {
       const originalInnerHeight = window.innerHeight;
       const originalInnerWidth = window.innerWidth;
       
-      delete (window as unknown).innerHeight;
-      delete (window as unknown).innerWidth;
+      delete (window as Record<string, unknown>).innerHeight;
+      delete (window as Record<string, unknown>).innerWidth;
       
       expect(() => renderComponent()).not.toThrow();
       

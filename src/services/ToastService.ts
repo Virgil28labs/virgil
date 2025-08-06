@@ -1,5 +1,6 @@
 import type { Toast } from '../components/ToastNotification';
 import { timeService } from './TimeService';
+import { logger } from '../lib/logger';
 
 type ToastEventListener = (toast: Omit<Toast, 'id'>) => void;
 
@@ -29,7 +30,7 @@ class ToastService {
         listener(toast);
       } catch (error) {
         // Silently ignore listener errors to prevent cascade failures
-        console.error('Toast listener error:', error);
+        logger.error('Toast listener error', { component: 'ToastService', action: 'emit' }, error as Error);
       }
     });
   }

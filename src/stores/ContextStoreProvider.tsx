@@ -226,43 +226,6 @@ export const ContextStoreProvider = ({
   return <>{children}</>;
 };
 
-/**
- * Hook for manually logging activities from components
- */
-export const useActivityLogger = () => {
-  const activityActions = useActivityActions();
-
-  return {
-    logActivity: activityActions.logActivity,
-    logComponentActivity: (component: string, action: string) => {
-      activityActions.logActivity(`${component}_${action}`, component);
-    },
-    logUserAction: (action: string, details?: string) => {
-      const fullAction = details ? `${action}_${details}` : action;
-      activityActions.logActivity(fullAction);
-    },
-  };
-};
-
-/**
- * Hook for environment utilities
- */
-export const useEnvironmentUtils = () => {
-  const environmentState = useContextStore((state) => state.environment);
-  
-  return {
-    isMobile: environmentState.deviceType === 'mobile',
-    isTablet: environmentState.deviceType === 'tablet',
-    isDesktop: environmentState.deviceType === 'desktop',
-    isOnline: environmentState.isOnline,
-    isDarkMode: environmentState.prefersDarkMode,
-    hasGeolocation: environmentState.capabilities.geolocation,
-    hasCamera: environmentState.capabilities.camera,
-    hasNotifications: environmentState.capabilities.notifications,
-    viewportWidth: environmentState.viewport.width,
-    viewportHeight: environmentState.viewport.height,
-  };
-};
 
 /**
  * Component for debugging store state in development

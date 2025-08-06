@@ -6,7 +6,7 @@
  */
 
 import React, { memo, useState, useEffect, useMemo } from 'react';
-import { useTimezones } from './TimezoneContext';
+import { useTimezones } from './useTimezoneContext';
 import { useTimezoneFormatters } from './useTimezones';
 import styles from './TimezoneWidget.module.css';
 

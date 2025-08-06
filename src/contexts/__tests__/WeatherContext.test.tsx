@@ -25,6 +25,10 @@ import { useContext } from 'react';
 import type { WeatherContextType, WeatherData } from '../../types/weather.types';
 import { createMockLocationContextValue } from '../../test-utils/mockTypes';
 
+// Mock timer functions globally
+Object.defineProperty(global, 'setInterval', { value: jest.fn() });
+Object.defineProperty(global, 'clearInterval', { value: jest.fn() });
+
 // Mock dependencies
 jest.mock('../../lib/weatherService', () => ({
   weatherService: {

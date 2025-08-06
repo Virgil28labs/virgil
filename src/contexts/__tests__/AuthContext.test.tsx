@@ -219,7 +219,7 @@ describe('AuthContext', () => {
     it('should update user on auth state change', async () => {
       let authChangeCallback: (event: string, session: unknown) => void;
 
-      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: unknown) => {
+      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: (event: string, session: unknown) => void) => {
         authChangeCallback = callback;
         return { data: { subscription: mockSubscription }, error: null };
       });
@@ -254,7 +254,7 @@ describe('AuthContext', () => {
     it('should handle null session on auth state change', async () => {
       let authChangeCallback: (event: string, session: unknown) => void;
 
-      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: unknown) => {
+      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: (event: string, session: unknown) => void) => {
         authChangeCallback = callback;
         return { data: { subscription: mockSubscription }, error: null };
       });
@@ -282,7 +282,7 @@ describe('AuthContext', () => {
     it('should handle auth state change with session but no user', async () => {
       let authChangeCallback: (event: string, session: unknown) => void;
 
-      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: unknown) => {
+      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: (event: string, session: unknown) => void) => {
         authChangeCallback = callback;
         return { data: { subscription: mockSubscription }, error: null };
       });
@@ -547,7 +547,7 @@ describe('AuthContext', () => {
     it('should update memoized value when user changes', async () => {
       let authChangeCallback: (event: string, session: unknown) => void;
 
-      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: unknown) => {
+      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: (event: string, session: unknown) => void) => {
         authChangeCallback = callback;
         return { data: { subscription: mockSubscription }, error: null };
       });
@@ -593,7 +593,7 @@ describe('AuthContext', () => {
     it('should handle malformed session data', async () => {
       let authChangeCallback: (event: string, session: unknown) => void;
 
-      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: unknown) => {
+      (mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback: (event: string, session: unknown) => void) => {
         authChangeCallback = callback;
         return { data: { subscription: mockSubscription }, error: null };
       });

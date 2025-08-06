@@ -91,7 +91,7 @@ export const StorageAnalyzer: React.FC = () => {
         for (const dbInfo of databases) {
           try {
             const db = await new Promise<IDBDatabase>((resolve, reject) => {
-              const request = indexedDB.open(dbInfo.name);
+              const request = indexedDB.open(dbInfo.name || 'unknown');
               request.onsuccess = () => resolve(request.result);
               request.onerror = () => reject(request.error);
             });
@@ -112,7 +112,7 @@ export const StorageAnalyzer: React.FC = () => {
             }
             
             db.close();
-            dbInfos.push({ name: dbInfo.name, stores });
+            dbInfos.push({ name: dbInfo.name || 'unknown', stores });
           } catch (e) {
             console.error(`Error opening database ${dbInfo.name}:`, e);
           }
@@ -161,7 +161,7 @@ export const StorageAnalyzer: React.FC = () => {
             const count = Array.isArray(data) ? data.length : 0;
             preview = `${count} GIFs`;
           } else if (key === 'virgil_habits') {
-            const habits = (data as any).habits?.length || 0;
+            const habits = (data as { habits?: unknown[] }).habits?.length || 0;
             preview = `${habits} habits`;
           } else if (key === 'rhythmMachineSaveSlots') {
             const patterns = Array.isArray(data) ? data.filter(Boolean).length : 0;
@@ -187,13 +187,6 @@ export const StorageAnalyzer: React.FC = () => {
     }
   };
 
-  const _formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   const getStoragePercentage = (): number => {
     // localStorage typically has a 5-10MB limit
