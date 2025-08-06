@@ -44,7 +44,7 @@ export const mockWeatherContextValue = {
     windSpeed: 10,
     icon: '01d',
     location: 'New York, NY',
-    lastUpdated: timeService.toISOString(),
+    lastUpdated: timeService.toISOString(new Date()),
   },
   weatherLoading: false,
   weatherError: null,

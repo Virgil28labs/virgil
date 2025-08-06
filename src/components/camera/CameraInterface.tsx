@@ -1,28 +1,10 @@
-import React, { useEffect, useState, useCallback, memo, forwardRef } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Camera } from 'react-camera-pro';
 import type { CameraControlsProps } from '../../types/camera.types';
 import { useCamera } from './hooks/useCamera';
 import styles from './Camera.module.css';
 
-// Wrapper component to filter out invalid props for react-camera-pro
-const CameraWrapper = forwardRef<any, any>((props, ref) => {
-  // Filter out props that shouldn't be passed to the DOM
-  const { aspectRatio, mirrored, facingMode, numberOfCamerasCallback, errorMessages, ...validProps } = props;
-  
-  // Pass the camera-specific props directly to Camera component
-  return (
-    <Camera
-      ref={ref}
-      aspectRatio={aspectRatio}
-      mirrored={mirrored}
-      facingMode={facingMode}
-      numberOfCamerasCallback={numberOfCamerasCallback}
-      errorMessages={errorMessages}
-      {...validProps}
-    />
-  );
-});
-CameraWrapper.displayName = 'CameraWrapper';
+// Removed CameraWrapper - using Camera directly
 
 interface CameraInterfaceProps {
   onPhotoCapture: (dataUrl: string) => Promise<void>
@@ -264,7 +246,7 @@ export const CameraInterface = memo(function CameraInterface({
   return (
     <div className={`camera-interface active ${className}`}>
       <div className="camera-viewport">
-        <CameraWrapper
+        <Camera
           ref={cameraRef}
           facingMode={cameraState.facingMode}
           aspectRatio="cover"

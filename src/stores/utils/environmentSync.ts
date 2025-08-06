@@ -15,6 +15,8 @@ import { useContextStore } from '../ContextStore';
  */
 export const useEnvironmentSync = () => {
   useEffect(() => {
+    let isUpdating = false; // Prevent recursive updates
+    
     const unsubscribe = useContextStore.subscribe(
       (state) => [
         // Location dependencies
@@ -31,9 +33,21 @@ export const useEnvironmentSync = () => {
         state.device.ip,
       ],
       () => {
-        // Automatically update environment context when dependencies change
-        const store = useContextStore.getState();
-        store.user.updateEnvironmentContext();
+        // Prevent infinite loop by checking if we're already updating
+        if (isUpdating) return;
+        
+        isUpdating = true;
+        
+        try {
+          // Automatically update environment context when dependencies change
+          const store = useContextStore.getState();
+          store.user.updateEnvironmentContext();
+        } finally {
+          // Reset flag after update completes
+          setTimeout(() => {
+            isUpdating = false;
+          }, 0);
+        }
       },
     );
 

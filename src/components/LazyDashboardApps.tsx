@@ -17,47 +17,47 @@ const moduleImports = {
 export const LazyDashboardApps = {
   // Notes App - prefetched as commonly used
   NotesApp: lazy(() =>
-    moduleImports.NotesApp().then(module => ({ default: module.NotesApp }))
+    moduleImports.NotesApp().then(module => ({ default: module.NotesApp })),
   ),
   
   // Camera App
   CameraApp: lazy(() =>
-    moduleImports.CameraApp().then(module => ({ default: module.CameraApp }))
+    moduleImports.CameraApp().then(module => ({ default: module.CameraApp })),
   ),
   
   // NASA APOD Viewer
   NasaApodViewer: lazy(() =>
-    moduleImports.NasaApodViewer().then(module => ({ default: module.NasaApodViewer }))
+    moduleImports.NasaApodViewer().then(module => ({ default: module.NasaApodViewer })),
   ),
   
   // Habit Tracker - prefetched as commonly used
   MinimalHabitTracker: lazy(() =>
-    moduleImports.MinimalHabitTracker().then(module => ({ default: module.MinimalHabitTracker }))
+    moduleImports.MinimalHabitTracker().then(module => ({ default: module.MinimalHabitTracker })),
   ),
   
   // Giphy Gallery
   GiphyGallery: lazy(() =>
-    moduleImports.GiphyGallery().then(module => ({ default: module.GiphyGallery }))
+    moduleImports.GiphyGallery().then(module => ({ default: module.GiphyGallery })),
   ),
   
   // Dog Gallery  
   DogGallery: lazy(() =>
-    moduleImports.DogGallery().then(module => ({ default: module.DogGallery }))
+    moduleImports.DogGallery().then(module => ({ default: module.DogGallery })),
   ),
   
   // Rhythm Machine
   RhythmMachineViewer: lazy(() =>
-    moduleImports.RhythmMachineViewer().then(module => ({ default: module.RhythmMachineViewer }))
+    moduleImports.RhythmMachineViewer().then(module => ({ default: module.RhythmMachineViewer })),
   ),
   
   // Perfect Circle Game
   DrawPerfectCircle: lazy(() =>
-    moduleImports.DrawPerfectCircle().then(module => ({ default: module.DrawPerfectCircle }))
+    moduleImports.DrawPerfectCircle().then(module => ({ default: module.DrawPerfectCircle })),
   ),
   
   // Vector Memory
   VectorMemory: lazy(() =>
-    moduleImports.VectorMemory().then(module => ({ default: module.VectorMemory }))
+    moduleImports.VectorMemory().then(module => ({ default: module.VectorMemory })),
   ),
 };
 

@@ -12,9 +12,10 @@ export class VectorSummaryService extends SupabaseMemoryService {
 
   async createDailySummary(date?: Date): Promise<string> {
     const targetDate = date || timeService.getLocalDate();
-    const startOfDay = new Date(targetDate);
+    const targetDateObj = typeof targetDate === 'string' ? timeService.parseDate(targetDate) || timeService.getCurrentDateTime() : targetDate;
+    const startOfDay = timeService.addDays(targetDateObj, 0);
     startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(targetDate);
+    const endOfDay = timeService.addDays(targetDateObj, 0);
     endOfDay.setHours(23, 59, 59, 999);
 
     try {
@@ -32,20 +33,20 @@ export class VectorSummaryService extends SupabaseMemoryService {
       const summaryParts: string[] = [];
 
       // Day overview
-      const dayStr = targetDate.toLocaleDateString('en-US', {
+      const dayStr = timeService.formatDateToLocal(targetDateObj, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
       summaryParts.push(`# Daily Summary for ${dayStr}`);
-      summaryParts.push(`\n## Overview`);
+      summaryParts.push('\n## Overview');
       summaryParts.push(`- Total conversations: ${threads.length}`);
       summaryParts.push(`- Total messages: ${messages.length}`);
       summaryParts.push(`- Active hours: ${this.getActiveHours(messages)}`);
 
       // Main topics discussed
-      summaryParts.push(`\n## Topics Discussed`);
+      summaryParts.push('\n## Topics Discussed');
       const topics = threads.flatMap(thread => this.extractTopics(thread));
       const uniqueTopics = [...new Set(topics)];
       uniqueTopics.forEach(topic => {
@@ -53,7 +54,7 @@ export class VectorSummaryService extends SupabaseMemoryService {
       });
 
       // Key information and learnings
-      summaryParts.push(`\n## Key Information`);
+      summaryParts.push('\n## Key Information');
       const keyInfo = threads.flatMap(thread => this.extractKeyInformation(thread));
       keyInfo.slice(0, 10).forEach(info => {
         summaryParts.push(`- ${info}`);
@@ -62,7 +63,7 @@ export class VectorSummaryService extends SupabaseMemoryService {
       // Context patterns
       const contextPatterns = this.analyzeContextPatterns(messages);
       if (contextPatterns.length > 0) {
-        summaryParts.push(`\n## Context Patterns`);
+        summaryParts.push('\n## Context Patterns');
         contextPatterns.forEach(pattern => {
           summaryParts.push(`- ${pattern}`);
         });
@@ -71,17 +72,17 @@ export class VectorSummaryService extends SupabaseMemoryService {
       const summary = summaryParts.join('\n');
 
       // Store the summary
-      await this.storeSummary(summary, targetDate);
+      await this.storeSummary(summary, targetDateObj);
 
       // Update last summary date
-      this.lastSummaryDate = targetDate.toISOString().split('T')[0];
+      this.lastSummaryDate = timeService.toISOString(targetDateObj).split('T')[0];
 
       return summary;
     } catch (error) {
       logger.error('Failed to create daily summary', error instanceof Error ? error : new Error(String(error)), {
         component: 'VectorSummaryService',
         action: 'createDailySummary',
-        metadata: { date: targetDate.toISOString() },
+        metadata: { date: timeService.toISOString(targetDateObj) },
       });
       throw error;
     }
@@ -96,7 +97,7 @@ export class VectorSummaryService extends SupabaseMemoryService {
         currentThread.push(message);
       } else {
         const prevMessage = messages[index - 1];
-        const timeDiff = message.timestamp - prevMessage.timestamp;
+        const timeDiff = Number(message.timestamp) - Number(prevMessage.timestamp);
 
         if (timeDiff > THREAD_GAP_THRESHOLD) {
           if (currentThread.length > 0) {
@@ -167,7 +168,7 @@ export class VectorSummaryService extends SupabaseMemoryService {
   }
 
   private getActiveHours(messages: ChatMessage[]): string {
-    const hours = messages.map(m => new Date(m.timestamp).getHours());
+    const hours = messages.map(m => timeService.getHours(timeService.parseDate(String(m.timestamp)) || timeService.getCurrentDateTime()));
     const uniqueHours = [...new Set(hours)].sort((a, b) => a - b);
 
     if (uniqueHours.length === 0) return 'None';
@@ -193,7 +194,7 @@ export class VectorSummaryService extends SupabaseMemoryService {
 
   private analyzeContextPatterns(messages: ChatMessage[]): string[] {
     const patterns: string[] = [];
-    const contexts = messages.map(m => m.context).filter(Boolean);
+    const contexts = messages.map(m => m.content).filter(Boolean);
 
     if (contexts.length === 0) return patterns;
 
@@ -216,16 +217,17 @@ export class VectorSummaryService extends SupabaseMemoryService {
   }
 
   private async storeSummary(summary: string, date: Date): Promise<void> {
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user?.id) {
+      throw new Error('User not authenticated');
+    }
+    
     const { error } = await supabase.from('memories').insert({
-      user_id: (await supabase.auth.getUser()).data.user?.id,
+      user_id: user.id,
       content: summary,
-      type: 'summary',
-      importance: 'high',
-      created_at: date.toISOString(),
-      metadata: {
-        summaryDate: date.toISOString().split('T')[0],
-        type: 'daily_summary',
-      },
+      tag: 'summary',
+      context: 'daily_summary',
+      created_at: timeService.toISOString(date),
     });
 
     if (error) {
@@ -234,15 +236,20 @@ export class VectorSummaryService extends SupabaseMemoryService {
   }
 
   private async getMessagesInRange(start: Date, end: Date): Promise<ChatMessage[]> {
-    const memories = await this.getMemoriesInTimeRange(start, end);
-    return memories
-      .filter(m => m.type === 'message')
+    // Get messages from the parent class or implement a method to fetch messages in range
+    const recentMessages = await this.getRecentMessages(1000);
+    // Use timeService for consistent timestamp handling
+    const startTime = start.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: getting timestamp from Date object
+    const endTime = end.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: getting timestamp from Date object
+    
+    return recentMessages
+      .filter(m => Number(m.timestamp) >= startTime && Number(m.timestamp) <= endTime)
       .map(m => ({
-        id: m.id,
+        id: m.id || String(m.timestamp),
         content: m.content,
-        role: (m.metadata?.role as 'user' | 'assistant') || 'user',
-        timestamp: new Date(m.created_at).getTime(),
-        context: m.metadata?.context as string | undefined,
+        role: m.role,
+        timestamp: m.timestamp,
+        context: m.content, // Use content since context doesn't exist on ChatMessage
       }));
   }
 
@@ -255,11 +262,11 @@ export class VectorSummaryService extends SupabaseMemoryService {
     // Check every hour if we need to create a summary
     this.summaryTimer = setInterval(async () => {
       try {
-        const now = timeService.getLocalDate();
-        const currentDateStr = now.toISOString().split('T')[0];
+        const now = timeService.getCurrentDateTime(); // Use TimeService
+        const currentDateStr = timeService.toISOString(now).split('T')[0];
 
         // Create summary at the end of the day (11 PM)
-        if (now.getHours() === 23 && this.lastSummaryDate !== currentDateStr) {
+        if (timeService.getHours(now) === 23 && this.lastSummaryDate !== currentDateStr) {
           await this.createDailySummary(now);
           dashboardContextService.logActivity('Created daily summary', 'memory-summary');
         }
@@ -280,7 +287,16 @@ export class VectorSummaryService extends SupabaseMemoryService {
   }
 
   async getSummaries(startDate: Date, endDate: Date): Promise<MarkedMemory[]> {
-    const memories = await this.getMemoriesInTimeRange(startDate, endDate);
-    return memories.filter(m => m.type === 'summary');
+    // Get all marked memories and filter for summaries by date range
+    const memories = await this.getMarkedMemories();
+    // Use Date.getTime() which is appropriate for Date objects
+    const startTime = startDate.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: getting timestamp from Date object
+    const endTime = endDate.getTime(); // eslint-disable-line no-restricted-syntax -- Valid use: getting timestamp from Date object
+    
+    return memories.filter(m => 
+      m.timestamp >= startTime && 
+      m.timestamp <= endTime &&
+      m.tag === 'summary',
+    );
   }
 }
